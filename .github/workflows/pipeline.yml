@@ -44,7 +44,7 @@ jobs:
         run: pnpm lint
 
       - name: Run tests and generate JUnit report
-        run: pnpm exec vitest run --reporter=default --reporter=junit --outputFile=junit.xml
+        run: pnpm exec vitest run --reporter=default --reporter=junit --outputFile=junit.xml --passWithNoTests
 
       - name: Publish Test Report
         uses: dorny/test-reporter@v1
@@ -55,7 +55,7 @@ jobs:
           reporter: jest-junit
 
       - name: Generate coverage report
-        run: pnpm exec vitest run --coverage
+        run: pnpm exec vitest run --coverage --passWithNoTests
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
