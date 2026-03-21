@@ -1,0 +1,7 @@
+services:
+  frontend:
+    container_name: highfive_frontend
+    restart: unless-stopped
+    build: .
+    ports:
+      - "8080:8080"
