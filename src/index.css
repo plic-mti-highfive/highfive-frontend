@@ -79,9 +79,9 @@
 
 @theme inline {
     /* ── Typographie ── */
-    --font-display: 'Fraunces', serif;
-    --font-heading: 'Lora', serif;
-    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-display: 'Fraunces Variable', serif;
+    --font-heading: 'Lora Variable', serif;
+    --font-sans: 'Plus Jakarta Sans Variable', sans-serif;
 
     /* ── Tailles de texte ── */
     --text-display-xl: 52px;
