@@ -9,8 +9,8 @@ export default function Home() {
       <div className="space-y-4 text-center">
         <h1 className="text-4xl font-bold">Hello</h1>
         <p className="text-muted-foreground">(avec Tailwind CSS)</p>
-        <Button size="lg" onClick={() => navigate('/canvas')}>
-          Ouvrir le canvas
+        <Button size="lg" onClick={() => navigate('/debug')}>
+          Ouvrir la palette
         </Button>
       </div>
     </div>
