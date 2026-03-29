@@ -195,7 +195,7 @@ function ShadcnTokensSection() {
         {SHADCN_TOKENS.map(({ token, usage }) => (
           <div key={token} className="flex items-center gap-3 bg-cream-dark rounded-md px-3 py-2.5">
             <div
-              className="w-8 h-8 rounded flex-shrink-0 border border-cream-mid"
+              className="w-8 h-8 rounded shrink-0 border border-cream-mid"
               style={{ background: `var(${token})` }}
             />
             <div className="min-w-0">
@@ -235,7 +235,7 @@ function TypographySection() {
       <div className="space-y-1 divide-y divide-cream-mid">
         {TYPE_SIZES.map((t) => (
           <div key={t.token} className="flex items-baseline gap-4 py-3">
-            <div className="w-48 flex-shrink-0 space-y-0.5">
+            <div className="w-48 shrink-0 space-y-0.5">
               <Chip>text-{t.token}</Chip>
               <p className="text-[10px] text-ink-muted font-sans mt-1">
                 {t.size} / {t.lh} lh · ls {t.ls} · fw {t.fw}
@@ -268,10 +268,10 @@ function SpacingSection() {
       <div className="space-y-3">
         {SPACINGS.map(({ token, value }) => (
           <div key={token} className="flex items-center gap-4">
-            <div className="w-36 flex-shrink-0 flex items-center gap-2">
+            <div className="w-36 shrink-0 flex items-center gap-2">
               <Chip>{token}</Chip>
             </div>
-            <span className="text-[11px] font-mono text-ink-muted w-10 flex-shrink-0">{value}</span>
+            <span className="text-[11px] font-mono text-ink-muted w-10 shrink-0">{value}</span>
             <div className="flex items-center">
               <div
                 className="bg-rose h-5 rounded-sm"
