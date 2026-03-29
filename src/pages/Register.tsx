@@ -20,6 +20,7 @@ export default function Register() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     localStorage.setItem('authenticated', 'true')
+    localStorage.setItem('username', username || 'Utilisateur')
     navigate('/')
   }
 
