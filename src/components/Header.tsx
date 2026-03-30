@@ -1,12 +1,10 @@
-import { Search, Bell, User, FolderOpen, MessageSquare, Settings, LogOut } from 'lucide-react'
+import { Bell, User, FolderOpen, MessageSquare, Settings, LogOut } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Menu } from '@base-ui/react/menu'
 
 import Logo from '@/components/Logo'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 
-// ─── Styles partagés ─────────────────────────────────────────────────────────
 
 const popupCls =
   'bg-cream border border-cream-mid rounded-xl shadow-lg py-1.5 min-w-56 z-50 origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
@@ -16,7 +14,14 @@ const itemCls =
 
 const separatorCls = 'border-t border-cream-mid my-1.5 mx-2'
 
-// ─── Menu notifications ───────────────────────────────────────────────────────
+
+const NAV_LINKS = [
+  { label: "What's New",    path: '/whats-new'      },
+  { label: 'Projects',      path: '/projects'       },
+  { label: 'Make A Project',path: '/create-project' },
+  { label: 'Conversations', path: '/messages'       },
+]
+
 
 function NotificationsMenu() {
   return (
@@ -40,8 +45,6 @@ function NotificationsMenu() {
   )
 }
 
-// ─── Menu utilisateur ─────────────────────────────────────────────────────────
-
 type UserMenuProps = {
   username: string
   initials: string
@@ -62,7 +65,6 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
         <Menu.Positioner side="bottom" align="end" sideOffset={8}>
           <Menu.Popup className={popupCls}>
 
-            {/* Infos compte */}
             <div className="flex items-center gap-3 px-3 py-2.5 mb-0.5">
               <div className="w-10 h-10 rounded-full bg-rose-light text-rose-dark text-ui-md font-bold flex items-center justify-center shrink-0">
                 {initials}
@@ -112,16 +114,12 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 export default function Header() {
-  const navigate  = useNavigate()
-  useLocation() // re-lit localStorage à chaque navigation
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const isAuthenticated = localStorage.getItem('authenticated') === 'true'
   const username        = localStorage.getItem('username') ?? 'Utilisateur'
   const initials        = username.slice(0, 2).toUpperCase()
-
-  function handleCreateProject() {
-    navigate(isAuthenticated ? '/create-project' : '/login')
-  }
 
   function handleLogout() {
     localStorage.removeItem('authenticated')
@@ -130,34 +128,37 @@ export default function Header() {
   }
 
   return (
-    <header className="w-full bg-cream border-b border-cream-mid px-6 h-16 flex items-center gap-4">
+    <header className="w-full bg-cream border-b border-cream-mid px-6 h-16 flex items-center gap-6">
 
       {/* Logo */}
       <div className="shrink-0">
         <Logo className="text-xl" />
       </div>
 
-      {/* Barre de recherche */}
-      <div className="flex-1 flex justify-center px-4">
-        <div className="relative w-full max-w-3xl">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none" />
-          <Input
-            type="search"
-            placeholder="Rechercher..."
-            className="pl-10 h-9 bg-cream-dark border-cream-mid placeholder:text-ink-muted text-body-md focus-visible:border-ink focus-visible:ring-ink/20"
-          />
-        </div>
-      </div>
+      {/* Navigation centrale */}
+      <nav className="flex-1 flex items-center justify-center gap-1">
+        {NAV_LINKS.map(({ label, path }) => {
+          const active = location.pathname === path
+          return (
+            <button
+              key={path}
+              onClick={() => navigate(path)}
+              className={`
+                px-4 py-2 rounded-lg text-body-md transition-colors outline-none
+                ${active
+                  ? 'text-ink font-semibold bg-cream-dark'
+                  : 'text-ink-muted hover:text-ink hover:bg-cream-dark'
+                }
+              `}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </nav>
 
-      {/* Actions */}
-      <div className="shrink-0 flex items-center gap-3">
-        <Button
-          className="h-9 px-4 text-ui-md text-cream border-0"
-          onClick={handleCreateProject}
-        >
-          Créer un projet
-        </Button>
-
+      {/* Actions droite */}
+      <div className="shrink-0 flex items-center gap-2">
         {isAuthenticated ? (
           <>
             <NotificationsMenu />
