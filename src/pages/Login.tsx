@@ -47,7 +47,7 @@ export default function Login() {
 
         {/* Logo */}
         <div className="flex pt-4 w-full max-w-md justify-center">
-          <Logo className="text-3xl" />
+          <Logo className="text-3xl" textColor="text-ink" />
         </div>
 
         {/* Formulaire centré verticalement */}
