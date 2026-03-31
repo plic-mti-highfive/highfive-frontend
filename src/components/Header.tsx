@@ -77,7 +77,7 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
 
             <div className={separatorCls} />
 
-            <Menu.Item className={itemCls} onClick={() => navigate('/profile')}>
+            <Menu.Item className={itemCls} onClick={() => navigate(`/user/${username}`)}>
               <User size={16} className="text-ink-muted shrink-0" />
               Mon profil
             </Menu.Item>
