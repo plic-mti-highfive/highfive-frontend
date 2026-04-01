@@ -14,18 +14,20 @@ interface TagSearchDropdownProps {
   selected: string[]
   onChange: (tags: string[]) => void
   maxTags?: number
+  tags?: string[]
 }
 
 export function TagSearchDropdown({
   selected,
   onChange,
   maxTags = 8,
+  tags = ALL_TAGS,
 }: TagSearchDropdownProps) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const filtered = ALL_TAGS.filter(t =>
+  const filtered = tags.filter(t =>
     t.toLowerCase().includes(query.toLowerCase())
   )
 
