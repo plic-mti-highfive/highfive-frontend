@@ -11,7 +11,7 @@ export function ProgressDots({ step }: { step: Step }) {
           i <= idx ? 'bg-gray-900 w-8' : 'bg-gray-300 w-4'
         }`} />
       ))}
-      <span className="text-xs text-gray-400 ml-1">{idx + 1} / {MANUAL_STEPS.length}</span>
+      <span className="text-xs text-ink ml-1">{idx + 1} / {MANUAL_STEPS.length}</span>
     </div>
   )
 }

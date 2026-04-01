@@ -11,11 +11,11 @@ export function StepDone({ projectName }: { projectName: string }) {
       </div>
 
       <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Projet créé</p>
-        <h2 className="text-4xl font-black text-gray-900 leading-tight">
+        <p className="text-xs font-bold uppercase tracking-widest text-ink mb-2">Projet créé</p>
+        <h2 className="text-4xl font-black text-ink leading-tight">
           {projectName || 'Ton projet'} est en ligne !
         </h2>
-        <p className="mt-3 text-sm text-gray-500 max-w-xs mx-auto">
+        <p className="mt-3 text-sm text-ink max-w-xs mx-auto">
           La communauté peut maintenant le découvrir et y contribuer.
         </p>
       </div>
@@ -29,7 +29,7 @@ export function StepDone({ projectName }: { projectName: string }) {
         </button>
         <button
           onClick={() => navigate('/')}
-          className="w-full py-3 rounded-2xl text-gray-500 text-sm hover:text-gray-800 transition-colors"
+          className="w-full py-3 rounded-2xl text-ink text-sm hover:text-ink transition-colors"
         >
           Retour à l'accueil
         </button>

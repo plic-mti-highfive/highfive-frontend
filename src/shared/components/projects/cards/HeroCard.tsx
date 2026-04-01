@@ -27,15 +27,15 @@ export function HeroCard({ project }: { project: Project }) {
 
       <div className="space-y-3 px-0.5">
         <AuthorChip author={project.author} />
-        <h2 className="text-2xl font-black text-gray-900 leading-tight tracking-tight">{project.name}</h2>
-        <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{project.description}</p>
+        <h2 className="text-2xl font-black text-ink leading-tight tracking-tight">{project.name}</h2>
+        <p className="text-sm text-ink leading-relaxed line-clamp-2">{project.description}</p>
         <ProgressBar value={project.successRate} />
         <div className="flex items-center gap-3">
-          <span className={`text-sm font-bold ${project.successRate >= 100 ? 'text-emerald-600' : 'text-gray-800'}`}>
+          <span className={`text-sm font-bold ${project.successRate >= 100 ? 'text-emerald-600' : 'text-ink'}`}>
             {project.successRate}%
           </span>
-          <span className="text-xs text-gray-300">·</span>
-          <span className="text-xs text-gray-500">{project.contributorsCount} contributeurs</span>
+          <span className="text-xs text-ink">·</span>
+          <span className="text-xs text-ink">{project.contributorsCount} contributeurs</span>
         </div>
         <div className="flex items-center justify-between pt-1">
           <div className="flex gap-1.5 flex-wrap">

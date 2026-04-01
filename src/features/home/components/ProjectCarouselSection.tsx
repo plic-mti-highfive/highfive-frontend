@@ -27,8 +27,8 @@ export function ProjectCarouselSection({ title, subtitle, projects, cardSide, au
         cardSide === 'right' ? 'items-start text-left' : 'items-end text-right'
       }`}
     >
-      <h2 className="text-4xl font-black text-gray-900 leading-tight mb-3">{title}</h2>
-      <p className="text-sm text-gray-500">{subtitle}</p>
+      <h2 className="text-4xl font-black text-ink leading-tight mb-3">{title}</h2>
+      <p className="text-sm text-ink">{subtitle}</p>
     </div>
   )
 

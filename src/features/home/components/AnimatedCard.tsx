@@ -26,8 +26,8 @@ export function AnimatedCard({
       `}
       style={{ minHeight: '9rem' }}
     >
-      <h3 className="font-bold text-xl mb-3 text-gray-900">{project.name}</h3>
-      <p className="text-sm text-gray-500 leading-relaxed">{project.description}</p>
+      <h3 className="font-bold text-xl mb-3 text-ink">{project.name}</h3>
+      <p className="text-sm text-ink leading-relaxed">{project.description}</p>
     </div>
   )
 }

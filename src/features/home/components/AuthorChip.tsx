@@ -11,7 +11,7 @@ export function AuthorChip({ author }: { author: string }) {
       >
         {initials}
       </div>
-      <span className="text-xs text-gray-400 font-medium">@{author}</span>
+      <span className="text-xs text-ink font-medium">@{author}</span>
     </div>
   )
 }

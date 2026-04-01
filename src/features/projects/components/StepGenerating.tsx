@@ -25,7 +25,7 @@ export function StepGenerating() {
       </div>
 
       <div className="space-y-1">
-        <p className="text-lg font-black text-gray-900">Génération en cours…</p>
+        <p className="text-lg font-black text-ink">Génération en cours…</p>
         <p className="text-sm text-[var(--color-rose-dark)] font-medium min-h-[1.25rem] transition-all duration-300">
           {LINES[lineIdx]}
         </p>

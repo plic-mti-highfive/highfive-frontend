@@ -10,8 +10,7 @@ export function FeaturedLayout({ hero, picks }: FeaturedLayoutProps) {
   return (
     <section className="mb-6 pb-16">
       <div className="mb-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400 mb-1">Mis en avant</p>
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Projet de la semaine</h2>
+        <h2 className="text-2xl font-black text-ink tracking-tight">Projet de la semaine</h2>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.85fr] gap-10 items-start">
         <HeroCard project={hero} />
