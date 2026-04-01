@@ -1,5 +1,5 @@
 import type { Project } from '@shared/types'
-import { AnimatedCard } from './AnimatedCard'
+import { AnimatedCard } from '@shared/components/projects'
 import { CarouselDots } from './CarouselDots'
 import { ArrowButton } from './ArrowButton'
 import { useCarousel } from '../hooks/useCarousel'

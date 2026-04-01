@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { TAG_COLORS } from '../utils/tagColors'
+import { TAG_COLORS } from '@shared/components/projects'
 
 const NAV_TAGS = [
   'Web', 'IA / ML', 'Open Source',
@@ -26,9 +26,16 @@ export function TagNavBar() {
   }, [lastScrollY])
 
   return (
-    <div className={`sticky top-14 z-0 bg-ink-soft border-b border-ink-muted transition-all duration-300 overflow-hidden ${
-      isVisible ? 'max-h-16' : 'max-h-0'
-    }`}>
+    <div
+      className={`fixed left-0 right-0 z-10 bg-ink-soft border-b border-ink-muted`}
+      style={{
+        top: '3.5rem',
+        height: '2.75rem',
+        transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
+        transition: 'transform 500ms cubic-bezier(0.4, 0, 0.2, 1)',
+        overflow: 'hidden'
+      }}
+    >
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-center gap-1 scrollbar-none py-1">
           {NAV_TAGS.map((tag) => {
@@ -42,7 +49,7 @@ export function TagNavBar() {
                   navigate(`/search?tag=${encodeURIComponent(tag)}`)
                 }}
                 className={`
-                  relative px-3.5 py-2 rounded-full text-[12px] font-semibold transition-all duration-150 whitespace-nowrap shrink-0
+                  relative px-3.5 py-2 rounded-full text-[14px] font-bold transition-all duration-150 whitespace-nowrap shrink-0
                   ${isActive
                     ? `${colors} ring-1 ring-current/20`
                     : 'text-white hover:text-white hover:bg-white/10'

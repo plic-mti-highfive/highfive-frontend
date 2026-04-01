@@ -69,16 +69,3 @@ export function EmptyState({ icon, title, description }: EmptyStateProps) {
   )
 }
 
-interface ProjectCardProps {
-  name: string
-  description: string
-}
-
-export function ProjectCard({ name, description }: ProjectCardProps) {
-  return (
-    <div className="bg-cream border border-cream-mid rounded-xl p-4 hover:border-ink-muted/50 transition-colors cursor-pointer">
-      <h4 className="font-semibold text-ink mb-2">{name}</h4>
-      <p className="text-body-sm text-ink-muted line-clamp-2">{description}</p>
-    </div>
-  )
-}

@@ -37,15 +37,15 @@ export const mockUsers: Record<string, User> = {
     },
     projects: {
       created: [
-        { id: '1', name: 'PixelForge', description: 'Éditeur graphique collaboratif en temps réel, open source et orienté pixel art et design UI.' },
-        { id: '2', name: 'DesignUI Kit', description: 'Composants React réutilisables pour créer des interfaces magnifiques et accessibles.' },
+        { id: '1', name: 'PixelForge', description: 'Éditeur graphique collaboratif en temps réel, open source et orienté pixel art et design UI.', tags: ['Open Source', 'Design', 'Web'], author: 'johndoe', contributorsCount: 24, successRate: 87, daysLeft: null },
+        { id: '2', name: 'DesignUI Kit', description: 'Composants React réutilisables pour créer des interfaces magnifiques et accessibles.', tags: ['Web', 'Design UI/UX', 'React'], author: 'johndoe', contributorsCount: 18, successRate: 95, daysLeft: 12 },
       ],
       collaborations: [
-        { id: '3', name: 'EcoTrack', description: 'Une plateforme collaborative pour suivre et réduire son empreinte carbone au quotidien.' },
+        { id: '3', name: 'EcoTrack', description: 'Une plateforme collaborative pour suivre et réduire son empreinte carbone au quotidien.', tags: ['Environnement', 'Web', 'Social'], author: 'alex', contributorsCount: 31, successRate: 72, daysLeft: 5 },
       ],
       liked: [
-        { id: '4', name: 'OpenLibrary', description: 'Un projet open source pour numériser et partager des livres rares.' },
-        { id: '5', name: 'MeshCity', description: 'Réseau mesh décentralisé pour connecter les quartiers sans FAI traditionnel.' },
+        { id: '4', name: 'OpenLibrary', description: 'Un projet open source pour numériser et partager des livres rares.', tags: ['Open Source', 'Data'], author: 'sam', contributorsCount: 45, successRate: 100, daysLeft: null },
+        { id: '5', name: 'MeshCity', description: 'Réseau mesh décentralisé pour connecter les quartiers sans FAI traditionnel.', tags: ['Hardware', 'Open Source', 'Social'], author: 'mike', contributorsCount: 12, successRate: 45, daysLeft: 8 },
       ],
     },
     followers: [
@@ -73,15 +73,15 @@ export const mockUsers: Record<string, User> = {
     },
     projects: {
       created: [
-        { id: '6', name: 'DataCommons', description: 'Entrepôt de datasets publics annotés par la communauté pour entraîner des modèles ML éthiques.' },
-        { id: '7', name: 'HealthMesh', description: 'Réseau de partage de données médicales anonymisées pour la recherche sur les maladies rares.' },
+        { id: '6', name: 'DataCommons', description: 'Entrepôt de datasets publics annotés par la communauté pour entraîner des modèles ML éthiques.', tags: ['Data', 'IA / ML', 'Open Source'], author: 'janedoe', contributorsCount: 67, successRate: 92, daysLeft: null },
+        { id: '7', name: 'HealthMesh', description: 'Réseau de partage de données médicales anonymisées pour la recherche sur les maladies rares.', tags: ['Data', 'Environnement', 'Social'], author: 'janedoe', contributorsCount: 22, successRate: 78, daysLeft: 15 },
       ],
       collaborations: [
-        { id: '8', name: 'CodeMentor', description: 'Plateforme de mentorat technique peer-to-peer pour débutants en programmation.' },
-        { id: '9', name: 'SoundWeave', description: 'Plateforme de composition musicale collaborative où chaque utilisateur peut contribuer une piste.' },
+        { id: '8', name: 'CodeMentor', description: 'Plateforme de mentorat technique peer-to-peer pour débutants en programmation.', tags: ['Éducation', 'Web', 'Open Source'], author: 'chris', contributorsCount: 43, successRate: 85, daysLeft: 3 },
+        { id: '9', name: 'SoundWeave', description: 'Plateforme de composition musicale collaborative où chaque utilisateur peut contribuer une piste.', tags: ['Art', 'Web'], author: 'alex', contributorsCount: 19, successRate: 68, daysLeft: 20 },
       ],
       liked: [
-        { id: '10', name: 'MicroGrid', description: 'Logiciel de gestion d\'énergie pour micro-réseaux solaires dans les zones rurales.' },
+        { id: '10', name: 'MicroGrid', description: 'Logiciel de gestion d\'énergie pour micro-réseaux solaires dans les zones rurales.', tags: ['Hardware', 'Environnement', 'Open Source'], author: 'david', contributorsCount: 15, successRate: 55, daysLeft: 7 },
       ],
     },
     followers: [
@@ -109,12 +109,12 @@ export const mockUsers: Record<string, User> = {
     },
     projects: {
       created: [
-        { id: '11', name: 'ArtFlow', description: 'Plateforme d\'art numérique collaborative pour les illustrateurs et designers.' },
+        { id: '11', name: 'ArtFlow', description: 'Plateforme d\'art numérique collaborative pour les illustrateurs et designers.', tags: ['Art', 'Design UI/UX', 'Web'], author: 'alexsmith', contributorsCount: 28, successRate: 81, daysLeft: 10 },
       ],
       collaborations: [],
       liked: [
-        { id: '12', name: 'PixelForge', description: 'Éditeur graphique collaboratif en temps réel, open source et orienté pixel art.' },
-        { id: '13', name: 'DesignUI Kit', description: 'Composants React réutilisables pour créer des interfaces magnifiques.' },
+        { id: '12', name: 'PixelForge', description: 'Éditeur graphique collaboratif en temps réel, open source et orienté pixel art.', tags: ['Design', 'Open Source', 'Web'], author: 'johndoe', contributorsCount: 24, successRate: 87, daysLeft: null },
+        { id: '13', name: 'DesignUI Kit', description: 'Composants React réutilisables pour créer des interfaces magnifiques.', tags: ['Web', 'Design UI/UX', 'React'], author: 'johndoe', contributorsCount: 18, successRate: 95, daysLeft: 12 },
       ],
     },
     followers: [
@@ -140,15 +140,15 @@ export const mockUsers: Record<string, User> = {
     },
     projects: {
       created: [
-        { id: '14', name: 'MLHub', description: 'Plateforme centralisée pour partager, collaborer et déployer des modèles de machine learning.' },
-        { id: '15', name: 'DataVisualizer', description: 'Outil interactif pour visualiser des datasets complexes en 3D et en temps réel.' },
-        { id: '16', name: 'AIEthics', description: 'Projet éducatif sur l\'éthique de l\'IA et les biais dans les modèles de machine learning.' },
+        { id: '14', name: 'MLHub', description: 'Plateforme centralisée pour partager, collaborer et déployer des modèles de machine learning.', tags: ['IA / ML', 'Data', 'Web'], author: 'mariedurand', contributorsCount: 89, successRate: 94, daysLeft: null },
+        { id: '15', name: 'DataVisualizer', description: 'Outil interactif pour visualiser des datasets complexes en 3D et en temps réel.', tags: ['Data', 'Web', 'IA / ML'], author: 'mariedurand', contributorsCount: 34, successRate: 88, daysLeft: 25 },
+        { id: '16', name: 'AIEthics', description: 'Projet éducatif sur l\'éthique de l\'IA et les biais dans les modèles de machine learning.', tags: ['Éducation', 'IA / ML', 'Open Source'], author: 'mariedurand', contributorsCount: 45, successRate: 91, daysLeft: 6 },
       ],
       collaborations: [
-        { id: '17', name: 'DataCommons', description: 'Entrepôt de datasets publics annotés par la communauté.' },
+        { id: '17', name: 'DataCommons', description: 'Entrepôt de datasets publics annotés par la communauté.', tags: ['Data', 'Open Source'], author: 'janedoe', contributorsCount: 67, successRate: 92, daysLeft: null },
       ],
       liked: [
-        { id: '18', name: 'OpenLibrary', description: 'Un projet open source pour numériser et partager des livres rares.' },
+        { id: '18', name: 'OpenLibrary', description: 'Un projet open source pour numériser et partager des livres rares.', tags: ['Open Source', 'Data', 'Éducation'], author: 'sam', contributorsCount: 45, successRate: 100, daysLeft: null },
       ],
     },
     followers: [

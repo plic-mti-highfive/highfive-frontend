@@ -3,11 +3,12 @@ import { useParams } from 'react-router-dom'
 import { MessageSquare, UserPlus, PackageOpen } from 'lucide-react'
 import { Header } from '@features/layout'
 import { Footer } from '@features/layout'
+import { SmallCard } from '@shared/components/projects'
 import { UserNotFound } from '../components/UserNotFound'
 import { UserActionsMenu } from '../components/UserActionsMenu'
 import { EditProfileModal } from '../components/EditProfileModal'
 import { Button } from '@shared/components/ui/button'
-import { ProfileTabs, EmptyState, ProjectCard } from '../components/ProfileTabs'
+import { ProfileTabs, EmptyState } from '../components/ProfileTabs'
 import { createProjectsTabs } from '../utils/profileTabsUtils'
 import { ProjectFiltersBar } from '../../projects/components/ProjectFilters'
 import { UsersListDialog } from '../components/UsersListDialog'
@@ -216,12 +217,11 @@ export default function UserProfile() {
                     user.projects.created.length > 0 ? (
                       <div>
                         <ProjectFiltersBar />
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
                           {user.projects.created.map((project) => (
-                            <ProjectCard
+                            <SmallCard
                               key={project.id}
-                              name={project.name}
-                              description={project.description}
+                              project={project}
                             />
                           ))}
                         </div>
@@ -241,12 +241,11 @@ export default function UserProfile() {
                     user.projects.collaborations.length > 0 ? (
                       <div>
                         <ProjectFiltersBar />
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
                           {user.projects.collaborations.map((project) => (
-                            <ProjectCard
+                            <SmallCard
                               key={project.id}
-                              name={project.name}
-                              description={project.description}
+                              project={project}
                             />
                           ))}
                         </div>
@@ -266,12 +265,11 @@ export default function UserProfile() {
                     user.projects.liked.length > 0 ? (
                       <div>
                         <ProjectFiltersBar />
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
                           {user.projects.liked.map((project) => (
-                            <ProjectCard
+                            <SmallCard
                               key={project.id}
-                              name={project.name}
-                              description={project.description}
+                              project={project}
                             />
                           ))}
                         </div>

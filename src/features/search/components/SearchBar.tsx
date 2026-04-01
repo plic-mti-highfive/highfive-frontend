@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { useState } from 'react'
 import { SearchResultsDropdown } from './SearchResultsDropdown'
 
@@ -19,12 +19,22 @@ export function SearchBar({ navigate }: SearchBarProps) {
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher des projets, utilisateurs..."
           className="
-            w-full rounded-lg border border-cream-mid bg-white pl-10 pr-6 py-2.5
+            w-full rounded-lg border border-cream-mid bg-white pl-10 pr-10 py-2.5
             text-body-md text-ink placeholder-ink-muted
             focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent
             transition-all shadow-sm
           "
         />
+
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-dark hover:text-ink transition-colors z-10"
+            aria-label="Effacer la recherche"
+          >
+            <X size={20} />
+          </button>
+        )}
 
         {/* Dropdown results */}
         {searchQuery.length > 0 && (

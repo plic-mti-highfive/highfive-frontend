@@ -12,14 +12,15 @@ export default function HomePage() {
     <>
       <Header />
       <TagNavBar />
-      <main className="min-h-screen bg-[#f0ebe3]">
+      <div className="bg-[var(--color-cream)]" style={{ height: '2.75rem' }} />
+      <main className="relative z-0 min-h-screen bg-[var(--color-cream)]">
         <div className="max-w-7xl mx-auto px-6 pt-10">
           <FeaturedLayout hero={FEATURED} picks={RECOMMENDED.slice(0, 4)} />
-          <Section label="Rien que pour toi" title="Recommandés" projects={RECOMMENDED} />
-          <Section label="En ce moment" title="Projets tendance" projects={TRENDING} />
-          <Section label="Dernière chance" title="Se terminent bientôt" projects={ENDING_SOON} cols={3} />
-          <Section label="Objectif atteint" title="Projets qui ont réussi" projects={SUCCESSFUL} />
-          <Section label="Fraîchement lancés" title="Projets récents" projects={RECENT} />
+          <Section title="Recommandés" projects={RECOMMENDED} />
+          <Section title="Projets tendance" projects={TRENDING} />
+          <Section title="Se terminent bientôt" projects={ENDING_SOON} cols={3} />
+          <Section title="Projets qui ont réussi" projects={SUCCESSFUL} />
+          <Section title="Projets récents" projects={RECENT} />
           <div className="pb-20" />
         </div>
       </main>

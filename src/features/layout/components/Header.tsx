@@ -112,11 +112,11 @@ export default function Header() {
   const { isAuthenticated, username, initials, logout } = useAuth()
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-ink-soft border-b border-ink-muted px-8 h-14 flex items-center gap-8">
+    <header className="sticky top-0 z-[9999] w-full bg-ink-soft border-b border-ink-muted px-8 h-14 flex items-center gap-8">
 
         {/* Logo */}
         <div className="shrink-0">
-          <Logo className="text-2xl" />
+          <Logo className="text-2xl" textColor="text-white" />
         </div>
 
         {/* Barre de recherche centrée absolument */}
@@ -134,7 +134,7 @@ export default function Header() {
               className="flex items-center gap-1.5 bg-transparent text-white hover:bg-rose-light/20 border border-transparent hover:border-cream"
             >
               <Plus className="w-5 h-5" />
-              <span className="text-body-md font-semibold">Créer un projet</span>
+              <span className="text-body-md font-bold">Créer un projet</span>
             </Button>
             <NotificationsMenu />
             <UserMenu

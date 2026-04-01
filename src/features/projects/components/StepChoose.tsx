@@ -11,7 +11,7 @@ export function StepChoose({ onChoose }: { onChoose: (m: Mode) => void }) {
       </div>
 
       <button type="button" onClick={() => onChoose('ai')}
-        className="w-full text-left bg-[#c0392b] hover:bg-[#a93226] active:scale-[0.99] text-white rounded-2xl px-7 py-6 transition-all duration-200 shadow-sm group flex items-center justify-between">
+        className="w-full text-left bg-[var(--color-rose-dark)] hover:bg-[var(--color-rose-deeper)] active:scale-[0.99] text-white rounded-2xl px-7 py-6 transition-all duration-200 shadow-sm group flex items-center justify-between">
         <div>
           <p className="font-bold text-lg mb-1">✦ Avec l'IA</p>
           <p className="text-sm text-red-200 leading-relaxed max-w-xs">

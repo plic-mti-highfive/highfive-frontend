@@ -51,7 +51,7 @@ export default function CreateProject() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[#f0ebe3] flex items-start justify-center px-6 py-16">
+      <main className="min-h-screen bg-[var(--color-cream)] flex items-start justify-center px-6 py-16">
         <div className="w-full max-w-lg">
           <StepWrapper visible={visible}>
             {step === 'choose'        && <StepChoose    onChoose={m => m === 'ai' ? handleChooseAI() : handleChooseManual()} />}

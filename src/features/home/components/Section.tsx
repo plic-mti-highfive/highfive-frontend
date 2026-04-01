@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import type { Project } from '@shared/types'
-import { SmallCard } from './SmallCard'
+import { SmallCard } from '@shared/components/projects'
 
 interface SectionProps {
   label: string
@@ -19,7 +19,7 @@ export function Section({ label, title, projects, cols = 4 }: SectionProps) {
     : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
 
   return (
-    <section className="py-14 border-t border-[#ddd5c8]/60">
+    <section className="py-14 border-t border-[var(--color-cream-mid)]/60">
       <div className="flex items-end justify-between mb-8">
         <div className="space-y-1">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">{label}</p>
