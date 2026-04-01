@@ -1,4 +1,4 @@
-import { Bell, User, FolderOpen, MessageSquare, Settings, LogOut, Plus, Search, Folder, Users, Tag, Zap } from 'lucide-react'
+import { Bell, User, FolderOpen, MessageSquare, Settings, LogOut, Plus, Search } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Menu } from '@base-ui/react/menu'
 import { useState } from 'react'
@@ -82,33 +82,51 @@ function SearchResultsDropdown({ query, navigate }: SearchResultsDropdownProps) 
   ]
   const filteredTags = mockTags.filter(t => t.name.toLowerCase().includes(queryLower)).slice(0, 3)
 
-  const mockAdvanced = [
-    { name: 'Mes favoris', icon: '⭐' },
-    { name: 'Projets archivés', icon: '📦' },
-    { name: 'Activité récente', icon: '🔥' },
+  const mockProgress = [
+    {
+      id: '1',
+      title: 'Refactoring de la page login',
+      projectName: 'Highfive Frontend',
+      description: 'Amélioration de la structure et simplification du code de connexion...',
+    },
+    {
+      id: '2',
+      title: 'Implémentation du dark mode',
+      projectName: 'Design System',
+      description: 'Ajout complet du support du thème sombre dans tous les composants...',
+    },
+    {
+      id: '3',
+      title: 'Optimisation des performances',
+      projectName: 'API Backend',
+      description: 'Réduction du temps de réponse des requêtes critiques...',
+    },
   ]
 
+  const filteredProgress = mockProgress
+    .filter(p => p.title.toLowerCase().includes(queryLower) || p.projectName.toLowerCase().includes(queryLower))
+    .slice(0, 3)
+
+  const resultItemCls = 'flex items-center gap-3 w-full px-3 py-2 text-body-md text-ink cursor-pointer hover:bg-cream-dark outline-none select-none transition-colors text-left'
+
   return (
-    <div className="max-h-96 overflow-y-auto">
+    <div className="py-1.5">
       {/* Projets Section */}
       {filteredProjects.length > 0 && (
         <>
-          <div className={sectionTitleCls}>
-            <Folder className="w-3.5 h-3.5 inline mr-1" />
-            Projets
-          </div>
+          <div className={sectionTitleCls}>Projets</div>
           {filteredProjects.map((project) => (
-            <Menu.Item
+            <button
               key={project.id}
-              className={itemCls}
+              className={resultItemCls}
               onClick={() => navigate(`/project/${project.id}`)}
+              type="button"
             >
-              <Folder size={16} className="text-ink-muted shrink-0" />
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-body-md text-ink truncate font-medium">{project.name}</p>
                 <p className="text-body-sm text-ink-muted truncate">{project.description}</p>
               </div>
-            </Menu.Item>
+            </button>
           ))}
           <div className={separatorCls} />
         </>
@@ -117,15 +135,13 @@ function SearchResultsDropdown({ query, navigate }: SearchResultsDropdownProps) 
       {/* Utilisateurs Section */}
       {filteredUsers.length > 0 && (
         <>
-          <div className={sectionTitleCls}>
-            <Users className="w-3.5 h-3.5 inline mr-1" />
-            Utilisateurs
-          </div>
+          <div className={sectionTitleCls}>Utilisateurs</div>
           {filteredUsers.map((user) => (
-            <Menu.Item
+            <button
               key={user.username}
-              className={itemCls}
+              className={resultItemCls}
               onClick={() => navigate(`/user/${user.username}`)}
+              type="button"
             >
               <img
                 src={user.avatar}
@@ -136,7 +152,7 @@ function SearchResultsDropdown({ query, navigate }: SearchResultsDropdownProps) 
                 <p className="text-body-md text-ink truncate font-medium">{user.displayName}</p>
                 <p className="text-body-sm text-ink-muted truncate">@{user.username}</p>
               </div>
-            </Menu.Item>
+            </button>
           ))}
           <div className={separatorCls} />
         </>
@@ -145,44 +161,45 @@ function SearchResultsDropdown({ query, navigate }: SearchResultsDropdownProps) 
       {/* Tags Section */}
       {filteredTags.length > 0 && (
         <>
-          <div className={sectionTitleCls}>
-            <Tag className="w-3.5 h-3.5 inline mr-1" />
-            Tags
-          </div>
+          <div className={sectionTitleCls}>Tags</div>
           {filteredTags.map((tag) => (
-            <Menu.Item
+            <button
               key={tag.name}
-              className={itemCls}
+              className={resultItemCls}
               onClick={() => navigate(`/tag/${tag.name.toLowerCase()}`)}
+              type="button"
             >
-              <Tag size={16} className="text-ink-muted shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-body-md text-ink truncate font-medium">{tag.name}</p>
               </div>
               <span className="text-body-sm text-ink-muted shrink-0">({tag.count})</span>
-            </Menu.Item>
+            </button>
           ))}
           <div className={separatorCls} />
         </>
       )}
 
-      {/* Avancées Section */}
-      <div className={sectionTitleCls}>
-        <Zap className="w-3.5 h-3.5 inline mr-1" />
-        Avancées
-      </div>
-      {mockAdvanced.map((item) => (
-        <Menu.Item
-          key={item.name}
-          className={itemCls}
-          onClick={() => console.log(`Navigate to ${item.name}`)}
-        >
-          <span className="text-base">{item.icon}</span>
-          <p className="text-body-md text-ink font-medium">{item.name}</p>
-        </Menu.Item>
-      ))}
+      {/* Progrès Section */}
+      {filteredProgress.length > 0 && (
+        <>
+          <div className={sectionTitleCls}>Progrès</div>
+          {filteredProgress.map((progress) => (
+            <button
+              key={progress.id}
+              className="flex flex-col gap-1 w-full px-3 py-2.5 text-ink cursor-pointer hover:bg-cream-dark outline-none select-none transition-colors"
+              onClick={() => console.log(`Navigate to progress ${progress.id}`)}
+              type="button"
+            >
+              <p className="text-body-md font-medium text-ink text-left">{progress.title}</p>
+              <p className="text-body-sm text-ink-muted text-left">{progress.projectName}</p>
+              <p className="text-body-sm text-ink-muted text-left line-clamp-2">{progress.description}</p>
+            </button>
+          ))}
+          <div className={separatorCls} />
+        </>
+      )}
 
-      {filteredProjects.length === 0 && filteredUsers.length === 0 && filteredTags.length === 0 && (
+      {filteredProjects.length === 0 && filteredUsers.length === 0 && filteredTags.length === 0 && filteredProgress.length === 0 && (
         <div className="px-4 py-8 text-center">
           <p className="text-body-md text-ink-muted">Aucun résultat trouvé pour "{query}"</p>
         </div>
@@ -267,7 +284,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-ink-soft border-b border-ink-muted px-8 h-16 flex items-center gap-8">
+    <header className="sticky top-0 z-50 w-full bg-ink-soft border-b border-ink-muted px-8 h-14 flex items-center gap-8">
 
         {/* Logo */}
         <div className="shrink-0">
@@ -275,41 +292,29 @@ export default function Header() {
         </div>
 
         {/* Barre de recherche centrée absolument */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
-          <Menu.Root open={searchQuery.length > 0}>
-            <div className="relative w-96">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-dark pointer-events-none" />
-              <Menu.Trigger
-                className="w-full"
-                onKeyDown={(e) => {
-                  // Prevent default Menu behavior for text input
-                  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') {
-                    e.stopPropagation()
-                  }
-                }}
-              >
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Rechercher des projets, utilisateurs..."
-                  className="
-                    w-full rounded-lg border border-cream-mid bg-white pl-10 pr-6 py-2.5
-                    text-body-md text-ink placeholder-ink-muted
-                    focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent
-                    transition-all shadow-sm cursor-text
-                  "
-                />
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner side="bottom" align="center" sideOffset={4}>
-                  <Menu.Popup className={popupCls}>
-                    <SearchResultsDropdown query={searchQuery} navigate={navigate} />
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </div>
-          </Menu.Root>
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-96">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-dark pointer-events-none z-10" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher des projets, utilisateurs..."
+              className="
+                w-full rounded-lg border border-cream-mid bg-white pl-10 pr-6 py-2.5
+                text-body-md text-ink placeholder-ink-muted
+                focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent
+                transition-all shadow-sm
+              "
+            />
+
+            {/* Dropdown results */}
+            {searchQuery.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-cream border border-cream-mid rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
+                <SearchResultsDropdown query={searchQuery} navigate={navigate} />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Actions droite */}

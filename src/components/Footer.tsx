@@ -13,14 +13,11 @@ export default function Footer() {
     <footer className="w-full bg-ink-soft border-t border-ink-muted">
 
       {/* Corps */}
-      <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-8">
+      <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-8">
 
         {/* Marque */}
         <div className="flex flex-col gap-2 shrink-0">
           <Logo className="text-xl" textColor="text-white" />
-          <p className="text-body-md text-white leading-relaxed max-w-xs">
-            La plateforme de gestion de projets créatifs pour les équipes ambitieuses.
-          </p>
         </div>
 
         {/* Liens - Ligne unique */}
