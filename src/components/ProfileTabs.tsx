@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Folder, Users, Heart } from 'lucide-react'
 
 interface Tab {
   id: string
@@ -82,32 +81,4 @@ export function ProjectCard({ name, description }: ProjectCardProps) {
       <p className="text-body-sm text-ink-muted line-clamp-2">{description}</p>
     </div>
   )
-}
-
-// Helper for creating tabs with common icons
-export function createProjectsTabs(params: {
-  createdProjects?: React.ReactNode
-  collaborations?: React.ReactNode
-  likedProjects?: React.ReactNode
-}) {
-  return [
-    {
-      id: 'created',
-      label: 'Créés',
-      icon: <Folder className="w-4 h-4" />,
-      content: params.createdProjects,
-    },
-    {
-      id: 'collaborations',
-      label: 'Collaborations',
-      icon: <Users className="w-4 h-4" />,
-      content: params.collaborations,
-    },
-    {
-      id: 'liked',
-      label: 'High Fives',
-      icon: <Heart className="w-4 h-4" />,
-      content: params.likedProjects,
-    },
-  ]
 }

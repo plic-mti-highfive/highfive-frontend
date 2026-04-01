@@ -120,7 +120,6 @@ function AnimatedCard({
   direction: Direction
 }) {
   const exitX   = direction === 'right' ? '-translate-x-6' : 'translate-x-6'
-  const enterX  = direction === 'right' ? 'translate-x-6'  : '-translate-x-6'
 
   return (
     <div
