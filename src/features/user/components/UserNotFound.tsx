@@ -6,7 +6,7 @@ export function UserNotFound() {
   const navigate = useNavigate()
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-cream px-4">
       <div className="flex flex-col items-center gap-6 max-w-md text-center">
         <div className="w-24 h-24 rounded-full bg-rose-light flex items-center justify-center">
           <UserX className="w-12 h-12 text-rose-dark" />
@@ -29,6 +29,6 @@ export function UserNotFound() {
           Retour à l'accueil
         </Button>
       </div>
-    </div>
+    </main>
   )
 }

@@ -31,7 +31,7 @@ export default function LoginPage() {
       return
     }
 
-    login(email, remember)
+    login('Utilisateur', remember)
     navigate('/')
   }
 
