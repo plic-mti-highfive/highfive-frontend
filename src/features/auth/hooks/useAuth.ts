@@ -1,18 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [username, setUsername] = useState('Utilisateur')
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Initialize from localStorage
-  useEffect(() => {
-    const auth = localStorage.getItem('authenticated') === 'true'
-    const user = localStorage.getItem('username') ?? 'Utilisateur'
-    setIsAuthenticated(auth)
-    setUsername(user)
-    setIsLoading(false)
-  }, [])
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => localStorage.getItem('authenticated') === 'true'
+  )
+  const [username, setUsername] = useState(
+    () => localStorage.getItem('username') ?? 'Utilisateur'
+  )
+  const isLoading = false
 
   const login = (user: string, rememberMe?: boolean) => {
     localStorage.setItem('authenticated', 'true')
