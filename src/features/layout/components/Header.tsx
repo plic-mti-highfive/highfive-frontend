@@ -9,7 +9,7 @@ import { useAuth } from '@features/auth'
 
 
 const popupCls =
-  'bg-cream border border-cream-mid rounded-xl shadow-lg py-1.5 w-[600px] z-50 origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
+  'bg-cream border border-cream-mid rounded-xl shadow-lg py-1.5 w-80 z-[999] origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
 
 const itemCls =
   'flex items-center gap-3 w-full px-3 py-2 text-body-md text-ink rounded-lg cursor-pointer hover:bg-cream-dark outline-none select-none transition-colors'
@@ -131,10 +131,10 @@ export default function Header() {
             <Button
               onClick={() => navigate('/create-project')}
               size="sm"
-              className="flex items-center gap-2 bg-transparent text-white hover:bg-rose-light/20 border border-transparent hover:border-cream"
+              className="flex items-center gap-1.5 bg-transparent text-white hover:bg-rose-light/20 border border-transparent hover:border-cream"
             >
-              <Plus className="w-6 h-6" />
-              <span className="text-heading-md font-semibold">Créer un projet</span>
+              <Plus className="w-5 h-5" />
+              <span className="text-body-md font-semibold">Créer un projet</span>
             </Button>
             <NotificationsMenu />
             <UserMenu
