@@ -26,9 +26,10 @@ type PatternType = 'circles' | 'triangles' | 'grid' | 'waves' | 'hexagons' | 'do
 export function generateSVGPattern(id: number | string, width = 400, height = 280): string {
   const seed = typeof id === 'string' ? id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) : id
   const rand = seededRand(seed * 137)
-  const palette = PALETTE_SETS[seed % PALETTE_SETS.length]
+  const paletteIndex = Math.abs(seed) % PALETTE_SETS.length
+  const palette = PALETTE_SETS[paletteIndex]
   const patternTypes: PatternType[] = ['circles', 'triangles', 'grid', 'waves', 'hexagons', 'dots']
-  const patternType = patternTypes[seed % patternTypes.length]
+  const patternType = patternTypes[Math.abs(seed) % patternTypes.length]
 
   const r = rand
   let shapes = ''

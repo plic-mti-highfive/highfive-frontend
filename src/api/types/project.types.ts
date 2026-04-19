@@ -92,3 +92,26 @@ export interface PaginatedResponse<T> {
   limit: number
   totalPages: number
 }
+
+export interface ProjectMessageDto {
+  id: string
+  projectId: string
+  authorId: string
+  tenantId: string
+  content: string
+  attachmentPath: string | null
+  createdAt: string
+  author?: {
+    id: string
+    email: string
+    profile?: {
+      bio: string | null
+      avatarPath: string | null
+    }
+  }
+}
+
+export interface CreateProjectMessageDto {
+  content: string
+  attachmentPath?: string
+}

@@ -19,7 +19,7 @@ export function ProfileTabs({ tabs }: ProfileTabsProps) {
   return (
     <div className="space-y-4">
       {/* Tab buttons */}
-      <div className="flex gap-0 border-b border-ink-muted/20">
+      <div className="flex gap-0 border-b border-border">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -28,8 +28,8 @@ export function ProfileTabs({ tabs }: ProfileTabsProps) {
               flex-1 flex items-center justify-center gap-3 px-6 py-5 text-heading-md font-semibold
               transition-colors border-b-4 outline-none
               ${activeTab === tab.id
-                ? 'text-ink border-b-ink'
-                : 'text-ink-muted border-b-transparent hover:text-ink'
+                ? 'text-foreground border-b-foreground'
+                : 'text-muted-foreground border-b-transparent hover:text-foreground'
               }
             `}
           >
@@ -56,13 +56,13 @@ interface EmptyStateProps {
 export function EmptyState({ icon, title, description }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="w-16 h-16 rounded-full bg-ink-muted/10 flex items-center justify-center mb-4">
+      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
         {icon}
       </div>
-      <h3 className="text-lg font-heading font-semibold text-ink mb-2">
+      <h3 className="text-lg font-heading font-semibold text-foreground mb-2">
         {title}
       </h3>
-      <p className="text-body-md text-ink-muted max-w-sm">
+      <p className="text-body-md text-muted-foreground max-w-sm">
         {description}
       </p>
     </div>
