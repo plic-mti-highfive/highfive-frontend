@@ -23,6 +23,7 @@ export function useHomeProjects() {
     const fetchProjects = async () => {
       try {
         setIsLoading(true)
+        setError(null)
         const response = await projectService.getProjects({
           status: ProjectStatus.ACTIVE,
           limit: 50, // Charger plus de projets pour avoir assez pour toutes les catégories
@@ -31,7 +32,19 @@ export function useHomeProjects() {
         const adaptedProjects = response.data.map(adaptProjectDto)
         setProjects(adaptedProjects)
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch projects'))
+        console.error('Failed to fetch projects:', err)
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : 'Erreur inconnue lors du chargement des projets'
+
+        // Ajouter plus de contexte à l'erreur
+        const enhancedError = new Error(errorMessage)
+        enhancedError.stack = err instanceof Error ? err.stack : undefined
+        setError(enhancedError)
+
+        // En cas d'erreur, garder les projets vides plutôt que de crasher
+        setProjects([])
       } finally {
         setIsLoading(false)
       }
