@@ -3,17 +3,6 @@ type Palette = { name: string; swatches: Swatch[] }
 
 const PALETTES: Palette[] = [
   {
-    name: 'Base neutre',
-    swatches: [
-      { token: 'cream',     hex: '#F6F1E9' },
-      { token: 'cream-dark',hex: '#EDE5D4' },
-      { token: 'cream-mid', hex: '#E4DAC8' },
-      { token: 'ink',       hex: '#18160F', textDark: true },
-      { token: 'ink-soft',  hex: '#3A3729', textDark: true },
-      { token: 'ink-muted', hex: '#918C82', textDark: true },
-    ],
-  },
-  {
     name: 'Rose',
     swatches: [
       { token: 'rose',        hex: '#FF4D8C', textDark: true },
@@ -128,17 +117,17 @@ const RADII = [
 ]
 
 const BORDERS = [
-  { token: 'border-thin',     value: '0.5px', style: '0.5px solid #18160F' },
-  { token: 'border (default)','value': '1px', style: '1px solid #18160F' },
-  { token: 'border-accent',   value: '1.5px', style: '1.5px solid #18160F' },
-  { token: 'border-featured', value: '2px',   style: '2px solid #18160F' },
+  { token: 'border-thin',     value: '0.5px', style: '0.5px solid #0A0A0A' },
+  { token: 'border (default)','value': '1px', style: '1px solid #0A0A0A' },
+  { token: 'border-accent',   value: '1.5px', style: '1.5px solid #0A0A0A' },
+  { token: 'border-featured', value: '2px',   style: '2px solid #0A0A0A' },
 ]
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="font-sans text-ui-sm text-ink-muted uppercase tracking-[0.14em] mb-6 pt-12 pb-2 border-b border-cream-mid">
+    <h2 className="font-sans text-ui-sm text-muted-foreground uppercase tracking-[0.14em] mb-6 pt-12 pb-2 border-b border-border">
       {children}
     </h2>
   )
@@ -146,7 +135,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <code className="text-[11px] font-mono bg-cream-mid text-ink-soft px-1.5 py-0.5 rounded">
+    <code className="text-[11px] font-mono bg-muted text-foreground px-1.5 py-0.5 rounded">
       {children}
     </code>
   )
@@ -161,22 +150,22 @@ function ColorSection() {
       <div className="space-y-8">
         {PALETTES.map((palette) => (
           <div key={palette.name}>
-            <p className="text-body-sm text-ink-muted mb-3 font-sans font-semibold">{palette.name}</p>
+            <p className="text-body-sm text-muted-foreground mb-3 font-sans font-semibold">{palette.name}</p>
             <div className="flex flex-wrap gap-3">
               {palette.swatches.map((swatch) => (
                 <div key={swatch.token} className="w-36">
                   <div
-                    className="h-16 w-full rounded-md border border-cream-mid flex items-end p-2"
+                    className="h-16 w-full rounded-md border border-border flex items-end p-2"
                     style={{ backgroundColor: swatch.hex }}
                   >
                     <span
                       className="text-[10px] font-mono font-semibold leading-none"
-                      style={{ color: swatch.textDark ? '#F6F1E9' : '#18160F' }}
+                      style={{ color: swatch.textDark ? '#FCFCFC' : '#0A0A0A' }}
                     >
                       {swatch.hex}
                     </span>
                   </div>
-                  <p className="text-[11px] font-mono text-ink-soft mt-1.5">{swatch.token}</p>
+                  <p className="text-[11px] font-mono text-foreground mt-1.5">{swatch.token}</p>
                 </div>
               ))}
             </div>
@@ -193,14 +182,14 @@ function ShadcnTokensSection() {
       <SectionTitle>Tokens shadcn (semantic)</SectionTitle>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {SHADCN_TOKENS.map(({ token, usage }) => (
-          <div key={token} className="flex items-center gap-3 bg-cream-dark rounded-md px-3 py-2.5">
+          <div key={token} className="flex items-center gap-3 bg-card rounded-md px-3 py-2.5 border border-border">
             <div
-              className="w-8 h-8 rounded shrink-0 border border-cream-mid"
+              className="w-8 h-8 rounded shrink-0 border border-border"
               style={{ background: `var(${token})` }}
             />
             <div className="min-w-0">
-              <p className="text-[11px] font-mono text-ink truncate">{token}</p>
-              <p className="text-[10px] text-ink-muted">{usage}</p>
+              <p className="text-[11px] font-mono text-foreground truncate">{token}</p>
+              <p className="text-[10px] text-muted-foreground">{usage}</p>
             </div>
           </div>
         ))}
@@ -221,10 +210,10 @@ function TypographySection() {
           { name: 'font-heading', label: 'Heading', family: 'Lora', weights: '700', sample: 'The quick brown fox' },
           { name: 'font-sans',   label: 'Sans / UI', family: 'Plus Jakarta Sans', weights: '400 500 600 700', sample: 'The quick brown fox' },
         ].map((f) => (
-          <div key={f.name} className="bg-cream-dark rounded-lg p-5 flex-1 min-w-52">
+          <div key={f.name} className="bg-card border border-border rounded-lg p-5 flex-1 min-w-52">
             <Chip>{f.name}</Chip>
-            <p className="text-body-sm text-ink-muted mt-1 mb-3 font-sans">{f.family} — {f.weights}</p>
-            <p className="text-2xl text-ink" style={{ fontFamily: f.family, fontStyle: f.name === 'font-display' ? 'italic' : 'normal', fontWeight: f.name === 'font-sans' ? 400 : 700 }}>
+            <p className="text-body-sm text-muted-foreground mt-1 mb-3 font-sans">{f.family} — {f.weights}</p>
+            <p className="text-2xl text-foreground" style={{ fontFamily: f.family, fontStyle: f.name === 'font-display' ? 'italic' : 'normal', fontWeight: f.name === 'font-sans' ? 400 : 700 }}>
               {f.sample}
             </p>
           </div>
@@ -232,17 +221,17 @@ function TypographySection() {
       </div>
 
       {/* Type scale */}
-      <div className="space-y-1 divide-y divide-cream-mid">
+      <div className="space-y-1 divide-y divide-border">
         {TYPE_SIZES.map((t) => (
           <div key={t.token} className="flex items-baseline gap-4 py-3">
             <div className="w-48 shrink-0 space-y-0.5">
               <Chip>text-{t.token}</Chip>
-              <p className="text-[10px] text-ink-muted font-sans mt-1">
+              <p className="text-[10px] text-muted-foreground font-sans mt-1">
                 {t.size} / {t.lh} lh · ls {t.ls} · fw {t.fw}
               </p>
             </div>
             <p
-              className="text-ink flex-1 min-w-0 truncate"
+              className="text-foreground flex-1 min-w-0 truncate"
               style={{
                 fontFamily: t.family === 'font-display' ? 'Fraunces' : t.family === 'font-heading' ? 'Lora' : 'Plus Jakarta Sans',
                 fontSize: t.size,
@@ -271,7 +260,7 @@ function SpacingSection() {
             <div className="w-36 shrink-0 flex items-center gap-2">
               <Chip>{token}</Chip>
             </div>
-            <span className="text-[11px] font-mono text-ink-muted w-10 shrink-0">{value}</span>
+            <span className="text-[11px] font-mono text-muted-foreground w-10 shrink-0">{value}</span>
             <div className="flex items-center">
               <div
                 className="bg-rose h-5 rounded-sm"
@@ -293,10 +282,10 @@ function RadiiSection() {
         {RADII.map(({ token, value, cssClass }) => (
           <div key={token} className="flex flex-col items-center gap-2">
             <div
-              className={`w-20 h-20 bg-cream-dark border-2 border-ink-muted ${cssClass}`}
+              className={`w-20 h-20 bg-muted border-2 border-border ${cssClass}`}
             />
             <Chip>{token}</Chip>
-            <span className="text-[10px] text-ink-muted font-mono">{value}</span>
+            <span className="text-[10px] text-muted-foreground font-mono">{value}</span>
           </div>
         ))}
       </div>
@@ -312,11 +301,11 @@ function BordersSection() {
         {BORDERS.map(({ token, value, style }) => (
           <div key={token} className="flex flex-col gap-2">
             <div
-              className="w-32 h-16 rounded-md bg-cream-dark"
+              className="w-32 h-16 rounded-md bg-muted"
               style={{ border: style }}
             />
             <Chip>{token}</Chip>
-            <span className="text-[10px] text-ink-muted font-mono">{value}</span>
+            <span className="text-[10px] text-muted-foreground font-mono">{value}</span>
           </div>
         ))}
       </div>
@@ -328,14 +317,14 @@ function BordersSection() {
 
 export default function Debug() {
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-cream border-b border-cream-mid px-8 py-4 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-sidebar border-b border-sidebar-border px-8 py-4 flex items-center justify-between">
         <div>
-          <h1 className="font-display italic text-2xl font-black text-ink leading-none">Design System</h1>
-          <p className="text-body-sm text-ink-muted font-sans mt-0.5">Debug - tous les tokens</p>
+          <h1 className="font-display italic text-2xl font-black text-foreground leading-none">Design System</h1>
+          <p className="text-body-sm text-muted-foreground font-sans mt-0.5">Debug - tous les tokens</p>
         </div>
-        <a href="/" className="text-ui-sm font-sans text-ink-muted hover:text-ink transition-colors">
+        <a href="/" className="text-ui-sm font-sans text-muted-foreground hover:text-foreground transition-colors">
           Retour
         </a>
       </div>

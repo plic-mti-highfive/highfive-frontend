@@ -27,7 +27,7 @@ export function TagNavBar() {
 
   return (
     <div
-      className={`fixed left-0 right-0 z-10 bg-ink-soft border-b border-ink-muted`}
+      className={`fixed left-0 right-0 z-10 bg-sidebar border-b border-sidebar-border`}
       style={{
         top: '3.5rem',
         height: '2.75rem',
@@ -52,7 +52,7 @@ export function TagNavBar() {
                   relative px-3.5 py-2 rounded-full text-[14px] font-bold transition-all duration-150 whitespace-nowrap shrink-0
                   ${isActive
                     ? `${colors} ring-1 ring-current/20`
-                    : 'text-white hover:text-white hover:bg-white/10'
+                    : 'text-foreground hover:bg-muted'
                   }
                 `}
               >

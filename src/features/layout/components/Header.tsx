@@ -9,19 +9,19 @@ import { useAuth } from '@features/auth'
 
 
 const popupCls =
-  'bg-cream border border-cream-mid rounded-xl shadow-lg py-1.5 w-80 z-[999] origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
+  'bg-background border border-border rounded-xl shadow-lg py-1.5 w-80 z-[999] origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
 
 const itemCls =
-  'flex items-center gap-3 w-full px-3 py-2 text-body-md text-ink rounded-lg cursor-pointer hover:bg-cream-dark outline-none select-none transition-colors'
+  'flex items-center gap-3 w-full px-3 py-2 text-body-md text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors'
 
-const separatorCls = 'border-t border-cream-mid my-1.5 mx-2'
+const separatorCls = 'border-t border-border my-1.5 mx-2'
 
 
 function NotificationsMenu() {
   return (
     <Menu.Root>
       <Menu.Trigger
-        className="flex items-center justify-center w-12 h-12 rounded-full text-white hover:bg-rose-light/20 transition-all outline-none cursor-pointer"
+        className="flex items-center justify-center w-12 h-12 rounded-full text-foreground hover:bg-muted transition-all outline-none cursor-pointer"
         aria-label="Notifications"
       >
         <Bell size={24} />
@@ -30,7 +30,7 @@ function NotificationsMenu() {
         <Menu.Positioner side="bottom" align="end" sideOffset={8}>
           <Menu.Popup className={popupCls}>
             <div className="px-4 py-6 text-center">
-              <p className="text-body-sm text-ink-muted">Aucune notification pour l'instant.</p>
+              <p className="text-body-sm text-muted-foreground">Aucune notification pour l'instant.</p>
             </div>
           </Menu.Popup>
         </Menu.Positioner>
@@ -64,27 +64,27 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
                 {initials}
               </div>
               <div className="min-w-0">
-                <p className="text-body-md font-semibold text-ink truncate">@{username}</p>
-                <p className="text-body-sm text-ink-muted truncate">Membre</p>
+                <p className="text-body-md font-semibold text-foreground truncate">@{username}</p>
+                <p className="text-body-sm text-muted-foreground truncate">Membre</p>
               </div>
             </div>
 
             <div className={separatorCls} />
 
             <Menu.Item className={itemCls} onClick={() => navigate(`/user/${username}`)}>
-              <User size={16} className="text-ink-muted shrink-0" />
+              <User size={16} className="text-muted-foreground shrink-0" />
               Mon profil
             </Menu.Item>
             <Menu.Item className={itemCls} onClick={() => navigate('/projects')}>
-              <FolderOpen size={16} className="text-ink-muted shrink-0" />
+              <FolderOpen size={16} className="text-muted-foreground shrink-0" />
               Mes projets
             </Menu.Item>
             <Menu.Item className={itemCls} onClick={() => navigate('/messages')}>
-              <MessageSquare size={16} className="text-ink-muted shrink-0" />
+              <MessageSquare size={16} className="text-muted-foreground shrink-0" />
               Messages
             </Menu.Item>
             <Menu.Item className={itemCls} onClick={() => navigate('/settings')}>
-              <Settings size={16} className="text-ink-muted shrink-0" />
+              <Settings size={16} className="text-muted-foreground shrink-0" />
               Paramètres
             </Menu.Item>
 
@@ -112,11 +112,11 @@ export default function Header() {
   const { isAuthenticated, username, initials, logout } = useAuth()
 
   return (
-    <header className="sticky top-0 z-[9999] w-full bg-ink-soft border-b border-ink-muted px-8 h-14 flex items-center gap-8">
+    <header className="sticky top-0 z-[9999] w-full bg-sidebar border-b border-sidebar-border px-8 h-14 flex items-center gap-8">
 
         {/* Logo */}
         <div className="shrink-0">
-          <Logo className="text-2xl" textColor="text-white" />
+          <Logo className="text-2xl" textColor="text-foreground" />
         </div>
 
         {/* Barre de recherche centrée absolument */}
@@ -131,7 +131,7 @@ export default function Header() {
             <Button
               onClick={() => navigate('/create-project')}
               size="sm"
-              className="flex items-center gap-1.5 bg-transparent text-white hover:bg-rose-light/20 border border-transparent hover:border-cream"
+              className="flex items-center gap-1.5 bg-transparent text-foreground hover:bg-muted border border-transparent hover:border-border"
             >
               <Plus className="w-5 h-5" />
               <span className="text-body-md font-bold">Créer un projet</span>

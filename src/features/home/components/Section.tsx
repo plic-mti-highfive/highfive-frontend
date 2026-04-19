@@ -19,15 +19,15 @@ export function Section({ label, title, projects, cols = 4 }: SectionProps) {
     : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
 
   return (
-    <section className="py-14 border-t border-[var(--color-cream-mid)]/60">
+    <section className="py-14 border-t border-border">
       <div className="flex items-end justify-between mb-8">
         <div className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink">{label}</p>
-          <h2 className="text-2xl font-black text-ink tracking-tight">{title}</h2>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-foreground">{label}</p>
+          <h2 className="text-2xl font-black text-foreground tracking-tight">{title}</h2>
         </div>
         <button
           onClick={() => navigate('/projects')}
-          className="group text-xs font-semibold text-ink hover:text-ink transition-colors flex items-center gap-1.5"
+          className="group text-xs font-semibold text-foreground hover:text-muted-foreground transition-colors flex items-center gap-1.5"
         >
           Voir tout
           <span className="group-hover:translate-x-0.5 transition-transform">→</span>

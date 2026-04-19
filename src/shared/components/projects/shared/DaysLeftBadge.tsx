@@ -23,5 +23,5 @@ export function DaysLeftBadge({ days }: { days: number | null }) {
       </span>
     )
   }
-  return <span className="text-[10px] text-ink">{days}j restants</span>
+  return <span className="text-[10px] text-muted-foreground">{days}j restants</span>
 }
