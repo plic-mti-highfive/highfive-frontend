@@ -29,7 +29,7 @@ export default function HomePage() {
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-start gap-3">
-                <span className="text-red-500 text-xl">⚠️</span>
+                <span className="text-red-500 text-xl font-bold">!</span>
                 <div className="flex-1">
                   <h3 className="text-red-800 font-semibold mb-1">
                     Impossible de charger les projets
