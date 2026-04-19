@@ -1,0 +1,62 @@
+import { useState, useEffect } from 'react'
+import { projectService, type ProjectDto, ProjectStatus } from '@/api'
+import type { Project } from '@shared/types'
+
+// Adapter ProjectDto vers l'ancien format Project pour compatibilité
+const adaptProjectDto = (dto: ProjectDto): Project => ({
+  id: dto.id,
+  name: dto.name,
+  description: dto.description || '',
+  tags: [], // TODO: ajouter tags quand disponible dans backend
+  author: 'unknown', // TODO: récupérer l'auteur via les membres
+  contributorsCount: 0, // TODO: calculer depuis les membres
+  successRate: 100, // TODO: calculer selon la logique métier
+  daysLeft: null, // TODO: calculer depuis une date de fin si disponible
+})
+
+export function useHomeProjects() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setIsLoading(true)
+        const response = await projectService.getProjects({
+          status: ProjectStatus.ACTIVE,
+          limit: 50, // Charger plus de projets pour avoir assez pour toutes les catégories
+        })
+
+        const adaptedProjects = response.data.map(adaptProjectDto)
+        setProjects(adaptedProjects)
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch projects'))
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [])
+
+  // Pour l'instant, on retourne tous les projets
+  // TODO: implémenter la logique de catégorisation quand le backend supportera les catégories
+  const featured = projects[0] || null
+  const recommended = projects.slice(0, 4)
+  const trending = projects.slice(4, 8)
+  const endingSoon = projects.slice(8, 12)
+  const successful = projects.slice(12, 16)
+  const recent = projects.slice(16, 20)
+
+  return {
+    featured,
+    recommended,
+    trending,
+    endingSoon,
+    successful,
+    recent,
+    isLoading,
+    error,
+  }
+}

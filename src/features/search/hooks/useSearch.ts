@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+import { projectService, ProjectStatus } from '@/api'
 import { mockUsers } from '@shared/data/mockUsers'
 
 export interface SearchTag {
@@ -13,21 +15,58 @@ export interface SearchProgress {
 }
 
 export function useSearch(query: string) {
-  // Get all projects from mock data
-  const allProjects: Array<{ id: string | number; name: string; description: string }> = []
-  Object.values(mockUsers).forEach((user) => {
-    allProjects.push(...user.projects.created, ...user.projects.collaborations, ...user.projects.liked)
-  })
+  const [projects, setProjects] = useState<Array<{ id: string | number; name: string; description: string }>>([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Charger les projets depuis l'API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!query) {
+        setProjects([])
+        return
+      }
+
+      try {
+        setIsLoading(true)
+        // TODO: Ajouter un paramètre de recherche query quand le backend le supporte
+        const response = await projectService.getProjects({
+          status: ProjectStatus.ACTIVE,
+          limit: 50,
+        })
+        setProjects(
+          response.data.map((p) => ({
+            id: p.id,
+            name: p.name,
+            description: p.description || '',
+          }))
+        )
+      } catch (error) {
+        console.error('Failed to fetch projects for search:', error)
+        setProjects([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [query])
 
   // Filter results
   const queryLower = query.toLowerCase()
-  const filteredProjects = allProjects.filter(p =>
-    p.name.toLowerCase().includes(queryLower) || p.description.toLowerCase().includes(queryLower)
-  ).slice(0, 3)
+  const filteredProjects = projects
+    .filter(
+      (p) =>
+        p.name.toLowerCase().includes(queryLower) ||
+        p.description.toLowerCase().includes(queryLower)
+    )
+    .slice(0, 3)
 
+  // TODO: Remplacer par API call quand endpoint disponible
   const filteredUsers = Object.values(mockUsers)
-    .filter((user) =>
-      user.displayName.toLowerCase().includes(queryLower) || user.username.toLowerCase().includes(queryLower)
+    .filter(
+      (user) =>
+        user.displayName.toLowerCase().includes(queryLower) ||
+        user.username.toLowerCase().includes(queryLower)
     )
     .slice(0, 3)
 
@@ -70,6 +109,11 @@ export function useSearch(query: string) {
     filteredUsers,
     filteredTags,
     filteredProgress,
-    isEmpty: filteredProjects.length === 0 && filteredUsers.length === 0 && filteredTags.length === 0 && filteredProgress.length === 0,
+    isEmpty:
+      filteredProjects.length === 0 &&
+      filteredUsers.length === 0 &&
+      filteredTags.length === 0 &&
+      filteredProgress.length === 0,
+    isLoading,
   }
 }
