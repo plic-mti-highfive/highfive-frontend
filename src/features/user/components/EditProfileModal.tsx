@@ -199,7 +199,7 @@ export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfi
                     }
                   `}
                 >
-                  {saved ? '✓ Enregistré !' : 'Enregistrer'}
+                  {saved ? 'Enregistré !' : 'Enregistrer'}
                 </button>
               </div>
             </form>

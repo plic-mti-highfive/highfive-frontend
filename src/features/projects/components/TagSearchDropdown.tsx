@@ -90,7 +90,7 @@ export function TagSearchDropdown({
                       ${active ? 'bg-cream text-ink font-medium' : 'text-ink-soft hover:bg-cream'}`}
                   >
                     <span>{tag}</span>
-                    {active && <span className="text-ink font-bold text-xs">✓</span>}
+                    {active && <span className="text-ink font-bold text-xs">[x]</span>}
                   </button>
                 )
               })

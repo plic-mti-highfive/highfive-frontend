@@ -115,7 +115,7 @@ export function ProjectFiltersBar({
                       } flex items-center justify-center`}
                     >
                       {activeFilters.includes(tag) && (
-                        <span className="text-white text-xs">✓</span>
+                        <span className="text-white text-xs">[x]</span>
                       )}
                     </div>
                     <span>{tag}</span>

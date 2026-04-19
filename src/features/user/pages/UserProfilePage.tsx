@@ -13,9 +13,10 @@ import { createProjectsTabs } from '../utils/profileTabsUtils'
 import { ProjectFiltersBar } from '../../projects/components/ProjectFilters'
 import { UsersListDialog } from '../components/UsersListDialog'
 import { UnfollowConfirmDialog } from '../components/UnfollowConfirmDialog'
-import { mockUsers, getCurrentUsername } from '@shared/data/mockUsers'
 import { getTagColor } from '@shared/utils/tagColors'
 import type { UserProfileFormData } from '@shared/types/user'
+import { useAuth } from '@/contexts'
+import { mockUsers } from '@shared/data/mockUsers'
 
 function formatDate(dateString: string) {
   const date = new Date(dateString)
@@ -50,8 +51,13 @@ function StatItem({
 
 export default function UserProfile() {
   const { username } = useParams<{ username: string }>()
+  const { user: currentUser, isAuthenticated } = useAuth()
+
+  // TODO: Remplacer par useUserProfile quand le backend aura un endpoint GET /users/by-username/:username
+  // Pour l'instant on garde les mocks
   const user = username ? mockUsers[username] : null
-  const isOwnProfile = username === getCurrentUsername()
+  const isOwnProfile = isAuthenticated && currentUser?.email.split('@')[0] === username
+
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [following, setFollowing] = useState(false)
   const [followersDialogOpen, setFollowersDialogOpen] = useState(false)
