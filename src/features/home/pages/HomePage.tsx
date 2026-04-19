@@ -23,8 +23,8 @@ export default function HomePage() {
     <>
       <Header />
       <TagNavBar />
-      <div className="bg-[var(--color-cream)]" style={{ height: '2.75rem' }} />
-      <main className="relative z-0 min-h-screen bg-[var(--color-cream)]">
+      <div className="bg-background" style={{ height: '2.75rem' }} />
+      <main className="relative z-0 min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-6 pt-10">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
