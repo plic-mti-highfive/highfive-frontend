@@ -43,8 +43,8 @@ function StatItem({
       }`}
       disabled={!onClick}
     >
-      <span className="text-2xl font-heading font-bold text-ink">{value}</span>
-      <span className="text-xs text-ink-muted text-center">{label}</span>
+      <span className="text-2xl font-heading font-bold text-foreground">{value}</span>
+      <span className="text-xs text-muted-foreground text-center">{label}</span>
     </button>
   )
 }
@@ -96,27 +96,27 @@ export default function UserProfile() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-cream">
+      <main className="min-h-screen bg-background">
         <div className="flex flex-col lg:flex-row">
           {/* Pan gauche - Profil */}
           <aside className="lg:w-1/3 lg:min-h-screen">
-            <div className="bg-white border-r border-cream-mid lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+            <div className="bg-card border-r border-border lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
                 {/* Bande horizontale en haut - Avatar + Infos + Menu */}
-                <div className="flex items-center gap-4 p-6 border-b border-cream-mid">
+                <div className="flex items-center gap-4 p-6 border-b border-border">
                   {/* Avatar à gauche */}
                   <img
                     src={user.avatar}
                     alt={user.displayName}
-                    className="w-24 h-24 rounded-3xl object-cover bg-cream-dark flex-shrink-0"
+                    className="w-24 h-24 rounded-3xl object-cover bg-muted flex-shrink-0"
                   />
 
                   {/* Infos au centre */}
                   <div className="flex-1">
-                    <h1 className="text-xl font-heading font-bold text-ink">
+                    <h1 className="text-xl font-heading font-bold text-foreground">
                       {user.displayName}
                     </h1>
-                    <p className="text-body-md text-ink-muted">@{user.username}</p>
-                    <p className="text-sm text-ink-muted mt-1">
+                    <p className="text-body-md text-muted-foreground">@{user.username}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
                       Membre depuis {formatDate(user.createdAt)}
                     </p>
                   </div>
@@ -133,7 +133,7 @@ export default function UserProfile() {
                 <div className="p-6 space-y-6">
 
                   {/* Statistiques */}
-                  <div className="grid grid-cols-4 gap-2 pb-6 border-b border-cream-mid">
+                  <div className="grid grid-cols-4 gap-2 pb-6 border-b border-border">
                     <StatItem
                       value={user.stats.projectsCreated}
                       label="Projets"
@@ -156,7 +156,7 @@ export default function UserProfile() {
 
                   {/* Biographie */}
                   {user.bio && (
-                    <p className="text-body-md text-ink text-center leading-relaxed">
+                    <p className="text-body-md text-foreground text-center leading-relaxed">
                       {user.bio}
                     </p>
                   )}
@@ -215,7 +215,7 @@ export default function UserProfile() {
           </aside>
 
           {/* Pan droit - Contenu */}
-          <section className="flex-1 lg:w-2/3 bg-ink-soft/5">
+          <section className="flex-1 lg:w-2/3 bg-muted/30">
             <div className="px-8 pt-0 pb-8">
               <ProfileTabs
                 tabs={createProjectsTabs({
