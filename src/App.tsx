@@ -1,15 +1,18 @@
 import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import Register from './pages/Register'
+import { HomePage } from '@features/home'
+import { LoginPage, RegisterPage } from '@features/auth'
+import { CreateProjectPage } from '@features/projects'
+import { UserProfilePage } from '@features/user'
 import Debug from './pages/Debug'
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/create-project" element={<CreateProjectPage />} />
+      <Route path="/user/:username" element={<UserProfilePage />} />
       <Route path="/debug" element={<Debug />} />
     </Routes>
   )
