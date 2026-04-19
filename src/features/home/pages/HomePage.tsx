@@ -66,11 +66,11 @@ export default function HomePage() {
           ) : (
             <>
               {featured && <FeaturedLayout hero={featured} picks={recommended.slice(0, 4)} />}
-              <Section label="recommended" title="Recommandés" projects={recommended} />
-              <Section label="trending" title="Projets tendance" projects={trending} />
-              <Section label="ending-soon" title="Se terminent bientôt" projects={endingSoon} cols={3} />
-              <Section label="successful" title="Projets qui ont réussi" projects={successful} />
-              <Section label="recent" title="Projets récents" projects={recent} />
+              <Section title="Recommandés" projects={recommended} />
+              <Section title="Projets tendance" projects={trending} />
+              <Section title="Se terminent bientôt" projects={endingSoon} cols={3} />
+              <Section title="Projets qui ont réussi" projects={successful} />
+              <Section title="Projets récents" projects={recent} />
               <div className="pb-20" />
             </>
           )}
