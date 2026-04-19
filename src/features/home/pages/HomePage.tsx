@@ -16,11 +16,11 @@ export default function HomePage() {
       <main className="relative z-0 min-h-screen bg-[var(--color-cream)]">
         <div className="max-w-7xl mx-auto px-6 pt-10">
           <FeaturedLayout hero={FEATURED} picks={RECOMMENDED.slice(0, 4)} />
-          <Section title="Recommandés" projects={RECOMMENDED} />
-          <Section title="Projets tendance" projects={TRENDING} />
-          <Section title="Se terminent bientôt" projects={ENDING_SOON} cols={3} />
-          <Section title="Projets qui ont réussi" projects={SUCCESSFUL} />
-          <Section title="Projets récents" projects={RECENT} />
+          <Section label="recommended" title="Recommandés" projects={RECOMMENDED} />
+          <Section label="trending" title="Projets tendance" projects={TRENDING} />
+          <Section label="ending-soon" title="Se terminent bientôt" projects={ENDING_SOON} cols={3} />
+          <Section label="successful" title="Projets qui ont réussi" projects={SUCCESSFUL} />
+          <Section label="recent" title="Projets récents" projects={RECENT} />
           <div className="pb-20" />
         </div>
       </main>
