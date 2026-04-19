@@ -11,6 +11,8 @@ import type {
   UpdateTicketDto,
   ListProjectsQuery,
   PaginatedResponse,
+  ProjectMessageDto,
+  CreateProjectMessageDto,
 } from '../../types'
 import { httpClient } from '../../http-client'
 
@@ -81,5 +83,14 @@ export class ProjectServiceHttp implements IProjectService {
     dto: UpdateTicketDto,
   ): Promise<TicketDto> {
     return httpClient.patch<TicketDto>(`/projects/${projectId}/tickets/${ticketId}`, dto)
+  }
+
+  // Messages
+  async createMessage(projectId: string, dto: CreateProjectMessageDto): Promise<ProjectMessageDto> {
+    return httpClient.post<ProjectMessageDto>(`/projects/${projectId}/messages`, dto)
+  }
+
+  async getProjectMessages(projectId: string): Promise<ProjectMessageDto[]> {
+    return httpClient.get<ProjectMessageDto[]>(`/projects/${projectId}/messages`)
   }
 }

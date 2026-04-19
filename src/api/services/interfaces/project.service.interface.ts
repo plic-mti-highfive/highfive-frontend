@@ -10,6 +10,8 @@ import type {
   UpdateTicketDto,
   ListProjectsQuery,
   PaginatedResponse,
+  ProjectMessageDto,
+  CreateProjectMessageDto,
 } from '../../types'
 
 export interface IProjectService {
@@ -35,4 +37,8 @@ export interface IProjectService {
   getProjectTickets(projectId: string): Promise<TicketDto[]>
   getTicketById(projectId: string, ticketId: string): Promise<TicketDto>
   updateTicket(projectId: string, ticketId: string, dto: UpdateTicketDto): Promise<TicketDto>
+
+  // Messages
+  createMessage(projectId: string, dto: CreateProjectMessageDto): Promise<ProjectMessageDto>
+  getProjectMessages(projectId: string): Promise<ProjectMessageDto[]>
 }

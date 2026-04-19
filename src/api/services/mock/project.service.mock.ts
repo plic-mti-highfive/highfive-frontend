@@ -11,6 +11,8 @@ import type {
   UpdateTicketDto,
   ListProjectsQuery,
   PaginatedResponse,
+  ProjectMessageDto,
+  CreateProjectMessageDto,
 } from '../../types'
 import { ProjectStatus, ProjectVisibility, ProjectRole, TicketStatus } from '../../types'
 import { delay, generateId } from './utils'
@@ -37,6 +39,7 @@ class MockProjectDb {
   private projects: Map<string, ProjectDto> = new Map()
   private members: Map<string, ProjectMemberDto[]> = new Map()
   private tickets: Map<string, TicketDto[]> = new Map()
+  private messages: Map<string, ProjectMessageDto[]> = new Map()
 
   constructor() {
     // Initialiser avec les projets mockés existants
@@ -140,6 +143,16 @@ class MockProjectDb {
     tickets[index] = updated
     this.tickets.set(projectId, tickets)
     return updated
+  }
+
+  getMessages(projectId: string): ProjectMessageDto[] {
+    return this.messages.get(projectId) || []
+  }
+
+  addMessage(projectId: string, message: ProjectMessageDto): void {
+    const messages = this.messages.get(projectId) || []
+    messages.push(message)
+    this.messages.set(projectId, messages)
   }
 }
 
@@ -321,5 +334,35 @@ export class ProjectServiceMock implements IProjectService {
     }
 
     return updated
+  }
+
+  async createMessage(projectId: string, dto: CreateProjectMessageDto): Promise<ProjectMessageDto> {
+    await delay(400)
+
+    const message: ProjectMessageDto = {
+      id: generateId(),
+      projectId,
+      authorId: 'current-user-id',
+      tenantId: 'default-tenant',
+      content: dto.content,
+      attachmentPath: dto.attachmentPath || null,
+      createdAt: new Date().toISOString(),
+      author: {
+        id: 'current-user-id',
+        email: 'utilisateur@example.com',
+        profile: {
+          bio: 'Développeur passionné',
+          avatarPath: null,
+        },
+      },
+    }
+
+    db.addMessage(projectId, message)
+    return message
+  }
+
+  async getProjectMessages(projectId: string): Promise<ProjectMessageDto[]> {
+    await delay(200)
+    return db.getMessages(projectId)
   }
 }
