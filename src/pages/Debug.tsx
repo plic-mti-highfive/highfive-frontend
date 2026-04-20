@@ -1,3 +1,5 @@
+import { Footer, Header } from "@/features/layout";
+
 type Swatch = { token: string; hex: string; textDark?: boolean }
 type Palette = { name: string; swatches: Swatch[] }
 
@@ -318,19 +320,10 @@ function BordersSection() {
 export default function Debug() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-sidebar border-b border-sidebar-border px-8 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="font-display italic text-2xl font-black text-foreground leading-none">Design System</h1>
-          <p className="text-body-sm text-muted-foreground font-sans mt-0.5">Debug - tous les tokens</p>
-        </div>
-        <a href="/" className="text-ui-sm font-sans text-muted-foreground hover:text-foreground transition-colors">
-          Retour
-        </a>
-      </div>
+      <Header />
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-8 pb-24">
+      <div className="max-w-5xl mx-auto px-8 pb-12">
         <ColorSection />
         <ShadcnTokensSection />
         <TypographySection />
@@ -338,6 +331,8 @@ export default function Debug() {
         <RadiiSection />
         <BordersSection />
       </div>
+
+      <Footer />
     </div>
   )
 }
