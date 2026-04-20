@@ -1,10 +1,13 @@
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { FolderOpen, Users } from 'lucide-react'
 import { Header } from '@features/layout'
 import { Footer } from '@features/layout'
 import { SmallCard } from '@shared/components/projects'
 import { ProjectFiltersBar } from '@features/projects/components/ProjectFilters'
+import { mockUsers } from '@shared/data/mockUsers'
 import type { Project } from '@shared/types'
+import type { User } from '@shared/types/user'
 
 // Données mockées pour le MVP
 const MOCK_PROJECTS: Project[] = [
@@ -130,9 +133,48 @@ const MOCK_PROJECTS: Project[] = [
   },
 ]
 
+// Composant pour afficher une carte utilisateur
+function UserCard({ user, navigate }: { user: User; navigate: (to: string) => void }) {
+  return (
+    <button
+      onClick={() => navigate(`/user/${user.username}`)}
+      className="group flex flex-col bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-200 hover:border-foreground/20 cursor-pointer text-left w-full"
+    >
+      <div className="flex flex-col items-center text-center">
+        <img
+          src={user.avatar}
+          alt={user.displayName}
+          className="w-20 h-20 rounded-full mb-4 object-cover"
+        />
+        <h3 className="text-heading-sm font-bold text-foreground mb-1 truncate w-full">
+          {user.displayName}
+        </h3>
+        <p className="text-body-sm text-muted-foreground mb-3 truncate w-full">
+          @{user.username}
+        </p>
+        {user.bio && (
+          <p className="text-body-sm text-muted-foreground line-clamp-2 mb-3">
+            {user.bio}
+          </p>
+        )}
+        <div className="flex gap-4 mt-auto pt-3 text-body-sm text-muted-foreground">
+          <span>{user.stats.projectsCreated} projets</span>
+          <span>·</span>
+          <span>{user.stats.followers} abonnés</span>
+        </div>
+      </div>
+    </button>
+  )
+}
+
+type ResultType = 'projects' | 'users'
+
 export function SearchPage() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
   const searchQuery = searchParams.get('q') || ''
+  const tagFilter = searchParams.get('tag')
+  const resultType = (searchParams.get('type') as ResultType) || 'projects'
 
   const [, setActiveSort] = useState<'name' | 'date' | 'popularity'>('date')
   const [, setActiveFilters] = useState<string[]>([])
@@ -140,6 +182,20 @@ export function SearchPage() {
   // Pour le MVP, on affiche tous les projets mockés
   // La logique de recherche et filtrage sera implémentée plus tard
   const displayedProjects = MOCK_PROJECTS
+  const displayedUsers = Object.values(mockUsers)
+
+  const resultsCount = resultType === 'projects' ? displayedProjects.length : displayedUsers.length
+  const resultsLabel = resultType === 'projects' ? 'projet' : 'utilisateur'
+
+  const handleTypeChange = (type: ResultType) => {
+    const newParams = new URLSearchParams(searchParams)
+    if (type === 'projects') {
+      newParams.delete('type')
+    } else {
+      newParams.set('type', type)
+    }
+    setSearchParams(newParams)
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -147,37 +203,93 @@ export function SearchPage() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
         {/* Titre centré avec la recherche */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-black text-foreground tracking-tight">
-            Résultats pour : <span className="text-muted-foreground">{searchQuery}</span>
+            Résultats pour : <span className="text-muted-foreground">{tagFilter || searchQuery}</span>
           </h1>
           <p className="mt-3 text-body-lg text-muted-foreground">
-            {displayedProjects.length} projet{displayedProjects.length > 1 ? 's' : ''} trouvé{displayedProjects.length > 1 ? 's' : ''}
+            {resultsCount} {resultsLabel}{resultsCount > 1 ? 's' : ''} trouvé{resultsCount > 1 ? 's' : ''}
           </p>
         </div>
 
-        {/* Barre de filtres */}
-        <ProjectFiltersBar
-          onSortChange={(sort) => setActiveSort(sort)}
-          onFilterChange={(filters) => setActiveFilters(filters)}
-        />
+        {/* Barre avec boutons de type et filtres */}
+        <div className="flex items-center justify-between gap-4 mb-8">
+          {/* Boutons de type de résultat */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleTypeChange('projects')}
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-lg text-body-md font-semibold
+                transition-all outline-none
+                ${resultType === 'projects'
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                }
+              `}
+            >
+              <FolderOpen size={18} />
+              Projets
+            </button>
+            <button
+              onClick={() => handleTypeChange('users')}
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-lg text-body-md font-semibold
+                transition-all outline-none
+                ${resultType === 'users'
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                }
+              `}
+            >
+              <Users size={18} />
+              Utilisateurs
+            </button>
+          </div>
+
+          {/* Filtres - uniquement pour les projets */}
+          {resultType === 'projects' && (
+            <ProjectFiltersBar
+              onSortChange={(sort) => setActiveSort(sort)}
+              onFilterChange={(filters) => setActiveFilters(filters)}
+            />
+          )}
+        </div>
 
         {/* Grille de résultats */}
-        {displayedProjects.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-7 gap-y-10">
-            {displayedProjects.map((project) => (
-              <SmallCard key={project.id} project={project} />
-            ))}
-          </div>
+        {resultType === 'projects' ? (
+          displayedProjects.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-7 gap-y-10">
+              {displayedProjects.map((project) => (
+                <SmallCard key={project.id} project={project} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-xl text-muted-foreground">
+                Aucun projet trouvé pour "{searchQuery}"
+              </p>
+              <p className="mt-2 text-body-md text-muted-foreground">
+                Essayez avec d'autres mots-clés
+              </p>
+            </div>
+          )
         ) : (
-          <div className="text-center py-20">
-            <p className="text-xl text-muted-foreground">
-              Aucun résultat trouvé pour "{searchQuery}"
-            </p>
-            <p className="mt-2 text-body-md text-muted-foreground">
-              Essayez avec d'autres mots-clés
-            </p>
-          </div>
+          displayedUsers.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-7 gap-y-10">
+              {displayedUsers.map((user) => (
+                <UserCard key={user.username} user={user} navigate={navigate} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-xl text-muted-foreground">
+                Aucun utilisateur trouvé pour "{searchQuery}"
+              </p>
+              <p className="mt-2 text-body-md text-muted-foreground">
+                Essayez avec d'autres mots-clés
+              </p>
+            </div>
+          )
         )}
       </main>
 
