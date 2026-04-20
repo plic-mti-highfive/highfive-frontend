@@ -1,4 +1,4 @@
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { FolderOpen, Users } from 'lucide-react'
 import { Header } from '@features/layout'
@@ -170,11 +170,14 @@ function UserCard({ user, navigate }: { user: User; navigate: (to: string) => vo
 type ResultType = 'projects' | 'users'
 
 export function SearchPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const searchQuery = searchParams.get('q') || ''
   const tagFilter = searchParams.get('tag')
-  const resultType = (searchParams.get('type') as ResultType) || 'projects'
+
+  // Déterminer le type de résultat à partir de la route
+  const resultType: ResultType = location.pathname.includes('/users') ? 'users' : 'projects'
 
   const [, setActiveSort] = useState<'name' | 'date' | 'popularity'>('date')
   const [, setActiveFilters] = useState<string[]>([])
@@ -188,13 +191,9 @@ export function SearchPage() {
   const resultsLabel = resultType === 'projects' ? 'projet' : 'utilisateur'
 
   const handleTypeChange = (type: ResultType) => {
-    const newParams = new URLSearchParams(searchParams)
-    if (type === 'projects') {
-      newParams.delete('type')
-    } else {
-      newParams.set('type', type)
-    }
-    setSearchParams(newParams)
+    const currentParams = searchParams.toString()
+    const path = type === 'projects' ? '/search/projects' : '/search/users'
+    navigate(currentParams ? `${path}?${currentParams}` : path)
   }
 
   return (
