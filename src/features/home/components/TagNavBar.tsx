@@ -27,7 +27,7 @@ export function TagNavBar() {
 
   return (
     <div
-      className={`fixed left-0 right-0 z-10 bg-sidebar border-b border-sidebar-border`}
+      className={`fixed left-0 right-0 z-[9998] bg-sidebar border-b border-sidebar-border`}
       style={{
         top: '3.5rem',
         height: '2.75rem',

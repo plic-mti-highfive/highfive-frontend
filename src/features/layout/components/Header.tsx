@@ -9,10 +9,10 @@ import { useAuth } from '@features/auth'
 
 
 const popupCls =
-  'bg-background border border-border rounded-xl shadow-lg py-1.5 w-80 z-[999] origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
+  'bg-background border border-border rounded-xl shadow-lg py-1.5 w-80 origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
 
 const itemCls =
-  'flex items-center gap-3 w-full px-3 py-2 text-body-md text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors'
+  'flex items-center gap-3 w-full px-3 py-2 text-body-lg text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors'
 
 const separatorCls = 'border-t border-border my-1.5 mx-2'
 
@@ -27,10 +27,10 @@ function NotificationsMenu() {
         <Bell size={24} />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner side="bottom" align="end" sideOffset={8}>
+        <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-[10000]">
           <Menu.Popup className={popupCls}>
             <div className="px-4 py-6 text-center">
-              <p className="text-body-sm text-muted-foreground">Aucune notification pour l'instant.</p>
+              <p className="text-body-md text-muted-foreground">Aucune notification pour l'instant.</p>
             </div>
           </Menu.Popup>
         </Menu.Positioner>
@@ -56,7 +56,7 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
         {initials}
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner side="bottom" align="end" sideOffset={8}>
+        <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-[10000]">
           <Menu.Popup className={popupCls}>
 
             <div className="flex items-center gap-3 px-3 py-2.5 mb-0.5">
@@ -64,27 +64,27 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
                 {initials}
               </div>
               <div className="min-w-0">
-                <p className="text-body-md font-semibold text-foreground truncate">@{username}</p>
-                <p className="text-body-sm text-muted-foreground truncate">Membre</p>
+                <p className="text-body-lg font-semibold text-foreground truncate">@{username}</p>
+                <p className="text-body-md text-muted-foreground truncate">Membre</p>
               </div>
             </div>
 
             <div className={separatorCls} />
 
             <Menu.Item className={itemCls} onClick={() => navigate(`/user/${username}`)}>
-              <User size={16} className="text-muted-foreground shrink-0" />
+              <User size={18} className="text-muted-foreground shrink-0" />
               Mon profil
             </Menu.Item>
             <Menu.Item className={itemCls} onClick={() => navigate('/projects')}>
-              <FolderOpen size={16} className="text-muted-foreground shrink-0" />
+              <FolderOpen size={18} className="text-muted-foreground shrink-0" />
               Mes projets
             </Menu.Item>
             <Menu.Item className={itemCls} onClick={() => navigate('/messages')}>
-              <MessageSquare size={16} className="text-muted-foreground shrink-0" />
+              <MessageSquare size={18} className="text-muted-foreground shrink-0" />
               Messages
             </Menu.Item>
             <Menu.Item className={itemCls} onClick={() => navigate('/settings')}>
-              <Settings size={16} className="text-muted-foreground shrink-0" />
+              <Settings size={18} className="text-muted-foreground shrink-0" />
               Paramètres
             </Menu.Item>
 
@@ -94,7 +94,7 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
               className={`${itemCls} text-rose hover:bg-rose-light hover:text-rose-dark`}
               onClick={onLogout}
             >
-              <LogOut size={16} className="shrink-0" />
+              <LogOut size={18} className="shrink-0" />
               Se déconnecter
             </Menu.Item>
 
