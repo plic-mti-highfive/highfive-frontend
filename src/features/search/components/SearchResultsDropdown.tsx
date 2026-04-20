@@ -22,7 +22,7 @@ export function SearchResultsDropdown({ query, navigate }: SearchResultsDropdown
             <button
               key={project.id}
               className={resultItemCls}
-              onClick={() => navigate(`/project/${project.id}`)}
+              onClick={() => navigate(`/projects/${project.id}`)}
               type="button"
             >
               <div className="min-w-0 flex-1">
@@ -69,7 +69,7 @@ export function SearchResultsDropdown({ query, navigate }: SearchResultsDropdown
             <button
               key={tag.name}
               className={resultItemCls}
-              onClick={() => navigate(`/tag/${tag.name.toLowerCase()}`)}
+              onClick={() => navigate(`/search?tag=${encodeURIComponent(tag.name)}`)}
               type="button"
             >
               <div className="flex-1 min-w-0">
