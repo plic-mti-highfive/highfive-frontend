@@ -9,6 +9,18 @@ type SearchBarProps = {
 export function SearchBar({ navigate }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
   return (
     <div className="w-96">
       <div className="relative">
@@ -17,6 +29,7 @@ export function SearchBar({ navigate }: SearchBarProps) {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Rechercher des projets, utilisateurs..."
           className="
             w-full rounded-lg border border-cream-mid bg-white pl-10 pr-10 py-2.5
