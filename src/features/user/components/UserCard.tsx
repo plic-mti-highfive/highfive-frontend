@@ -20,31 +20,16 @@ function formatDate(dateString: string): string {
 export function UserCard({ user, onNavigate, isOwnProfile = false }: UserCardProps) {
   return (
     <div className="group flex bg-card border border-border rounded-2xl p-5 hover:shadow-lg transition-all duration-200 hover:border-foreground/20">
-      {/* Colonne gauche : Photo + Stats */}
-      <div className="flex flex-col gap-3">
-        {/* Photo de profil */}
-        <div className="shrink-0 cursor-pointer" onClick={() => onNavigate(user.username)}>
-          <img
-            src={user.avatar}
-            alt={user.displayName}
-            className="w-24 h-24 rounded-2xl object-cover"
-          />
-        </div>
-
-        {/* Stats sous la photo */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
-            <FolderOpen size={16} className="shrink-0" />
-            <span className="font-semibold text-foreground">{user.stats.projectsCreated}</span>
-          </div>
-          <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
-            <Users size={16} className="shrink-0" />
-            <span className="font-semibold text-foreground">{user.stats.followers}</span>
-          </div>
-        </div>
+      {/* Colonne gauche : Photo */}
+      <div className="shrink-0 cursor-pointer" onClick={() => onNavigate(user.username)}>
+        <img
+          src={user.avatar}
+          alt={user.displayName}
+          className="w-24 h-24 rounded-2xl object-cover"
+        />
       </div>
 
-      {/* Colonne droite : Nom + Date + Boutons */}
+      {/* Colonne droite : Nom + Date + Stats + Boutons */}
       <div className="flex-1 ml-4 flex flex-col">
         {/* Header : Nom + Menu 3 points */}
         <div className="flex items-start justify-between mb-2">
@@ -66,8 +51,21 @@ export function UserCard({ user, onNavigate, isOwnProfile = false }: UserCardPro
           </div>
         </div>
 
-        {/* Bouton Suivre en bas à droite */}
-        <div className="mt-auto flex justify-end">
+        {/* Ligne du bas : Stats à gauche + Bouton Suivre à droite */}
+        <div className="mt-auto flex items-center justify-between">
+          {/* Stats */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
+              <FolderOpen size={16} className="shrink-0" />
+              <span className="font-semibold text-foreground">{user.stats.projectsCreated}</span>
+            </div>
+            <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
+              <Users size={16} className="shrink-0" />
+              <span className="font-semibold text-foreground">{user.stats.followers}</span>
+            </div>
+          </div>
+
+          {/* Bouton Suivre */}
           {!isOwnProfile && (
             <Button
               onClick={() => console.log('Suivre', user.username)}
