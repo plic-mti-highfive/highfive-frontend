@@ -69,7 +69,7 @@ export function SearchResultsDropdown({ query, navigate }: SearchResultsDropdown
             <button
               key={tag.name}
               className={resultItemCls}
-              onClick={() => navigate(`/search?tag=${encodeURIComponent(tag.name)}`)}
+              onClick={() => navigate(`/search/projects?tag=${encodeURIComponent(tag.name)}`)}
               type="button"
             >
               <div className="flex-1 min-w-0">
