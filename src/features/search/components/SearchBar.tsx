@@ -24,7 +24,7 @@ export function SearchBar({ navigate }: SearchBarProps) {
   return (
     <div className="w-96">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-dark pointer-events-none z-10" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted pointer-events-none z-10" />
         <input
           type="text"
           value={searchQuery}
@@ -42,7 +42,7 @@ export function SearchBar({ navigate }: SearchBarProps) {
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-dark hover:text-ink transition-colors z-10"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted hover:text-ink transition-colors z-10"
             aria-label="Effacer la recherche"
           >
             <X size={20} />
