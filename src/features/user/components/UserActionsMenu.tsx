@@ -2,10 +2,10 @@ import { Menu } from '@base-ui/react/menu'
 import { EllipsisVertical, Ban, Flag, EyeOff, Share2, Pencil } from 'lucide-react'
 
 const popupCls =
-  'bg-cream border border-cream-mid rounded-xl shadow-lg py-1.5 min-w-48 z-50'
+  'bg-background border border-border rounded-xl shadow-lg py-1.5 min-w-48 z-50'
 const itemCls =
-  'flex items-center gap-3 w-full px-3 py-2 text-body-md text-ink rounded-lg cursor-pointer hover:bg-cream-dark outline-none select-none transition-colors data-[highlighted]:bg-cream-dark'
-const separatorCls = 'border-t border-cream-mid my-1.5 mx-2'
+  'flex items-center gap-3 w-full px-3 py-2 text-body-md text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors data-[highlighted]:bg-muted'
+const separatorCls = 'border-t border-border my-1.5 mx-2'
 
 interface UserActionsMenuProps {
   isOwnProfile: boolean
@@ -26,8 +26,8 @@ export function UserActionsMenu({
 }: UserActionsMenuProps) {
   return (
     <Menu.Root>
-      <Menu.Trigger className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-cream-dark transition-colors cursor-pointer outline-none">
-        <EllipsisVertical className="w-5 h-5 text-ink" />
+      <Menu.Trigger className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors cursor-pointer outline-none">
+        <EllipsisVertical className="w-5 h-5 text-foreground" />
       </Menu.Trigger>
 
       <Menu.Portal>

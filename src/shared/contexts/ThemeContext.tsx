@@ -39,6 +39,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const resolved = resolveTheme(theme)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResolvedTheme(resolved)
 
     const root = document.documentElement
@@ -82,6 +83,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme() {
   const context = useContext(ThemeContext)
   if (!context) {

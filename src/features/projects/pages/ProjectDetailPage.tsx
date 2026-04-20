@@ -9,6 +9,7 @@ import { ProjectSidebar } from '../components/ProjectSidebar'
 import { TicketList } from '../components/TicketList'
 import { DiscussionThread } from '../components/DiscussionThread'
 import { SimilarProjects } from '../components/SimilarProjects'
+import { ProjectDetailSkeleton } from '../components/ProjectDetailSkeleton'
 import type { ProjectMessageDto } from '@/api/types'
 import { TicketStatus } from '@/api/types'
 
@@ -30,13 +31,7 @@ export function ProjectDetailPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen bg-background">
-          <div className="max-w-7xl mx-auto px-6 py-12">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Chargement...</p>
-            </div>
-          </div>
-        </main>
+        <ProjectDetailSkeleton />
         <Footer />
       </>
     )

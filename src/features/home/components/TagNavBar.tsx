@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { TAG_COLORS } from '@shared/components/projects'
 
 const NAV_TAGS = [
-  'Web', 'IA / ML', 'Open Source',
-  'Hardware', 'Environnement', 'Éducation',
-  'Art', 'Social', 'Data',
+  'Créatif', 'Communauté', 'Environnement',
+  'Culture', 'Technologie', 'Éducation',
+  'Art', 'Sport', 'Événement',
 ]
 
 export function TagNavBar() {
@@ -27,7 +27,7 @@ export function TagNavBar() {
 
   return (
     <div
-      className={`fixed left-0 right-0 z-10 bg-sidebar border-b border-sidebar-border`}
+      className={`fixed left-0 right-0 z-[9998] bg-sidebar border-b border-sidebar-border`}
       style={{
         top: '3.5rem',
         height: '2.75rem',

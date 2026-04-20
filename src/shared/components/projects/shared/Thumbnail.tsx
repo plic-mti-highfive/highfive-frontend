@@ -23,6 +23,7 @@ const PALETTE_SETS = [
 
 type PatternType = 'circles' | 'triangles' | 'grid' | 'waves' | 'hexagons' | 'dots'
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function generateSVGPattern(id: number | string, width = 400, height = 280): string {
   const seed = typeof id === 'string' ? id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) : id
   const rand = seededRand(seed * 137)

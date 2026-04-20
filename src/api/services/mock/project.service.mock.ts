@@ -16,23 +16,7 @@ import type {
 } from '../../types'
 import { ProjectStatus, ProjectVisibility, ProjectRole, TicketStatus } from '../../types'
 import { delay, generateId } from './utils'
-
-// Import des données mockées existantes
-import { FEATURED, RECOMMENDED, TRENDING, SUCCESSFUL, RECENT, ENDING_SOON } from '@/features/home/data/mockProjects'
-import type { Project as OldProject } from '@shared/types'
-
-// Adapter les anciens projets vers le nouveau format DTO
-const adaptOldProjectToDto = (oldProject: OldProject): ProjectDto => ({
-  id: String(oldProject.id),
-  tenantId: 'default-tenant',
-  name: oldProject.name,
-  description: oldProject.description,
-  status: ProjectStatus.ACTIVE,
-  visibility: ProjectVisibility.PUBLIC,
-  createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString(),
-  updatedAt: new Date().toISOString(),
-  deletedAt: null,
-})
+import { getAllProjects } from './data'
 
 // Base de données mock en mémoire
 class MockProjectDb {
@@ -42,19 +26,10 @@ class MockProjectDb {
   private messages: Map<string, ProjectMessageDto[]> = new Map()
 
   constructor() {
-    // Initialiser avec les projets mockés existants
-    const allOldProjects = [
-      FEATURED,
-      ...RECOMMENDED,
-      ...TRENDING,
-      ...SUCCESSFUL,
-      ...RECENT,
-      ...ENDING_SOON,
-    ].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i) // Déduplicate
-
-    allOldProjects.forEach((oldProject) => {
-      const dto = adaptOldProjectToDto(oldProject)
-      this.projects.set(dto.id, dto)
+    // Initialiser avec les projets mockés centralisés
+    const allProjects = getAllProjects()
+    allProjects.forEach((project) => {
+      this.projects.set(project.id, project)
     })
   }
 

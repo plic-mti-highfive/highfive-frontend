@@ -2,7 +2,7 @@ import { BackButton } from './BackButton'
 import { PrimaryButton } from './PrimaryButton'
 import { ProgressDots } from './ProgressDots'
 import { TagSearchDropdown } from './TagSearchDropdown'
-import { ALL_TAGS } from '../data/tags'
+import { ALL_TAGS } from '@/api/services/mock/data'
 
 export function StepManualTags({ onBack, onSubmit, value, onChange }: {
   onBack: () => void

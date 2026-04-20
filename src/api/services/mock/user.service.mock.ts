@@ -1,25 +1,27 @@
 import type { IUserService } from '../interfaces'
 import type { UpdateUserProfileDto, UserProfileResponse } from '../../types'
 import { delay } from './utils'
-import { mockUsers } from '@shared/data/mockUsers'
+import { getAllUsers } from './data'
 
 // Base de données mock pour les profils utilisateurs
 class MockUserDb {
   private profiles: Map<string, UserProfileResponse> = new Map()
 
   constructor() {
-    // Initialiser avec quelques profils basés sur mockUsers
-    Object.values(mockUsers).forEach((user, index) => {
-      const userId = `user-${index + 1}`
-      this.profiles.set(userId, {
-        userId,
-        email: `${user.username}@example.com`,
-        bio: user.bio,
-        avatarPath: user.avatar,
-        themePreference: 'light',
-        emailNotifications: true,
-        createdAt: user.createdAt,
-      })
+    // Initialiser avec les profils depuis mockUsers centralisé
+    const allUsers = getAllUsers()
+    allUsers.forEach((user) => {
+      if (user.profile) {
+        this.profiles.set(user.id, {
+          userId: user.id,
+          email: user.email,
+          bio: user.profile.bio,
+          avatarPath: user.profile.avatarPath,
+          themePreference: user.profile.themePreference,
+          emailNotifications: user.profile.emailNotifications,
+          createdAt: user.createdAt,
+        })
+      }
     })
   }
 

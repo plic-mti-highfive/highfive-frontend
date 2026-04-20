@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { projectService, ProjectStatus } from '@/api'
+import { getAllTags } from '@/api/services/mock/data'
 import { mockUsers } from '@shared/data/mockUsers'
 
 export interface SearchTag {
@@ -62,22 +63,23 @@ export function useSearch(query: string) {
     .slice(0, 3)
 
   // TODO: Remplacer par API call quand endpoint disponible
-  const filteredUsers = Object.values(mockUsers)
+  const allUsers = Object.values(mockUsers)
+  const filteredUsers = allUsers
     .filter(
-      (user) =>
-        user.displayName.toLowerCase().includes(queryLower) ||
-        user.username.toLowerCase().includes(queryLower)
+      (u) =>
+        u.username.toLowerCase().includes(queryLower) ||
+        u.displayName.toLowerCase().includes(queryLower) ||
+        (u.bio && u.bio.toLowerCase().includes(queryLower))
     )
     .slice(0, 3)
 
-  const mockTags: SearchTag[] = [
-    { name: 'React', count: 24 },
-    { name: 'Design', count: 18 },
-    { name: 'Python', count: 15 },
-    { name: 'DevOps', count: 9 },
-    { name: 'Machine Learning', count: 12 },
-  ]
-  const filteredTags = mockTags.filter(t => t.name.toLowerCase().includes(queryLower)).slice(0, 3)
+  // Utiliser les tags centralisés
+  const allTags = getAllTags()
+  const tagsWithCounts: SearchTag[] = allTags.map((tag) => ({
+    name: tag,
+    count: Math.floor(Math.random() * 30) + 5, // Mock count for now
+  }))
+  const filteredTags = tagsWithCounts.filter(t => t.name.toLowerCase().includes(queryLower)).slice(0, 3)
 
   const mockProgress: SearchProgress[] = [
     {

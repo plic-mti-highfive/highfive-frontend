@@ -5,6 +5,7 @@ import { Footer } from '@features/layout'
 import { FeaturedLayout } from '../components/FeaturedLayout'
 import { Section } from '../components/Section'
 import { TagNavBar } from '../components/TagNavBar'
+import { HomePageSkeleton } from '../components/HomePageSkeleton'
 import { useHomeProjects } from '../hooks/useHomeProjects'
 
 export default function HomePage() {
@@ -51,9 +52,7 @@ export default function HomePage() {
           )}
 
           {isLoading ? (
-            <div className="text-center py-20">
-              <p>Chargement des projets...</p>
-            </div>
+            <HomePageSkeleton />
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-ink-muted">
