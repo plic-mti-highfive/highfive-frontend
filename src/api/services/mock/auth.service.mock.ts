@@ -6,10 +6,24 @@ import type {
   UserDto,
 } from '../../types'
 import { UserStatus } from '../../types'
-import { delay } from './utils'
+import { delay, generateId } from './utils'
+import { getUserByEmail, getAllUsers } from './data'
 
-// Mock user database
-const mockUserDb = new Map<string, { email: string; password: string; user: UserDto }>()
+// Mock user database with passwords
+// Uses centralized mockUsers as the source of truth
+const mockUserPasswords = new Map<string, string>([
+  ['utilisateur@highfive.com', 'password123'],
+  ['johndoe@highfive.com', 'password123'],
+  ['janedoe@highfive.com', 'password123'],
+  ['alexsmith@highfive.com', 'password123'],
+  ['mariedurand@highfive.com', 'password123'],
+  ['alice@highfive.com', 'password123'],
+  ['bob@highfive.com', 'password123'],
+  ['carol@highfive.com', 'password123'],
+])
+
+// Store for newly registered users (in addition to mockUsers)
+const registeredUsers = new Map<string, UserDto>()
 
 // Mock tokens
 const createMockTokens = () => ({
@@ -21,19 +35,26 @@ export class AuthServiceMock implements IAuthService {
   async register(dto: RegisterDto): Promise<AuthResponse> {
     await delay(500)
 
-    if (mockUserDb.has(dto.email)) {
+    // Check if user already exists in mockUsers or registeredUsers
+    const existingUser = getUserByEmail(dto.email)
+    const existingRegisteredUser = Array.from(registeredUsers.values()).find(
+      (u) => u.email === dto.email,
+    )
+
+    if (existingUser || existingRegisteredUser) {
       throw new Error('User already exists')
     }
 
+    const userId = generateId()
     const user: UserDto = {
-      id: `user-${Date.now()}`,
+      id: userId,
       email: dto.email,
       status: UserStatus.ACTIVE,
       tenantId: 'default-tenant',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       profile: {
-        userId: `user-${Date.now()}`,
+        userId,
         bio: null,
         avatarPath: null,
         themePreference: 'light',
@@ -41,11 +62,9 @@ export class AuthServiceMock implements IAuthService {
       },
     }
 
-    mockUserDb.set(dto.email, {
-      email: dto.email,
-      password: dto.password,
-      user,
-    })
+    // Store new user
+    registeredUsers.set(userId, user)
+    mockUserPasswords.set(dto.email, dto.password)
 
     const tokens = createMockTokens()
 
@@ -58,9 +77,19 @@ export class AuthServiceMock implements IAuthService {
   async login(dto: LoginDto): Promise<AuthResponse> {
     await delay(500)
 
-    const userRecord = mockUserDb.get(dto.email)
+    // Check password
+    const storedPassword = mockUserPasswords.get(dto.email)
+    if (!storedPassword || storedPassword !== dto.password) {
+      throw new Error('Invalid credentials')
+    }
 
-    if (!userRecord || userRecord.password !== dto.password) {
+    // Find user (check both mockUsers and registeredUsers)
+    let user = getUserByEmail(dto.email)
+    if (!user) {
+      user = Array.from(registeredUsers.values()).find((u) => u.email === dto.email)
+    }
+
+    if (!user) {
       throw new Error('Invalid credentials')
     }
 
@@ -68,7 +97,7 @@ export class AuthServiceMock implements IAuthService {
 
     return {
       ...tokens,
-      user: userRecord.user,
+      user,
     }
   }
 
@@ -83,18 +112,25 @@ export class AuthServiceMock implements IAuthService {
     // For mock, just return new tokens
     const tokens = createMockTokens()
 
-    // Return first user in db or create a default one
-    const firstUser = Array.from(mockUserDb.values())[0]
-    const user = firstUser
-      ? firstUser.user
-      : {
-          id: 'default-user-id',
-          email: 'user@example.com',
-          status: UserStatus.ACTIVE,
-          tenantId: 'default-tenant',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
+    // Return first user from mockUsers or registeredUsers
+    const allUsers = getAllUsers()
+    const user =
+      allUsers[0] ||
+      Array.from(registeredUsers.values())[0] || {
+        id: 'default-user-id',
+        email: 'user@example.com',
+        status: UserStatus.ACTIVE,
+        tenantId: 'default-tenant',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        profile: {
+          userId: 'default-user-id',
+          bio: null,
+          avatarPath: null,
+          themePreference: 'light',
+          emailNotifications: true,
+        },
+      }
 
     return {
       ...tokens,
@@ -105,27 +141,26 @@ export class AuthServiceMock implements IAuthService {
   async getCurrentUser(): Promise<UserDto> {
     await delay(200)
 
-    // Return first user or default
-    const firstUser = Array.from(mockUserDb.values())[0]
+    // Return first user from mockUsers or registeredUsers
+    const allUsers = getAllUsers()
+    const user =
+      allUsers[0] ||
+      Array.from(registeredUsers.values())[0] || {
+        id: 'default-user-id',
+        email: 'user@example.com',
+        status: UserStatus.ACTIVE,
+        tenantId: 'default-tenant',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        profile: {
+          userId: 'default-user-id',
+          bio: 'Mock user bio',
+          avatarPath: 'https://api.dicebear.com/7.x/avataaars/svg?seed=default',
+          themePreference: 'light',
+          emailNotifications: true,
+        },
+      }
 
-    if (firstUser) {
-      return firstUser.user
-    }
-
-    return {
-      id: 'default-user-id',
-      email: 'user@example.com',
-      status: UserStatus.ACTIVE,
-      tenantId: 'default-tenant',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      profile: {
-        userId: 'default-user-id',
-        bio: 'Mock user bio',
-        avatarPath: 'https://api.dicebear.com/7.x/avataaars/svg?seed=default',
-        themePreference: 'light',
-        emailNotifications: true,
-      },
-    }
+    return user
   }
 }

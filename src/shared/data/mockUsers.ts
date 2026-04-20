@@ -1,5 +1,16 @@
 import type { User } from '../types/user'
 
+// LEGACY: Ce fichier utilise l'ancien type `User` qui contient des données UI spécifiques
+// (stats, projects embarqués, followers/following) qui ne correspondent pas au format backend.
+// Ce fichier est uniquement utilisé par UserProfilePage.tsx et devrait être migré vers
+// les mocks centralisés (src/api/services/mock/data/) une fois que le backend supportera
+// les endpoints nécessaires pour récupérer ces données agrégées.
+//
+// Pour les nouveaux développements, utilisez les mocks centralisés :
+// - src/api/services/mock/data/mockUsers.ts (format UserDto compatible backend)
+// - src/api/services/mock/data/mockProjects.ts (format ProjectDto compatible backend)
+// - src/api/services/mock/data/mockTags.ts (tags centralisés)
+
 export const mockUsers: Record<string, User> = {
   Utilisateur: {
     username: 'Utilisateur',
