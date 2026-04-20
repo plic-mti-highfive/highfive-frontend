@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { projectService, ProjectStatus } from '@/api'
 import { getAllTags } from '@/api/services/mock/data'
+import { mockUsers } from '@shared/data/mockUsers'
 
 export interface SearchTag {
   name: string
@@ -62,8 +63,15 @@ export function useSearch(query: string) {
     .slice(0, 3)
 
   // TODO: Remplacer par API call quand endpoint disponible
-  // Pour l'instant, retourner un tableau vide car les utilisateurs ne sont pas disponibles via l'API de recherche
-  const filteredUsers: never[] = []
+  const allUsers = Object.values(mockUsers)
+  const filteredUsers = allUsers
+    .filter(
+      (u) =>
+        u.username.toLowerCase().includes(queryLower) ||
+        u.displayName.toLowerCase().includes(queryLower) ||
+        (u.bio && u.bio.toLowerCase().includes(queryLower))
+    )
+    .slice(0, 3)
 
   // Utiliser les tags centralisés
   const allTags = getAllTags()
