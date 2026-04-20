@@ -5,9 +5,9 @@ import { Header } from '@features/layout'
 import { Footer } from '@features/layout'
 import { SmallCard } from '@shared/components/projects'
 import { ProjectFiltersBar } from '@features/projects/components/ProjectFilters'
+import { UserCard } from '@features/user/components'
 import { mockUsers } from '@shared/data/mockUsers'
 import type { Project } from '@shared/types'
-import type { User } from '@shared/types/user'
 
 // Données mockées pour le MVP
 const MOCK_PROJECTS: Project[] = [
@@ -133,40 +133,6 @@ const MOCK_PROJECTS: Project[] = [
   },
 ]
 
-// Composant pour afficher une carte utilisateur
-function UserCard({ user, navigate }: { user: User; navigate: (to: string) => void }) {
-  return (
-    <button
-      onClick={() => navigate(`/user/${user.username}`)}
-      className="group flex flex-col bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-200 hover:border-foreground/20 cursor-pointer text-left w-full"
-    >
-      <div className="flex flex-col items-center text-center">
-        <img
-          src={user.avatar}
-          alt={user.displayName}
-          className="w-20 h-20 rounded-full mb-4 object-cover"
-        />
-        <h3 className="text-heading-sm font-bold text-foreground mb-1 truncate w-full">
-          {user.displayName}
-        </h3>
-        <p className="text-body-sm text-muted-foreground mb-3 truncate w-full">
-          @{user.username}
-        </p>
-        {user.bio && (
-          <p className="text-body-sm text-muted-foreground line-clamp-2 mb-3">
-            {user.bio}
-          </p>
-        )}
-        <div className="flex gap-4 mt-auto pt-3 text-body-sm text-muted-foreground">
-          <span>{user.stats.projectsCreated} projets</span>
-          <span>·</span>
-          <span>{user.stats.followers} abonnés</span>
-        </div>
-      </div>
-    </button>
-  )
-}
-
 type ResultType = 'projects' | 'users'
 
 export function SearchPage() {
@@ -274,9 +240,13 @@ export function SearchPage() {
           )
         ) : (
           displayedUsers.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-7 gap-y-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
               {displayedUsers.map((user) => (
-                <UserCard key={user.username} user={user} navigate={navigate} />
+                <UserCard
+                  key={user.username}
+                  user={user}
+                  onNavigate={(username) => navigate(`/user/${username}`)}
+                />
               ))}
             </div>
           ) : (
