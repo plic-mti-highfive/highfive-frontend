@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { userService } from '@/api'
 import type { User } from '@shared/types/user'
+import type { UserProfileResponse } from '@/api/types/user.types'
 
 // Adapter la réponse API vers le format User attendu par les composants
-const adaptUserProfile = (profile: any): User => ({
+const adaptUserProfile = (profile: UserProfileResponse): User => ({
   username: profile.email.split('@')[0], // Temporaire: utiliser email comme username
   displayName: profile.email.split('@')[0],
   avatar: profile.avatarPath || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.userId}`,

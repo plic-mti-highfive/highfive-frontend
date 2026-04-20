@@ -3,7 +3,6 @@ import type {
   LoginDto,
   RegisterDto,
   AuthResponse,
-  RefreshTokenDto,
   UserDto,
 } from '../../types'
 import { UserStatus } from '../../types'
@@ -78,7 +77,7 @@ export class AuthServiceMock implements IAuthService {
     // Mock logout - just simulate the delay
   }
 
-  async refresh(_dto: RefreshTokenDto): Promise<AuthResponse> {
+  async refresh(): Promise<AuthResponse> {
     await delay(300)
 
     // For mock, just return new tokens
