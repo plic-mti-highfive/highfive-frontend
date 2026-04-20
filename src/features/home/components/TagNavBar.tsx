@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { TAG_COLORS } from '@shared/components/projects'
 
 const NAV_TAGS = [
-  'Web', 'IA / ML', 'Open Source',
-  'Hardware', 'Environnement', 'Éducation',
-  'Art', 'Social', 'Data',
+  'Créatif', 'Communauté', 'Environnement',
+  'Culture', 'Technologie', 'Éducation',
+  'Art', 'Sport', 'Événement',
 ]
 
 export function TagNavBar() {
