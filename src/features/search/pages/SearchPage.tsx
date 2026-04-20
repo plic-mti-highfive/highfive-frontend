@@ -178,7 +178,7 @@ export function SearchPage() {
         </div>
 
         {/* Barre avec boutons de type et filtres */}
-        <div className="flex items-center justify-between gap-4 mb-8">
+        <div className="flex items-start justify-between gap-4 mb-8">
           {/* Boutons de type de résultat */}
           <div className="flex gap-3">
             <button
@@ -211,13 +211,15 @@ export function SearchPage() {
             </button>
           </div>
 
-          {/* Filtres - uniquement pour les projets */}
-          {resultType === 'projects' && (
-            <ProjectFiltersBar
-              onSortChange={(sort) => setActiveSort(sort)}
-              onFilterChange={(filters) => setActiveFilters(filters)}
-            />
-          )}
+          {/* Filtres avec espace réservé */}
+          <div className="flex-shrink-0 h-[42px]">
+            {resultType === 'projects' && (
+              <ProjectFiltersBar
+                onSortChange={(sort) => setActiveSort(sort)}
+                onFilterChange={(filters) => setActiveFilters(filters)}
+              />
+            )}
+          </div>
         </div>
 
         {/* Grille de résultats */}
