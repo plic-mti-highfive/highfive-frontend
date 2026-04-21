@@ -21,11 +21,11 @@ export function Section({ title, projects, cols = 4, showViewAll = true }: Secti
   return (
     <section className="py-14 border-t border-border">
       <div className="flex items-end justify-between mb-8">
-        <h2 className="text-2xl font-black text-foreground tracking-tight">{title}</h2>
+        <h2 className="text-2xl font-semibold text-foreground tracking-tight">{title}</h2>
         {showViewAll && (
           <button
             onClick={() => navigate('/projects')}
-            className="group text-xs font-semibold text-foreground hover:text-muted-foreground transition-colors flex items-center gap-1.5"
+            className="group text-sm font-semibold text-foreground hover:text-muted-foreground transition-colors flex items-center gap-1.5"
           >
             Voir tout
             <span className="group-hover:translate-x-0.5 transition-transform">→</span>

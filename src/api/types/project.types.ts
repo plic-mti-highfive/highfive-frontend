@@ -9,6 +9,8 @@ export interface ProjectDto {
   description: string | null
   status: ProjectStatus
   visibility: ProjectVisibility
+  highfiveCount?: number
+  tags?: string[]
   createdAt: string
   updatedAt: string
   deletedAt: string | null
@@ -100,6 +102,7 @@ export interface ProjectMessageDto {
   tenantId: string
   content: string
   attachmentPath: string | null
+  replyToId?: string | null
   createdAt: string
   author?: {
     id: string
@@ -114,4 +117,5 @@ export interface ProjectMessageDto {
 export interface CreateProjectMessageDto {
   content: string
   attachmentPath?: string
+  replyToId?: string | null
 }

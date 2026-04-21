@@ -1,5 +1,6 @@
 import type { ProjectDto, ProjectMemberDto } from '@/api/types'
 import { ProjectRole } from '@/api/types'
+import { TagPill } from '@shared/components/projects/shared/TagPill'
 
 interface ProjectSidebarProps {
   project: ProjectDto
@@ -41,7 +42,7 @@ export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
     <div className="space-y-8">
       <div>
         <h3 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Informations</h3>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
             <p className="text-xs text-muted-foreground mb-1">Date de création</p>
             <p className="text-sm text-foreground">{formatDate(project.createdAt)}</p>
@@ -49,6 +50,13 @@ export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
           <div>
             <p className="text-xs text-muted-foreground mb-1">Dernière mise à jour</p>
             <p className="text-sm text-foreground">{formatDate(project.updatedAt)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">Tags</p>
+            <div className="flex flex-wrap gap-2">
+              <TagPill tag="Open Source" />
+              <TagPill tag="Tech" />
+            </div>
           </div>
         </div>
       </div>

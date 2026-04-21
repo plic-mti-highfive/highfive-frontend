@@ -4,6 +4,7 @@ import { LoginPage, RegisterPage } from '@features/auth'
 import { CreateProjectPage, ProjectDetailPage } from '@features/projects'
 import { UserProfilePage } from '@features/user'
 import { SearchPage } from '@features/search'
+import { MessagesPage } from '@features/messages'
 import { ScrollToTop } from '@shared/components/ScrollToTop'
 import { LabPage } from '@features/lab'
 
@@ -27,7 +28,9 @@ export default function App() {
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/user/:username" element={<UserProfilePage />} />
 
-        <Route path="/project/:projectId/lab" element={<LabPage />} />
+        <Route path="/projects/:projectId/lab" element={<LabPage />} />
+
+        <Route path="/messages" element={<MessagesPage />} />
 
         <Route path="/debug" element={<Debug />} />
         <Route path="*" element={<NotFoundPage />} />

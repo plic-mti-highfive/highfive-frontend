@@ -10,7 +10,7 @@ export function HeroCard({ project }: { project: Project }) {
   const navigate = useNavigate()
   return (
     <article className="cursor-pointer group" onClick={() => navigate(`/projects/${project.id}`)}>
-      <div className="relative overflow-hidden rounded-2xl mb-5 shadow-md group-hover:shadow-xl transition-shadow duration-300">
+      <div className="relative overflow-hidden rounded-2xl mb-5 shadow-xl group-hover:shadow-xl transition-shadow duration-300">
         <div className="transition-transform duration-500 group-hover:scale-[1.02]">
           <Thumbnail
             id={project.id}

@@ -7,9 +7,10 @@ const adaptProjectDto = (dto: ProjectDto): Project => ({
   id: dto.id,
   name: dto.name,
   description: dto.description || '',
-  tags: [], // TODO: ajouter tags quand disponible dans backend
+  tags: dto.tags || [], // Tags disponibles depuis backend
   author: 'unknown', // TODO: récupérer l'auteur via les membres
   contributorsCount: 0, // TODO: calculer depuis les membres
+  highfiveCount: dto.highfiveCount || 0,
   successRate: 100, // TODO: calculer selon la logique métier
   daysLeft: null, // TODO: calculer depuis une date de fin si disponible
 })

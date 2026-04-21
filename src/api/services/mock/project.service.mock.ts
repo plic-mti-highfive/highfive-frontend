@@ -321,6 +321,7 @@ export class ProjectServiceMock implements IProjectService {
       tenantId: 'default-tenant',
       content: dto.content,
       attachmentPath: dto.attachmentPath || null,
+      replyToId: dto.replyToId || null,
       createdAt: new Date().toISOString(),
       author: {
         id: 'current-user-id',

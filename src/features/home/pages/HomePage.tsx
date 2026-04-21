@@ -26,7 +26,7 @@ export default function HomePage() {
       <TagNavBar />
       <div className="bg-background" style={{ height: '2.75rem' }} />
       <main className="relative z-0 min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-6 pt-10">
+        <div className="max-w-7xl mx-auto px-6">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-start gap-3">
@@ -67,7 +67,7 @@ export default function HomePage() {
               {featured && <FeaturedLayout hero={featured} picks={recommended.slice(0, 4)} />}
               <Section title="Recommandés" projects={recommended} />
               <Section title="Projets tendance" projects={trending} />
-              <Section title="Se terminent bientôt" projects={endingSoon} cols={3} />
+              <Section title="Se terminent bientôt" projects={endingSoon} />
               <Section title="Projets qui ont réussi" projects={successful} />
               <Section title="Projets récents" projects={recent} />
               <div className="pb-20" />

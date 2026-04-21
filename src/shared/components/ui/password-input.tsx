@@ -24,7 +24,7 @@ export function PasswordInput({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-body-md text-ink font-semibold">
+      <Label htmlFor={id} className="text-body-md text-foreground font-semibold">
         {label}
       </Label>
       <div className="relative">
@@ -34,12 +34,12 @@ export function PasswordInput({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-13 text-body-md bg-cream-dark border-cream-mid text-ink placeholder:text-ink-muted focus-visible:border-ink focus-visible:ring-ink/20 pr-11"
+          className="h-13 text-body-md pr-11"
         />
         <button
           type="button"
           onClick={() => setShow((v) => !v)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label={ariaLabel || (show ? 'Masquer' : 'Afficher')}
         >
           {show ? <EyeOff size={18} /> : <Eye size={18} />}

@@ -19,25 +19,25 @@ export function AuthLayout({
   onSubmit
 }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-cream flex p-6 gap-6">
+    <div className="min-h-screen bg-background flex p-6 gap-6">
       {/* Gauche : placeholder image */}
-      <div className="hidden md:flex w-1/2 bg-cream-dark rounded-xl" />
+      <div className="hidden md:flex w-1/2 bg-muted rounded-xl" />
 
       {/* Droite : formulaire */}
       <div className="w-full md:w-1/2 flex flex-col items-center px-4">
         {/* Logo */}
         <div className="flex pt-4 w-full max-w-md justify-center">
-          <Logo className="text-3xl" textColor="text-ink" />
+          <Logo className="text-3xl" textColor="text-foreground" />
         </div>
 
         {/* Formulaire centré verticalement */}
         <div className="flex-1 flex flex-col justify-center w-full max-w-md">
           {/* En-tête */}
           <div className="mb-10 text-center">
-            <h1 className="font-heading text-display-lg text-ink mb-3">
+            <h1 className="font-heading text-display-lg text-foreground mb-3">
               {title}
             </h1>
-            <p className="text-body-lg text-ink-muted">
+            <p className="text-body-lg text-muted-foreground">
               {description}
             </p>
           </div>
@@ -50,11 +50,11 @@ export function AuthLayout({
 
         {/* Bas : lien */}
         <div className="pb-4 text-center">
-          <p className="text-body-md text-ink-muted">
+          <p className="text-body-md text-muted-foreground">
             {footerText}{' '}
             <Link
               to={footerLink.href}
-              className="text-ink font-semibold underline-offset-4 hover:underline"
+              className="text-foreground font-semibold underline-offset-4 hover:underline"
             >
               {footerLink.text}
             </Link>

@@ -1,7 +1,13 @@
+import { useState } from 'react'
+import { MoreVertical, Flag } from 'lucide-react'
+import { Menu } from '@base-ui/react/menu'
 import type { ProjectMessageDto } from '@/api/types'
 
 interface MessageCardProps {
   message: ProjectMessageDto
+  isReply?: boolean
+  onReply?: (messageId: string) => void
+  onReport?: (messageId: string) => void
 }
 
 export function MessageCard({ message }: MessageCardProps) {
@@ -28,41 +34,78 @@ export function MessageCard({ message }: MessageCardProps) {
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
-  return (
-    <div className="flex gap-3 p-4 bg-card border border-border rounded-lg">
-      <div
-        className="w-10 h-10 rounded-full text-sm font-bold flex items-center justify-center shrink-0 ring-1 ring-black/10"
-        style={{
-          background: avatarPath
-            ? `url(${avatarPath}) center/cover`
-            : `hsl(${(authorName.charCodeAt(0) * 37) % 360} 45% 80%)`,
-          color: avatarPath ? 'transparent' : `hsl(${(authorName.charCodeAt(0) * 37) % 360} 45% 30%)`,
-        }}
-      >
-        {!avatarPath && getInitials(authorName)}
-      </div>
+  const popupCls =
+    'bg-background border border-border rounded-xl shadow-lg py-1.5 w-48 z-[999] origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2 mb-1">
-          <span className="font-semibold text-foreground">{authorName}</span>
-          <span className="text-xs text-muted-foreground">{formatDate(message.createdAt)}</span>
+  const itemCls =
+    'flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors'
+
+  return (
+    <div className={`flex gap-3 ${isReply ? 'ml-8 pl-4 border-l-2 border-border' : ''}`}>
+      <div className="flex gap-3 flex-1 p-4 bg-card border border-border rounded-lg">
+        <div
+          className="w-10 h-10 rounded-full text-sm font-bold flex items-center justify-center shrink-0 ring-1 ring-black/10"
+          style={{
+            background: avatarPath
+              ? `url(${avatarPath}) center/cover`
+              : `hsl(${(authorName.charCodeAt(0) * 37) % 360} 45% 80%)`,
+            color: avatarPath ? 'transparent' : `hsl(${(authorName.charCodeAt(0) * 37) % 360} 45% 30%)`,
+          }}
+        >
+          {!avatarPath && getInitials(authorName)}
         </div>
 
-        <p className="text-sm text-foreground whitespace-pre-wrap break-words">
-          {message.content}
-        </p>
-
-        {message.attachmentPath && (
-          <div className="mt-2">
-            <a
-              href={message.attachmentPath}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              Voir la pièce jointe
-            </a>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2 mb-1">
+            <span className="font-semibold text-foreground">{authorName}</span>
+            <span className="text-xs text-muted-foreground">{formatDate(message.createdAt)}</span>
           </div>
+
+          <p className="text-sm text-foreground whitespace-pre-wrap break-words">
+            {message.content}
+          </p>
+
+          {message.attachmentPath && (
+            <div className="mt-2">
+              <a
+                href={message.attachmentPath}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Voir la pièce jointe
+              </a>
+            </div>
+          )}
+
+          <div className="flex gap-2 mt-2">
+            {onReply && (
+              <button
+                onClick={() => onReply(message.id)}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Répondre
+              </button>
+            )}
+          </div>
+        </div>
+
+        {onReport && (
+          <Menu.Root>
+            <Menu.Trigger className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-muted transition-colors cursor-pointer shrink-0">
+              <MoreVertical size={16} className="text-muted-foreground" />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner side="bottom" align="end" sideOffset={4}>
+                <Menu.Popup className={popupCls}>
+                  <Menu.Item className={itemCls} onClick={() => onReport(message.id)}>
+                    <Flag size={16} className="text-muted-foreground" />
+                    Signaler
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
         )}
       </div>
     </div>

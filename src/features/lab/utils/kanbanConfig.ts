@@ -8,9 +8,9 @@ export const PRIORITY_CONFIG: Record<KanbanPriority, { color: string; label: str
 
 /** Default columns for a new project — 3 universal stages */
 export const DEFAULT_COLUMNS = [
-  { id: 'todo',        label: 'À faire',  accentColor: '#3EC6F5', bgColor: '#E5F8FF' },
-  { id: 'in-progress', label: 'En cours', accentColor: '#FF6B1A', bgColor: '#FFF0E6' },
-  { id: 'done',        label: 'Terminé',  accentColor: '#5ED651', bgColor: '#EDFCE8' },
+  { id: 'todo',        label: 'À faire',  accentColor: '#3EC6F5', bgColor: '#D4F1FF' },
+  { id: 'in-progress', label: 'En cours', accentColor: '#FF6B1A', bgColor: '#FFE5D1' },
+  { id: 'done',        label: 'Terminé',  accentColor: '#5ED651', bgColor: '#DFFBD4' },
 ]
 
 /** Palette for user-created tags (cycles through on creation) */

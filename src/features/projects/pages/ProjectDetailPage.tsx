@@ -123,7 +123,7 @@ export function ProjectDetailPage() {
                   </div>
                 )}
 
-                {activeTab === 'tickets' && <TicketList tickets={tickets} members={members} />}
+                {activeTab === 'tickets' && <TicketList tickets={tickets} members={members} projectId={project.id} />}
               </div>
 
               <div className="lg:col-span-1">
