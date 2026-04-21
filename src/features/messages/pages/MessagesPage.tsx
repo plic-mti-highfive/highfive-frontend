@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Header } from '@features/layout'
+import { Footer, Header } from '@features/layout'
 import { ConversationList } from '../components/ConversationList'
 import { ConversationDetail } from '../components/ConversationDetail'
 import { EmptyConversation } from '../components/EmptyConversation'
@@ -18,8 +18,7 @@ export function MessagesPage() {
   return (
     <>
       <Header />
-      <div className="bg-background" style={{ height: '2.75rem' }} />
-      <main className="relative z-0 min-h-screen bg-background">
+      <main className="relative z-0 bg-background">
         <div className="flex flex-col lg:flex-row h-[calc(100vh-4.375rem)]">
           {/* Sidebar - Conversation List */}
           <aside
@@ -51,6 +50,7 @@ export function MessagesPage() {
           </section>
         </div>
       </main>
+      <Footer />
     </>
   )
 }
