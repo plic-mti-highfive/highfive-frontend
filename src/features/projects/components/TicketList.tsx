@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+import { Kanban } from 'lucide-react'
 import type { TicketDto, ProjectMemberDto } from '@/api/types'
 import { TicketStatus } from '@/api/types'
 import { TicketCard } from './TicketCard'
@@ -5,9 +7,12 @@ import { TicketCard } from './TicketCard'
 interface TicketListProps {
   tickets: TicketDto[]
   members: ProjectMemberDto[]
+  projectId: string
 }
 
-export function TicketList({ tickets, members }: TicketListProps) {
+export function TicketList({ tickets, members, projectId }: TicketListProps) {
+  const navigate = useNavigate()
+
   const getAssigneeName = (assigneeId: string | null) => {
     if (!assigneeId) return undefined
     const member = members.find((m) => m.userId === assigneeId)
@@ -30,14 +35,34 @@ export function TicketList({ tickets, members }: TicketListProps) {
 
   if (tickets.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Aucun ticket pour le moment.</p>
-      </div>
+      <>
+        <div className="mb-6">
+          <button
+            onClick={() => navigate(`/projects/${projectId}/lab`)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-semibold rounded-lg hover:opacity-90 transition-opacity"
+          >
+            <Kanban size={18} />
+            Accéder au lab
+          </button>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Aucun ticket pour le moment.</p>
+        </div>
+      </>
     )
   }
 
   return (
     <div className="space-y-6">
+      <div className="mb-4">
+        <button
+          onClick={() => navigate(`/projects/${projectId}/lab`)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-semibold rounded-lg hover:opacity-90 transition-opacity"
+        >
+          <Kanban size={18} />
+          Accéder au lab
+        </button>
+      </div>
       {Object.entries(groupedTickets).map(([status, statusTickets]) => {
         if (statusTickets.length === 0) return null
 

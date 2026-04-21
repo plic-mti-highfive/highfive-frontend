@@ -27,7 +27,7 @@ export default function App() {
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/user/:username" element={<UserProfilePage />} />
 
-        <Route path="/project/:projectId/lab" element={<LabPage />} />
+        <Route path="/projects/:projectId/lab" element={<LabPage />} />
 
         <Route path="/debug" element={<Debug />} />
         <Route path="*" element={<NotFoundPage />} />

@@ -33,11 +33,11 @@ export default function RegisterPage() {
     >
       {/* Nom affiché */}
       <div className="space-y-2">
-        <Label htmlFor="username" className="text-body-md text-ink font-semibold">
+        <Label htmlFor="username" className="text-body-md text-foreground font-semibold">
           Nom affiché
         </Label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body-md text-ink-muted select-none">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body-md text-muted-foreground select-none">
             @
           </span>
           <Input
@@ -46,14 +46,14 @@ export default function RegisterPage() {
             placeholder="votre_nom"
             value={username}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-            className="h-13 text-body-md bg-cream-dark border-cream-mid text-ink placeholder:text-ink-muted focus-visible:border-ink focus-visible:ring-ink/20 pl-7"
+            className="h-13 text-body-md pl-7"
           />
         </div>
       </div>
 
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-body-md text-ink font-semibold">
+        <Label htmlFor="email" className="text-body-md text-foreground font-semibold">
           Adresse e-mail
         </Label>
         <Input
@@ -62,7 +62,7 @@ export default function RegisterPage() {
           placeholder="vous@exemple.com"
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          className="h-13 text-body-md bg-cream-dark border-cream-mid text-ink placeholder:text-ink-muted focus-visible:border-ink focus-visible:ring-ink/20"
+          className="h-13 text-body-md"
         />
       </div>
 
@@ -85,7 +85,7 @@ export default function RegisterPage() {
       {/* Bouton */}
       <Button
         type="submit"
-        className="w-full h-13 text-body-lg font-semibold rounded-lg text-cream mt-2"
+        className="w-full h-13 text-body-lg font-semibold rounded-lg mt-2 dark:bg-foreground dark:text-background dark:hover:bg-foreground/90"
       >
         Créer mon compte
       </Button>

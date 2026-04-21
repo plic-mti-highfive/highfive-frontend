@@ -24,10 +24,10 @@ export function KanbanBoard({ columns, tasks, customTags, addTask, moveTask, del
     dragRef.current = { taskId, fromColumnId: columnId }
   }
 
-  const handleDrop = (targetColumnId: KanbanColumnId) => {
+  const handleDrop = (targetColumnId: KanbanColumnId, dropIndex?: number) => {
     if (!dragRef.current) return
     const { taskId, fromColumnId } = dragRef.current
-    moveTask(taskId, fromColumnId, targetColumnId)
+    moveTask(taskId, fromColumnId, targetColumnId, dropIndex)
     dragRef.current = null
   }
 
@@ -40,7 +40,7 @@ export function KanbanBoard({ columns, tasks, customTags, addTask, moveTask, del
   }
 
   return (
-    <div className="overflow-x-auto pb-4">
+    <div className="overflow-x-auto pb-4 px-1 pt-1">
       <div className="flex gap-4 items-start" style={{ minWidth: 'max-content' }}>
         {columns.map(col => (
           <KanbanColumn
@@ -61,9 +61,9 @@ export function KanbanBoard({ columns, tasks, customTags, addTask, moveTask, del
         ))}
 
         {/* Add column */}
-        <div className="shrink-0" style={{ minWidth: '220px' }}>
+        <div className="shrink-0" style={{ width: '280px' }}>
           {addingColumn ? (
-            <div className="bg-white/70 rounded-2xl border-2 border-dashed border-[var(--color-cream-mid)] p-4 space-y-2">
+            <div className="bg-card/70 dark:bg-card/50 rounded-2xl border-2 border-dashed border-border p-4 space-y-2">
               <input
                 autoFocus
                 type="text"
@@ -74,18 +74,18 @@ export function KanbanBoard({ columns, tasks, customTags, addTask, moveTask, del
                   if (e.key === 'Escape') { setAddingColumn(false); setNewColLabel('') }
                 }}
                 placeholder="Nom de la colonne…"
-                className="w-full text-body-md text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
+                className="w-full text-body-md text-foreground bg-transparent outline-none placeholder:text-muted-foreground"
               />
               <div className="flex gap-2">
                 <button
                   onClick={submitNewColumn}
-                  className="flex-1 py-1.5 rounded-lg text-ui-sm font-semibold bg-[var(--color-ink)] text-white cursor-pointer hover:opacity-80"
+                  className="flex-1 py-1.5 rounded-lg text-ui-sm font-semibold bg-foreground text-background cursor-pointer hover:opacity-80"
                 >
                   Ajouter
                 </button>
                 <button
                   onClick={() => { setAddingColumn(false); setNewColLabel('') }}
-                  className="px-3 py-1.5 rounded-lg text-ui-sm text-[var(--color-ink-muted)] hover:bg-black/8 cursor-pointer transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-ui-sm text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
                 >
                   Annuler
                 </button>
@@ -94,7 +94,7 @@ export function KanbanBoard({ columns, tasks, customTags, addTask, moveTask, del
           ) : (
             <button
               onClick={() => setAddingColumn(true)}
-              className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-2xl border-2 border-dashed border-[var(--color-cream-mid)] text-body-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:border-[var(--color-ink-muted)] transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-2xl border-2 border-dashed border-border text-body-sm text-muted-foreground hover:text-foreground hover:border-muted-foreground transition-colors cursor-pointer"
             >
               <Plus size={14} />
               Nouvelle colonne

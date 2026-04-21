@@ -48,9 +48,9 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
       onClick={() => {
         if (!didDragRef.current) onOpen(task.id, columnId)
       }}
-      className={`group relative bg-white rounded-xl px-3.5 py-3 border transition-all duration-150 cursor-pointer select-none
-        border-[var(--color-cream-mid)]
-        shadow-sm hover:shadow-[0_6px_20px_rgba(0,0,0,0.09)] hover:-translate-y-0.5 hover:border-[var(--color-cream-dark)]
+      className={`group relative bg-card rounded-xl px-3.5 py-3 border transition-all duration-150 cursor-pointer select-none
+        border-border
+        shadow-sm hover:shadow-[0_6px_20px_rgba(0,0,0,0.09)] dark:hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 hover:border-muted-foreground
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rose)]
         ${isDragging ? 'opacity-40 scale-[0.97] shadow-none' : ''}
       `}
@@ -58,7 +58,7 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
       {/* Top row: grip + title + delete */}
       <div className="flex items-start gap-2">
         <GripVertical
-          className="shrink-0 mt-0.5 text-[var(--color-ink-muted)] opacity-0 group-hover:opacity-40 transition-opacity"
+          className="shrink-0 mt-0.5 text-muted-foreground opacity-0 group-hover:opacity-40 transition-opacity"
           size={14}
         />
         <div className="flex-1 min-w-0">
@@ -72,12 +72,12 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
                 <PriorityIcon size={11} strokeWidth={2.5} style={{ color: priorityCfg.color }} />
               </span>
             )}
-            <p className="text-body-md font-medium text-[var(--color-ink)] leading-snug">{task.title}</p>
+            <p className="text-body-md font-medium text-foreground leading-snug">{task.title}</p>
           </div>
         </div>
         <button
           onClick={e => { e.stopPropagation(); onDelete(task.id, columnId) }}
-          className="shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-[var(--color-ink-muted)] hover:text-red-500 cursor-pointer p-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+          className="shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-500 cursor-pointer p-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
           aria-label="Supprimer la tâche"
         >
           <Trash2 size={13} />
@@ -109,7 +109,7 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
           <div className="flex items-center gap-2.5">
             {checklistTotal > 0 && (
               <span
-                className={`inline-flex items-center gap-1 text-body-sm ${checklistComplete ? 'text-[#2A8C1E]' : 'text-[var(--color-ink-muted)]'}`}
+                className={`inline-flex items-center gap-1 text-body-sm ${checklistComplete ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}
                 title={`Checklist : ${checklistDone}/${checklistTotal}`}
               >
                 <CheckSquare size={12} />
@@ -118,7 +118,7 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
             )}
             {commentsCount > 0 && (
               <span
-                className="inline-flex items-center gap-1 text-body-sm text-[var(--color-ink-muted)]"
+                className="inline-flex items-center gap-1 text-body-sm text-muted-foreground"
                 title={`${commentsCount} commentaire${commentsCount > 1 ? 's' : ''}`}
               >
                 <MessageCircle size={12} />

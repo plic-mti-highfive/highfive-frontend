@@ -99,15 +99,36 @@ export function useKanban() {
     }))
   }
 
-  function moveTask(taskId: string, from: KanbanColumnId, to: KanbanColumnId) {
-    if (from === to) return
+  function moveTask(taskId: string, from: KanbanColumnId, to: KanbanColumnId, toIndex?: number) {
     setTasks(prev => {
       const task = prev[from]?.find(t => t.id === taskId)
       if (!task) return prev
+
+      // Si c'est la même colonne, on réordonne
+      if (from === to) {
+        const newList = [...prev[from]]
+        const currentIndex = newList.findIndex(t => t.id === taskId)
+        if (currentIndex === -1) return prev
+
+        newList.splice(currentIndex, 1)
+        const insertIndex = toIndex !== undefined ? toIndex : newList.length
+        newList.splice(insertIndex, 0, task)
+
+        return {
+          ...prev,
+          [from]: newList,
+        }
+      }
+
+      // Sinon, on déplace vers une autre colonne
+      const targetList = [...(prev[to] ?? [])]
+      const insertIndex = toIndex !== undefined ? toIndex : targetList.length
+      targetList.splice(insertIndex, 0, task)
+
       return {
         ...prev,
         [from]: prev[from].filter(t => t.id !== taskId),
-        [to]: [...(prev[to] ?? []), task],
+        [to]: targetList,
       }
     })
   }

@@ -45,7 +45,7 @@ export default function LoginPage() {
     >
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-body-md text-ink font-semibold">
+        <Label htmlFor="email" className="text-body-md text-foreground font-semibold">
           Adresse e-mail
         </Label>
         <Input
@@ -54,7 +54,7 @@ export default function LoginPage() {
           placeholder="vous@exemple.com"
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          className="h-13 text-body-md bg-cream-dark border-cream-mid text-ink placeholder:text-ink-muted focus-visible:border-ink focus-visible:ring-ink/20"
+          className="h-13 text-body-md"
         />
       </div>
 
@@ -74,11 +74,11 @@ export default function LoginPage() {
             checked={remember}
             onCheckedChange={(v: boolean) => setRemember(v === true)}
           />
-          <span className="text-body-md text-ink-soft">Se souvenir de moi</span>
+          <span className="text-body-md text-muted-foreground">Se souvenir de moi</span>
         </label>
         <button
           type="button"
-          className="text-body-md text-ink-muted hover:text-ink transition-colors underline-offset-4 hover:underline"
+          className="text-body-md text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
         >
           Mot de passe oublié ?
         </button>
@@ -92,7 +92,7 @@ export default function LoginPage() {
       {/* Bouton Se connecter */}
       <Button
         type="submit"
-        className="w-full h-13 text-body-lg font-semibold rounded-lg text-cream mt-2"
+        className="w-full h-13 text-body-lg font-semibold rounded-lg mt-2 dark:bg-foreground dark:text-background dark:hover:bg-foreground/90"
       >
         Se connecter
       </Button>
