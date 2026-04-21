@@ -75,10 +75,6 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
               <User size={18} className="text-muted-foreground shrink-0" />
               Mon profil
             </Menu.Item>
-            <Menu.Item className={itemCls} onClick={() => navigate('/projects')}>
-              <FolderOpen size={18} className="text-muted-foreground shrink-0" />
-              Mes projets
-            </Menu.Item>
             <Menu.Item className={itemCls} onClick={() => navigate('/messages')}>
               <MessageSquare size={18} className="text-muted-foreground shrink-0" />
               Messages

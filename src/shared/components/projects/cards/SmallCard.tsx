@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Hand } from 'lucide-react'
 import type { Project } from '@shared/types'
 import { Thumbnail } from '../shared/Thumbnail'
 import { AuthorChip } from '../shared/AuthorChip'
-import { DaysLeftBadge } from '../shared/DaysLeftBadge'
-import { ProgressBar } from '../shared/ProgressBar'
 import { TagPill } from '../shared/TagPill'
 
 export function SmallCard({ project }: { project: Project }) {
@@ -29,30 +28,21 @@ export function SmallCard({ project }: { project: Project }) {
         </div>
         <div className={`absolute inset-0 rounded-xl bg-gray-900/80 backdrop-blur-[3px] flex flex-col justify-end p-3 gap-2 transition-opacity duration-200 ${hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <p className="text-white/85 text-xs leading-relaxed line-clamp-3">{project.description}</p>
-          <button
-            className="self-start mt-0.5 bg-white text-foreground text-[11px] font-bold px-3 py-1 rounded-full hover:bg-gray-100 transition-colors"
-            onClick={e => { e.stopPropagation(); navigate(`/projects/${project.id}`) }}
-          >
-            Voir le projet →
-          </button>
         </div>
       </div>
 
       <div className="space-y-2 px-0.5">
-        <div className="flex items-center justify-between">
-          <AuthorChip author={project.author} />
-          <DaysLeftBadge days={project.daysLeft} />
-        </div>
+        <AuthorChip author={project.author} />
         <h3 className="font-bold text-sm text-foreground leading-snug line-clamp-1">{project.name}</h3>
-        <ProgressBar value={project.successRate} />
-        <div className="flex items-center justify-between">
-          <span className={`text-xs font-bold ${project.successRate >= 100 ? 'text-emerald-600' : 'text-foreground'}`}>
-            {project.successRate}%
-          </span>
-          <span className="text-[11px] text-foreground">{project.contributorsCount} contributeurs</span>
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-xs text-foreground">{project.contributorsCount} contributeurs</span>
+          <div className="flex items-center gap-1">
+            <Hand size={14} className="text-muted-foreground" />
+            <span className="text-[11px] text-foreground font-medium">{project.highfiveCount || 0}</span>
+          </div>
         </div>
-        <div className="flex gap-1 flex-wrap">
-          {project.tags.slice(0, 2).map(t => <TagPill key={t} tag={t} size="xs" />)}
+        <div className="flex gap-1 flex-wrap pt-2">
+          {project.tags.slice(0, 3).map(t => <TagPill key={t} tag={t} size="xs" />)}
         </div>
       </div>
     </article>

@@ -6,6 +6,7 @@ export interface Project {
   author: string
   authorAvatar?: string
   contributorsCount: number
+  highfiveCount?: number
   successRate: number
   daysLeft: number | null
   thumbnailUrl?: string

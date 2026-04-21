@@ -4,10 +4,10 @@ export function StepChoose({ onChoose }: { onChoose: (m: Mode) => void }) {
   return (
     <div className="space-y-6">
       <div className="mb-10">
-        <h1 className="text-5xl font-black text-ink leading-tight">
-          Créer un<br />projet
+        <h1 className="text-center text-5xl font-bold text-foreground leading-tight">
+          Créer un projet
         </h1>
-        <p className="mt-3 text-sm text-ink">Comment veux-tu démarrer ?</p>
+        <p className="text-center mt-3 text-sm text-ink">Comment veux-tu démarrer ?</p>
       </div>
 
       <button type="button" onClick={() => onChoose('ai')}
