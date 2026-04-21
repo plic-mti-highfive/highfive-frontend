@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react'
 import { Trash2, GripVertical, ArrowUp, Minus, ArrowDown, MessageCircle, CheckSquare } from 'lucide-react'
-import type { KanbanTask, KanbanColumnId } from '../types'
-import { getTagStyle, getAssigneeColor, assigneeInitials, PRIORITY_CONFIG } from '../utils/kanbanConfig'
+import type { KanbanTask, KanbanColumnId, CustomTag } from '../types'
+import { getAssigneeColor, assigneeInitials, PRIORITY_CONFIG, tagBg } from '../utils/kanbanConfig'
 
 interface KanbanCardProps {
   task: KanbanTask
   columnId: KanbanColumnId
+  customTags: CustomTag[]
   onDelete: (taskId: string, columnId: KanbanColumnId) => void
   onDragStart: (taskId: string, columnId: KanbanColumnId) => void
   onOpen: (taskId: string, columnId: KanbanColumnId) => void
@@ -17,7 +18,7 @@ const PRIORITY_ICONS = {
   low:    ArrowDown,
 }
 
-export function KanbanCard({ task, columnId, onDelete, onDragStart, onOpen }: KanbanCardProps) {
+export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, onOpen }: KanbanCardProps) {
   const [isDragging, setIsDragging] = useState(false)
   const didDragRef = useRef(false)
 
@@ -86,15 +87,16 @@ export function KanbanCard({ task, columnId, onDelete, onDragStart, onOpen }: Ka
       {/* Tags row */}
       {task.tags && task.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2 ml-5">
-          {task.tags.map(tag => {
-            const style = getTagStyle(tag)
+          {task.tags.map(tagId => {
+            const tag = customTags.find(t => t.id === tagId)
+            if (!tag) return null
             return (
               <span
-                key={tag}
+                key={tagId}
                 className="text-label uppercase px-2 py-0.5 rounded-full font-semibold"
-                style={{ backgroundColor: style.bg, color: style.color }}
+                style={{ backgroundColor: tagBg(tag.color), color: tag.color }}
               >
-                {tag}
+                {tag.label}
               </span>
             )
           })}

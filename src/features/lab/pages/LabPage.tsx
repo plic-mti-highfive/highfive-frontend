@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronRight, LayoutTemplate, Kanban, ArrowLeft, Sparkles } from 'lucide-react'
+import { ChevronRight, LayoutTemplate, Kanban, ArrowLeft } from 'lucide-react'
 import { Header } from '@features/layout'
 import { Footer } from '@features/layout'
 import { KanbanBoard } from '../components/KanbanBoard'
@@ -12,8 +12,7 @@ import type { KanbanColumnId } from '../types'
 
 export default function LabPage() {
   const { projectId } = useParams<{ projectId: string }>()
-  const { tasks, addTask, moveTask, deleteTask, updateTask } = useKanban()
-  const [canvaNotified, setCanvaNotified] = useState(false)
+  const { tasks, columns, customTags, addTask, moveTask, deleteTask, updateTask, addColumn, deleteColumn, addCustomTag } = useKanban()
   const [openTask, setOpenTask] = useState<{ taskId: string; columnId: KanbanColumnId } | null>(null)
 
   const { total, done } = useMemo(() => {
@@ -49,15 +48,15 @@ export default function LabPage() {
               <span>Projet #{projectId}</span>
             </Link>
             <ChevronRight size={11} className="opacity-50" />
-            <span className="text-[var(--color-ink)] font-semibold">Lab</span>
+            <span className="text-[var(--color-ink)] font-semibold">Tableau de bord</span>
           </nav>
 
           {/* Project context bar */}
           <div className="flex items-center justify-between gap-6 mb-6 pb-6 border-b border-[var(--color-cream-mid)]">
             <div>
-              <h1 className="text-heading-lg font-semibold text-[var(--color-ink)] mb-0.5">Lab</h1>
+              <h1 className="text-heading-lg font-semibold text-[var(--color-ink)] mb-0.5">Tableau de bord</h1>
               <p className="text-body-sm text-[var(--color-ink-muted)]">
-                Gérez les tâches de votre projet collaboratif.
+                Organisez les tâches de votre projet à votre façon.
               </p>
             </div>
 
@@ -103,52 +102,34 @@ export default function LabPage() {
           </div>
 
           {/* Tool switcher */}
-          <div className="flex items-stretch gap-3 mb-8">
+          <div className="flex items-center gap-2 mb-8">
             {/* Kanban — active */}
-            <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-[var(--color-ink)] text-white shadow-md cursor-default select-none min-w-[200px]">
-              <Kanban size={18} className="shrink-0" />
-              <div>
-                <div className="text-ui-md font-bold">Kanban</div>
-                <div className="text-[11px] opacity-50 mt-0.5">Vue par colonnes</div>
-              </div>
+            <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-[var(--color-ink)] text-white shadow-sm cursor-default select-none">
+              <Kanban size={16} className="shrink-0" />
+              <span className="text-ui-md font-bold">Kanban</span>
             </div>
 
-            {/* Canva — future, highlighted as USP */}
-            <div className="group flex items-center gap-3 px-5 py-3.5 rounded-2xl border-2 border-dashed border-[var(--color-rose-mid)] bg-[var(--color-rose-light)]/40 min-w-[200px]">
-              <LayoutTemplate size={18} className="shrink-0 text-[var(--color-rose)]" />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-ui-md font-bold text-[var(--color-ink)]">Canva</span>
-                  <span className="inline-flex items-center gap-0.5 text-label uppercase px-1.5 py-0.5 rounded-full font-bold bg-[var(--color-cream-mid)] text-[var(--color-ink-muted)]">
-                    <Sparkles size={8} />
-                    bientôt
-                  </span>
-                </div>
-                <div className="text-[11px] text-[var(--color-ink-muted)] mt-0.5">
-                  Collaboration visuelle en temps réel
-                </div>
-              </div>
-              <button
-                onClick={() => setCanvaNotified(true)}
-                disabled={canvaNotified}
-                className={`shrink-0 text-ui-sm font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rose)] ${
-                  canvaNotified
-                    ? 'bg-[var(--color-apple-light)] text-[var(--color-apple-dark)] cursor-default'
-                    : 'bg-[var(--color-rose)] text-white hover:bg-[var(--color-rose-dark)] active:scale-[0.97]'
-                }`}
-              >
-                {canvaNotified ? '✓ Notifié' : 'Me notifier'}
-              </button>
-            </div>
+            {/* Moodboard — inactive */}
+            <Link
+              to={`/project/${projectId}/moodboard`}
+              className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-[var(--color-cream-mid)] text-[var(--color-ink-muted)] hover:bg-[var(--color-cream-dark)] hover:text-[var(--color-ink)] transition-colors select-none"
+            >
+              <LayoutTemplate size={16} className="shrink-0" />
+              <span className="text-ui-md font-bold">Moodboard</span>
+            </Link>
           </div>
 
           {/* Kanban board */}
           <KanbanBoard
+            columns={columns}
             tasks={tasks}
+            customTags={customTags}
             addTask={addTask}
             moveTask={moveTask}
             deleteTask={deleteTask}
             onOpenTask={(taskId, columnId) => setOpenTask({ taskId, columnId })}
+            onAddColumn={addColumn}
+            onDeleteColumn={deleteColumn}
           />
 
         </div>
@@ -160,10 +141,13 @@ export default function LabPage() {
         columnId={openTask?.columnId ?? null}
         isOpen={openTask !== null}
         members={MOCK_MEMBERS}
+        columns={columns}
+        customTags={customTags}
         onClose={() => setOpenTask(null)}
         onUpdate={updateTask}
         onMoveColumn={handleDrawerMove}
         onDelete={(id, col) => { deleteTask(id, col); setOpenTask(null) }}
+        onAddTag={addCustomTag}
       />
     </>
   )

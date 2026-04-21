@@ -1,5 +1,11 @@
-export type KanbanColumnId = 'todo' | 'in-progress' | 'review' | 'done'
+export type KanbanColumnId = string
 export type KanbanPriority = 'high' | 'medium' | 'low'
+
+export interface CustomTag {
+  id: string
+  label: string
+  color: string // hex, e.g. '#FF6B1A'
+}
 
 export interface ChecklistItem {
   id: string
@@ -17,7 +23,7 @@ export interface TaskComment {
 export interface KanbanTask {
   id: string
   title: string
-  tags?: string[]
+  tags?: string[] // tag ids
   assignee?: string
   priority?: KanbanPriority
   checklistItems?: ChecklistItem[]

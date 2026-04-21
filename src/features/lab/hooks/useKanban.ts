@@ -1,12 +1,22 @@
 import { useState } from 'react'
-import type { KanbanColumnId, KanbanTask } from '../types'
+import type { KanbanColumnId, KanbanTask, KanbanColumnDef, CustomTag } from '../types'
+import { DEFAULT_COLUMNS, TAG_COLOR_PALETTE } from '../utils/kanbanConfig'
+
+const INITIAL_COLUMNS: KanbanColumnDef[] = DEFAULT_COLUMNS.map(c => ({ ...c, bgColor: c.bgColor }))
+
+const INITIAL_TAGS: CustomTag[] = [
+  { id: 'tag-1', label: 'Idée',       color: '#3EC6F5' },
+  { id: 'tag-2', label: 'Urgent',     color: '#E0305A' },
+  { id: 'tag-3', label: 'Recherche',  color: '#C24BFF' },
+  { id: 'tag-4', label: 'Créatif',    color: '#FF6B1A' },
+]
 
 const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
   todo: [
     {
       id: '1',
       title: 'Définir le périmètre du projet',
-      tags: ['planning'],
+      tags: ['tag-1', 'tag-3'],
       assignee: 'Alice M.',
       priority: 'high',
       checklistItems: [
@@ -20,68 +30,59 @@ const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
     },
     {
       id: '2',
-      title: 'Créer les maquettes UI',
-      tags: ['design'],
+      title: 'Préparer les visuels',
+      tags: ['tag-4'],
       assignee: 'Lucas T.',
       priority: 'medium',
       checklistItems: [],
       taskComments: [
-        { id: 'cm2-1', author: 'Alice M.', text: 'Utiliser les composants du Design System !', createdAt: '2026-04-18T10:00:00Z' },
-        { id: 'cm2-2', author: 'Lucas T.', text: 'Bien noté, je commence par le dashboard.', createdAt: '2026-04-18T11:30:00Z' },
-        { id: 'cm2-3', author: 'Sara K.',  text: 'Prévoir la vue mobile aussi.', createdAt: '2026-04-19T09:15:00Z' },
+        { id: 'cm2-1', author: 'Alice M.', text: 'Penser à inclure les contraintes de format.', createdAt: '2026-04-18T10:00:00Z' },
+        { id: 'cm2-2', author: 'Lucas T.', text: 'Noté, je commence par les formats mobiles.', createdAt: '2026-04-18T11:30:00Z' },
+        { id: 'cm2-3', author: 'Sara K.',  text: 'Prévoir aussi la version print.', createdAt: '2026-04-19T09:15:00Z' },
       ],
     },
   ],
   'in-progress': [
     {
       id: '3',
-      title: 'Développer le backend API',
-      tags: ['dev'],
+      title: 'Rédiger le contenu principal',
+      tags: ['tag-3'],
       assignee: 'Alice M.',
       priority: 'high',
       checklistItems: [
-        { id: 'c3-1', text: 'Setup Express + TypeScript', done: true },
-        { id: 'c3-2', text: 'Endpoints authentification', done: false },
-        { id: 'c3-3', text: 'Endpoints projets', done: false },
-        { id: 'c3-4', text: 'Tests unitaires', done: false },
+        { id: 'c3-1', text: 'Introduction', done: true },
+        { id: 'c3-2', text: 'Section 1', done: false },
+        { id: 'c3-3', text: 'Section 2', done: false },
+        { id: 'c3-4', text: 'Conclusion', done: false },
       ],
       taskComments: [
-        { id: 'cm3-1', author: 'Lucas T.', text: 'Est-ce que tu peux documenter les routes ?', createdAt: '2026-04-19T14:00:00Z' },
-        { id: 'cm3-2', author: 'Alice M.', text: 'Oui, je vais utiliser Swagger.', createdAt: '2026-04-19T15:00:00Z' },
-      ],
-    },
-  ],
-  review: [
-    {
-      id: '4',
-      title: 'Tester les formulaires',
-      tags: ['QA'],
-      assignee: 'Lucas T.',
-      priority: 'low',
-      checklistItems: [],
-      taskComments: [
-        { id: 'cm4-1', author: 'Sara K.', text: "J'ai trouvé un bug sur le formulaire de contact.", createdAt: '2026-04-20T08:00:00Z' },
+        { id: 'cm3-1', author: 'Lucas T.', text: 'Est-ce qu\'on a validé le ton éditorial ?', createdAt: '2026-04-19T14:00:00Z' },
+        { id: 'cm3-2', author: 'Alice M.', text: 'Oui, on part sur quelque chose de chaleureux.', createdAt: '2026-04-19T15:00:00Z' },
       ],
     },
   ],
   done: [
     {
-      id: '5',
-      title: 'Setup du projet',
-      tags: ['dev'],
-      assignee: 'Alice M.',
-      priority: 'medium',
+      id: '4',
+      title: 'Réunion de lancement',
+      tags: ['tag-2'],
+      assignee: 'Lucas T.',
+      priority: 'low',
       checklistItems: [
-        { id: 'c5-1', text: 'Initialiser le repo Git', done: true },
-        { id: 'c5-2', text: 'Setup CI/CD', done: true },
-        { id: 'c5-3', text: 'Configurer ESLint + Prettier', done: true },
+        { id: 'c4-1', text: 'Préparer l\'ordre du jour', done: true },
+        { id: 'c4-2', text: 'Envoyer les invitations', done: true },
+        { id: 'c4-3', text: 'Rédiger le compte-rendu', done: true },
       ],
-      taskComments: [],
+      taskComments: [
+        { id: 'cm4-1', author: 'Sara K.', text: 'Très bonne réunion, tout était clair !', createdAt: '2026-04-20T08:00:00Z' },
+      ],
     },
   ],
 }
 
 export function useKanban() {
+  const [columns, setColumns] = useState<KanbanColumnDef[]>(INITIAL_COLUMNS)
+  const [customTags, setCustomTags] = useState<CustomTag[]>(INITIAL_TAGS)
   const [tasks, setTasks] = useState<Record<KanbanColumnId, KanbanTask[]>>(INITIAL_TASKS)
 
   function addTask(columnId: KanbanColumnId, title: string) {
@@ -94,19 +95,19 @@ export function useKanban() {
     }
     setTasks(prev => ({
       ...prev,
-      [columnId]: [...prev[columnId], newTask],
+      [columnId]: [...(prev[columnId] ?? []), newTask],
     }))
   }
 
   function moveTask(taskId: string, from: KanbanColumnId, to: KanbanColumnId) {
     if (from === to) return
     setTasks(prev => {
-      const task = prev[from].find(t => t.id === taskId)
+      const task = prev[from]?.find(t => t.id === taskId)
       if (!task) return prev
       return {
         ...prev,
         [from]: prev[from].filter(t => t.id !== taskId),
-        [to]: [...prev[to], task],
+        [to]: [...(prev[to] ?? []), task],
       }
     })
   }
@@ -125,6 +126,62 @@ export function useKanban() {
     }))
   }
 
-  return { tasks, addTask, moveTask, deleteTask, updateTask }
+  function addColumn(label: string) {
+    const id = crypto.randomUUID()
+    const colors = ['#A78BFA', '#34D399', '#F472B6', '#60A5FA', '#FBBF24']
+    const accentColor = colors[columns.length % colors.length]
+    const newCol: KanbanColumnDef = {
+      id,
+      label: label.trim(),
+      accentColor,
+      bgColor: accentColor + '18',
+    }
+    setColumns(prev => [...prev, newCol])
+    setTasks(prev => ({ ...prev, [id]: [] }))
+  }
+
+  function deleteColumn(columnId: KanbanColumnId) {
+    setColumns(prev => prev.filter(c => c.id !== columnId))
+    setTasks(prev => {
+      const updated = { ...prev }
+      delete updated[columnId]
+      return updated
+    })
+  }
+
+  function addCustomTag(label: string, color: string) {
+    const id = crypto.randomUUID()
+    setCustomTags(prev => [...prev, { id, label: label.trim(), color }])
+  }
+
+  function deleteCustomTag(tagId: string) {
+    setCustomTags(prev => prev.filter(t => t.id !== tagId))
+    // Remove from all tasks
+    setTasks(prev => {
+      const updated = { ...prev }
+      for (const colId of Object.keys(updated)) {
+        updated[colId] = updated[colId].map(t => ({
+          ...t,
+          tags: t.tags?.filter(id => id !== tagId),
+        }))
+      }
+      return updated
+    })
+  }
+
+  return {
+    columns,
+    customTags,
+    tasks,
+    addTask,
+    moveTask,
+    deleteTask,
+    updateTask,
+    addColumn,
+    deleteColumn,
+    addCustomTag,
+    deleteCustomTag,
+  }
 }
+
 

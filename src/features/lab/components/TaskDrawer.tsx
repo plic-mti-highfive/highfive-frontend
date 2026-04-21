@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Trash2, Plus, Check } from 'lucide-react'
-import type { KanbanTask, KanbanColumnId, KanbanPriority, ChecklistItem, TaskComment } from '../types'
+import type { KanbanTask, KanbanColumnId, KanbanPriority, KanbanColumnDef, CustomTag, ChecklistItem, TaskComment } from '../types'
 import {
   PRIORITY_CONFIG,
-  COLUMN_META,
-  ALL_TAGS,
-  getTagStyle,
+  TAG_COLOR_PALETTE,
   getAssigneeColor,
   assigneeInitials,
+  tagBg,
 } from '../utils/kanbanConfig'
 import type { Member } from '../data/members'
 
@@ -16,10 +15,13 @@ interface TaskDrawerProps {
   columnId: KanbanColumnId | null
   isOpen: boolean
   members: Member[]
+  columns: KanbanColumnDef[]
+  customTags: CustomTag[]
   onClose: () => void
   onUpdate: (taskId: string, columnId: KanbanColumnId, updates: Partial<KanbanTask>) => void
   onMoveColumn: (taskId: string, from: KanbanColumnId, to: KanbanColumnId) => void
   onDelete: (taskId: string, columnId: KanbanColumnId) => void
+  onAddTag: (label: string, color: string) => void
 }
 
 function Section({
@@ -33,7 +35,7 @@ function Section({
 }) {
   return (
     <div>
-      <div className="flex items-center justify-between mb-2.5">
+      <div className="flex items-center justify-between mb-1.5">
         <p className="text-label uppercase tracking-wider font-bold text-[var(--color-ink-muted)]">{label}</p>
         {aside}
       </div>
@@ -57,19 +59,34 @@ export function TaskDrawer({
   columnId,
   isOpen,
   members,
+  columns,
+  customTags,
   onClose,
   onUpdate,
   onMoveColumn,
   onDelete,
+  onAddTag,
 }: TaskDrawerProps) {
   const [title, setTitle] = useState('')
   const [newChecklistText, setNewChecklistText] = useState('')
   const [newComment, setNewComment] = useState('')
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [newTagLabel, setNewTagLabel] = useState('')
+  const [newTagColor, setNewTagColor] = useState(TAG_COLOR_PALETTE[0])
+  const [showTagForm, setShowTagForm] = useState(false)
   const titleRef = useRef<HTMLTextAreaElement>(null)
+  // Keep last known task/column so the panel content stays visible during close animation
+  const lastTaskRef = useRef<KanbanTask | null>(null)
+  const lastColumnIdRef = useRef<KanbanColumnId | null>(null)
+  if (task) lastTaskRef.current = task
+  if (columnId) lastColumnIdRef.current = columnId
+  const visibleTask = lastTaskRef.current
+  const visibleColumnId = lastColumnIdRef.current
 
-  // Sync title on task change
+  // Sync title on task change, reset confirmation state
   useEffect(() => {
     setTitle(task?.title ?? '')
+    setDeleteConfirm(false)
   }, [task?.id])
 
   // Auto-resize title textarea
@@ -92,70 +109,66 @@ export function TaskDrawer({
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
 
-  if (!task || !columnId) return null
-
-  const colMeta = COLUMN_META[columnId]
-  const checklistDone = task.checklistItems?.filter(i => i.done).length ?? 0
-  const checklistTotal = task.checklistItems?.length ?? 0
+  const colMeta = columns.find(c => c.id === visibleColumnId) ?? columns[0]
+  const checklistDone = visibleTask?.checklistItems?.filter(i => i.done).length ?? 0
+  const checklistTotal = visibleTask?.checklistItems?.length ?? 0
   const checklistPct = checklistTotal > 0 ? Math.round((checklistDone / checklistTotal) * 100) : 0
-  const commentsCount = task.taskComments?.length ?? 0
+  const commentsCount = visibleTask?.taskComments?.length ?? 0
 
   function saveTitle() {
+    if (!visibleTask || !visibleColumnId) return
     const trimmed = title.trim()
-    if (trimmed && trimmed !== task!.title) {
-      onUpdate(task!.id, columnId!, { title: trimmed })
+    if (trimmed && trimmed !== visibleTask.title) {
+      onUpdate(visibleTask.id, visibleColumnId, { title: trimmed })
     } else {
-      setTitle(task!.title)
+      setTitle(visibleTask.title)
     }
   }
 
   function togglePriority(p: KanbanPriority) {
-    onUpdate(task!.id, columnId!, { priority: task!.priority === p ? undefined : p })
+    if (!visibleTask || !visibleColumnId) return
+    onUpdate(visibleTask.id, visibleColumnId, { priority: visibleTask.priority === p ? undefined : p })
   }
 
   function toggleAssignee(name: string) {
-    onUpdate(task!.id, columnId!, { assignee: task!.assignee === name ? undefined : name })
-  }
-
-  function toggleTag(tag: string) {
-    const current = task!.tags ?? []
-    onUpdate(task!.id, columnId!, {
-      tags: current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag],
-    })
+    if (!visibleTask || !visibleColumnId) return
+    onUpdate(visibleTask.id, visibleColumnId, { assignee: visibleTask.assignee === name ? undefined : name })
   }
 
   function toggleChecklistItem(itemId: string) {
-    onUpdate(task!.id, columnId!, {
-      checklistItems: (task!.checklistItems ?? []).map(i =>
+    if (!visibleTask || !visibleColumnId) return
+    onUpdate(visibleTask.id, visibleColumnId, {
+      checklistItems: (visibleTask.checklistItems ?? []).map(i =>
         i.id === itemId ? { ...i, done: !i.done } : i
       ),
     })
   }
 
   function deleteChecklistItem(itemId: string) {
-    onUpdate(task!.id, columnId!, {
-      checklistItems: (task!.checklistItems ?? []).filter(i => i.id !== itemId),
+    if (!visibleTask || !visibleColumnId) return
+    onUpdate(visibleTask.id, visibleColumnId, {
+      checklistItems: (visibleTask.checklistItems ?? []).filter(i => i.id !== itemId),
     })
   }
 
   function addChecklistItem(e: React.FormEvent) {
     e.preventDefault()
-    if (!newChecklistText.trim()) return
+    if (!visibleTask || !visibleColumnId || !newChecklistText.trim()) return
     const item: ChecklistItem = { id: crypto.randomUUID(), text: newChecklistText.trim(), done: false }
-    onUpdate(task!.id, columnId!, { checklistItems: [...(task!.checklistItems ?? []), item] })
+    onUpdate(visibleTask.id, visibleColumnId, { checklistItems: [...(visibleTask.checklistItems ?? []), item] })
     setNewChecklistText('')
   }
 
   function addComment(e: React.FormEvent) {
     e.preventDefault()
-    if (!newComment.trim()) return
+    if (!visibleTask || !visibleColumnId || !newComment.trim()) return
     const comment: TaskComment = {
       id: crypto.randomUUID(),
       author: 'Alice M.',
       text: newComment.trim(),
       createdAt: new Date().toISOString(),
     }
-    onUpdate(task!.id, columnId!, { taskComments: [...(task!.taskComments ?? []), comment] })
+    onUpdate(visibleTask.id, visibleColumnId, { taskComments: [...(visibleTask.taskComments ?? []), comment] })
     setNewComment('')
   }
 
@@ -172,9 +185,9 @@ export function TaskDrawer({
       {/* Drawer panel */}
       <div
         className={`fixed right-0 top-0 h-full z-[101] bg-white flex flex-col
-          shadow-[−8px_0_40px_rgba(0,0,0,0.12)]
-          transition-transform duration-[280ms] ease-[cubic-bezier(0.4,0,0.2,1)]
-          ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+          shadow-[-8px_0_40px_rgba(0,0,0,0.12)]
+          transition-[transform,opacity] duration-[320ms] ease-[cubic-bezier(0.32,0.72,0,1)]
+          ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[40px] opacity-0 pointer-events-none'}
         `}
         style={{ width: '440px', maxWidth: '100vw' }}
       >
@@ -191,10 +204,10 @@ export function TaskDrawer({
             </span>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-dark)] transition-colors cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--color-cream)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-dark)] transition-colors cursor-pointer"
               aria-label="Fermer"
             >
-              <X size={16} />
+              <X size={15} />
             </button>
           </div>
 
@@ -206,6 +219,7 @@ export function TaskDrawer({
             onBlur={saveTitle}
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); saveTitle(); titleRef.current?.blur() } }}
             placeholder="Titre de la tâche"
+            spellCheck={false}
             rows={1}
             className="w-full resize-none overflow-hidden text-heading-md font-semibold text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)] leading-snug hover:bg-[var(--color-cream)] focus:bg-[var(--color-cream)] rounded-lg px-2.5 py-1.5 -mx-2.5 transition-colors"
           />
@@ -217,23 +231,22 @@ export function TaskDrawer({
           {/* Column move */}
           <Section label="Colonne">
             <div className="flex flex-wrap gap-1.5">
-              {(Object.keys(COLUMN_META) as KanbanColumnId[]).map(cid => {
-                const meta = COLUMN_META[cid]
-                const isActive = cid === columnId
+              {columns.map(col => {
+                const isActive = col.id === visibleColumnId
                 return (
                   <button
-                    key={cid}
-                    onClick={() => !isActive && onMoveColumn(task.id, columnId!, cid)}
+                    key={col.id}
+                    onClick={() => !isActive && visibleTask && visibleColumnId && onMoveColumn(visibleTask.id, visibleColumnId, col.id)}
                     disabled={isActive}
                     className={`text-ui-sm px-3 py-1.5 rounded-lg font-semibold transition-all ${
                       isActive ? 'cursor-default' : 'cursor-pointer hover:opacity-90 active:scale-[0.97]'
                     }`}
                     style={{
-                      backgroundColor: isActive ? meta.accentColor : meta.accentColor + '20',
-                      color: isActive ? 'white' : meta.accentColor,
+                      backgroundColor: isActive ? col.accentColor : col.accentColor + '20',
+                      color: isActive ? 'white' : col.accentColor,
                     }}
                   >
-                    {meta.label}
+                    {col.label}
                   </button>
                 )
               })}
@@ -245,7 +258,7 @@ export function TaskDrawer({
             <div className="flex gap-2">
               {(['high', 'medium', 'low'] as KanbanPriority[]).map(p => {
                 const cfg = PRIORITY_CONFIG[p]
-                const isActive = task.priority === p
+                const isActive = visibleTask?.priority === p
                 return (
                   <button
                     key={p}
@@ -271,7 +284,7 @@ export function TaskDrawer({
             <div className="flex flex-wrap gap-2">
               {members.map(m => {
                 const c = getAssigneeColor(m.name)
-                const isActive = task.assignee === m.name
+                const isActive = visibleTask?.assignee === m.name
                 return (
                   <button
                     key={m.name}
@@ -297,26 +310,80 @@ export function TaskDrawer({
           </Section>
 
           {/* Tags */}
-          <Section label="Tags">
-            <div className="flex flex-wrap gap-1.5">
-              {ALL_TAGS.map(tag => {
-                const style = getTagStyle(tag)
-                const isActive = task.tags?.includes(tag) ?? false
+          <Section label="Étiquettes">
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {customTags.map(tag => {
+                const isActive = visibleTask?.tags?.includes(tag.id) ?? false
                 return (
                   <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`inline-flex items-center gap-1 text-label uppercase font-bold px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-[0.97] border ${
+                    key={tag.id}
+                    onClick={() => {
+                      if (!visibleTask || !visibleColumnId) return
+                      const current = visibleTask.tags ?? []
+                      onUpdate(visibleTask.id, visibleColumnId, {
+                        tags: isActive ? current.filter(id => id !== tag.id) : [...current, tag.id],
+                      })
+                    }}
+                    className={`inline-flex items-center gap-1 text-label font-bold px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-[0.97] border ${
                       isActive ? 'border-current' : 'border-transparent opacity-40 hover:opacity-75'
                     }`}
-                    style={{ backgroundColor: style.bg, color: style.color }}
+                    style={{ backgroundColor: tagBg(tag.color), color: tag.color }}
                   >
                     {isActive && <Check size={8} strokeWidth={3} />}
-                    {tag}
+                    {tag.label}
                   </button>
                 )
               })}
             </div>
+            {/* Create new tag */}
+            {showTagForm ? (
+              <div className="flex items-center gap-2 bg-[var(--color-cream)] rounded-xl px-3 py-2">
+                <input
+                  autoFocus
+                  type="text"
+                  value={newTagLabel}
+                  onChange={e => setNewTagLabel(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Escape') { setShowTagForm(false); setNewTagLabel('') } }}
+                  placeholder="Nom de l'étiquette…"
+                  className="flex-1 text-body-sm text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
+                />
+                {/* Color picker */}
+                <div className="flex gap-1">
+                  {TAG_COLOR_PALETTE.slice(0, 5).map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setNewTagColor(c)}
+                      className={`w-4 h-4 rounded-full cursor-pointer transition-transform ${
+                        newTagColor === c ? 'scale-125 ring-2 ring-offset-1 ring-current' : 'hover:scale-110'
+                      }`}
+                      style={{ backgroundColor: c, color: c }}
+                    />
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  disabled={!newTagLabel.trim()}
+                  onClick={() => {
+                    if (!newTagLabel.trim()) return
+                    onAddTag(newTagLabel.trim(), newTagColor)
+                    setNewTagLabel('')
+                    setShowTagForm(false)
+                  }}
+                  className="text-ui-sm font-semibold px-2.5 py-1 rounded-lg border border-[var(--color-cream-mid)] text-[var(--color-ink)] bg-white cursor-pointer hover:bg-[var(--color-cream-dark)] disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  Créer
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowTagForm(true)}
+                className="inline-flex items-center gap-1.5 text-body-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] cursor-pointer transition-colors"
+              >
+                <Plus size={12} />
+                Nouvelle étiquette
+              </button>
+            )}
           </Section>
 
           {/* Divider */}
@@ -348,7 +415,7 @@ export function TaskDrawer({
               </div>
             )}
             <div className="space-y-1">
-              {task.checklistItems?.map(item => (
+              {visibleTask?.checklistItems?.map(item => (
                 <div key={item.id} className="group flex items-center gap-2.5 py-1 px-1 rounded-lg hover:bg-[var(--color-cream)] transition-colors">
                   <button
                     onClick={() => toggleChecklistItem(item.id)}
@@ -374,23 +441,24 @@ export function TaskDrawer({
               ))}
 
               {/* Add item */}
-              <form onSubmit={addChecklistItem} className="flex items-center gap-2.5 py-1 px-1">
-                <div className="shrink-0 w-4 h-4 rounded border-2 border-dashed border-[var(--color-cream-mid)]" />
-                <input
-                  type="text"
-                  value={newChecklistText}
-                  onChange={e => setNewChecklistText(e.target.value)}
-                  placeholder="Ajouter un élément…"
-                  className="flex-1 text-body-sm text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
-                />
-                {newChecklistText.trim() && (
+              <form onSubmit={addChecklistItem} className="mt-1.5">
+                <div className="flex items-center gap-2 bg-[var(--color-cream)] rounded-xl px-3 py-2 border border-transparent focus-within:border-[var(--color-cream-mid)] transition-colors">
+                  <Plus size={13} className="shrink-0 text-[var(--color-ink-muted)]" />
+                  <input
+                    type="text"
+                    value={newChecklistText}
+                    onChange={e => setNewChecklistText(e.target.value)}
+                    placeholder="Nouvel élément…"
+                    className="flex-1 text-body-sm text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
+                  />
                   <button
                     type="submit"
-                    className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--color-ink)] text-white cursor-pointer hover:opacity-80"
+                    disabled={!newChecklistText.trim()}
+                    className="shrink-0 text-ui-sm font-semibold px-3 py-1 rounded-lg border border-[var(--color-cream-mid)] text-[var(--color-ink)] bg-white cursor-pointer transition-all hover:bg-[var(--color-cream-dark)] hover:border-[var(--color-ink-muted)] disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    ↵
+                    Ajouter
                   </button>
-                )}
+                </div>
               </form>
             </div>
           </Section>
@@ -400,9 +468,9 @@ export function TaskDrawer({
 
           {/* Comments */}
           <Section label={`Commentaires${commentsCount > 0 ? ` · ${commentsCount}` : ''}`}>
-            {task.taskComments && task.taskComments.length > 0 && (
+            {visibleTask?.taskComments && visibleTask.taskComments.length > 0 && (
               <div className="space-y-4 mb-4">
-                {task.taskComments.map(comment => {
+                {visibleTask.taskComments.map(comment => {
                   const c = getAssigneeColor(comment.author)
                   return (
                     <div key={comment.id} className="flex gap-3">
@@ -445,15 +513,35 @@ export function TaskDrawer({
 
         </div>
 
-        {/* ── Footer ── */}
-        <div className="flex-none px-6 py-4 border-t border-[var(--color-cream-mid)]">
-          <button
-            onClick={() => { onDelete(task.id, columnId!); onClose() }}
-            className="flex items-center gap-2 text-body-sm text-red-500 hover:text-red-600 cursor-pointer transition-colors"
-          >
-            <Trash2 size={14} />
-            Supprimer la tâche
-          </button>
+        {/* ── Footer / Danger zone ── */}
+        <div className={`flex-none px-6 py-4 border-t transition-colors ${deleteConfirm ? 'border-red-200 bg-red-50/60' : 'border-[var(--color-cream-mid)]'}`}>
+          {!deleteConfirm ? (
+            <button
+              onClick={() => setDeleteConfirm(true)}
+              className="flex items-center gap-2 text-body-sm text-[var(--color-ink-muted)] hover:text-red-500 cursor-pointer transition-colors"
+            >
+              <Trash2 size={14} />
+              Supprimer la tâche
+            </button>
+          ) : (
+            <div className="space-y-2.5">
+              <p className="text-body-sm font-semibold text-red-600">Supprimer définitivement cette tâche ?</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDeleteConfirm(false)}
+                  className="flex-1 text-ui-sm font-semibold py-2 rounded-xl border border-[var(--color-cream-mid)] text-[var(--color-ink)] hover:bg-[var(--color-cream)] cursor-pointer transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={() => { if (visibleTask && visibleColumnId) { onDelete(visibleTask.id, visibleColumnId); onClose() } }}
+                  className="flex-1 text-ui-sm font-semibold py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 cursor-pointer transition-colors active:scale-[0.97]"
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
