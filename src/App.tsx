@@ -6,6 +6,7 @@ import { UserProfilePage } from '@features/user'
 import { SearchPage } from '@features/search'
 import { MessagesPage } from '@features/messages'
 import { ScrollToTop } from '@shared/components/ScrollToTop'
+import { ScrollToTopButton } from '@shared/components/ScrollToTopButton'
 import { LabPage } from '@features/lab'
 
 import Debug from './pages/Debug'
@@ -15,6 +16,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <ScrollToTopButton />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
