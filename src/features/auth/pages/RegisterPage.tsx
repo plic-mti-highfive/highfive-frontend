@@ -27,6 +27,7 @@ export default function RegisterPage() {
     <AuthLayout
       title="Créer un compte"
       description="Rejoignez la plateforme et accédez à tous les outils."
+      imageUrl="https://images.unsplash.com/photo-1496115965489-21be7e6e59a0"
       onSubmit={handleSubmit}
       footerText="Vous avez déjà un compte ?"
       footerLink={{ text: 'Connectez-vous.', href: '/login' }}

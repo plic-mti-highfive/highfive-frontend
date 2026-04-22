@@ -39,6 +39,7 @@ export default function LoginPage() {
     <AuthLayout
       title="Se connecter"
       description="Profitez de tous les outils fournis par la plateforme."
+      imageUrl="https://images.unsplash.com/photo-1552664730-d307ca884978"
       onSubmit={handleSubmit}
       footerText="Vous n'avez pas de compte ?"
       footerLink={{ text: 'Créez-en un ici.', href: '/register' }}

@@ -7,6 +7,7 @@ interface AuthLayoutProps {
   children: React.ReactNode
   footerText: string
   footerLink: { text: string; href: string }
+  imageUrl?: string
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
@@ -16,12 +17,19 @@ export function AuthLayout({
   children,
   footerText,
   footerLink,
+  imageUrl = 'https://images.unsplash.com/photo-1552664730-d307ca884978',
   onSubmit
 }: AuthLayoutProps) {
   return (
     <div className="min-h-screen bg-background flex p-6 gap-6">
-      {/* Gauche : placeholder image */}
-      <div className="hidden md:flex w-1/2 bg-muted rounded-xl" />
+      {/* Gauche : image */}
+      <div className="hidden md:flex w-1/2 rounded-xl overflow-hidden">
+        <img
+          src={imageUrl}
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
+      </div>
 
       {/* Droite : formulaire */}
       <div className="w-full md:w-1/2 flex flex-col items-center px-4">
