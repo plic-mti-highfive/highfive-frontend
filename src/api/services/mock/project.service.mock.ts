@@ -6,15 +6,15 @@ import type {
   ProjectMemberDto,
   AddProjectMemberDto,
   UpdateProjectMemberDto,
-  TicketDto,
-  CreateTicketDto,
-  UpdateTicketDto,
+  TaskDto,
+  CreateTaskDto,
+  UpdateTaskDto,
   ListProjectsQuery,
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
 } from '../../types'
-import { ProjectStatus, ProjectVisibility, ProjectRole, TicketStatus } from '../../types'
+import { ProjectStatus, ProjectVisibility, ProjectRole, TaskStatus } from '../../types'
 import { delay, generateId } from './utils'
 import { getAllProjects } from './data'
 
@@ -22,14 +22,38 @@ import { getAllProjects } from './data'
 class MockProjectDb {
   private projects: Map<string, ProjectDto> = new Map()
   private members: Map<string, ProjectMemberDto[]> = new Map()
-  private tickets: Map<string, TicketDto[]> = new Map()
+  private tasks: Map<string, TaskDto[]> = new Map()
   private messages: Map<string, ProjectMessageDto[]> = new Map()
 
   constructor() {
     // Initialiser avec les projets mockés centralisés
     const allProjects = getAllProjects()
-    allProjects.forEach((project) => {
+    const mockUsers = [
+      { id: 'user-1', email: 'marie.dupont@example.com', avatar: null },
+      { id: 'user-2', email: 'jean.martin@example.com', avatar: null },
+      { id: 'user-3', email: 'sophie.bernard@example.com', avatar: null },
+      { id: 'user-4', email: 'lucas.petit@example.com', avatar: null },
+    ]
+
+    allProjects.forEach((project, index) => {
       this.projects.set(project.id, project)
+      // Créer un member pour chaque projet avec un utilisateur fictif
+      const creatorUser = mockUsers[index % mockUsers.length]
+      const member: ProjectMemberDto = {
+        projectId: project.id,
+        userId: creatorUser.id,
+        tenantId: 'default-tenant',
+        role: ProjectRole.OWNER,
+        createdAt: project.createdAt,
+        user: {
+          id: creatorUser.id,
+          email: creatorUser.email,
+          profile: {
+            avatarPath: creatorUser.avatar,
+          },
+        },
+      }
+      this.members.set(project.id, [member])
     })
   }
 
@@ -90,33 +114,33 @@ class MockProjectDb {
     return filtered.length < members.length
   }
 
-  getTickets(projectId: string): TicketDto[] {
-    return this.tickets.get(projectId) || []
+  getTasks(projectId: string): TaskDto[] {
+    return this.tasks.get(projectId) || []
   }
 
-  addTicket(projectId: string, ticket: TicketDto): void {
-    const tickets = this.tickets.get(projectId) || []
-    tickets.push(ticket)
-    this.tickets.set(projectId, tickets)
+  addTask(projectId: string, task: TaskDto): void {
+    const tasks = this.tasks.get(projectId) || []
+    tasks.push(task)
+    this.tasks.set(projectId, tasks)
   }
 
-  getTicket(projectId: string, ticketId: string): TicketDto | undefined {
-    const tickets = this.tickets.get(projectId) || []
-    return tickets.find((t) => t.id === ticketId)
+  getTask(projectId: string, taskId: string): TaskDto | undefined {
+    const tasks = this.tasks.get(projectId) || []
+    return tasks.find((t) => t.id === taskId)
   }
 
-  updateTicket(
+  updateTask(
     projectId: string,
-    ticketId: string,
-    updates: Partial<TicketDto>,
-  ): TicketDto | undefined {
-    const tickets = this.tickets.get(projectId) || []
-    const index = tickets.findIndex((t) => t.id === ticketId)
+    taskId: string,
+    updates: Partial<TaskDto>,
+  ): TaskDto | undefined {
+    const tasks = this.tasks.get(projectId) || []
+    const index = tasks.findIndex((t) => t.id === taskId)
     if (index === -1) return undefined
 
-    const updated = { ...tickets[index], ...updates, updatedAt: new Date().toISOString() }
-    tickets[index] = updated
-    this.tickets.set(projectId, tickets)
+    const updated = { ...tasks[index], ...updates, updatedAt: new Date().toISOString() }
+    tasks[index] = updated
+    this.tasks.set(projectId, tasks)
     return updated
   }
 
@@ -261,51 +285,51 @@ export class ProjectServiceMock implements IProjectService {
     }
   }
 
-  async createTicket(projectId: string, dto: CreateTicketDto): Promise<TicketDto> {
+  async createTask(projectId: string, dto: CreateTaskDto): Promise<TaskDto> {
     await delay(400)
 
-    const ticket: TicketDto = {
+    const task: TaskDto = {
       id: generateId(),
       projectId,
       tenantId: 'default-tenant',
       title: dto.title,
       description: dto.description || null,
-      status: dto.status || TicketStatus.TODO,
+      status: dto.status || TaskStatus.TODO,
       assigneeId: dto.assigneeId || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
 
-    db.addTicket(projectId, ticket)
-    return ticket
+    db.addTask(projectId, task)
+    return task
   }
 
-  async getProjectTickets(projectId: string): Promise<TicketDto[]> {
+  async getProjectTasks(projectId: string): Promise<TaskDto[]> {
     await delay(200)
-    return db.getTickets(projectId)
+    return db.getTasks(projectId)
   }
 
-  async getTicketById(projectId: string, ticketId: string): Promise<TicketDto> {
+  async getTaskById(projectId: string, taskId: string): Promise<TaskDto> {
     await delay(200)
 
-    const ticket = db.getTicket(projectId, ticketId)
-    if (!ticket) {
-      throw new Error('Ticket not found')
+    const task = db.getTask(projectId, taskId)
+    if (!task) {
+      throw new Error('Task not found')
     }
 
-    return ticket
+    return task
   }
 
-  async updateTicket(
+  async updateTask(
     projectId: string,
-    ticketId: string,
-    dto: UpdateTicketDto,
-  ): Promise<TicketDto> {
+    taskId: string,
+    dto: UpdateTaskDto,
+  ): Promise<TaskDto> {
     await delay(400)
 
-    const updated = db.updateTicket(projectId, ticketId, dto)
+    const updated = db.updateTask(projectId, taskId, dto)
     if (!updated) {
-      throw new Error('Ticket not found')
+      throw new Error('Task not found')
     }
 
     return updated

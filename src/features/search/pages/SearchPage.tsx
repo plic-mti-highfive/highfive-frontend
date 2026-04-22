@@ -1,6 +1,6 @@
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { FolderOpen, Users } from 'lucide-react'
+import { FolderOpen, Users, Tag } from 'lucide-react'
 import { Header } from '@features/layout'
 import { Footer } from '@features/layout'
 import { SmallCard } from '@shared/components/projects'
@@ -133,7 +133,7 @@ const MOCK_PROJECTS: Project[] = [
   },
 ]
 
-type ResultType = 'projects' | 'users'
+type ResultType = 'projects' | 'users' | 'tags'
 
 export function SearchPage() {
   const [searchParams] = useSearchParams()
@@ -143,22 +143,46 @@ export function SearchPage() {
   const tagFilter = searchParams.get('tag')
 
   // Déterminer le type de résultat à partir de la route
-  const resultType: ResultType = location.pathname.includes('/users') ? 'users' : 'projects'
+  const resultType: ResultType = location.pathname.includes('/users')
+    ? 'users'
+    : location.pathname.includes('/tags')
+      ? 'tags'
+      : 'projects'
 
   const [, setActiveSort] = useState<'name' | 'date' | 'popularity'>('date')
   const [, setActiveFilters] = useState<string[]>([])
 
-  // Pour le MVP, on affiche tous les projets mockés
-  // La logique de recherche et filtrage sera implémentée plus tard
-  const displayedProjects = MOCK_PROJECTS
+  // Filtrer les projets par tag si présent
+  const displayedProjects = tagFilter
+    ? MOCK_PROJECTS.filter((project) =>
+        project.tags.some((t) => t.toLowerCase() === tagFilter.toLowerCase())
+      )
+    : MOCK_PROJECTS
+
   const displayedUsers = Object.values(mockUsers)
 
-  const resultsCount = resultType === 'projects' ? displayedProjects.length : displayedUsers.length
-  const resultsLabel = resultType === 'projects' ? 'projet' : 'utilisateur'
+  // Extraire tous les tags uniques
+  const allTags = Array.from(
+    new Set(MOCK_PROJECTS.flatMap((p) => p.tags))
+  ).sort()
+
+  const resultsCount =
+    resultType === 'projects'
+      ? displayedProjects.length
+      : resultType === 'users'
+        ? displayedUsers.length
+        : allTags.length
+  const resultsLabel =
+    resultType === 'projects' ? 'projet' : resultType === 'users' ? 'utilisateur' : 'tag'
 
   const handleTypeChange = (type: ResultType) => {
     const currentParams = searchParams.toString()
-    const path = type === 'projects' ? '/search/projects' : '/search/users'
+    const path =
+      type === 'projects'
+        ? '/search/projects'
+        : type === 'users'
+          ? '/search/users'
+          : '/search/tags'
     navigate(currentParams ? `${path}?${currentParams}` : path)
   }
 
@@ -209,6 +233,20 @@ export function SearchPage() {
               <Users size={18} />
               Utilisateurs
             </button>
+            <button
+              onClick={() => handleTypeChange('tags')}
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-lg text-body-md font-semibold
+                transition-all outline-none
+                ${resultType === 'tags'
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                }
+              `}
+            >
+              <Tag size={18} />
+              Tags
+            </button>
           </div>
 
           {/* Filtres avec espace réservé */}
@@ -233,14 +271,14 @@ export function SearchPage() {
           ) : (
             <div className="text-center py-20">
               <p className="text-xl text-muted-foreground">
-                Aucun projet trouvé pour "{searchQuery}"
+                Aucun projet trouvé pour "{tagFilter || searchQuery}"
               </p>
               <p className="mt-2 text-body-md text-muted-foreground">
                 Essayez avec d'autres mots-clés
               </p>
             </div>
           )
-        ) : (
+        ) : resultType === 'users' ? (
           displayedUsers.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
               {displayedUsers.map((user) => (
@@ -261,6 +299,18 @@ export function SearchPage() {
               </p>
             </div>
           )
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => navigate(`/search/projects?tag=${encodeURIComponent(tag)}`)}
+                className="px-4 py-3 rounded-lg bg-muted text-foreground hover:bg-muted/80 transition-all font-semibold text-body-md"
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         )}
       </main>
 

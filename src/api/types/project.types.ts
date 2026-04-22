@@ -1,4 +1,4 @@
-import { ProjectStatus, ProjectVisibility, ProjectRole, TicketStatus } from './enums'
+import { ProjectStatus, ProjectVisibility, ProjectRole, TaskStatus } from './enums'
 
 // DTOs Project - alignés avec backend
 
@@ -54,29 +54,29 @@ export interface UpdateProjectMemberDto {
   role: ProjectRole
 }
 
-export interface TicketDto {
+export interface TaskDto {
   id: string
   projectId: string
   tenantId: string
   title: string
   description: string | null
-  status: TicketStatus
+  status: TaskStatus
   assigneeId: string | null
   createdAt: string
   updatedAt: string
 }
 
-export interface CreateTicketDto {
+export interface CreateTaskDto {
   title: string
   description?: string
-  status?: TicketStatus
+  status?: TaskStatus
   assigneeId?: string
 }
 
-export interface UpdateTicketDto {
+export interface UpdateTaskDto {
   title?: string
   description?: string
-  status?: TicketStatus
+  status?: TaskStatus
   assigneeId?: string
 }
 

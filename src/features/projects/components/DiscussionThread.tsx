@@ -79,62 +79,61 @@ export function DiscussionThread({ projectId, messages, onMessageSent }: Discuss
       ) : (
         <div className="space-y-3">
           {parentMessages.map((message) => (
-            <div key={message.id} className="space-y-3">
+            <div key={message.id} className="space-y-0">
               <MessageCard
                 message={message}
                 onReply={setReplyingTo}
                 onReport={handleReportMessage}
               />
 
-              {/* Replies to this message */}
-              {getReplies(message.id).length > 0 && (
-                <div className="space-y-3">
+              {/* Replies container with continuous border */}
+              {(getReplies(message.id).length > 0 || replyingTo === message.id) && (
+                <div className="ml-8 pl-4 border-l-2 border-border space-y-3 pt-3">
                   {getReplies(message.id).map((reply) => (
                     <MessageCard
                       key={reply.id}
                       message={reply}
                       isReply
-                      onReply={setReplyingTo}
                       onReport={handleReportMessage}
                     />
                   ))}
-                </div>
-              )}
 
-              {/* Reply form */}
-              {replyingTo === message.id && (
-                <form onSubmit={(e) => handleReplySubmit(e, message.id)} className="ml-8 pl-4 border-l-2 border-border">
-                  <div className="bg-card border border-border rounded-lg overflow-hidden">
-                    <textarea
-                      value={newReplyMessage}
-                      onChange={(e) => setNewReplyMessage(e.target.value)}
-                      placeholder="Écrivez une réponse..."
-                      className="w-full p-4 bg-transparent text-foreground resize-none focus:outline-none"
-                      rows={2}
-                      disabled={isReplySending}
-                      autoFocus
-                    />
-                    <div className="flex justify-end gap-2 px-4 pb-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setReplyingTo(null)
-                          setNewReplyMessage('')
-                        }}
-                        className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors"
-                      >
-                        Annuler
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={!newReplyMessage.trim() || isReplySending}
-                        className="px-4 py-2 bg-foreground text-background font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
-                      >
-                        {isReplySending ? 'Envoi...' : 'Répondre'}
-                      </button>
-                    </div>
-                  </div>
-                </form>
+                  {/* Reply form */}
+                  {replyingTo === message.id && (
+                    <form onSubmit={(e) => handleReplySubmit(e, message.id)}>
+                      <div className="bg-card border border-border rounded-lg overflow-hidden">
+                        <textarea
+                          value={newReplyMessage}
+                          onChange={(e) => setNewReplyMessage(e.target.value)}
+                          placeholder="Écrivez une réponse..."
+                          className="w-full p-4 bg-transparent text-foreground resize-none focus:outline-none"
+                          rows={2}
+                          disabled={isReplySending}
+                          autoFocus
+                        />
+                        <div className="flex justify-end gap-2 px-4 pb-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReplyingTo(null)
+                              setNewReplyMessage('')
+                            }}
+                            className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors"
+                          >
+                            Annuler
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={!newReplyMessage.trim() || isReplySending}
+                            className="px-4 py-2 bg-foreground text-background font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+                          >
+                            {isReplySending ? 'Envoi...' : 'Répondre'}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+                </div>
               )}
             </div>
           ))}

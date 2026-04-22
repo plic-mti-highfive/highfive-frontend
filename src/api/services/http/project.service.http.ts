@@ -6,9 +6,9 @@ import type {
   ProjectMemberDto,
   AddProjectMemberDto,
   UpdateProjectMemberDto,
-  TicketDto,
-  CreateTicketDto,
-  UpdateTicketDto,
+  TaskDto,
+  CreateTaskDto,
+  UpdateTaskDto,
   ListProjectsQuery,
   PaginatedResponse,
   ProjectMessageDto,
@@ -64,25 +64,25 @@ export class ProjectServiceHttp implements IProjectService {
     return httpClient.delete(`/projects/${projectId}/members/${userId}`)
   }
 
-  // Tickets
-  async createTicket(projectId: string, dto: CreateTicketDto): Promise<TicketDto> {
-    return httpClient.post<TicketDto>(`/projects/${projectId}/tickets`, dto)
+  // Tasks
+  async createTask(projectId: string, dto: CreateTaskDto): Promise<TaskDto> {
+    return httpClient.post<TaskDto>(`/projects/${projectId}/tasks`, dto)
   }
 
-  async getProjectTickets(projectId: string): Promise<TicketDto[]> {
-    return httpClient.get<TicketDto[]>(`/projects/${projectId}/tickets`)
+  async getProjectTasks(projectId: string): Promise<TaskDto[]> {
+    return httpClient.get<TaskDto[]>(`/projects/${projectId}/tasks`)
   }
 
-  async getTicketById(projectId: string, ticketId: string): Promise<TicketDto> {
-    return httpClient.get<TicketDto>(`/projects/${projectId}/tickets/${ticketId}`)
+  async getTaskById(projectId: string, taskId: string): Promise<TaskDto> {
+    return httpClient.get<TaskDto>(`/projects/${projectId}/tasks/${taskId}`)
   }
 
-  async updateTicket(
+  async updateTask(
     projectId: string,
-    ticketId: string,
-    dto: UpdateTicketDto,
-  ): Promise<TicketDto> {
-    return httpClient.patch<TicketDto>(`/projects/${projectId}/tickets/${ticketId}`, dto)
+    taskId: string,
+    dto: UpdateTaskDto,
+  ): Promise<TaskDto> {
+    return httpClient.patch<TaskDto>(`/projects/${projectId}/tasks/${taskId}`, dto)
   }
 
   // Messages

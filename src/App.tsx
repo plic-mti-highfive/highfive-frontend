@@ -25,6 +25,7 @@ export default function App() {
         <Route path="/search" element={<Navigate to="/search/projects" replace />} />
         <Route path="/search/projects" element={<SearchPage />} />
         <Route path="/search/users" element={<SearchPage />} />
+        <Route path="/search/tags" element={<SearchPage />} />
 
         <Route path="/create-project" element={<CreateProjectPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />

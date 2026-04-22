@@ -6,12 +6,12 @@ import { useProjectDetail } from '../hooks/useProjectDetail'
 import { ProjectHero } from '../components/ProjectHero'
 import { ProjectTabs, type TabId } from '../components/ProjectTabs'
 import { ProjectSidebar } from '../components/ProjectSidebar'
-import { TicketList } from '../components/TicketList'
+import { TaskList } from '../components/TaskList'
 import { DiscussionThread } from '../components/DiscussionThread'
 import { SimilarProjects } from '../components/SimilarProjects'
 import { ProjectDetailSkeleton } from '../components/ProjectDetailSkeleton'
 import type { ProjectMessageDto } from '@/api/types'
-import { TicketStatus } from '@/api/types'
+import { TaskStatus } from '@/api/types'
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -19,13 +19,17 @@ export function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState<TabId>('overview')
   const [localMessages, setLocalMessages] = useState<ProjectMessageDto[]>([])
 
-  const { project, members, tickets, messages, isLoading, error } = useProjectDetail(id || '')
+  const { project, members, tasks, messages, isLoading, error } = useProjectDetail(id || '')
 
   const handleMessageSent = (newMessage: ProjectMessageDto) => {
     setLocalMessages((prev) => [...prev, newMessage])
   }
 
-  const allMessages = [...messages, ...localMessages]
+  const allMessages = (() => {
+    const messageIds = new Set(messages.map((m) => m.id))
+    const combined = [...messages, ...localMessages.filter((m) => !messageIds.has(m.id))]
+    return combined
+  })()
 
   if (isLoading) {
     return (
@@ -62,9 +66,9 @@ export function ProjectDetailPage() {
     )
   }
 
-  const completedTickets = tickets.filter((t) => t.status === TicketStatus.DONE).length
-  const totalTickets = tickets.length
-  const progress = totalTickets > 0 ? (completedTickets / totalTickets) * 100 : 0
+  const completedTasks = tasks.filter((t) => t.status === TaskStatus.DONE).length
+  const totalTasks = tasks.length
+  const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0
 
   const handleJoinProject = () => {
     console.log('Rejoindre le projet:', project.id)
@@ -90,6 +94,7 @@ export function ProjectDetailPage() {
         <ProjectHero
           project={project}
           memberCount={members.length}
+          creator={members[0]?.user ? { email: members[0].user.email, avatar: members[0].user.profile?.avatarPath } : undefined}
           progress={progress}
           highfiveCount={highfiveCount}
           onJoinClick={handleJoinProject}
@@ -97,13 +102,13 @@ export function ProjectDetailPage() {
         />
 
         <div className="border-b border-border bg-background py-12">
-          <div className="max-w-[1400px] mx-auto px-6">
+          <div className="max-w-8xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 <ProjectTabs activeTab={activeTab} onChange={setActiveTab} />
 
                 {activeTab === 'overview' && (
-                  <div className="prose prose-sm max-w-none">
+                  <div className="pl-4 prose prose-sm max-w-none">
                     {project.description ? (
                       <div>
                         <h2 className="text-xl font-semibold text-foreground mb-4">
@@ -123,7 +128,7 @@ export function ProjectDetailPage() {
                   </div>
                 )}
 
-                {activeTab === 'tickets' && <TicketList tickets={tickets} members={members} projectId={project.id} />}
+                {activeTab === 'tasks' && <TaskList tasks={tasks} members={members} projectId={project.id} />}
               </div>
 
               <div className="lg:col-span-1">

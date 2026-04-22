@@ -34,14 +34,14 @@ export const ProjectRole = {
 
 export type ProjectRole = (typeof ProjectRole)[keyof typeof ProjectRole]
 
-export const TicketStatus = {
+export const TaskStatus = {
   TODO: 'TODO',
   IN_PROGRESS: 'IN_PROGRESS',
   IN_REVIEW: 'IN_REVIEW',
   DONE: 'DONE',
 } as const
 
-export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 
 export const ConnectionStatus = {
   PENDING: 'PENDING',

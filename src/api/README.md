@@ -190,11 +190,11 @@ serviceFactory.reset()
 - `updateProjectMember(projectId, userId, dto)` - Modifier le rôle
 - `removeProjectMember(projectId, userId)` - Retirer un membre
 
-**Tickets:**
-- `createTicket(projectId, dto)` - Créer un ticket
-- `getProjectTickets(projectId)` - Liste des tickets
-- `getTicketById(projectId, ticketId)` - Obtenir un ticket
-- `updateTicket(projectId, ticketId, dto)` - Mettre à jour un ticket
+**Tasks:**
+- `createTask(projectId, dto)` - Créer un task
+- `getProjectTasks(projectId)` - Liste des tasks
+- `getTaskById(projectId, taskId)` - Obtenir un task
+- `updateTask(projectId, taskId, dto)` - Mettre à jour un task
 
 ### UserService
 
@@ -212,7 +212,7 @@ import {
   ProjectStatus,
   ProjectVisibility,
   ProjectRole,
-  TicketStatus,
+  TaskStatus,
   ConnectionStatus,
 
   // DTOs
@@ -223,7 +223,7 @@ import {
   ProjectDto,
   CreateProjectDto,
   UpdateProjectDto,
-  TicketDto,
+  TaskDto,
   // ... etc
 } from '@/api'
 ```

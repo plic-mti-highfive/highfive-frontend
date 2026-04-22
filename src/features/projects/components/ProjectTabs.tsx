@@ -1,4 +1,4 @@
-type TabId = 'overview' | 'tickets'
+type TabId = 'overview' | 'tasks' | 'milestones' | 'announcement'
 
 interface Tab {
   id: TabId
@@ -7,7 +7,9 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: 'overview', label: 'Aperçu' },
-  { id: 'tickets', label: 'Tickets' },
+  { id: 'announcement', label: 'Annonces' },
+  { id: 'tasks', label: 'Tâches' },
+  { id: 'milestones', label: 'Étapes' },
 ]
 
 interface ProjectTabsProps {
