@@ -1,4 +1,4 @@
-import { Bell, User, FolderOpen, MessageSquare, Settings, LogOut, Plus } from 'lucide-react'
+import { Bell, User, MessageSquare, Settings, LogOut, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Menu } from '@base-ui/react/menu'
 

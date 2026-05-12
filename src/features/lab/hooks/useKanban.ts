@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { KanbanColumnId, KanbanTicket, KanbanColumnDef, CustomTag } from '../types'
-import { DEFAULT_COLUMNS, TAG_COLOR_PALETTE } from '../utils/kanbanConfig'
+import { DEFAULT_COLUMNS } from '../utils/kanbanConfig'
 
 const INITIAL_COLUMNS: KanbanColumnDef[] = DEFAULT_COLUMNS.map(c => ({ ...c, bgColor: c.bgColor }))
 

@@ -67,27 +67,21 @@ export function TicketDrawer({
   onDelete,
   onAddTag,
 }: TicketDrawerProps) {
-  const [title, setTitle] = useState('')
+  const [titleDraft, setTitleDraft] = useState<{ ticketId: string | null; value: string }>({
+    ticketId: null,
+    value: '',
+  })
   const [newChecklistText, setNewChecklistText] = useState('')
   const [newComment, setNewComment] = useState('')
-  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleteConfirmFor, setDeleteConfirmFor] = useState<string | null>(null)
   const [newTagLabel, setNewTagLabel] = useState('')
   const [newTagColor, setNewTagColor] = useState(TAG_COLOR_PALETTE[0])
   const [showTagForm, setShowTagForm] = useState(false)
   const titleRef = useRef<HTMLTextAreaElement>(null)
-  // Keep last known ticket/column so the panel content stays visible during close animation
-  const lastTicketRef = useRef<KanbanTicket | null>(null)
-  const lastColumnIdRef = useRef<KanbanColumnId | null>(null)
-  if (ticket) lastTicketRef.current = ticket
-  if (columnId) lastColumnIdRef.current = columnId
-  const visibleTicket = lastTicketRef.current
-  const visibleColumnId = lastColumnIdRef.current
-
-  // Sync title on ticket change, reset confirmation state
-  useEffect(() => {
-    setTitle(ticket?.title ?? '')
-    setDeleteConfirm(false)
-  }, [ticket?.id])
+  const visibleTicket = ticket
+  const visibleColumnId = columnId
+  const title = titleDraft.ticketId === visibleTicket?.id ? titleDraft.value : visibleTicket?.title ?? ''
+  const deleteConfirm = deleteConfirmFor === visibleTicket?.id
 
   // Auto-resize title textarea
   useEffect(() => {
@@ -121,7 +115,7 @@ export function TicketDrawer({
     if (trimmed && trimmed !== visibleTicket.title) {
       onUpdate(visibleTicket.id, visibleColumnId, { title: trimmed })
     } else {
-      setTitle(visibleTicket.title)
+      setTitleDraft({ ticketId: visibleTicket.id, value: visibleTicket.title })
     }
   }
 
@@ -215,7 +209,7 @@ export function TicketDrawer({
           <textarea
             ref={titleRef}
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={e => setTitleDraft({ ticketId: visibleTicket?.id ?? null, value: e.target.value })}
             onBlur={saveTitle}
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); saveTitle(); titleRef.current?.blur() } }}
             placeholder="Titre du ticket"
@@ -517,7 +511,7 @@ export function TicketDrawer({
         <div className={`flex-none px-6 py-4 border-t transition-colors ${deleteConfirm ? 'border-red-200 bg-red-50/60' : 'border-[var(--color-cream-mid)]'}`}>
           {!deleteConfirm ? (
             <button
-              onClick={() => setDeleteConfirm(true)}
+              onClick={() => setDeleteConfirmFor(visibleTicket?.id ?? null)}
               className="flex items-center gap-2 text-body-sm text-[var(--color-ink-muted)] hover:text-red-500 cursor-pointer transition-colors"
             >
               <Trash2 size={14} />
@@ -528,7 +522,7 @@ export function TicketDrawer({
               <p className="text-body-sm font-semibold text-red-600">Supprimer définitivement ce ticket ?</p>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setDeleteConfirm(false)}
+                  onClick={() => setDeleteConfirmFor(null)}
                   className="flex-1 text-ui-sm font-semibold py-2 rounded-xl border border-[var(--color-cream-mid)] text-[var(--color-ink)] hover:bg-[var(--color-cream)] cursor-pointer transition-colors"
                 >
                   Annuler

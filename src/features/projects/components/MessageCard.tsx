@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Flag } from 'lucide-react'
 import { DropdownMenu } from '@shared/components/DropdownMenu'
 import type { ProjectMessageDto } from '@/api/types'
@@ -10,7 +9,7 @@ interface MessageCardProps {
   onReport?: (messageId: string) => void
 }
 
-export function MessageCard({ message, isReply, onReply, onReport }: MessageCardProps) {
+export function MessageCard({ message, onReply, onReport }: MessageCardProps) {
   const authorName = message.author?.email.split('@')[0] || 'Utilisateur'
   const avatarPath = message.author?.profile?.avatarPath
 

@@ -67,27 +67,21 @@ export function TaskDrawer({
   onDelete,
   onAddTag,
 }: TaskDrawerProps) {
-  const [title, setTitle] = useState('')
+  const [titleDraft, setTitleDraft] = useState<{ taskId: string | null; value: string }>({
+    taskId: null,
+    value: '',
+  })
   const [newChecklistText, setNewChecklistText] = useState('')
   const [newComment, setNewComment] = useState('')
-  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleteConfirmFor, setDeleteConfirmFor] = useState<string | null>(null)
   const [newTagLabel, setNewTagLabel] = useState('')
   const [newTagColor, setNewTagColor] = useState(TAG_COLOR_PALETTE[0])
   const [showTagForm, setShowTagForm] = useState(false)
   const titleRef = useRef<HTMLTextAreaElement>(null)
-  // Keep last known task/column so the panel content stays visible during close animation
-  const lastTaskRef = useRef<KanbanTask | null>(null)
-  const lastColumnIdRef = useRef<KanbanColumnId | null>(null)
-  if (task) lastTaskRef.current = task
-  if (columnId) lastColumnIdRef.current = columnId
-  const visibleTask = lastTaskRef.current
-  const visibleColumnId = lastColumnIdRef.current
-
-  // Sync title on task change, reset confirmation state
-  useEffect(() => {
-    setTitle(task?.title ?? '')
-    setDeleteConfirm(false)
-  }, [task?.id])
+  const visibleTask = task
+  const visibleColumnId = columnId
+  const title = titleDraft.taskId === visibleTask?.id ? titleDraft.value : visibleTask?.title ?? ''
+  const deleteConfirm = deleteConfirmFor === visibleTask?.id
 
   // Auto-resize title textarea
   useEffect(() => {
@@ -121,7 +115,7 @@ export function TaskDrawer({
     if (trimmed && trimmed !== visibleTask.title) {
       onUpdate(visibleTask.id, visibleColumnId, { title: trimmed })
     } else {
-      setTitle(visibleTask.title)
+      setTitleDraft({ taskId: visibleTask.id, value: visibleTask.title })
     }
   }
 
@@ -215,7 +209,7 @@ export function TaskDrawer({
           <textarea
             ref={titleRef}
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={e => setTitleDraft({ taskId: visibleTask?.id ?? null, value: e.target.value })}
             onBlur={saveTitle}
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); saveTitle(); titleRef.current?.blur() } }}
             placeholder="Titre de la tâche"
@@ -517,7 +511,7 @@ export function TaskDrawer({
         <div className={`flex-none px-6 py-4 border-t transition-colors ${deleteConfirm ? 'border-red-200 bg-red-50/60' : 'border-[var(--color-cream-mid)]'}`}>
           {!deleteConfirm ? (
             <button
-              onClick={() => setDeleteConfirm(true)}
+              onClick={() => setDeleteConfirmFor(visibleTask?.id ?? null)}
               className="flex items-center gap-2 text-body-sm text-[var(--color-ink-muted)] hover:text-red-500 cursor-pointer transition-colors"
             >
               <Trash2 size={14} />
@@ -528,7 +522,7 @@ export function TaskDrawer({
               <p className="text-body-sm font-semibold text-red-600">Supprimer définitivement cette tâche ?</p>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setDeleteConfirm(false)}
+                  onClick={() => setDeleteConfirmFor(null)}
                   className="flex-1 text-ui-sm font-semibold py-2 rounded-xl border border-[var(--color-cream-mid)] text-[var(--color-ink)] hover:bg-[var(--color-cream)] cursor-pointer transition-colors"
                 >
                   Annuler
