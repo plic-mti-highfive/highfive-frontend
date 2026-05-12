@@ -29,7 +29,7 @@ export default function App() {
 
         <Route path="/create-project" element={<CreateProjectPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
-        <Route path="/user/:username" element={<UserProfilePage />} />
+        <Route path="/user/:userId" element={<UserProfilePage />} />
 
         <Route path="/projects/:projectId/lab" element={<LabPage />} />
 

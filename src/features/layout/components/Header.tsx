@@ -42,11 +42,12 @@ function NotificationsMenu() {
 type UserMenuProps = {
   username: string
   initials: string
+  profilePath: string
   onLogout: () => void
   navigate: (to: string) => void
 }
 
-function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
+function UserMenu({ username, initials, profilePath, onLogout, navigate }: UserMenuProps) {
   return (
     <Menu.Root>
       <Menu.Trigger
@@ -71,7 +72,7 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
 
             <div className={separatorCls} />
 
-            <Menu.Item className={itemCls} onClick={() => navigate(`/user/${username}`)}>
+            <Menu.Item className={itemCls} onClick={() => navigate(profilePath)}>
               <User size={18} className="text-muted-foreground shrink-0" />
               Mon profil
             </Menu.Item>
@@ -105,7 +106,9 @@ function UserMenu({ username, initials, onLogout, navigate }: UserMenuProps) {
 
 export default function Header() {
   const navigate = useNavigate()
-  const { isAuthenticated, username, initials, logout } = useAuth()
+  const { isAuthenticated, user, logout } = useAuth()
+  const username = user?.email.split('@')[0] ?? ''
+  const initials = username.slice(0, 2).toUpperCase()
 
   return (
     <header className="sticky top-0 z-[9999] w-full bg-sidebar border-b border-sidebar-border px-8 h-14 flex items-center gap-8">
@@ -136,7 +139,8 @@ export default function Header() {
             <UserMenu
               username={username}
               initials={initials}
-              onLogout={() => { logout(); navigate('/') }}
+              profilePath={user ? `/user/${user.id}` : '/'}
+              onLogout={() => { logout().then(() => navigate('/')) }}
               navigate={navigate}
             />
           </>

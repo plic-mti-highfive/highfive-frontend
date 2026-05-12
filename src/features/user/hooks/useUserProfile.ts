@@ -5,11 +5,11 @@ import type { UserProfileResponse } from '@/api/types/user.types'
 
 // Adapter la réponse API vers le format User attendu par les composants
 const adaptUserProfile = (profile: UserProfileResponse): User => ({
-  username: profile.email.split('@')[0], // Temporaire: utiliser email comme username
-  displayName: profile.email.split('@')[0],
+  username: profile.userId,
+  displayName: profile.userId,
   avatar: profile.avatarPath || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.userId}`,
   bio: profile.bio || '',
-  createdAt: profile.createdAt,
+  createdAt: '',
   tags: [], // TODO: implémenter quand le backend supporte les tags
   stats: {
     projectsCreated: 0, // TODO: récupérer depuis API

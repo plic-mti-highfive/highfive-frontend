@@ -1,16 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import { Kanban } from 'lucide-react'
-import type { TaskDto, ProjectMemberDto } from '@/api/types'
+import type { TicketDto, ProjectMemberDto } from '@/api/types'
 import { TicketStatus } from '@plic-mti-highfive/shared-types'
-import { TaskCard } from './TaskCard'
+import { TicketCard } from './TicketCard'
 
-interface TaskListProps {
-  tasks: TaskDto[]
+interface TicketListProps {
+  tickets: TicketDto[]
   members: ProjectMemberDto[]
   projectId: string
 }
 
-export function TaskList({ tasks, members, projectId }: TaskListProps) {
+export function TicketList({ tickets, members, projectId }: TicketListProps) {
   const navigate = useNavigate()
 
   const getAssigneeName = (assigneeId: string | null) => {
@@ -19,11 +19,11 @@ export function TaskList({ tasks, members, projectId }: TaskListProps) {
     return member?.user?.email || 'Inconnu'
   }
 
-  const groupedTasks = {
-    [TicketStatus.TODO]: tasks.filter((t) => t.status === TicketStatus.TODO),
-    [TicketStatus.IN_PROGRESS]: tasks.filter((t) => t.status === TicketStatus.IN_PROGRESS),
-    [TicketStatus.IN_REVIEW]: tasks.filter((t) => t.status === TicketStatus.IN_REVIEW),
-    [TicketStatus.DONE]: tasks.filter((t) => t.status === TicketStatus.DONE),
+  const groupedTickets = {
+    [TicketStatus.TODO]: tickets.filter((t) => t.status === TicketStatus.TODO),
+    [TicketStatus.IN_PROGRESS]: tickets.filter((t) => t.status === TicketStatus.IN_PROGRESS),
+    [TicketStatus.IN_REVIEW]: tickets.filter((t) => t.status === TicketStatus.IN_REVIEW),
+    [TicketStatus.DONE]: tickets.filter((t) => t.status === TicketStatus.DONE),
   }
 
   const statusLabels = {
@@ -33,7 +33,7 @@ export function TaskList({ tasks, members, projectId }: TaskListProps) {
     [TicketStatus.DONE]: 'Terminé',
   }
 
-  if (tasks.length === 0) {
+  if (tickets.length === 0) {
     return (
       <>
         <div className="mb-6">
@@ -46,7 +46,7 @@ export function TaskList({ tasks, members, projectId }: TaskListProps) {
           </button>
         </div>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Aucune tâche pour le moment.</p>
+          <p className="text-muted-foreground">Aucun ticket pour le moment.</p>
         </div>
       </>
     )
@@ -63,23 +63,23 @@ export function TaskList({ tasks, members, projectId }: TaskListProps) {
           Accéder au lab
         </button>
       </div>
-      {Object.entries(groupedTasks).map(([status, statusTasks]) => {
-        if (statusTasks.length === 0) return null
+      {Object.entries(groupedTickets).map(([status, statusTickets]) => {
+        if (statusTickets.length === 0) return null
 
         return (
           <div key={status}>
             <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
               {statusLabels[status as TicketStatus]}
               <span className="text-xs font-normal text-muted-foreground">
-                ({statusTasks.length})
+                ({statusTickets.length})
               </span>
             </h3>
             <div className="space-y-2">
-              {statusTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  assigneeName={getAssigneeName(task.assigneeId)}
+              {statusTickets.map((ticket) => (
+                <TicketCard
+                  key={ticket.id}
+                  ticket={ticket}
+                  assigneeName={getAssigneeName(ticket.assigneeId)}
                 />
               ))}
             </div>

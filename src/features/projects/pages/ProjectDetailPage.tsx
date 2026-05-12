@@ -6,12 +6,12 @@ import { useProjectDetail } from '../hooks/useProjectDetail'
 import { ProjectHero } from '../components/ProjectHero'
 import { ProjectTabs, type TabId } from '../components/ProjectTabs'
 import { ProjectSidebar } from '../components/ProjectSidebar'
-import { TaskList } from '../components/TaskList'
+import { TicketList } from '../components/TicketList'
 import { DiscussionThread } from '../components/DiscussionThread'
 import { SimilarProjects } from '../components/SimilarProjects'
 import { ProjectDetailSkeleton } from '../components/ProjectDetailSkeleton'
 import type { ProjectMessageDto } from '@/api/types'
-import { TaskStatus } from '@/api/types'
+import { TicketStatus } from '@plic-mti-highfive/shared-types'
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -19,7 +19,7 @@ export function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState<TabId>('overview')
   const [localMessages, setLocalMessages] = useState<ProjectMessageDto[]>([])
 
-  const { project, members, tasks, messages, isLoading, error } = useProjectDetail(id || '')
+  const { project, members, tickets, messages, isLoading, error } = useProjectDetail(id || '')
 
   const handleMessageSent = (newMessage: ProjectMessageDto) => {
     setLocalMessages((prev) => [...prev, newMessage])
@@ -66,9 +66,9 @@ export function ProjectDetailPage() {
     )
   }
 
-  const completedTasks = tasks.filter((t) => t.status === TaskStatus.DONE).length
-  const totalTasks = tasks.length
-  const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0
+  const completedTickets = tickets.filter((t) => t.status === TicketStatus.DONE).length
+  const totalTickets = tickets.length
+  const progress = totalTickets > 0 ? (completedTickets / totalTickets) * 100 : 0
 
   const handleJoinProject = () => {
     console.log('Rejoindre le projet:', project.id)
@@ -128,7 +128,7 @@ export function ProjectDetailPage() {
                   </div>
                 )}
 
-                {activeTab === 'tasks' && <TaskList tasks={tasks} members={members} projectId={project.id} />}
+                {activeTab === 'tasks' && <TicketList tickets={tickets} members={members} projectId={project.id} />}
               </div>
 
               <div className="lg:col-span-1">

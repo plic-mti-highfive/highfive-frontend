@@ -17,8 +17,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError('')
 
@@ -31,8 +32,15 @@ export default function LoginPage() {
       return
     }
 
-    login('Utilisateur', remember)
-    navigate('/')
+    try {
+      setIsSubmitting(true)
+      await login(email, password)
+      navigate('/')
+    } catch {
+      setError('Identifiants incorrects.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -93,9 +101,10 @@ export default function LoginPage() {
       {/* Bouton Se connecter */}
       <Button
         type="submit"
+        disabled={isSubmitting}
         className="w-full h-13 text-body-lg font-semibold rounded-lg mt-2 dark:bg-foreground dark:text-background dark:hover:bg-foreground/90"
       >
-        Se connecter
+        {isSubmitting ? 'Connexion…' : 'Se connecter'}
       </Button>
     </AuthLayout>
   )

@@ -43,7 +43,7 @@ export function SearchResultsDropdown({ query, navigate }: SearchResultsDropdown
             <button
               key={user.username}
               className={resultItemCls}
-              onClick={() => navigate(`/user/${user.username}`)}
+              onClick={() => navigate(`/user/${user.id}`)}
               type="button"
             >
               <img

@@ -1,33 +1,33 @@
 import { useRef, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { KanbanColumn } from './KanbanColumn'
-import type { KanbanColumnDef, KanbanColumnId, KanbanTask } from '../types'
+import type { KanbanColumnDef, KanbanColumnId, KanbanTicket } from '../types'
 
 interface KanbanBoardProps {
   columns: KanbanColumnDef[]
-  tasks: Record<KanbanColumnId, KanbanTask[]>
+  tickets: Record<KanbanColumnId, KanbanTicket[]>
   customTags: import('../types').CustomTag[]
-  addTask: (columnId: KanbanColumnId, title: string) => void
-  moveTask: (taskId: string, from: KanbanColumnId, to: KanbanColumnId) => void
-  deleteTask: (taskId: string, columnId: KanbanColumnId) => void
-  onOpenTask: (taskId: string, columnId: KanbanColumnId) => void
+  addTicket: (columnId: KanbanColumnId, title: string) => void
+  moveTicket: (ticketId: string, from: KanbanColumnId, to: KanbanColumnId) => void
+  deleteTicket: (ticketId: string, columnId: KanbanColumnId) => void
+  onOpenTicket: (ticketId: string, columnId: KanbanColumnId) => void
   onAddColumn: (label: string) => void
   onDeleteColumn: (columnId: KanbanColumnId) => void
 }
 
-export function KanbanBoard({ columns, tasks, customTags, addTask, moveTask, deleteTask, onOpenTask, onAddColumn, onDeleteColumn }: KanbanBoardProps) {
-  const dragRef = useRef<{ taskId: string; fromColumnId: KanbanColumnId } | null>(null)
+export function KanbanBoard({ columns, tickets, customTags, addTicket, moveTicket, deleteTicket, onOpenTicket, onAddColumn, onDeleteColumn }: KanbanBoardProps) {
+  const dragRef = useRef<{ ticketId: string; fromColumnId: KanbanColumnId } | null>(null)
   const [addingColumn, setAddingColumn] = useState(false)
   const [newColLabel, setNewColLabel] = useState('')
 
-  const handleDragStart = (taskId: string, columnId: KanbanColumnId) => {
-    dragRef.current = { taskId, fromColumnId: columnId }
+  const handleDragStart = (ticketId: string, columnId: KanbanColumnId) => {
+    dragRef.current = { ticketId, fromColumnId: columnId }
   }
 
   const handleDrop = (targetColumnId: KanbanColumnId, dropIndex?: number) => {
     if (!dragRef.current) return
-    const { taskId, fromColumnId } = dragRef.current
-    moveTask(taskId, fromColumnId, targetColumnId, dropIndex)
+    const { ticketId, fromColumnId } = dragRef.current
+    moveTicket(ticketId, fromColumnId, targetColumnId, dropIndex)
     dragRef.current = null
   }
 
@@ -50,12 +50,12 @@ export function KanbanBoard({ columns, tasks, customTags, addTask, moveTask, del
             accentColor={col.accentColor}
             bgColor={col.bgColor}
             customTags={customTags}
-            tasks={tasks[col.id] ?? []}
-            onAddTask={addTask}
-            onDeleteTask={deleteTask}
+            tickets={tickets[col.id] ?? []}
+            onAddTicket={addTicket}
+            onDeleteTicket={deleteTicket}
             onDragStart={handleDragStart}
             onDrop={handleDrop}
-            onOpenTask={onOpenTask}
+            onOpenTicket={onOpenTicket}
             onDeleteColumn={onDeleteColumn}
           />
         ))}

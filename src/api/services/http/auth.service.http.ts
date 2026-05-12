@@ -22,7 +22,10 @@ export class AuthServiceHttp implements IAuthService {
   }
 
   async logout(): Promise<void> {
-    await httpClient.post('/auth/logout')
+    const refreshToken = tokenStorage.getRefreshToken()
+    if (refreshToken) {
+      await httpClient.post('/auth/logout', { refreshToken })
+    }
     tokenStorage.clearTokens()
   }
 

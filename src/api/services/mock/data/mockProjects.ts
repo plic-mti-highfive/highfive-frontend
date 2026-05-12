@@ -1,5 +1,5 @@
 import type { ProjectDto } from '@/api/types'
-import { ProjectStatus, ProjectVisibility } from '@/api/types'
+import { ProjectStatus, ProjectVisibility } from '@plic-mti-highfive/shared-types'
 
 // Mock projects - source de vérité unique pour tous les mocks de projets
 // Format: ProjectDto (compatible avec l'API backend)

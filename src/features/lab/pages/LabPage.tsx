@@ -4,7 +4,7 @@ import { LayoutTemplate, Kanban } from 'lucide-react'
 import { Header } from '@features/layout'
 import { Footer } from '@features/layout'
 import { KanbanBoard } from '../components/KanbanBoard'
-import { TaskDrawer } from '../components/TaskDrawer'
+import { TicketDrawer } from '../components/TicketDrawer'
 import { useKanban } from '../hooks/useKanban'
 import { MOCK_MEMBERS } from '../data/members'
 import { getAssigneeColor, assigneeInitials } from '../utils/kanbanConfig'
@@ -20,23 +20,23 @@ import {
 
 export default function LabPage() {
   const { projectId } = useParams<{ projectId: string }>()
-  const { tasks, columns, customTags, addTask, moveTask, deleteTask, updateTask, addColumn, deleteColumn, addCustomTag } = useKanban()
-  const [openTask, setOpenTask] = useState<{ taskId: string; columnId: KanbanColumnId } | null>(null)
+  const { tickets, columns, customTags, addTicket, moveTicket, deleteTicket, updateTicket, addColumn, deleteColumn, addCustomTag } = useKanban()
+  const [openTicket, setOpenTicket] = useState<{ ticketId: string; columnId: KanbanColumnId } | null>(null)
 
   const { total, done } = useMemo(() => {
-    const all = Object.values(tasks).flat()
-    return { total: all.length, done: tasks.done.length }
-  }, [tasks])
+    const all = Object.values(tickets).flat()
+    return { total: all.length, done: tickets.done.length }
+  }, [tickets])
 
   const progressPct = total > 0 ? Math.round((done / total) * 100) : 0
 
-  const activeTask = openTask
-    ? (tasks[openTask.columnId]?.find(t => t.id === openTask.taskId) ?? null)
+  const activeTicket = openTicket
+    ? (tickets[openTicket.columnId]?.find(t => t.id === openTicket.ticketId) ?? null)
     : null
 
-  function handleDrawerMove(taskId: string, from: KanbanColumnId, to: KanbanColumnId) {
-    moveTask(taskId, from, to)
-    setOpenTask({ taskId, columnId: to })
+  function handleDrawerMove(ticketId: string, from: KanbanColumnId, to: KanbanColumnId) {
+    moveTicket(ticketId, from, to)
+    setOpenTicket({ ticketId, columnId: to })
   }
 
   return (
@@ -131,12 +131,12 @@ export default function LabPage() {
           {/* Kanban board */}
           <KanbanBoard
             columns={columns}
-            tasks={tasks}
+            tickets={tickets}
             customTags={customTags}
-            addTask={addTask}
-            moveTask={moveTask}
-            deleteTask={deleteTask}
-            onOpenTask={(taskId, columnId) => setOpenTask({ taskId, columnId })}
+            addTicket={addTicket}
+            moveTicket={moveTicket}
+            deleteTicket={deleteTicket}
+            onOpenTicket={(ticketId, columnId) => setOpenTicket({ ticketId, columnId })}
             onAddColumn={addColumn}
             onDeleteColumn={deleteColumn}
           />
@@ -145,20 +145,19 @@ export default function LabPage() {
       </main>
       <Footer />
 
-      <TaskDrawer
-        task={activeTask}
-        columnId={openTask?.columnId ?? null}
-        isOpen={openTask !== null}
+      <TicketDrawer
+        ticket={activeTicket}
+        columnId={openTicket?.columnId ?? null}
+        isOpen={openTicket !== null}
         members={MOCK_MEMBERS}
         columns={columns}
         customTags={customTags}
-        onClose={() => setOpenTask(null)}
-        onUpdate={updateTask}
+        onClose={() => setOpenTicket(null)}
+        onUpdate={updateTicket}
         onMoveColumn={handleDrawerMove}
-        onDelete={(id, col) => { deleteTask(id, col); setOpenTask(null) }}
+        onDelete={(id, col) => { deleteTicket(id, col); setOpenTicket(null) }}
         onAddTag={addCustomTag}
       />
     </>
   )
 }
-

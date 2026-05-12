@@ -96,12 +96,13 @@ class HttpClient {
       throw new ApiError(response.status, response.statusText, errorData)
     }
 
-    // Handle 204 No Content
     if (response.status === 204) {
       return undefined as T
     }
 
-    return response.json()
+    const text = await response.text()
+    if (!text) return undefined as T
+    return JSON.parse(text) as T
   }
 
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {

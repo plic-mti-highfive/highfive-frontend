@@ -1,5 +1,5 @@
 import type { UserDto } from '@/api/types'
-import { UserStatus } from '@/api/types'
+import { UserStatus } from '@plic-mti-highfive/shared-types'
 
 // Mock users - source de vérité unique pour tous les mocks d'utilisateurs
 // Format: UserDto (compatible avec l'API backend)

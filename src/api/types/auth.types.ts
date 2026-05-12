@@ -1,4 +1,4 @@
-import { UserStatus } from './enums'
+import type { UserStatus } from '@plic-mti-highfive/shared-types'
 
 // DTOs Auth - alignés avec backend
 

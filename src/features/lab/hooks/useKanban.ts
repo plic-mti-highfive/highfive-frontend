@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { KanbanColumnId, KanbanTask, KanbanColumnDef, CustomTag } from '../types'
+import type { KanbanColumnId, KanbanTicket, KanbanColumnDef, CustomTag } from '../types'
 import { DEFAULT_COLUMNS, TAG_COLOR_PALETTE } from '../utils/kanbanConfig'
 
 const INITIAL_COLUMNS: KanbanColumnDef[] = DEFAULT_COLUMNS.map(c => ({ ...c, bgColor: c.bgColor }))
@@ -11,7 +11,7 @@ const INITIAL_TAGS: CustomTag[] = [
   { id: 'tag-4', label: 'Créatif',    color: '#FF6B1A' },
 ]
 
-const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
+const INITIAL_TICKETS: Record<KanbanColumnId, KanbanTicket[]> = {
   todo: [
     {
       id: '1',
@@ -26,7 +26,7 @@ const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
         { id: 'c1-4', text: 'Valider le budget', done: false },
         { id: 'c1-5', text: 'Planifier les jalons', done: false },
       ],
-      taskComments: [],
+      ticketComments: [],
     },
     {
       id: '2',
@@ -35,7 +35,7 @@ const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
       assignee: 'Lucas T.',
       priority: 'medium',
       checklistItems: [],
-      taskComments: [
+      ticketComments: [
         { id: 'cm2-1', author: 'Alice M.', text: 'Penser à inclure les contraintes de format.', createdAt: '2026-04-18T10:00:00Z' },
         { id: 'cm2-2', author: 'Lucas T.', text: 'Noté, je commence par les formats mobiles.', createdAt: '2026-04-18T11:30:00Z' },
         { id: 'cm2-3', author: 'Sara K.',  text: 'Prévoir aussi la version print.', createdAt: '2026-04-19T09:15:00Z' },
@@ -55,7 +55,7 @@ const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
         { id: 'c3-3', text: 'Section 2', done: false },
         { id: 'c3-4', text: 'Conclusion', done: false },
       ],
-      taskComments: [
+      ticketComments: [
         { id: 'cm3-1', author: 'Lucas T.', text: 'Est-ce qu\'on a validé le ton éditorial ?', createdAt: '2026-04-19T14:00:00Z' },
         { id: 'cm3-2', author: 'Alice M.', text: 'Oui, on part sur quelque chose de chaleureux.', createdAt: '2026-04-19T15:00:00Z' },
       ],
@@ -73,7 +73,7 @@ const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
         { id: 'c4-2', text: 'Envoyer les invitations', done: true },
         { id: 'c4-3', text: 'Rédiger le compte-rendu', done: true },
       ],
-      taskComments: [
+      ticketComments: [
         { id: 'cm4-1', author: 'Sara K.', text: 'Très bonne réunion, tout était clair !', createdAt: '2026-04-20T08:00:00Z' },
       ],
     },
@@ -83,67 +83,59 @@ const INITIAL_TASKS: Record<KanbanColumnId, KanbanTask[]> = {
 export function useKanban() {
   const [columns, setColumns] = useState<KanbanColumnDef[]>(INITIAL_COLUMNS)
   const [customTags, setCustomTags] = useState<CustomTag[]>(INITIAL_TAGS)
-  const [tasks, setTasks] = useState<Record<KanbanColumnId, KanbanTask[]>>(INITIAL_TASKS)
+  const [tickets, setTickets] = useState<Record<KanbanColumnId, KanbanTicket[]>>(INITIAL_TICKETS)
 
-  function addTask(columnId: KanbanColumnId, title: string) {
+  function addTicket(columnId: KanbanColumnId, title: string) {
     if (!title.trim()) return
-    const newTask: KanbanTask = {
+    const newTicket: KanbanTicket = {
       id: crypto.randomUUID(),
       title: title.trim(),
       checklistItems: [],
-      taskComments: [],
+      ticketComments: [],
     }
-    setTasks(prev => ({
+    setTickets(prev => ({
       ...prev,
-      [columnId]: [...(prev[columnId] ?? []), newTask],
+      [columnId]: [...(prev[columnId] ?? []), newTicket],
     }))
   }
 
-  function moveTask(taskId: string, from: KanbanColumnId, to: KanbanColumnId, toIndex?: number) {
-    setTasks(prev => {
-      const task = prev[from]?.find(t => t.id === taskId)
-      if (!task) return prev
+  function moveTicket(ticketId: string, from: KanbanColumnId, to: KanbanColumnId, toIndex?: number) {
+    setTickets(prev => {
+      const ticket = prev[from]?.find(t => t.id === ticketId)
+      if (!ticket) return prev
 
-      // Si c'est la même colonne, on réordonne
       if (from === to) {
         const newList = [...prev[from]]
-        const currentIndex = newList.findIndex(t => t.id === taskId)
+        const currentIndex = newList.findIndex(t => t.id === ticketId)
         if (currentIndex === -1) return prev
-
         newList.splice(currentIndex, 1)
         const insertIndex = toIndex !== undefined ? toIndex : newList.length
-        newList.splice(insertIndex, 0, task)
-
-        return {
-          ...prev,
-          [from]: newList,
-        }
+        newList.splice(insertIndex, 0, ticket)
+        return { ...prev, [from]: newList }
       }
 
-      // Sinon, on déplace vers une autre colonne
       const targetList = [...(prev[to] ?? [])]
       const insertIndex = toIndex !== undefined ? toIndex : targetList.length
-      targetList.splice(insertIndex, 0, task)
-
+      targetList.splice(insertIndex, 0, ticket)
       return {
         ...prev,
-        [from]: prev[from].filter(t => t.id !== taskId),
+        [from]: prev[from].filter(t => t.id !== ticketId),
         [to]: targetList,
       }
     })
   }
 
-  function deleteTask(taskId: string, columnId: KanbanColumnId) {
-    setTasks(prev => ({
+  function deleteTicket(ticketId: string, columnId: KanbanColumnId) {
+    setTickets(prev => ({
       ...prev,
-      [columnId]: prev[columnId].filter(t => t.id !== taskId),
+      [columnId]: prev[columnId].filter(t => t.id !== ticketId),
     }))
   }
 
-  function updateTask(taskId: string, columnId: KanbanColumnId, updates: Partial<KanbanTask>) {
-    setTasks(prev => ({
+  function updateTicket(ticketId: string, columnId: KanbanColumnId, updates: Partial<KanbanTicket>) {
+    setTickets(prev => ({
       ...prev,
-      [columnId]: prev[columnId].map(t => t.id === taskId ? { ...t, ...updates } : t),
+      [columnId]: prev[columnId].map(t => t.id === ticketId ? { ...t, ...updates } : t),
     }))
   }
 
@@ -158,12 +150,12 @@ export function useKanban() {
       bgColor: accentColor + '18',
     }
     setColumns(prev => [...prev, newCol])
-    setTasks(prev => ({ ...prev, [id]: [] }))
+    setTickets(prev => ({ ...prev, [id]: [] }))
   }
 
   function deleteColumn(columnId: KanbanColumnId) {
     setColumns(prev => prev.filter(c => c.id !== columnId))
-    setTasks(prev => {
+    setTickets(prev => {
       const updated = { ...prev }
       delete updated[columnId]
       return updated
@@ -177,8 +169,7 @@ export function useKanban() {
 
   function deleteCustomTag(tagId: string) {
     setCustomTags(prev => prev.filter(t => t.id !== tagId))
-    // Remove from all tasks
-    setTasks(prev => {
+    setTickets(prev => {
       const updated = { ...prev }
       for (const colId of Object.keys(updated)) {
         updated[colId] = updated[colId].map(t => ({
@@ -193,16 +184,14 @@ export function useKanban() {
   return {
     columns,
     customTags,
-    tasks,
-    addTask,
-    moveTask,
-    deleteTask,
-    updateTask,
+    tickets,
+    addTicket,
+    moveTicket,
+    deleteTicket,
+    updateTicket,
     addColumn,
     deleteColumn,
     addCustomTag,
     deleteCustomTag,
   }
 }
-
-

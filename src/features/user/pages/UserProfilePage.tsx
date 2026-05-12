@@ -16,15 +16,7 @@ import { UnfollowConfirmDialog } from '../components/UnfollowConfirmDialog'
 import { getTagColor } from '@shared/utils/tagColors'
 import type { UserProfileFormData } from '@shared/types/user'
 import { useAuth } from '@/contexts'
-import { mockUsers } from '@shared/data/mockUsers'
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'long'
-  })
-}
+import { useUserProfile } from '../hooks/useUserProfile'
 
 function StatItem({
   value,
@@ -50,13 +42,21 @@ function StatItem({
 }
 
 export default function UserProfile() {
-  const { username } = useParams<{ username: string }>()
+  const { userId } = useParams<{ userId: string }>()
   const { user: currentUser, isAuthenticated } = useAuth()
+  const { user, isLoading, error } = useUserProfile(userId)
 
-  // TODO: Remplacer par useUserProfile quand le backend aura un endpoint GET /users/by-username/:username
-  // Pour l'instant on garde les mocks
-  const user = username ? mockUsers[username] : null
-  const isOwnProfile = isAuthenticated && currentUser?.email.split('@')[0] === username
+  const isOwnProfile = isAuthenticated && currentUser?.id === userId
+
+  // For display name / username: prefer the email prefix when viewing own profile
+  const displayUsername =
+    isOwnProfile && currentUser?.email
+      ? currentUser.email.split('@')[0]
+      : (user?.username ?? userId ?? '')
+  const displayName =
+    isOwnProfile && currentUser?.email
+      ? currentUser.email.split('@')[0]
+      : (user?.displayName ?? userId ?? '')
 
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [following, setFollowing] = useState(false)
@@ -66,7 +66,6 @@ export default function UserProfile() {
 
   const handleSaveProfile = (data: UserProfileFormData) => {
     console.log('Saving profile:', data)
-    // Ici on mettrait à jour les données de l'utilisateur
   }
 
   const handleShare = () => {
@@ -75,14 +74,25 @@ export default function UserProfile() {
 
   const handleFollow = () => {
     setFollowing(!following)
-    console.log(following ? 'Unfollow' : 'Follow')
   }
 
   const handleMessage = () => {
     console.log('Envoyer un message')
   }
 
-  if (!user) {
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-muted-foreground">Chargement...</p>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  if (error || !user) {
     return (
       <>
         <Header />
@@ -106,19 +116,16 @@ export default function UserProfile() {
                   {/* Avatar à gauche */}
                   <img
                     src={user.avatar}
-                    alt={user.displayName}
+                    alt={displayName}
                     className="w-24 h-24 rounded-3xl object-cover bg-muted flex-shrink-0"
                   />
 
                   {/* Infos au centre */}
                   <div className="flex-1">
                     <h1 className="text-xl font-heading font-bold text-foreground">
-                      {user.displayName}
+                      {displayName}
                     </h1>
-                    <p className="text-body-md text-muted-foreground">@{user.username}</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Membre depuis {formatDate(user.createdAt)}
-                    </p>
+                    <p className="text-body-md text-muted-foreground">@{displayUsername}</p>
                   </div>
 
                   {/* Menu 3 points à droite */}
@@ -239,7 +246,7 @@ export default function UserProfile() {
                         description={
                           isOwnProfile
                             ? "Vous n'avez pas encore créé de projet. Commencez à créer quelque chose !"
-                            : `${user.displayName} n'a pas encore créé de projet.`
+                            : `${displayName} n'a pas encore créé de projet.`
                         }
                       />
                     ),
@@ -263,7 +270,7 @@ export default function UserProfile() {
                         description={
                           isOwnProfile
                             ? "Vous n'avez pas encore collaboré sur des projets."
-                            : `${user.displayName} n'a pas encore collaboré sur des projets.`
+                            : `${displayName} n'a pas encore collaboré sur des projets.`
                         }
                       />
                     ),
@@ -287,7 +294,7 @@ export default function UserProfile() {
                         description={
                           isOwnProfile
                             ? "Vous n'avez pas encore liké de projets."
-                            : `${user.displayName} n'a pas encore liké de projets.`
+                            : `${displayName} n'a pas encore liké de projets.`
                         }
                       />
                     ),
@@ -326,7 +333,7 @@ export default function UserProfile() {
       <UnfollowConfirmDialog
         open={unfollowConfirmOpen}
         onOpenChange={setUnfollowConfirmOpen}
-        displayName={user.displayName}
+        displayName={displayName}
         onConfirm={handleFollow}
       />
     </>

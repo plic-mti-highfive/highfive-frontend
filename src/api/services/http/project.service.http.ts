@@ -6,9 +6,9 @@ import type {
   ProjectMemberDto,
   AddProjectMemberDto,
   UpdateProjectMemberDto,
-  TaskDto,
-  CreateTaskDto,
-  UpdateTaskDto,
+  TicketDto,
+  CreateTicketDto,
+  UpdateTicketDto,
   ListProjectsQuery,
   PaginatedResponse,
   ProjectMessageDto,
@@ -23,8 +23,11 @@ export class ProjectServiceHttp implements IProjectService {
   }
 
   async getProjects(query?: ListProjectsQuery): Promise<PaginatedResponse<ProjectDto>> {
+    const { page, limit, ...rest } = query ?? {}
+    const resolvedLimit = limit ?? 20
+    const offset = page !== undefined ? (page - 1) * resolvedLimit : 0
     return httpClient.get<PaginatedResponse<ProjectDto>>('/projects', {
-      params: query as Record<string, string | number | boolean>,
+      params: { ...rest, offset, limit: resolvedLimit } as Record<string, string | number | boolean>,
     })
   }
 
@@ -64,25 +67,25 @@ export class ProjectServiceHttp implements IProjectService {
     return httpClient.delete(`/projects/${projectId}/members/${userId}`)
   }
 
-  // Tasks
-  async createTask(projectId: string, dto: CreateTaskDto): Promise<TaskDto> {
-    return httpClient.post<TaskDto>(`/projects/${projectId}/tasks`, dto)
+  // Tickets
+  async createTicket(projectId: string, dto: CreateTicketDto): Promise<TicketDto> {
+    return httpClient.post<TicketDto>(`/projects/${projectId}/tickets`, dto)
   }
 
-  async getProjectTasks(projectId: string): Promise<TaskDto[]> {
-    return httpClient.get<TaskDto[]>(`/projects/${projectId}/tasks`)
+  async getProjectTickets(projectId: string): Promise<TicketDto[]> {
+    return httpClient.get<TicketDto[]>(`/projects/${projectId}/tickets`)
   }
 
-  async getTaskById(projectId: string, taskId: string): Promise<TaskDto> {
-    return httpClient.get<TaskDto>(`/projects/${projectId}/tasks/${taskId}`)
+  async getTicketById(projectId: string, ticketId: string): Promise<TicketDto> {
+    return httpClient.get<TicketDto>(`/projects/${projectId}/tickets/${ticketId}`)
   }
 
-  async updateTask(
+  async updateTicket(
     projectId: string,
-    taskId: string,
-    dto: UpdateTaskDto,
-  ): Promise<TaskDto> {
-    return httpClient.patch<TaskDto>(`/projects/${projectId}/tasks/${taskId}`, dto)
+    ticketId: string,
+    dto: UpdateTicketDto,
+  ): Promise<TicketDto> {
+    return httpClient.patch<TicketDto>(`/projects/${projectId}/tickets/${ticketId}`, dto)
   }
 
   // Messages

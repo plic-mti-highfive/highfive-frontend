@@ -8,38 +8,32 @@ class MockUserDb {
   private profiles: Map<string, UserProfileResponse> = new Map()
 
   constructor() {
-    // Initialiser avec les profils depuis mockUsers centralisé
     const allUsers = getAllUsers()
     allUsers.forEach((user) => {
       if (user.profile) {
         this.profiles.set(user.id, {
           userId: user.id,
-          email: user.email,
           bio: user.profile.bio,
           avatarPath: user.profile.avatarPath,
           themePreference: user.profile.themePreference,
           emailNotifications: user.profile.emailNotifications,
-          createdAt: user.createdAt,
         })
       }
     })
   }
 
-  getProfile(userId: string): UserProfileResponse | undefined {
-    return this.profiles.get(userId)
+  getProfile(userId: string): UserProfileResponse {
+    return this.profiles.get(userId) ?? {
+      userId,
+      bio: null,
+      avatarPath: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
+      themePreference: 'light',
+      emailNotifications: true,
+    }
   }
 
   updateProfile(userId: string, updates: Partial<UserProfileResponse>): UserProfileResponse {
-    const existing = this.profiles.get(userId) || {
-      userId,
-      email: `user-${userId}@example.com`,
-      bio: null,
-      avatarPath: null,
-      themePreference: 'light',
-      emailNotifications: true,
-      createdAt: new Date().toISOString(),
-    }
-
+    const existing = this.getProfile(userId)
     const updated = { ...existing, ...updates }
     this.profiles.set(userId, updated)
     return updated
@@ -51,13 +45,7 @@ const db = new MockUserDb()
 export class UserServiceMock implements IUserService {
   async getUserProfile(userId: string): Promise<UserProfileResponse> {
     await delay(200)
-
-    const profile = db.getProfile(userId)
-    if (!profile) {
-      throw new Error('User not found')
-    }
-
-    return profile
+    return db.getProfile(userId)
   }
 
   async updateUserProfile(

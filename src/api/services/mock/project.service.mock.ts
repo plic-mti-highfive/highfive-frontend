@@ -6,27 +6,25 @@ import type {
   ProjectMemberDto,
   AddProjectMemberDto,
   UpdateProjectMemberDto,
-  TaskDto,
-  CreateTaskDto,
-  UpdateTaskDto,
+  TicketDto,
+  CreateTicketDto,
+  UpdateTicketDto,
   ListProjectsQuery,
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
 } from '../../types'
-import { ProjectStatus, ProjectVisibility, ProjectRole, TaskStatus } from '../../types'
+import { ProjectStatus, ProjectVisibility, ProjectRole, TicketStatus } from '@plic-mti-highfive/shared-types'
 import { delay, generateId } from './utils'
 import { getAllProjects } from './data'
 
-// Base de données mock en mémoire
 class MockProjectDb {
   private projects: Map<string, ProjectDto> = new Map()
   private members: Map<string, ProjectMemberDto[]> = new Map()
-  private tasks: Map<string, TaskDto[]> = new Map()
+  private tickets: Map<string, TicketDto[]> = new Map()
   private messages: Map<string, ProjectMessageDto[]> = new Map()
 
   constructor() {
-    // Initialiser avec les projets mockés centralisés
     const allProjects = getAllProjects()
     const mockUsers = [
       { id: 'user-1', email: 'marie.dupont@example.com', avatar: null },
@@ -37,7 +35,6 @@ class MockProjectDb {
 
     allProjects.forEach((project, index) => {
       this.projects.set(project.id, project)
-      // Créer un member pour chaque projet avec un utilisateur fictif
       const creatorUser = mockUsers[index % mockUsers.length]
       const member: ProjectMemberDto = {
         projectId: project.id,
@@ -72,7 +69,6 @@ class MockProjectDb {
   updateProject(id: string, updates: Partial<ProjectDto>): ProjectDto | undefined {
     const existing = this.projects.get(id)
     if (!existing) return undefined
-
     const updated = { ...existing, ...updates, updatedAt: new Date().toISOString() }
     this.projects.set(id, updated)
     return updated
@@ -100,7 +96,6 @@ class MockProjectDb {
     const members = this.members.get(projectId) || []
     const index = members.findIndex((m) => m.userId === userId)
     if (index === -1) return undefined
-
     const updated = { ...members[index], ...updates }
     members[index] = updated
     this.members.set(projectId, members)
@@ -114,33 +109,32 @@ class MockProjectDb {
     return filtered.length < members.length
   }
 
-  getTasks(projectId: string): TaskDto[] {
-    return this.tasks.get(projectId) || []
+  getTickets(projectId: string): TicketDto[] {
+    return this.tickets.get(projectId) || []
   }
 
-  addTask(projectId: string, task: TaskDto): void {
-    const tasks = this.tasks.get(projectId) || []
-    tasks.push(task)
-    this.tasks.set(projectId, tasks)
+  addTicket(projectId: string, ticket: TicketDto): void {
+    const tickets = this.tickets.get(projectId) || []
+    tickets.push(ticket)
+    this.tickets.set(projectId, tickets)
   }
 
-  getTask(projectId: string, taskId: string): TaskDto | undefined {
-    const tasks = this.tasks.get(projectId) || []
-    return tasks.find((t) => t.id === taskId)
+  getTicket(projectId: string, ticketId: string): TicketDto | undefined {
+    const tickets = this.tickets.get(projectId) || []
+    return tickets.find((t) => t.id === ticketId)
   }
 
-  updateTask(
+  updateTicket(
     projectId: string,
-    taskId: string,
-    updates: Partial<TaskDto>,
-  ): TaskDto | undefined {
-    const tasks = this.tasks.get(projectId) || []
-    const index = tasks.findIndex((t) => t.id === taskId)
+    ticketId: string,
+    updates: Partial<TicketDto>,
+  ): TicketDto | undefined {
+    const tickets = this.tickets.get(projectId) || []
+    const index = tickets.findIndex((t) => t.id === ticketId)
     if (index === -1) return undefined
-
-    const updated = { ...tasks[index], ...updates, updatedAt: new Date().toISOString() }
-    tasks[index] = updated
-    this.tasks.set(projectId, tasks)
+    const updated = { ...tickets[index], ...updates, updatedAt: new Date().toISOString() }
+    tickets[index] = updated
+    this.tickets.set(projectId, tickets)
     return updated
   }
 
@@ -160,7 +154,6 @@ const db = new MockProjectDb()
 export class ProjectServiceMock implements IProjectService {
   async createProject(dto: CreateProjectDto): Promise<ProjectDto> {
     await delay(500)
-
     const project: ProjectDto = {
       id: generateId(),
       tenantId: 'default-tenant',
@@ -172,32 +165,23 @@ export class ProjectServiceMock implements IProjectService {
       updatedAt: new Date().toISOString(),
       deletedAt: null,
     }
-
     db.addProject(project)
     return project
   }
 
   async getProjects(query?: ListProjectsQuery): Promise<PaginatedResponse<ProjectDto>> {
     await delay(300)
-
     let projects = db.getAllProjects()
-
-    // Filtrage
     if (query?.status) {
       projects = projects.filter((p) => p.status === query.status)
     }
     if (query?.visibility) {
       projects = projects.filter((p) => p.visibility === query.visibility)
     }
-
-    // Pagination
     const page = query?.page || 1
     const limit = query?.limit || 20
     const start = (page - 1) * limit
-    const end = start + limit
-
-    const paginatedProjects = projects.slice(start, end)
-
+    const paginatedProjects = projects.slice(start, start + limit)
     return {
       data: paginatedProjects,
       total: projects.length,
@@ -209,33 +193,22 @@ export class ProjectServiceMock implements IProjectService {
 
   async getProjectById(id: string): Promise<ProjectDto> {
     await delay(200)
-
     const project = db.getProject(id)
-    if (!project) {
-      throw new Error('Project not found')
-    }
-
+    if (!project) throw new Error('Project not found')
     return project
   }
 
   async updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto> {
     await delay(400)
-
     const updated = db.updateProject(id, dto)
-    if (!updated) {
-      throw new Error('Project not found')
-    }
-
+    if (!updated) throw new Error('Project not found')
     return updated
   }
 
   async deleteProject(id: string): Promise<void> {
     await delay(300)
-
     const success = db.deleteProject(id)
-    if (!success) {
-      throw new Error('Project not found')
-    }
+    if (!success) throw new Error('Project not found')
   }
 
   async getProjectMembers(projectId: string): Promise<ProjectMemberDto[]> {
@@ -243,12 +216,8 @@ export class ProjectServiceMock implements IProjectService {
     return db.getMembers(projectId)
   }
 
-  async addProjectMember(
-    projectId: string,
-    dto: AddProjectMemberDto,
-  ): Promise<ProjectMemberDto> {
+  async addProjectMember(projectId: string, dto: AddProjectMemberDto): Promise<ProjectMemberDto> {
     await delay(400)
-
     const member: ProjectMemberDto = {
       projectId,
       userId: dto.userId,
@@ -256,7 +225,6 @@ export class ProjectServiceMock implements IProjectService {
       role: dto.role || ProjectRole.MEMBER,
       createdAt: new Date().toISOString(),
     }
-
     db.addMember(projectId, member)
     return member
   }
@@ -267,77 +235,59 @@ export class ProjectServiceMock implements IProjectService {
     dto: UpdateProjectMemberDto,
   ): Promise<ProjectMemberDto> {
     await delay(400)
-
     const updated = db.updateMember(projectId, userId, dto)
-    if (!updated) {
-      throw new Error('Member not found')
-    }
-
+    if (!updated) throw new Error('Member not found')
     return updated
   }
 
   async removeProjectMember(projectId: string, userId: string): Promise<void> {
     await delay(300)
-
     const success = db.removeMember(projectId, userId)
-    if (!success) {
-      throw new Error('Member not found')
-    }
+    if (!success) throw new Error('Member not found')
   }
 
-  async createTask(projectId: string, dto: CreateTaskDto): Promise<TaskDto> {
+  async createTicket(projectId: string, dto: CreateTicketDto): Promise<TicketDto> {
     await delay(400)
-
-    const task: TaskDto = {
+    const ticket: TicketDto = {
       id: generateId(),
       projectId,
       tenantId: 'default-tenant',
       title: dto.title,
       description: dto.description || null,
-      status: dto.status || TaskStatus.TODO,
+      status: dto.status || TicketStatus.TODO,
       assigneeId: dto.assigneeId || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
-
-    db.addTask(projectId, task)
-    return task
+    db.addTicket(projectId, ticket)
+    return ticket
   }
 
-  async getProjectTasks(projectId: string): Promise<TaskDto[]> {
+  async getProjectTickets(projectId: string): Promise<TicketDto[]> {
     await delay(200)
-    return db.getTasks(projectId)
+    return db.getTickets(projectId)
   }
 
-  async getTaskById(projectId: string, taskId: string): Promise<TaskDto> {
+  async getTicketById(projectId: string, ticketId: string): Promise<TicketDto> {
     await delay(200)
-
-    const task = db.getTask(projectId, taskId)
-    if (!task) {
-      throw new Error('Task not found')
-    }
-
-    return task
+    const ticket = db.getTicket(projectId, ticketId)
+    if (!ticket) throw new Error('Ticket not found')
+    return ticket
   }
 
-  async updateTask(
+  async updateTicket(
     projectId: string,
-    taskId: string,
-    dto: UpdateTaskDto,
-  ): Promise<TaskDto> {
+    ticketId: string,
+    dto: UpdateTicketDto,
+  ): Promise<TicketDto> {
     await delay(400)
-
-    const updated = db.updateTask(projectId, taskId, dto)
-    if (!updated) {
-      throw new Error('Task not found')
-    }
-
+    const updated = db.updateTicket(projectId, ticketId, dto)
+    if (!updated) throw new Error('Ticket not found')
     return updated
   }
 
   async createMessage(projectId: string, dto: CreateProjectMessageDto): Promise<ProjectMessageDto> {
     await delay(400)
-
     const message: ProjectMessageDto = {
       id: generateId(),
       projectId,
@@ -356,7 +306,6 @@ export class ProjectServiceMock implements IProjectService {
         },
       },
     }
-
     db.addMessage(projectId, message)
     return message
   }

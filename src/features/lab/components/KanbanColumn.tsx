@@ -1,20 +1,20 @@
 import { useState, useRef } from 'react'
 import { Plus, MousePointerClick, Trash2 } from 'lucide-react'
 import { KanbanCard } from './KanbanCard'
-import type { KanbanTask, KanbanColumnId, CustomTag } from '../types'
+import type { KanbanTicket, KanbanColumnId, CustomTag } from '../types'
 
 interface KanbanColumnProps {
   id: KanbanColumnId
   label: string
   accentColor: string
   bgColor: string
-  tasks: KanbanTask[]
+  tickets: KanbanTicket[]
   customTags: CustomTag[]
-  onAddTask: (columnId: KanbanColumnId, title: string) => void
-  onDeleteTask: (taskId: string, columnId: KanbanColumnId) => void
-  onDragStart: (taskId: string, columnId: KanbanColumnId) => void
+  onAddTicket: (columnId: KanbanColumnId, title: string) => void
+  onDeleteTicket: (ticketId: string, columnId: KanbanColumnId) => void
+  onDragStart: (ticketId: string, columnId: KanbanColumnId) => void
   onDrop: (targetColumnId: KanbanColumnId, dropIndex?: number) => void
-  onOpenTask: (taskId: string, columnId: KanbanColumnId) => void
+  onOpenTicket: (ticketId: string, columnId: KanbanColumnId) => void
   onDeleteColumn: (columnId: KanbanColumnId) => void
 }
 
@@ -23,13 +23,13 @@ export function KanbanColumn({
   label,
   accentColor,
   bgColor,
-  tasks,
+  tickets,
   customTags,
-  onAddTask,
-  onDeleteTask,
+  onAddTicket,
+  onDeleteTicket,
   onDragStart,
   onDrop,
-  onOpenTask,
+  onOpenTicket,
   onDeleteColumn,
 }: KanbanColumnProps) {
   const [isOver, setIsOver] = useState(false)
@@ -41,22 +41,21 @@ export function KanbanColumn({
 
   const handleSubmit = () => {
     if (newTitle.trim()) {
-      onAddTask(id, newTitle)
+      onAddTicket(id, newTitle)
       setNewTitle('')
     }
     setAdding(false)
   }
 
-  const isEmpty = tasks.length === 0 && !adding
+  const isEmpty = tickets.length === 0 && !adding
 
   const calculateDropIndex = (e: React.DragEvent) => {
     const containerRect = e.currentTarget.getBoundingClientRect()
     const mouseY = e.clientY - containerRect.top
 
-    // Calculer la position d'insertion basée sur la position de la souris
     let insertIndex = 0
-    for (let i = 0; i < tasks.length; i++) {
-      const cardElement = cardRefs.current.get(tasks[i].id)
+    for (let i = 0; i < tickets.length; i++) {
+      const cardElement = cardRefs.current.get(tickets[i].id)
       if (!cardElement) continue
 
       const cardRect = cardElement.getBoundingClientRect()
@@ -113,11 +112,10 @@ export function KanbanColumn({
             className="text-label font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center shrink-0"
             style={{ backgroundColor: accentColor + '28', color: accentColor }}
           >
-            {tasks.length}
+            {tickets.length}
           </span>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Delete column button — hover reveal */}
           {confirmDelete ? (
             <div className="flex items-center gap-1.5">
               <span className="text-body-sm text-muted-foreground dark:text-card-foreground/60">Supprimer ?</span>
@@ -147,7 +145,7 @@ export function KanbanColumn({
             onClick={() => setAdding(true)}
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-ui-sm font-bold transition-all cursor-pointer hover:opacity-90 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rose)]"
             style={{ backgroundColor: accentColor + '22', color: accentColor }}
-            aria-label={`Ajouter une tâche dans ${label}`}
+            aria-label={`Ajouter un ticket dans ${label}`}
           >
             <Plus size={12} strokeWidth={2.5} />
             Ajouter
@@ -165,37 +163,37 @@ export function KanbanColumn({
             style={{ borderColor: accentColor + '50' }}
           >
             <MousePointerClick size={20} className="mb-2 opacity-40" style={{ color: accentColor }} />
-            <p className="text-body-sm font-medium text-foreground dark:text-card-foreground mb-1">Aucune tâche</p>
-            <p className="text-body-sm text-muted-foreground dark:text-card-foreground/60 mb-3 leading-snug">Ajoutez une tâche pour démarrer !</p>
+            <p className="text-body-sm font-medium text-foreground dark:text-card-foreground mb-1">Aucun ticket</p>
+            <p className="text-body-sm text-muted-foreground dark:text-card-foreground/60 mb-3 leading-snug">Ajoutez un ticket pour démarrer !</p>
             <button
               onClick={() => setAdding(true)}
               className="inline-flex items-center gap-1.5 text-ui-sm font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all hover:opacity-90 active:scale-[0.97]"
               style={{ backgroundColor: accentColor + '20', color: accentColor }}
             >
               <Plus size={12} />
-              Ajouter une tâche
+              Ajouter un ticket
             </button>
           </div>
         )}
 
-        {tasks.map((task, index) => (
-          <div key={task.id} className="relative">
+        {tickets.map((ticket, index) => (
+          <div key={ticket.id} className="relative">
             {/* Drop indicator */}
             {dropIndex === index && (
               <div className="absolute -top-1.5 left-0 right-0 h-0.5 bg-[var(--color-rose)] rounded-full shadow-[0_0_8px_rgba(224,48,90,0.6)]" />
             )}
-            <div ref={(el) => el && cardRefs.current.set(task.id, el)}>
+            <div ref={(el) => el && cardRefs.current.set(ticket.id, el)}>
               <KanbanCard
-                task={task}
+                ticket={ticket}
                 columnId={id}
                 customTags={customTags}
-                onDelete={onDeleteTask}
+                onDelete={onDeleteTicket}
                 onDragStart={onDragStart}
-                onOpen={onOpenTask}
+                onOpen={onOpenTicket}
               />
             </div>
             {/* Drop indicator at the end after last card */}
-            {dropIndex === tasks.length && index === tasks.length - 1 && (
+            {dropIndex === tickets.length && index === tickets.length - 1 && (
               <div className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-[var(--color-rose)] rounded-full shadow-[0_0_8px_rgba(224,48,90,0.6)]" />
             )}
           </div>
@@ -218,7 +216,7 @@ export function KanbanColumn({
                   setNewTitle('')
                 }
               }}
-              placeholder="Titre de la tâche…"
+              placeholder="Titre du ticket…"
               rows={2}
               className="w-full resize-none text-body-md text-foreground bg-transparent outline-none placeholder:text-muted-foreground focus-visible:outline-none"
             />
@@ -247,7 +245,7 @@ export function KanbanColumn({
               className="flex items-center gap-1.5 text-muted-foreground dark:text-card-foreground/60 hover:text-foreground dark:hover:text-card-foreground text-body-sm py-2 px-2 rounded-lg hover:bg-muted/50 dark:hover:bg-muted/20 transition-colors w-full text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rose)]"
             >
               <Plus size={13} />
-              Ajouter une tâche
+              Ajouter un ticket
             </button>
           )
         )}
@@ -255,4 +253,3 @@ export function KanbanColumn({
     </div>
   )
 }
-

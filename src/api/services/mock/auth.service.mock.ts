@@ -3,9 +3,10 @@ import type {
   LoginDto,
   RegisterDto,
   AuthResponse,
+  RefreshTokenDto,
   UserDto,
 } from '../../types'
-import { UserStatus } from '../../types'
+import { UserStatus } from '@plic-mti-highfive/shared-types'
 import { delay, generateId } from './utils'
 import { getUserByEmail, getAllUsers } from './data'
 
@@ -106,7 +107,7 @@ export class AuthServiceMock implements IAuthService {
     // Mock logout - just simulate the delay
   }
 
-  async refresh(): Promise<AuthResponse> {
+  async refresh(_dto: RefreshTokenDto): Promise<AuthResponse> {
     await delay(300)
 
     // For mock, just return new tokens

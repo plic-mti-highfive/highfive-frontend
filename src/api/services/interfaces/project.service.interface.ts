@@ -5,9 +5,9 @@ import type {
   ProjectMemberDto,
   AddProjectMemberDto,
   UpdateProjectMemberDto,
-  TaskDto,
-  CreateTaskDto,
-  UpdateTaskDto,
+  TicketDto,
+  CreateTicketDto,
+  UpdateTicketDto,
   ListProjectsQuery,
   PaginatedResponse,
   ProjectMessageDto,
@@ -32,11 +32,11 @@ export interface IProjectService {
   ): Promise<ProjectMemberDto>
   removeProjectMember(projectId: string, userId: string): Promise<void>
 
-  // Tasks
-  createTask(projectId: string, dto: CreateTaskDto): Promise<TaskDto>
-  getProjectTasks(projectId: string): Promise<TaskDto[]>
-  getTaskById(projectId: string, taskId: string): Promise<TaskDto>
-  updateTask(projectId: string, taskId: string, dto: UpdateTaskDto): Promise<TaskDto>
+  // Tickets
+  createTicket(projectId: string, dto: CreateTicketDto): Promise<TicketDto>
+  getProjectTickets(projectId: string): Promise<TicketDto[]>
+  getTicketById(projectId: string, ticketId: string): Promise<TicketDto>
+  updateTicket(projectId: string, ticketId: string, dto: UpdateTicketDto): Promise<TicketDto>
 
   // Messages
   createMessage(projectId: string, dto: CreateProjectMessageDto): Promise<ProjectMessageDto>

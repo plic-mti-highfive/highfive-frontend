@@ -1,5 +1,5 @@
 import type { ProjectDto, ProjectMemberDto } from '@/api/types'
-import { ProjectRole } from '@/api/types'
+import { ProjectRole } from '@plic-mti-highfive/shared-types'
 import { TagPill } from '@shared/components/projects/shared/TagPill'
 
 interface ProjectSidebarProps {

@@ -1,12 +1,12 @@
-import type { TaskDto } from '@/api/types'
+import type { TicketDto } from '@/api/types'
 import { TicketStatus } from '@plic-mti-highfive/shared-types'
 
-interface TaskCardProps {
-  task: TaskDto
+interface TicketCardProps {
+  ticket: TicketDto
   assigneeName?: string
 }
 
-export function TaskCard({ task, assigneeName }: TaskCardProps) {
+export function TicketCard({ ticket, assigneeName }: TicketCardProps) {
   const getStatusColor = (status: TicketStatus) => {
     switch (status) {
       case TicketStatus.TODO:
@@ -40,17 +40,17 @@ export function TaskCard({ task, assigneeName }: TaskCardProps) {
   return (
     <div className="p-4 bg-card border border-border rounded-lg hover:border-border/60 transition-colors">
       <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="font-medium text-foreground flex-1">{task.title}</h3>
+        <h3 className="font-medium text-foreground flex-1">{ticket.title}</h3>
         <span
-          className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(task.status)}`}
+          className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(ticket.status)}`}
         >
-          {getStatusLabel(task.status)}
+          {getStatusLabel(ticket.status)}
         </span>
       </div>
 
-      {task.description && (
+      {ticket.description && (
         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-          {task.description}
+          {ticket.description}
         </p>
       )}
 

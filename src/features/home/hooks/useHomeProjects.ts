@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { projectService, type ProjectDto, ProjectStatus } from '@/api'
+import { projectService, type ProjectDto } from '@/api'
+import { ProjectStatus } from '@plic-mti-highfive/shared-types'
 import type { Project } from '@shared/types'
 
 // Adapter ProjectDto vers l'ancien format Project pour compatibilité

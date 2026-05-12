@@ -2,7 +2,7 @@ import { Hand, Bookmark, Share2, Flag } from 'lucide-react'
 import { Thumbnail } from '@shared/components/projects/shared/Thumbnail'
 import { DropdownMenu } from '@shared/components/DropdownMenu'
 import type { ProjectDto } from '@/api/types'
-import { ProjectStatus } from '@/api/types'
+import { ProjectStatus } from '@plic-mti-highfive/shared-types'
 
 interface ProjectHeroProps {
   project: ProjectDto

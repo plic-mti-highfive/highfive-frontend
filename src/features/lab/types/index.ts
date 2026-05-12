@@ -13,21 +13,21 @@ export interface ChecklistItem {
   done: boolean
 }
 
-export interface TaskComment {
+export interface TicketComment {
   id: string
   author: string
   text: string
   createdAt: string
 }
 
-export interface KanbanTask {
+export interface KanbanTicket {
   id: string
   title: string
   tags?: string[] // tag ids
   assignee?: string
   priority?: KanbanPriority
   checklistItems?: ChecklistItem[]
-  taskComments?: TaskComment[]
+  ticketComments?: TicketComment[]
 }
 
 export interface KanbanColumnDef {

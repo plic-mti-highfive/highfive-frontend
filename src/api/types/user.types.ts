@@ -9,10 +9,8 @@ export interface UpdateUserProfileDto {
 
 export interface UserProfileResponse {
   userId: string
-  email: string
   bio: string | null
   avatarPath: string | null
   themePreference: string
   emailNotifications: boolean
-  createdAt: string
 }

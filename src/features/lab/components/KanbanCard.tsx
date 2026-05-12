@@ -1,15 +1,15 @@
 import { useRef, useState } from 'react'
 import { Trash2, GripVertical, ArrowUp, Minus, ArrowDown, MessageCircle, CheckSquare } from 'lucide-react'
-import type { KanbanTask, KanbanColumnId, CustomTag } from '../types'
+import type { KanbanTicket, KanbanColumnId, CustomTag } from '../types'
 import { getAssigneeColor, assigneeInitials, PRIORITY_CONFIG, tagBg } from '../utils/kanbanConfig'
 
 interface KanbanCardProps {
-  task: KanbanTask
+  ticket: KanbanTicket
   columnId: KanbanColumnId
   customTags: CustomTag[]
-  onDelete: (taskId: string, columnId: KanbanColumnId) => void
-  onDragStart: (taskId: string, columnId: KanbanColumnId) => void
-  onOpen: (taskId: string, columnId: KanbanColumnId) => void
+  onDelete: (ticketId: string, columnId: KanbanColumnId) => void
+  onDragStart: (ticketId: string, columnId: KanbanColumnId) => void
+  onOpen: (ticketId: string, columnId: KanbanColumnId) => void
 }
 
 const PRIORITY_ICONS = {
@@ -18,18 +18,18 @@ const PRIORITY_ICONS = {
   low:    ArrowDown,
 }
 
-export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, onOpen }: KanbanCardProps) {
+export function KanbanCard({ ticket, columnId, customTags, onDelete, onDragStart, onOpen }: KanbanCardProps) {
   const [isDragging, setIsDragging] = useState(false)
   const didDragRef = useRef(false)
 
-  const priorityCfg = task.priority ? PRIORITY_CONFIG[task.priority] : null
-  const PriorityIcon = task.priority ? PRIORITY_ICONS[task.priority] : null
-  const checklistDone = task.checklistItems?.filter(i => i.done).length ?? 0
-  const checklistTotal = task.checklistItems?.length ?? 0
+  const priorityCfg = ticket.priority ? PRIORITY_CONFIG[ticket.priority] : null
+  const PriorityIcon = ticket.priority ? PRIORITY_ICONS[ticket.priority] : null
+  const checklistDone = ticket.checklistItems?.filter(i => i.done).length ?? 0
+  const checklistTotal = ticket.checklistItems?.length ?? 0
   const checklistComplete = checklistTotal > 0 && checklistDone === checklistTotal
-  const commentsCount = task.taskComments?.length ?? 0
+  const commentsCount = ticket.ticketComments?.length ?? 0
 
-  const hasFooter = checklistTotal > 0 || commentsCount > 0 || !!task.assignee
+  const hasFooter = checklistTotal > 0 || commentsCount > 0 || !!ticket.assignee
 
   return (
     <div
@@ -38,15 +38,14 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
         didDragRef.current = true
         setIsDragging(true)
         e.dataTransfer.effectAllowed = 'move'
-        onDragStart(task.id, columnId)
+        onDragStart(ticket.id, columnId)
       }}
       onDragEnd={() => {
         setIsDragging(false)
-        // reset drag flag after the click event that follows dragend
         setTimeout(() => { didDragRef.current = false }, 50)
       }}
       onClick={() => {
-        if (!didDragRef.current) onOpen(task.id, columnId)
+        if (!didDragRef.current) onOpen(ticket.id, columnId)
       }}
       className={`group relative bg-card rounded-xl px-3.5 py-3 border transition-all duration-150 cursor-pointer select-none
         border-border
@@ -72,22 +71,22 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
                 <PriorityIcon size={11} strokeWidth={2.5} style={{ color: priorityCfg.color }} />
               </span>
             )}
-            <p className="text-body-md font-medium text-foreground leading-snug">{task.title}</p>
+            <p className="text-body-md font-medium text-foreground leading-snug">{ticket.title}</p>
           </div>
         </div>
         <button
-          onClick={e => { e.stopPropagation(); onDelete(task.id, columnId) }}
+          onClick={e => { e.stopPropagation(); onDelete(ticket.id, columnId) }}
           className="shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-500 cursor-pointer p-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-          aria-label="Supprimer la tâche"
+          aria-label="Supprimer le ticket"
         >
           <Trash2 size={13} />
         </button>
       </div>
 
       {/* Tags row */}
-      {task.tags && task.tags.length > 0 && (
+      {ticket.tags && ticket.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2 ml-5">
-          {task.tags.map(tagId => {
+          {ticket.tags.map(tagId => {
             const tag = customTags.find(t => t.id === tagId)
             if (!tag) return null
             return (
@@ -126,15 +125,15 @@ export function KanbanCard({ task, columnId, customTags, onDelete, onDragStart, 
               </span>
             )}
           </div>
-          {task.assignee && (() => {
-            const c = getAssigneeColor(task.assignee)
+          {ticket.assignee && (() => {
+            const c = getAssigneeColor(ticket.assignee)
             return (
               <span
-                title={task.assignee}
+                title={ticket.assignee}
                 className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold"
                 style={{ backgroundColor: c.bg, color: c.text }}
               >
-                {assigneeInitials(task.assignee)}
+                {assigneeInitials(ticket.assignee)}
               </span>
             )
           })()}

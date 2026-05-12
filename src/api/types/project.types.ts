@@ -1,4 +1,4 @@
-import { ProjectStatus, ProjectVisibility, ProjectRole, TaskStatus } from './enums'
+import type { ProjectStatus, ProjectVisibility, ProjectRole, TicketStatus } from '@plic-mti-highfive/shared-types'
 
 // DTOs Project - alignés avec backend
 
@@ -54,29 +54,29 @@ export interface UpdateProjectMemberDto {
   role: ProjectRole
 }
 
-export interface TaskDto {
+export interface TicketDto {
   id: string
   projectId: string
   tenantId: string
   title: string
   description: string | null
-  status: TaskStatus
+  status: TicketStatus
   assigneeId: string | null
   createdAt: string
   updatedAt: string
 }
 
-export interface CreateTaskDto {
+export interface CreateTicketDto {
   title: string
   description?: string
-  status?: TaskStatus
+  status?: TicketStatus
   assigneeId?: string
 }
 
-export interface UpdateTaskDto {
+export interface UpdateTicketDto {
   title?: string
   description?: string
-  status?: TaskStatus
+  status?: TicketStatus
   assigneeId?: string
 }
 
