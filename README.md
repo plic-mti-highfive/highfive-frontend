@@ -5,12 +5,50 @@
 - Node >= 24
 - pnpm (`npm install -g pnpm`)
 
-## Installation & démarrage
+## Démarrage rapide (après un clone)
 
 ```bash
+# 1. Copier les variables d'environnement
+cp .env.example .env
+
+# 2. Installer les dépendances
 pnpm install
+
+# 3. Lancer en mode mock (aucun backend requis)
 pnpm dev
 ```
+
+L'application est accessible sur `http://localhost:5173`.
+
+### Variables d'environnement
+
+| Variable         | Valeur par défaut       | Description                             |
+| ---------------- | ----------------------- | --------------------------------------- |
+| `VITE_API_MODE`  | `mock`                  | Mode API : `mock` ou `http`             |
+| `VITE_API_URL`   | `http://localhost:3000` | URL du backend (mode `http` uniquement) |
+| `VITE_TENANT_ID` | `default-tenant`        | Tenant ID pour le multi-tenancy         |
+
+## Docker
+
+### Avec Docker Compose (recommandé)
+
+```bash
+docker compose up --build
+```
+
+L'application est servie par nginx sur `http://localhost:8080`.
+
+### Image seule
+
+```bash
+# Build
+docker build -t highfive-frontend .
+
+# Run
+docker run -p 8080:8080 highfive-frontend
+```
+
+Le Dockerfile utilise un build multi-stage : Node 22 pour compiler, nginx:alpine pour servir le `dist/`.
 
 ## Commandes disponibles
 
@@ -29,7 +67,7 @@ Un hook pre-commit (Husky + lint-staged) lance `prettier --write .` automatiquem
 
 ## Architecture
 
-L'application suit une architecture **feature-based hermétique** : chaque feature est autonome et communique uniquement via son `index.ts`. Les imports cross-features sont interdits — seul `@shared` est accessible depuis n'importe où.
+L'application suit une architecture **feature-based hermétique** : chaque feature est autonome et communique uniquement via son `index.ts`. Les imports cross-features sont interdits - seul `@shared` est accessible depuis n'importe où.
 
 ```
 src/
@@ -109,9 +147,9 @@ src/
 
 ### Règles d'import
 
-- `@features/<feature>` — toujours via le barrel `index.ts`, jamais dans les sous-dossiers
-- `@shared/*` — accessible depuis n'importe quelle feature
-- `@/api` — couche de données, ne dépend pas des features
+- `@features/<feature>` - toujours via le barrel `index.ts`, jamais dans les sous-dossiers
+- `@shared/*` - accessible depuis n'importe quelle feature
+- `@/api` - couche de données, ne dépend pas des features
 - Pas d'import croisé entre features
 
 ### Aliases de chemin (Vite + TypeScript)
@@ -126,8 +164,8 @@ src/
 
 Les services suivent une interface commune (`IAuthService`, `IProjectService`, `IUserService`). Le mode est contrôlé par la variable d'environnement `VITE_API_MODE` :
 
-- `mock` (défaut) — données statiques locales, aucun backend requis
-- `http` — appels réels vers le backend
+- `mock` (défaut) - données statiques locales, aucun backend requis
+- `http` - appels réels vers le backend
 
 ```bash
 # Utiliser le backend réel
