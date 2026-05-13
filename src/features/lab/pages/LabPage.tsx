@@ -140,13 +140,13 @@ export default function LabPage() {
 
           {/* Tool switcher */}
           <div className="flex items-center gap-2 mb-8">
-            {/* Kanban — active */}
+            {/* Kanban - active */}
             <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-foreground text-background shadow-sm cursor-default select-none">
               <Kanban size={16} className="shrink-0" />
               <span className="text-ui-md font-bold">Kanban</span>
             </div>
 
-            {/* Moodboard — inactive */}
+            {/* Moodboard - inactive */}
             <Link
               to={`/projects/${projectId}/moodboard`}
               className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors select-none"

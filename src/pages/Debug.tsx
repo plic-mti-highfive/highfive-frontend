@@ -93,7 +93,7 @@ const TYPE_SIZES = [
     ls: "-0.025em",
     fw: "900",
     family: "font-display",
-    label: "Display XL — Fraunces italic 900",
+    label: "Display XL - Fraunces italic 900",
   },
   {
     token: "display-lg",
@@ -102,7 +102,7 @@ const TYPE_SIZES = [
     ls: "-0.02em",
     fw: "700",
     family: "font-display",
-    label: "Display LG — Fraunces 700",
+    label: "Display LG - Fraunces 700",
   },
   {
     token: "heading-lg",
@@ -111,7 +111,7 @@ const TYPE_SIZES = [
     ls: "-0.02em",
     fw: "700",
     family: "font-heading",
-    label: "Heading LG — Geist 700",
+    label: "Heading LG - Geist 700",
   },
   {
     token: "heading-md",
@@ -120,7 +120,7 @@ const TYPE_SIZES = [
     ls: "-0.01em",
     fw: "700",
     family: "font-heading",
-    label: "Heading MD — Geist 700",
+    label: "Heading MD - Geist 700",
   },
   {
     token: "body-lg",
@@ -129,7 +129,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "400",
     family: "font-sans",
-    label: "Body LG — Geist 400",
+    label: "Body LG - Geist 400",
   },
   {
     token: "body-md",
@@ -138,7 +138,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "400",
     family: "font-sans",
-    label: "Body MD — Geist 400",
+    label: "Body MD - Geist 400",
   },
   {
     token: "body-sm",
@@ -147,7 +147,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "400",
     family: "font-sans",
-    label: "Body SM — Geist 400",
+    label: "Body SM - Geist 400",
   },
   {
     token: "ui-md",
@@ -156,7 +156,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "600",
     family: "font-sans",
-    label: "UI MD — Geist 600",
+    label: "UI MD - Geist 600",
   },
   {
     token: "ui-sm",
@@ -165,7 +165,7 @@ const TYPE_SIZES = [
     ls: "0.10em",
     fw: "600",
     family: "font-sans",
-    label: "UI SM — Geist 600",
+    label: "UI SM - Geist 600",
   },
   {
     token: "label",
@@ -174,7 +174,7 @@ const TYPE_SIZES = [
     ls: "0.14em",
     fw: "600",
     family: "font-sans",
-    label: "Label — Geist 600",
+    label: "Label - Geist 600",
   },
 ];
 
@@ -325,7 +325,7 @@ function TypographySection() {
           >
             <Chip>{f.name}</Chip>
             <p className="text-body-sm text-muted-foreground mt-1 mb-3 font-sans">
-              {f.family} — {f.weights}
+              {f.family} - {f.weights}
             </p>
             <p
               className="text-2xl text-foreground"

@@ -175,7 +175,7 @@ export function TagSearchDropdown({
       <p className="text-xs text-ink-muted mt-1.5">
         {selected.length} / {maxTags} tags
         {selected.length >= maxTags && (
-          <span className="text-orange"> — maximum atteint</span>
+          <span className="text-orange"> - maximum atteint</span>
         )}
       </p>
     </div>

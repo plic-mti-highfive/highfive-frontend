@@ -9,7 +9,7 @@ export const PRIORITY_CONFIG: Record<
   low: { color: "#2A8C1E", label: "Basse" },
 };
 
-/** Default columns for a new project — 3 universal stages */
+/** Default columns for a new project - 3 universal stages */
 export const DEFAULT_COLUMNS = [
   { id: "todo", label: "À faire", accentColor: "#3EC6F5", bgColor: "#D4F1FF" },
   {

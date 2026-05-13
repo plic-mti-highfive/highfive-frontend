@@ -143,49 +143,49 @@
   --color-rose-dark: #cc0055;
   --color-rose-deeper: #99003d;
 
-  /* -- Couleurs — Orange - */
+  /* -- Couleurs - Orange - */
   --color-orange: #ff6b1a;
   --color-orange-light: #fff0e6;
   --color-orange-mid: #ffd8bc;
   --color-orange-dark: #aa3a00;
   --color-orange-deeper: #7a2800;
 
-  /* -- Couleurs — Yellow -- */
+  /* -- Couleurs - Yellow -- */
   --color-yellow: #ffd600;
   --color-yellow-light: #fffbe0;
   --color-yellow-mid: #ffe680;
   --color-yellow-dark: #6a4e00;
   --color-yellow-deeper: #4a3600;
 
-  /* -- Couleurs — Apple -- */
+  /* -- Couleurs - Apple -- */
   --color-apple: #5ed651;
   --color-apple-light: #edfce8;
   --color-apple-mid: #c0f0ba;
   --color-apple-dark: #1a7010;
   --color-apple-deeper: #0e400a;
 
-  /* -- Couleurs — Sky -- */
+  /* -- Couleurs - Sky -- */
   --color-sky: #3ec6f5;
   --color-sky-light: #e5f8ff;
   --color-sky-mid: #b0e8fa;
   --color-sky-dark: #0a6080;
   --color-sky-deeper: #054060;
 
-  /* -- Couleurs — Purple -- */
+  /* -- Couleurs - Purple -- */
   --color-purple: #c24bff;
   --color-purple-light: #f5e8ff;
   --color-purple-mid: #e8c8ff;
   --color-purple-dark: #7000b8;
   --color-purple-deeper: #4a0080;
 
-  /* -- Espacement — Composants -- */
+  /* -- Espacement - Composants -- */
   --spacing-comp-xs: 6px;
   --spacing-comp-sm: 9px;
   --spacing-comp-md: 13px;
   --spacing-comp-lg: 18px;
   --spacing-comp-xl: 22px;
 
-  /* -- Espacement — Layout -- */
+  /* -- Espacement - Layout -- */
   --spacing-gap-sm: 8px;
   --spacing-gap-md: 14px;
   --spacing-gap-lg: 24px;

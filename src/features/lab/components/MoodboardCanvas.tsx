@@ -47,7 +47,7 @@ export function MoodboardCanvas({
     viewportRef.current = viewport;
   });
 
-  // -- Non-passive wheel listener — prevents page scroll when cursor is over canvas
+  // -- Non-passive wheel listener - prevents page scroll when cursor is over canvas
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;

@@ -50,11 +50,11 @@ docker run -p 8080:8080 highfive-frontend
 
 Le Dockerfile utilise un build multi-stage : Node 22 pour compiler, nginx:alpine pour servir le `dist/`.
 
-> **Problème connu — build Docker échoue**
+> Problème connu - build Docker échoue
 >
 > Le package `@plic-mti-highfive/shared-types` est hébergé sur le GitHub Package Registry et nécessite un token GitHub pour être installé. En local, `pnpm install` fonctionne si vous êtes authentifié (`~/.npmrc` global). Dans Docker, ce token n'est pas disponible au moment du `RUN pnpm install`, ce qui provoque une erreur 401.
 >
-> Contournement temporaire — passer le token en argument de build :
+> Contournement temporaire : passer le token en argument de build :
 >
 > ```bash
 > docker build --build-arg NPM_TOKEN=ghp_xxxx -t highfive-frontend .

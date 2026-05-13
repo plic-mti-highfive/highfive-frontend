@@ -151,7 +151,7 @@ export default function MoodboardPage() {
               onBringToFront={bringToFront}
             />
 
-            {/* Zoom controls — bottom left */}
+            {/* Zoom controls - bottom left */}
             <div className="absolute bottom-5 left-5 flex items-center gap-1 bg-background border border-border rounded-xl shadow-sm px-2 py-1.5 z-10">
               <button
                 onClick={() => zoomStep(-1)}
