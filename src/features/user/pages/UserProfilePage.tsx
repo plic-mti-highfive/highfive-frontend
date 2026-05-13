@@ -10,7 +10,7 @@ import { EditProfileModal } from "../components/EditProfileModal";
 import { Button } from "@shared/components/ui/button";
 import { ProfileTabs, EmptyState } from "../components/ProfileTabs";
 import { createProjectsTabs } from "../utils/profileTabsUtils";
-import { ProjectFiltersBar } from "../../projects/components/ProjectFilters";
+import { ProjectFiltersBar } from "@features/projects";
 import { UsersListDialog } from "../components/UsersListDialog";
 import { UnfollowConfirmDialog } from "../components/UnfollowConfirmDialog";
 import { getTagColor } from "@shared/utils/tagColors";

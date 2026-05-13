@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Header from "@features/layout/components/Header";
-import Footer from "@features/layout/components/Footer";
+import { Header, Footer } from "@features/layout";
 import { useProjectDetail } from "../hooks/useProjectDetail";
 import { ProjectHero } from "../components/ProjectHero";
 import { ProjectTabs, type TabId } from "../components/ProjectTabs";

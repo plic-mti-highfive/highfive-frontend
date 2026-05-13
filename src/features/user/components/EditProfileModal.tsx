@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import { X } from "lucide-react";
-import { TagSearchDropdown } from "../../projects/components/TagSearchDropdown";
+import { TagSearchDropdown } from "@features/projects";
 import type { User, UserProfileFormData } from "@shared/types";
 
 interface EditProfileModalProps {

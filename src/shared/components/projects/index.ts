@@ -7,3 +7,4 @@ export {
   DaysLeftBadge,
   TagPill,
 } from "./shared";
+export { Section } from "./Section";

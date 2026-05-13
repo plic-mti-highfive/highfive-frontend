@@ -1,4 +1,4 @@
-import { Section } from "@features/home";
+import { Section } from "@shared/components/projects";
 import type { ProjectDto } from "@/api/types";
 import type { Project } from "@shared/types";
 

@@ -4,7 +4,7 @@ import { FolderOpen, Users, Tag } from "lucide-react";
 import { Header } from "@features/layout";
 import { Footer } from "@features/layout";
 import { SmallCard } from "@shared/components/projects";
-import { ProjectFiltersBar } from "@features/projects/components/ProjectFilters";
+import { ProjectFiltersBar } from "@features/projects";
 import { projectService } from "@/api";
 import type { Project } from "@shared/types";
 import type { ProjectDto } from "@/api/types";

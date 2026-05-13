@@ -3,7 +3,7 @@
 import { Header } from "@features/layout";
 import { Footer } from "@features/layout";
 import { FeaturedLayout } from "../components/FeaturedLayout";
-import { Section } from "../components/Section";
+import { Section } from "@shared/components/projects";
 import { TagNavBar } from "../components/TagNavBar";
 import { HomePageSkeleton } from "../components/HomePageSkeleton";
 import { useHomeProjects } from "../hooks/useHomeProjects";
