@@ -1,4 +1,4 @@
-import type { Conversation } from "@features/messages/types";
+import type { ConversationDto as Conversation } from "../../../types";
 
 export const mockConversations: Conversation[] = [
   {
