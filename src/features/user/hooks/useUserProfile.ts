@@ -30,14 +30,11 @@ const adaptUserProfile = (profile: UserProfileResponse): User => ({
 
 export function useUserProfile(userId: string | undefined) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!userId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!userId) return;
 
     const fetchUserProfile = async () => {
       try {

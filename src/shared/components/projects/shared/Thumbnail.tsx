@@ -53,7 +53,7 @@ export function generateSVGPattern(
   const patternType = patternTypes[Math.abs(seed) % patternTypes.length];
 
   const r = rand;
-  let shapes = "";
+  let shapes: string;
 
   if (patternType === "circles") {
     const cx1 = width * (0.2 + r() * 0.3);

@@ -156,8 +156,7 @@ export function MoodboardCanvas({
       const dx = (ev.clientX - startMX) / scale;
       const dy = (ev.clientY - startMY) / scale;
 
-      let nw = sw,
-        nh = sh;
+      let nw: number, nh: number;
       if (corner === "tl") {
         nw = sw - dx;
         nh = sh - dy;
