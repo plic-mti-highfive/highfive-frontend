@@ -11,5 +11,3 @@ export interface Project {
   daysLeft: number | null;
   thumbnailUrl?: string;
 }
-
-export type Direction = "left" | "right";

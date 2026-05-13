@@ -83,5 +83,3 @@ export function useCarousel(items: Project[], autoplayMs: number) {
     total: items.length,
   };
 }
-
-export type { Direction };
