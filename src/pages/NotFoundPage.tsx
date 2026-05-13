@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Header } from "@features/layout";
-import { Footer } from "@features/layout";
+import { Header, Footer } from "@features/layout";
 
 export default function NotFoundPage() {
   const navigate = useNavigate();

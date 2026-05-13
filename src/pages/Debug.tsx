@@ -1,4 +1,4 @@
-import { Footer, Header } from "@/features/layout";
+import { Footer, Header } from "@features/layout";
 
 type Swatch = { token: string; hex: string; textDark?: boolean };
 type Palette = { name: string; swatches: Swatch[] };
@@ -111,7 +111,7 @@ const TYPE_SIZES = [
     ls: "-0.02em",
     fw: "700",
     family: "font-heading",
-    label: "Heading LG — Lora 700",
+    label: "Heading LG — Geist 700",
   },
   {
     token: "heading-md",
@@ -120,7 +120,7 @@ const TYPE_SIZES = [
     ls: "-0.01em",
     fw: "700",
     family: "font-heading",
-    label: "Heading MD — Lora 700",
+    label: "Heading MD — Geist 700",
   },
   {
     token: "body-lg",
@@ -129,7 +129,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "400",
     family: "font-sans",
-    label: "Body LG — Plus Jakarta Sans 400",
+    label: "Body LG — Geist 400",
   },
   {
     token: "body-md",
@@ -138,7 +138,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "400",
     family: "font-sans",
-    label: "Body MD — Plus Jakarta Sans 400",
+    label: "Body MD — Geist 400",
   },
   {
     token: "body-sm",
@@ -147,7 +147,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "400",
     family: "font-sans",
-    label: "Body SM — Plus Jakarta Sans 400",
+    label: "Body SM — Geist 400",
   },
   {
     token: "ui-md",
@@ -156,7 +156,7 @@ const TYPE_SIZES = [
     ls: "normal",
     fw: "600",
     family: "font-sans",
-    label: "UI MD — Plus Jakarta Sans 600",
+    label: "UI MD — Geist 600",
   },
   {
     token: "ui-sm",
@@ -165,7 +165,7 @@ const TYPE_SIZES = [
     ls: "0.10em",
     fw: "600",
     family: "font-sans",
-    label: "UI SM — Plus Jakarta Sans 600",
+    label: "UI SM — Geist 600",
   },
   {
     token: "label",
@@ -174,7 +174,7 @@ const TYPE_SIZES = [
     ls: "0.14em",
     fw: "600",
     family: "font-sans",
-    label: "Label — Plus Jakarta Sans 600",
+    label: "Label — Geist 600",
   },
 ];
 
@@ -307,14 +307,14 @@ function TypographySection() {
           {
             name: "font-heading",
             label: "Heading",
-            family: "Lora",
+            family: "Geist Variable",
             weights: "700",
             sample: "The quick brown fox",
           },
           {
             name: "font-sans",
             label: "Sans / UI",
-            family: "Plus Jakarta Sans",
+            family: "Geist Variable",
             weights: "400 500 600 700",
             sample: "The quick brown fox",
           },
@@ -356,10 +356,8 @@ function TypographySection() {
               style={{
                 fontFamily:
                   t.family === "font-display"
-                    ? "Fraunces"
-                    : t.family === "font-heading"
-                      ? "Lora"
-                      : "Plus Jakarta Sans",
+                    ? "Fraunces Variable"
+                    : "Geist Variable",
                 fontSize: t.size,
                 lineHeight: t.lh,
                 letterSpacing: t.ls,
