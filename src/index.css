@@ -2,8 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/fraunces/wght-italic.css";
-@import "@fontsource-variable/lora";
-@import "@fontsource-variable/plus-jakarta-sans";
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
