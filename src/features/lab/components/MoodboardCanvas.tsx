@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { Trash2 } from "lucide-react";
 import type {
   MoodboardElement,
@@ -43,7 +43,9 @@ export function MoodboardCanvas({
 
   // Keep viewport accessible inside native event handlers without stale closures
   const viewportRef = useRef(viewport);
-  viewportRef.current = viewport;
+  useLayoutEffect(() => {
+    viewportRef.current = viewport;
+  });
 
   // -- Non-passive wheel listener — prevents page scroll when cursor is over canvas
   useEffect(() => {
