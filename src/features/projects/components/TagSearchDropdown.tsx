@@ -43,7 +43,7 @@ interface TagSearchDropdownProps {
   selected: string[];
   onChange: (tags: string[]) => void;
   maxTags?: number;
-  tags?: string[];
+  tags?: readonly string[];
 }
 
 export function TagSearchDropdown({

@@ -12,6 +12,7 @@ interface KanbanBoardProps {
     ticketId: string,
     from: KanbanColumnId,
     to: KanbanColumnId,
+    dropIndex?: number,
   ) => void;
   deleteTicket: (ticketId: string, columnId: KanbanColumnId) => void;
   onOpenTicket: (ticketId: string, columnId: KanbanColumnId) => void;

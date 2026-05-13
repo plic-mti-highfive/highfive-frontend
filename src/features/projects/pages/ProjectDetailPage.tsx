@@ -11,7 +11,6 @@ import { DiscussionThread } from "../components/DiscussionThread";
 import { SimilarProjects } from "../components/SimilarProjects";
 import { ProjectDetailSkeleton } from "../components/ProjectDetailSkeleton";
 import type { ProjectMessageDto } from "@/api/types";
-import { TicketStatus } from "@plic-mti-highfive/shared-types";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -72,13 +71,6 @@ export function ProjectDetailPage() {
     );
   }
 
-  const completedTickets = tickets.filter(
-    (t) => t.status === TicketStatus.DONE,
-  ).length;
-  const totalTickets = tickets.length;
-  const progress =
-    totalTickets > 0 ? (completedTickets / totalTickets) * 100 : 0;
-
   const handleJoinProject = () => {
     console.log("Rejoindre le projet:", project.id);
   };
@@ -127,11 +119,10 @@ export function ProjectDetailPage() {
             members[0]?.user
               ? {
                   email: members[0].user.email,
-                  avatar: members[0].user.profile?.avatarPath,
+                  avatar: members[0].user.profile?.avatarPath ?? undefined,
                 }
               : undefined
           }
-          progress={progress}
           highfiveCount={highfiveCount}
           onJoinClick={handleJoinProject}
           onHighfiveClick={handleHighfive}

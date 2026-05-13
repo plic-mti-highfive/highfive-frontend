@@ -196,7 +196,11 @@ export function KanbanColumn({
             {dropIndex === index && (
               <div className="absolute -top-1.5 left-0 right-0 h-0.5 bg-[var(--color-rose)] rounded-full shadow-[0_0_8px_rgba(224,48,90,0.6)]" />
             )}
-            <div ref={(el) => el && cardRefs.current.set(ticket.id, el)}>
+            <div
+              ref={(el) => {
+                if (el) cardRefs.current.set(ticket.id, el);
+              }}
+            >
               <KanbanCard
                 ticket={ticket}
                 columnId={id}

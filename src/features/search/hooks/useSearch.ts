@@ -62,9 +62,14 @@ export function useSearch(query: string) {
 
   return {
     filteredProjects,
-    filteredUsers: [],
-    filteredTags: [],
-    filteredProgress: [],
+    filteredUsers: [] as Array<{
+      username: string;
+      id: string;
+      avatar: string;
+      displayName: string;
+    }>,
+    filteredTags: [] as SearchTag[],
+    filteredProgress: [] as SearchProgress[],
     isEmpty: filteredProjects.length === 0,
     isLoading,
   };
