@@ -12,10 +12,5 @@ export type { RequestConfig } from "./http-client";
 export * from "./types";
 
 // Export des services (factory qui retourne mock ou http selon config)
-export {
-  authService,
-  projectService,
-  userService,
-  serviceFactory,
-} from "./services";
+export { authService, projectService, userService } from "./services";
 export type { IAuthService, IProjectService, IUserService } from "./services";

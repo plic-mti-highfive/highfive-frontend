@@ -4,4 +4,4 @@ export const delay = (ms: number) =>
 
 // Générer un UUID simple pour les mocks
 export const generateId = () =>
-  `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;

@@ -53,8 +53,5 @@ export const authService = factory.authService;
 export const projectService = factory.projectService;
 export const userService = factory.userService;
 
-// Export de la factory pour pouvoir reset si besoin
-export { factory as serviceFactory };
-
 // Re-export des types
 export type { IAuthService, IProjectService, IUserService };
