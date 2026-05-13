@@ -1,37 +1,41 @@
-import { Flag } from 'lucide-react'
-import { DropdownMenu } from '@shared/components/DropdownMenu'
-import type { ProjectMessageDto } from '@/api/types'
+import { Flag } from "lucide-react";
+import { DropdownMenu } from "@shared/components/DropdownMenu";
+import type { ProjectMessageDto } from "@/api/types";
 
 interface MessageCardProps {
-  message: ProjectMessageDto
-  isReply?: boolean
-  onReply?: (messageId: string) => void
-  onReport?: (messageId: string) => void
+  message: ProjectMessageDto;
+  isReply?: boolean;
+  onReply?: (messageId: string) => void;
+  onReport?: (messageId: string) => void;
 }
 
 export function MessageCard({ message, onReply, onReport }: MessageCardProps) {
-  const authorName = message.author?.email.split('@')[0] || 'Utilisateur'
-  const avatarPath = message.author?.profile?.avatarPath
+  const authorName = message.author?.email.split("@")[0] || "Utilisateur";
+  const avatarPath = message.author?.profile?.avatarPath;
 
   const getInitials = (name: string) => {
-    return name.slice(0, 2).toUpperCase()
-  }
+    return name.slice(0, 2).toUpperCase();
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInMs = now.getTime() - date.getTime()
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-    if (diffInMinutes < 1) return "À l'instant"
-    if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`
-    if (diffInHours < 24) return `Il y a ${diffInHours}h`
-    if (diffInDays === 1) return 'Hier'
-    if (diffInDays < 7) return `Il y a ${diffInDays}j`
-    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
-  }
+    if (diffInMinutes < 1) return "À l'instant";
+    if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
+    if (diffInHours < 24) return `Il y a ${diffInHours}h`;
+    if (diffInDays === 1) return "Hier";
+    if (diffInDays < 7) return `Il y a ${diffInDays}j`;
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className="flex gap-3">
@@ -42,7 +46,9 @@ export function MessageCard({ message, onReply, onReport }: MessageCardProps) {
             background: avatarPath
               ? `url(${avatarPath}) center/cover`
               : `hsl(${(authorName.charCodeAt(0) * 37) % 360} 45% 80%)`,
-            color: avatarPath ? 'transparent' : `hsl(${(authorName.charCodeAt(0) * 37) % 360} 45% 30%)`,
+            color: avatarPath
+              ? "transparent"
+              : `hsl(${(authorName.charCodeAt(0) * 37) % 360} 45% 30%)`,
           }}
         >
           {!avatarPath && getInitials(authorName)}
@@ -51,7 +57,9 @@ export function MessageCard({ message, onReply, onReport }: MessageCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 mb-1">
             <span className="font-semibold text-foreground">{authorName}</span>
-            <span className="text-xs text-muted-foreground">{formatDate(message.createdAt)}</span>
+            <span className="text-xs text-muted-foreground">
+              {formatDate(message.createdAt)}
+            </span>
           </div>
 
           <p className="text-sm text-foreground whitespace-pre-wrap break-words">
@@ -91,7 +99,7 @@ export function MessageCard({ message, onReply, onReport }: MessageCardProps) {
             items={[
               {
                 icon: <Flag size={16} className="text-muted-foreground" />,
-                label: 'Signaler',
+                label: "Signaler",
                 onClick: () => onReport(message.id),
               },
             ]}
@@ -99,5 +107,5 @@ export function MessageCard({ message, onReply, onReport }: MessageCardProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

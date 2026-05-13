@@ -1,4 +1,4 @@
-import { Skeleton } from '@shared/components/ui/skeleton'
+import { Skeleton } from "@shared/components/ui/skeleton";
 
 export function ProjectDetailSkeleton() {
   return (
@@ -64,7 +64,10 @@ export function ProjectDetailSkeleton() {
           <Skeleton className="h-8 w-40" />
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex gap-4 p-4 border border-border rounded-lg">
+              <div
+                key={i}
+                className="flex gap-4 p-4 border border-border rounded-lg"
+              >
                 <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-32" />
@@ -77,5 +80,5 @@ export function ProjectDetailSkeleton() {
         </div>
       </section>
     </div>
-  )
+  );
 }

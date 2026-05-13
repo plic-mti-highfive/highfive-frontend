@@ -1,57 +1,82 @@
-import { useRef, useState } from 'react'
-import { Trash2, GripVertical, ArrowUp, Minus, ArrowDown, MessageCircle, CheckSquare } from 'lucide-react'
-import type { KanbanTicket, KanbanColumnId, CustomTag } from '../types'
-import { getAssigneeColor, assigneeInitials, PRIORITY_CONFIG, tagBg } from '../utils/kanbanConfig'
+import { useRef, useState } from "react";
+import {
+  Trash2,
+  GripVertical,
+  ArrowUp,
+  Minus,
+  ArrowDown,
+  MessageCircle,
+  CheckSquare,
+} from "lucide-react";
+import type { KanbanTicket, KanbanColumnId, CustomTag } from "../types";
+import {
+  getAssigneeColor,
+  assigneeInitials,
+  PRIORITY_CONFIG,
+  tagBg,
+} from "../utils/kanbanConfig";
 
 interface KanbanCardProps {
-  ticket: KanbanTicket
-  columnId: KanbanColumnId
-  customTags: CustomTag[]
-  onDelete: (ticketId: string, columnId: KanbanColumnId) => void
-  onDragStart: (ticketId: string, columnId: KanbanColumnId) => void
-  onOpen: (ticketId: string, columnId: KanbanColumnId) => void
+  ticket: KanbanTicket;
+  columnId: KanbanColumnId;
+  customTags: CustomTag[];
+  onDelete: (ticketId: string, columnId: KanbanColumnId) => void;
+  onDragStart: (ticketId: string, columnId: KanbanColumnId) => void;
+  onOpen: (ticketId: string, columnId: KanbanColumnId) => void;
 }
 
 const PRIORITY_ICONS = {
-  high:   ArrowUp,
+  high: ArrowUp,
   medium: Minus,
-  low:    ArrowDown,
-}
+  low: ArrowDown,
+};
 
-export function KanbanCard({ ticket, columnId, customTags, onDelete, onDragStart, onOpen }: KanbanCardProps) {
-  const [isDragging, setIsDragging] = useState(false)
-  const didDragRef = useRef(false)
+export function KanbanCard({
+  ticket,
+  columnId,
+  customTags,
+  onDelete,
+  onDragStart,
+  onOpen,
+}: KanbanCardProps) {
+  const [isDragging, setIsDragging] = useState(false);
+  const didDragRef = useRef(false);
 
-  const priorityCfg = ticket.priority ? PRIORITY_CONFIG[ticket.priority] : null
-  const PriorityIcon = ticket.priority ? PRIORITY_ICONS[ticket.priority] : null
-  const checklistDone = ticket.checklistItems?.filter(i => i.done).length ?? 0
-  const checklistTotal = ticket.checklistItems?.length ?? 0
-  const checklistComplete = checklistTotal > 0 && checklistDone === checklistTotal
-  const commentsCount = ticket.ticketComments?.length ?? 0
+  const priorityCfg = ticket.priority ? PRIORITY_CONFIG[ticket.priority] : null;
+  const PriorityIcon = ticket.priority ? PRIORITY_ICONS[ticket.priority] : null;
+  const checklistDone =
+    ticket.checklistItems?.filter((i) => i.done).length ?? 0;
+  const checklistTotal = ticket.checklistItems?.length ?? 0;
+  const checklistComplete =
+    checklistTotal > 0 && checklistDone === checklistTotal;
+  const commentsCount = ticket.ticketComments?.length ?? 0;
 
-  const hasFooter = checklistTotal > 0 || commentsCount > 0 || !!ticket.assignee
+  const hasFooter =
+    checklistTotal > 0 || commentsCount > 0 || !!ticket.assignee;
 
   return (
     <div
       draggable
       onDragStart={(e) => {
-        didDragRef.current = true
-        setIsDragging(true)
-        e.dataTransfer.effectAllowed = 'move'
-        onDragStart(ticket.id, columnId)
+        didDragRef.current = true;
+        setIsDragging(true);
+        e.dataTransfer.effectAllowed = "move";
+        onDragStart(ticket.id, columnId);
       }}
       onDragEnd={() => {
-        setIsDragging(false)
-        setTimeout(() => { didDragRef.current = false }, 50)
+        setIsDragging(false);
+        setTimeout(() => {
+          didDragRef.current = false;
+        }, 50);
       }}
       onClick={() => {
-        if (!didDragRef.current) onOpen(ticket.id, columnId)
+        if (!didDragRef.current) onOpen(ticket.id, columnId);
       }}
       className={`group relative bg-card rounded-xl px-3.5 py-3 border transition-all duration-150 cursor-pointer select-none
         border-border
         shadow-sm hover:shadow-[0_6px_20px_rgba(0,0,0,0.09)] dark:hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 hover:border-muted-foreground
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rose)]
-        ${isDragging ? 'opacity-40 scale-[0.97] shadow-none' : ''}
+        ${isDragging ? "opacity-40 scale-[0.97] shadow-none" : ""}
       `}
     >
       {/* Top row: grip + title + delete */}
@@ -68,14 +93,23 @@ export function KanbanCard({ ticket, columnId, customTags, onDelete, onDragStart
                 title={`Priorité ${priorityCfg.label}`}
                 className="shrink-0 mt-1 inline-flex items-center justify-center"
               >
-                <PriorityIcon size={11} strokeWidth={2.5} style={{ color: priorityCfg.color }} />
+                <PriorityIcon
+                  size={11}
+                  strokeWidth={2.5}
+                  style={{ color: priorityCfg.color }}
+                />
               </span>
             )}
-            <p className="text-body-md font-medium text-foreground leading-snug">{ticket.title}</p>
+            <p className="text-body-md font-medium text-foreground leading-snug">
+              {ticket.title}
+            </p>
           </div>
         </div>
         <button
-          onClick={e => { e.stopPropagation(); onDelete(ticket.id, columnId) }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(ticket.id, columnId);
+          }}
           className="shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-500 cursor-pointer p-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
           aria-label="Supprimer le ticket"
         >
@@ -86,9 +120,9 @@ export function KanbanCard({ ticket, columnId, customTags, onDelete, onDragStart
       {/* Tags row */}
       {ticket.tags && ticket.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2 ml-5">
-          {ticket.tags.map(tagId => {
-            const tag = customTags.find(t => t.id === tagId)
-            if (!tag) return null
+          {ticket.tags.map((tagId) => {
+            const tag = customTags.find((t) => t.id === tagId);
+            if (!tag) return null;
             return (
               <span
                 key={tagId}
@@ -97,7 +131,7 @@ export function KanbanCard({ ticket, columnId, customTags, onDelete, onDragStart
               >
                 {tag.label}
               </span>
-            )
+            );
           })}
         </div>
       )}
@@ -108,37 +142,40 @@ export function KanbanCard({ ticket, columnId, customTags, onDelete, onDragStart
           <div className="flex items-center gap-2.5">
             {checklistTotal > 0 && (
               <span
-                className={`inline-flex items-center gap-1 text-body-sm ${checklistComplete ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}
+                className={`inline-flex items-center gap-1 text-body-sm ${checklistComplete ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`}
                 title={`Checklist : ${checklistDone}/${checklistTotal}`}
               >
                 <CheckSquare size={12} />
-                <span className="tabular-nums">{checklistDone}/{checklistTotal}</span>
+                <span className="tabular-nums">
+                  {checklistDone}/{checklistTotal}
+                </span>
               </span>
             )}
             {commentsCount > 0 && (
               <span
                 className="inline-flex items-center gap-1 text-body-sm text-muted-foreground"
-                title={`${commentsCount} commentaire${commentsCount > 1 ? 's' : ''}`}
+                title={`${commentsCount} commentaire${commentsCount > 1 ? "s" : ""}`}
               >
                 <MessageCircle size={12} />
                 <span className="tabular-nums">{commentsCount}</span>
               </span>
             )}
           </div>
-          {ticket.assignee && (() => {
-            const c = getAssigneeColor(ticket.assignee)
-            return (
-              <span
-                title={ticket.assignee}
-                className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold"
-                style={{ backgroundColor: c.bg, color: c.text }}
-              >
-                {assigneeInitials(ticket.assignee)}
-              </span>
-            )
-          })()}
+          {ticket.assignee &&
+            (() => {
+              const c = getAssigneeColor(ticket.assignee);
+              return (
+                <span
+                  title={ticket.assignee}
+                  className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold"
+                  style={{ backgroundColor: c.bg, color: c.text }}
+                >
+                  {assigneeInitials(ticket.assignee)}
+                </span>
+              );
+            })()}
         </div>
       )}
     </div>
-  )
+  );
 }

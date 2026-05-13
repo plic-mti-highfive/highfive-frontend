@@ -7,5 +7,5 @@ export function NewMessagesSeparator() {
       </span>
       <div className="flex-1 h-px bg-red-500" />
     </div>
-  )
+  );
 }

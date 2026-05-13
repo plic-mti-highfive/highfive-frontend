@@ -1,7 +1,7 @@
 export function AuthorChip({ author }: { author: string }) {
-  if (!author) return null
-  const initials = author.slice(0, 2).toUpperCase()
-  const hue = (author.charCodeAt(0) * 37) % 360
+  if (!author) return null;
+  const initials = author.slice(0, 2).toUpperCase();
+  const hue = (author.charCodeAt(0) * 37) % 360;
   return (
     <div className="flex items-center gap-1.5">
       <div
@@ -15,5 +15,5 @@ export function AuthorChip({ author }: { author: string }) {
       </div>
       <span className="text-xs text-foreground font-medium">@{author}</span>
     </div>
-  )
+  );
 }

@@ -1,1 +1,1 @@
-export { TAG_COLORS } from './tagColors'
+export { TAG_COLORS } from "./tagColors";

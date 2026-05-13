@@ -1,45 +1,45 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { Button } from '@shared/components/ui/button'
-import { Input } from '@shared/components/ui/input'
-import { Label } from '@shared/components/ui/label'
-import { Checkbox } from '@shared/components/ui/checkbox'
-import { AuthLayout } from '../components/AuthLayout'
-import { PasswordInput } from '@shared/components/ui/password-input'
-import { useAuth } from '../hooks/useAuth'
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
+import { Label } from "@shared/components/ui/label";
+import { Checkbox } from "@shared/components/ui/checkbox";
+import { AuthLayout } from "../components/AuthLayout";
+import { PasswordInput } from "@shared/components/ui/password-input";
+import { useAuth } from "../hooks/useAuth";
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const { login } = useAuth()
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [remember, setRemember] = useState(false)
-  const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     if (!email.trim() || !password.trim()) {
-      setError('Veuillez remplir tous les champs.')
-      return
+      setError("Veuillez remplir tous les champs.");
+      return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Adresse e-mail invalide.')
-      return
+      setError("Adresse e-mail invalide.");
+      return;
     }
 
     try {
-      setIsSubmitting(true)
-      await login(email, password)
-      navigate('/')
+      setIsSubmitting(true);
+      await login(email, password);
+      navigate("/");
     } catch {
-      setError('Identifiants incorrects.')
+      setError("Identifiants incorrects.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -50,11 +50,14 @@ export default function LoginPage() {
       imageUrl="https://images.unsplash.com/photo-1552664730-d307ca884978"
       onSubmit={handleSubmit}
       footerText="Vous n'avez pas de compte ?"
-      footerLink={{ text: 'Créez-en un ici.', href: '/register' }}
+      footerLink={{ text: "Créez-en un ici.", href: "/register" }}
     >
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-body-md text-foreground font-semibold">
+        <Label
+          htmlFor="email"
+          className="text-body-md text-foreground font-semibold"
+        >
           Adresse e-mail
         </Label>
         <Input
@@ -62,7 +65,9 @@ export default function LoginPage() {
           type="email"
           placeholder="vous@exemple.com"
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           className="h-13 text-body-md"
         />
       </div>
@@ -83,7 +88,9 @@ export default function LoginPage() {
             checked={remember}
             onCheckedChange={(v: boolean) => setRemember(v === true)}
           />
-          <span className="text-body-md text-muted-foreground">Se souvenir de moi</span>
+          <span className="text-body-md text-muted-foreground">
+            Se souvenir de moi
+          </span>
         </label>
         <button
           type="button"
@@ -94,9 +101,7 @@ export default function LoginPage() {
       </div>
 
       {/* Erreur */}
-      {error && (
-        <p className="text-body-md text-rose-dark">{error}</p>
-      )}
+      {error && <p className="text-body-md text-rose-dark">{error}</p>}
 
       {/* Bouton Se connecter */}
       <Button
@@ -104,8 +109,8 @@ export default function LoginPage() {
         disabled={isSubmitting}
         className="w-full h-13 text-body-lg font-semibold rounded-lg mt-2 dark:bg-foreground dark:text-background dark:hover:bg-foreground/90"
       >
-        {isSubmitting ? 'Connexion…' : 'Se connecter'}
+        {isSubmitting ? "Connexion…" : "Se connecter"}
       </Button>
     </AuthLayout>
-  )
+  );
 }

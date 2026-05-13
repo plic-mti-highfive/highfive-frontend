@@ -1,38 +1,38 @@
-import { useState, useRef, useEffect } from 'react'
-import { Send } from 'lucide-react'
+import { useState, useRef, useEffect } from "react";
+import { Send } from "lucide-react";
 
 interface MessageInputProps {
-  onSendMessage: (content: string) => void
+  onSendMessage: (content: string) => void;
 }
 
 export function MessageInput({ onSendMessage }: MessageInputProps) {
-  const [message, setMessage] = useState('')
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [message, setMessage] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-expand textarea as user types
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
-  }, [message])
+  }, [message]);
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      onSendMessage(message)
-      setMessage('')
+      onSendMessage(message);
+      setMessage("");
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto'
+        textareaRef.current.style.height = "auto";
       }
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
-  }
+  };
 
   return (
     <div className="border-t border-border bg-card p-4">
@@ -56,5 +56,5 @@ export function MessageInput({ onSendMessage }: MessageInputProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -1,2 +1,2 @@
-export { UserCard } from './UserCard'
-export { UserActionsMenu } from './UserActionsMenu'
+export { UserCard } from "./UserCard";
+export { UserActionsMenu } from "./UserActionsMenu";

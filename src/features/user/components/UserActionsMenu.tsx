@@ -1,28 +1,35 @@
-import { Menu } from '@base-ui/react/menu'
-import { EllipsisVertical, Ban, Flag, EyeOff, Share2, Pencil } from 'lucide-react'
+import { Menu } from "@base-ui/react/menu";
+import {
+  EllipsisVertical,
+  Ban,
+  Flag,
+  EyeOff,
+  Share2,
+  Pencil,
+} from "lucide-react";
 
 const popupCls =
-  'bg-background border border-border rounded-xl shadow-lg py-1.5 min-w-48 z-50'
+  "bg-background border border-border rounded-xl shadow-lg py-1.5 min-w-48 z-50";
 const itemCls =
-  'flex items-center gap-3 w-full px-3 py-2 text-body-md text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors data-[highlighted]:bg-muted'
-const separatorCls = 'border-t border-border my-1.5 mx-2'
+  "flex items-center gap-3 w-full px-3 py-2 text-body-md text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors data-[highlighted]:bg-muted";
+const separatorCls = "border-t border-border my-1.5 mx-2";
 
 interface UserActionsMenuProps {
-  isOwnProfile: boolean
-  onShare?: () => void
-  onEdit?: () => void
-  onBlock?: () => void
-  onReport?: () => void
-  onHide?: () => void
+  isOwnProfile: boolean;
+  onShare?: () => void;
+  onEdit?: () => void;
+  onBlock?: () => void;
+  onReport?: () => void;
+  onHide?: () => void;
 }
 
 export function UserActionsMenu({
   isOwnProfile,
-  onShare = () => console.log('Partager'),
-  onEdit = () => console.log('Éditer'),
-  onBlock = () => console.log('Bloquer'),
-  onReport = () => console.log('Signaler'),
-  onHide = () => console.log('Masquer'),
+  onShare = () => console.log("Partager"),
+  onEdit = () => console.log("Éditer"),
+  onBlock = () => console.log("Bloquer"),
+  onReport = () => console.log("Signaler"),
+  onHide = () => console.log("Masquer"),
 }: UserActionsMenuProps) {
   return (
     <Menu.Root>
@@ -69,5 +76,5 @@ export function UserActionsMenu({
         </Menu.Positioner>
       </Menu.Portal>
     </Menu.Root>
-  )
+  );
 }

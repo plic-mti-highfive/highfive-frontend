@@ -1,18 +1,18 @@
-import { isToday, isYesterday, format } from 'date-fns'
-import { frCA } from 'date-fns/locale'
+import { isToday, isYesterday, format } from "date-fns";
+import { frCA } from "date-fns/locale";
 
 interface MessageDateSeparatorProps {
-  date: Date
+  date: Date;
 }
 
 function formatSeparatorDate(date: Date): string {
   if (isToday(date)) {
-    return 'Aujourd\'hui'
+    return "Aujourd'hui";
   }
   if (isYesterday(date)) {
-    return 'Hier'
+    return "Hier";
   }
-  return format(date, 'd MMMM yyyy', { locale: frCA })
+  return format(date, "d MMMM yyyy", { locale: frCA });
 }
 
 export function MessageDateSeparator({ date }: MessageDateSeparatorProps) {
@@ -24,5 +24,5 @@ export function MessageDateSeparator({ date }: MessageDateSeparatorProps) {
       </span>
       <div className="flex-1 h-px bg-border" />
     </div>
-  )
+  );
 }

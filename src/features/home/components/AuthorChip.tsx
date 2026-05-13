@@ -1,5 +1,5 @@
 export function AuthorChip({ author }: { author: string }) {
-  const initials = author.slice(0, 2).toUpperCase()
+  const initials = author.slice(0, 2).toUpperCase();
   return (
     <div className="flex items-center gap-1.5">
       <div
@@ -13,5 +13,5 @@ export function AuthorChip({ author }: { author: string }) {
       </div>
       <span className="text-xs text-ink font-medium">@{author}</span>
     </div>
-  )
+  );
 }

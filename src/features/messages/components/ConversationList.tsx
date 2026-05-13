@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { ChevronLeft, Plus, Search } from 'lucide-react'
-import type { Conversation } from '../types'
-import { ConversationListItem } from './ConversationListItem'
-import { CreateConversationModal } from './CreateConversationModal'
+import { useState } from "react";
+import { ChevronLeft, Plus, Search } from "lucide-react";
+import type { Conversation } from "../types";
+import { ConversationListItem } from "./ConversationListItem";
+import { CreateConversationModal } from "./CreateConversationModal";
 
 interface ConversationListProps {
-  conversations: Conversation[]
-  selectedConversationId: string | null
-  onSelectConversation: (id: string) => void
-  onToggleCollapse: () => void
+  conversations: Conversation[];
+  selectedConversationId: string | null;
+  onSelectConversation: (id: string) => void;
+  onToggleCollapse: () => void;
 }
 
 export function ConversationList({
@@ -17,32 +17,36 @@ export function ConversationList({
   onSelectConversation,
   onToggleCollapse,
 }: ConversationListProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Simple mock for conversation names
   const getConversationName = (conv: Conversation): string => {
-    if (conv.type === 'group') {
-      return conv.name || 'Groupe sans nom'
+    if (conv.type === "group") {
+      return conv.name || "Groupe sans nom";
     }
     const names: { [key: string]: string } = {
-      'user-2': 'Sophie Martin',
-      'user-3': 'Thomas Dupont',
-      'user-4': 'Marie Laurent',
-      'user-5': 'Jean Claude',
-      'user-6': 'Lisa Moreau',
-    }
-    const otherUserId = conv.participants.find(id => id !== 'user-1')
-    return names[otherUserId || 'user-1'] || 'Utilisateur'
-  }
+      "user-2": "Sophie Martin",
+      "user-3": "Thomas Dupont",
+      "user-4": "Marie Laurent",
+      "user-5": "Jean Claude",
+      "user-6": "Lisa Moreau",
+    };
+    const otherUserId = conv.participants.find((id) => id !== "user-1");
+    return names[otherUserId || "user-1"] || "Utilisateur";
+  };
 
   // Filter conversations based on search query
   const filteredConversations = conversations
-    .sort((a, b) => new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime())
-    .filter(conv => {
-      const name = getConversationName(conv)
-      return name.toLowerCase().includes(searchQuery.toLowerCase())
-    })
+    .sort(
+      (a, b) =>
+        new Date(b.lastMessage.timestamp).getTime() -
+        new Date(a.lastMessage.timestamp).getTime(),
+    )
+    .filter((conv) => {
+      const name = getConversationName(conv);
+      return name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
 
   return (
     <div className="flex flex-col h-full bg-sidebar">
@@ -84,7 +88,7 @@ export function ConversationList({
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto">
         {filteredConversations.length > 0 ? (
-          filteredConversations.map(conversation => (
+          filteredConversations.map((conversation) => (
             <ConversationListItem
               key={conversation.id}
               conversation={conversation}
@@ -106,5 +110,5 @@ export function ConversationList({
         onCreateConversation={() => setIsCreateModalOpen(false)}
       />
     </div>
-  )
+  );
 }

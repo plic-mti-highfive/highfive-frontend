@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import Header from '@features/layout/components/Header'
-import Footer from '@features/layout/components/Footer'
-import { useProjectDetail } from '../hooks/useProjectDetail'
-import { ProjectHero } from '../components/ProjectHero'
-import { ProjectTabs, type TabId } from '../components/ProjectTabs'
-import { ProjectSidebar } from '../components/ProjectSidebar'
-import { TicketList } from '../components/TicketList'
-import { DiscussionThread } from '../components/DiscussionThread'
-import { SimilarProjects } from '../components/SimilarProjects'
-import { ProjectDetailSkeleton } from '../components/ProjectDetailSkeleton'
-import type { ProjectMessageDto } from '@/api/types'
-import { TicketStatus } from '@plic-mti-highfive/shared-types'
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import Header from "@features/layout/components/Header";
+import Footer from "@features/layout/components/Footer";
+import { useProjectDetail } from "../hooks/useProjectDetail";
+import { ProjectHero } from "../components/ProjectHero";
+import { ProjectTabs, type TabId } from "../components/ProjectTabs";
+import { ProjectSidebar } from "../components/ProjectSidebar";
+import { TicketList } from "../components/TicketList";
+import { DiscussionThread } from "../components/DiscussionThread";
+import { SimilarProjects } from "../components/SimilarProjects";
+import { ProjectDetailSkeleton } from "../components/ProjectDetailSkeleton";
+import type { ProjectMessageDto } from "@/api/types";
+import { TicketStatus } from "@plic-mti-highfive/shared-types";
 
 export function ProjectDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<TabId>('overview')
-  const [localMessages, setLocalMessages] = useState<ProjectMessageDto[]>([])
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [localMessages, setLocalMessages] = useState<ProjectMessageDto[]>([]);
 
-  const { project, members, tickets, messages, isLoading, error } = useProjectDetail(id || '')
+  const { project, members, tickets, messages, isLoading, error } =
+    useProjectDetail(id || "");
 
   const handleMessageSent = (newMessage: ProjectMessageDto) => {
-    setLocalMessages((prev) => [...prev, newMessage])
-  }
+    setLocalMessages((prev) => [...prev, newMessage]);
+  };
 
   const allMessages = (() => {
-    const messageIds = new Set(messages.map((m) => m.id))
-    const combined = [...messages, ...localMessages.filter((m) => !messageIds.has(m.id))]
-    return combined
-  })()
+    const messageIds = new Set(messages.map((m) => m.id));
+    const combined = [
+      ...messages,
+      ...localMessages.filter((m) => !messageIds.has(m.id)),
+    ];
+    return combined;
+  })();
 
   if (isLoading) {
     return (
@@ -38,7 +42,7 @@ export function ProjectDetailPage() {
         <ProjectDetailSkeleton />
         <Footer />
       </>
-    )
+    );
   }
 
   if (error || !project) {
@@ -48,12 +52,14 @@ export function ProjectDetailPage() {
         <main className="min-h-screen bg-background">
           <div className="max-w-7xl mx-auto px-6 py-12">
             <div className="text-center py-12">
-              <h1 className="text-2xl font-bold text-foreground mb-4">Projet introuvable</h1>
+              <h1 className="text-2xl font-bold text-foreground mb-4">
+                Projet introuvable
+              </h1>
               <p className="text-muted-foreground mb-6">
-                {error || 'Le projet que vous recherchez n\'existe pas.'}
+                {error || "Le projet que vous recherchez n'existe pas."}
               </p>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
                 className="px-6 py-2.5 bg-foreground text-background font-medium rounded-lg hover:opacity-90 transition-opacity"
               >
                 Retour à l'accueil
@@ -63,29 +69,52 @@ export function ProjectDetailPage() {
         </main>
         <Footer />
       </>
-    )
+    );
   }
 
-  const completedTickets = tickets.filter((t) => t.status === TicketStatus.DONE).length
-  const totalTickets = tickets.length
-  const progress = totalTickets > 0 ? (completedTickets / totalTickets) * 100 : 0
+  const completedTickets = tickets.filter(
+    (t) => t.status === TicketStatus.DONE,
+  ).length;
+  const totalTickets = tickets.length;
+  const progress =
+    totalTickets > 0 ? (completedTickets / totalTickets) * 100 : 0;
 
   const handleJoinProject = () => {
-    console.log('Rejoindre le projet:', project.id)
-  }
+    console.log("Rejoindre le projet:", project.id);
+  };
 
   const handleHighfive = () => {
-    console.log('Highfive le projet:', project.id)
-  }
+    console.log("Highfive le projet:", project.id);
+  };
 
   // Simuler des projets similaires et highfives (à remplacer par une vraie requête API plus tard)
-  const similarProjects: typeof project[] = [
-    { ...project, id: '101', name: 'Projet Open Source similaire 1', description: 'Description du projet similaire 1' },
-    { ...project, id: '102', name: 'Projet Open Source similaire 2', description: 'Description du projet similaire 2' },
-    { ...project, id: '103', name: 'Projet Open Source similaire 3', description: 'Description du projet similaire 3' },
-    { ...project, id: '104', name: 'Projet Open Source similaire 4', description: 'Description du projet similaire 4' },
-  ]
-  const highfiveCount = 42
+  const similarProjects: (typeof project)[] = [
+    {
+      ...project,
+      id: "101",
+      name: "Projet Open Source similaire 1",
+      description: "Description du projet similaire 1",
+    },
+    {
+      ...project,
+      id: "102",
+      name: "Projet Open Source similaire 2",
+      description: "Description du projet similaire 2",
+    },
+    {
+      ...project,
+      id: "103",
+      name: "Projet Open Source similaire 3",
+      description: "Description du projet similaire 3",
+    },
+    {
+      ...project,
+      id: "104",
+      name: "Projet Open Source similaire 4",
+      description: "Description du projet similaire 4",
+    },
+  ];
+  const highfiveCount = 42;
 
   return (
     <>
@@ -94,7 +123,14 @@ export function ProjectDetailPage() {
         <ProjectHero
           project={project}
           memberCount={members.length}
-          creator={members[0]?.user ? { email: members[0].user.email, avatar: members[0].user.profile?.avatarPath } : undefined}
+          creator={
+            members[0]?.user
+              ? {
+                  email: members[0].user.email,
+                  avatar: members[0].user.profile?.avatarPath,
+                }
+              : undefined
+          }
           progress={progress}
           highfiveCount={highfiveCount}
           onJoinClick={handleJoinProject}
@@ -107,7 +143,7 @@ export function ProjectDetailPage() {
               <div className="lg:col-span-2">
                 <ProjectTabs activeTab={activeTab} onChange={setActiveTab} />
 
-                {activeTab === 'overview' && (
+                {activeTab === "overview" && (
                   <div className="pl-4 prose prose-sm max-w-none">
                     {project.description ? (
                       <div>
@@ -128,7 +164,13 @@ export function ProjectDetailPage() {
                   </div>
                 )}
 
-                {activeTab === 'tasks' && <TicketList tickets={tickets} members={members} projectId={project.id} />}
+                {activeTab === "tasks" && (
+                  <TicketList
+                    tickets={tickets}
+                    members={members}
+                    projectId={project.id}
+                  />
+                )}
               </div>
 
               <div className="lg:col-span-1">
@@ -155,5 +197,5 @@ export function ProjectDetailPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }

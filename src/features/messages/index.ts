@@ -1,2 +1,2 @@
-export { MessagesPage } from './pages/MessagesPage'
-export * from './types'
+export { MessagesPage } from "./pages/MessagesPage";
+export * from "./types";

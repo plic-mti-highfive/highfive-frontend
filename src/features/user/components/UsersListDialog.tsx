@@ -1,20 +1,25 @@
-import { Dialog } from '@base-ui/react/dialog'
-import { X } from 'lucide-react'
+import { Dialog } from "@base-ui/react/dialog";
+import { X } from "lucide-react";
 
 export interface UserListItem {
-  username: string
-  displayName: string
-  avatar: string
+  username: string;
+  displayName: string;
+  avatar: string;
 }
 
 interface UsersListDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title: string
-  users: UserListItem[]
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  users: UserListItem[];
 }
 
-export function UsersListDialog({ open, onOpenChange, title, users }: UsersListDialogProps) {
+export function UsersListDialog({
+  open,
+  onOpenChange,
+  title,
+  users,
+}: UsersListDialogProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -33,7 +38,9 @@ export function UsersListDialog({ open, onOpenChange, title, users }: UsersListD
 
             {users.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-body-md text-muted-foreground">Aucun utilisateur</p>
+                <p className="text-body-md text-muted-foreground">
+                  Aucun utilisateur
+                </p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -63,5 +70,5 @@ export function UsersListDialog({ open, onOpenChange, title, users }: UsersListD
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
-  )
+  );
 }

@@ -1,52 +1,52 @@
-import { Menu } from '@base-ui/react/menu'
-import { ChevronDown, Filter, ArrowUpDown } from 'lucide-react'
-import { useState } from 'react'
+import { Menu } from "@base-ui/react/menu";
+import { ChevronDown, Filter, ArrowUpDown } from "lucide-react";
+import { useState } from "react";
 
-type SortOption = 'name' | 'date' | 'popularity'
-type FilterTag = string
+type SortOption = "name" | "date" | "popularity";
+type FilterTag = string;
 
 const popupCls =
-  'bg-cream border border-cream-mid rounded-xl shadow-lg py-1.5 min-w-48 z-50'
+  "bg-cream border border-cream-mid rounded-xl shadow-lg py-1.5 min-w-48 z-50";
 const itemCls =
-  'flex items-center gap-3 w-full px-3 py-2 text-body-md text-ink rounded-lg cursor-pointer hover:bg-cream-dark outline-none select-none transition-colors data-[highlighted]:bg-cream-dark'
+  "flex items-center gap-3 w-full px-3 py-2 text-body-md text-ink rounded-lg cursor-pointer hover:bg-cream-dark outline-none select-none transition-colors data-[highlighted]:bg-cream-dark";
 
 export function ProjectFiltersBar({
   onSortChange,
   onFilterChange,
 }: {
-  onSortChange?: (sort: SortOption) => void
-  onFilterChange?: (filters: FilterTag[]) => void
+  onSortChange?: (sort: SortOption) => void;
+  onFilterChange?: (filters: FilterTag[]) => void;
 }) {
-  const [activeSort, setActiveSort] = useState<SortOption>('date')
-  const [activeFilters, setActiveFilters] = useState<FilterTag[]>([])
+  const [activeSort, setActiveSort] = useState<SortOption>("date");
+  const [activeFilters, setActiveFilters] = useState<FilterTag[]>([]);
 
   const handleSort = (sort: SortOption) => {
-    setActiveSort(sort)
-    onSortChange?.(sort)
-  }
+    setActiveSort(sort);
+    onSortChange?.(sort);
+  };
 
   const handleToggleFilter = (tag: FilterTag) => {
     const newFilters = activeFilters.includes(tag)
-      ? activeFilters.filter(t => t !== tag)
-      : [...activeFilters, tag]
-    setActiveFilters(newFilters)
-    onFilterChange?.(newFilters)
-  }
+      ? activeFilters.filter((t) => t !== tag)
+      : [...activeFilters, tag];
+    setActiveFilters(newFilters);
+    onFilterChange?.(newFilters);
+  };
 
   const AVAILABLE_TAGS = [
-    'React',
-    'Python',
-    'Design',
-    'Open Source',
-    'Machine Learning',
-    'Web',
-  ]
+    "React",
+    "Python",
+    "Design",
+    "Open Source",
+    "Machine Learning",
+    "Web",
+  ];
 
   const SORT_OPTIONS = [
-    { value: 'name' as const, label: 'Par nom' },
-    { value: 'date' as const, label: 'Plus récent' },
-    { value: 'popularity' as const, label: 'Populaire' },
-  ]
+    { value: "name" as const, label: "Par nom" },
+    { value: "date" as const, label: "Plus récent" },
+    { value: "popularity" as const, label: "Populaire" },
+  ];
 
   return (
     <div className="flex items-center justify-end gap-3 mb-4">
@@ -55,7 +55,7 @@ export function ProjectFiltersBar({
         <Menu.Trigger className="flex items-center gap-2 px-4 py-2 rounded-lg border border-cream-mid bg-white hover:bg-cream-dark transition-colors outline-none">
           <ArrowUpDown className="w-4 h-4 text-ink" />
           <span className="text-body-md font-medium text-ink">
-            {SORT_OPTIONS.find(o => o.value === activeSort)?.label}
+            {SORT_OPTIONS.find((o) => o.value === activeSort)?.label}
           </span>
           <ChevronDown className="w-4 h-4 text-ink-muted" />
         </Menu.Trigger>
@@ -72,7 +72,7 @@ export function ProjectFiltersBar({
                   <div className="flex items-center gap-2 flex-1">
                     <div
                       className={`w-2 h-2 rounded-full ${
-                        activeSort === option.value ? 'bg-ink' : 'bg-cream-mid'
+                        activeSort === option.value ? "bg-ink" : "bg-cream-mid"
                       }`}
                     />
                     <span>{option.label}</span>
@@ -110,8 +110,8 @@ export function ProjectFiltersBar({
                     <div
                       className={`w-4 h-4 rounded border ${
                         activeFilters.includes(tag)
-                          ? 'bg-ink border-ink'
-                          : 'border-cream-mid bg-white'
+                          ? "bg-ink border-ink"
+                          : "border-cream-mid bg-white"
                       } flex items-center justify-center`}
                     >
                       {activeFilters.includes(tag) && (
@@ -127,5 +127,5 @@ export function ProjectFiltersBar({
         </Menu.Portal>
       </Menu.Root>
     </div>
-  )
+  );
 }

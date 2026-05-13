@@ -1,7 +1,7 @@
 interface ArrowButtonProps {
-  onClick: () => void
-  label: string
-  children: React.ReactNode
+  onClick: () => void;
+  label: string;
+  children: React.ReactNode;
 }
 
 export function ArrowButton({ onClick, label, children }: ArrowButtonProps) {
@@ -20,5 +20,5 @@ export function ArrowButton({ onClick, label, children }: ArrowButtonProps) {
     >
       {children}
     </button>
-  )
+  );
 }

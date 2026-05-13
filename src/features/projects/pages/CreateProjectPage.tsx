@@ -1,51 +1,63 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Header } from '@features/layout'
-import { Footer } from '@features/layout'
-import type { ProjectForm } from '../types'
-import { useStepTransition } from '../hooks/useStepTransition'
-import { StepWrapper } from '../components/StepWrapper'
-import { StepChoose } from '../components/StepChoose'
-import { StepAIPitch } from '../components/StepAIPitch'
-import { StepGenerating } from '../components/StepGenerating'
-import { StepManualName } from '../components/StepManualName'
-import { StepManualDesc } from '../components/StepManualDesc'
-import { StepManualTags } from '../components/StepManualTags'
-import { StepDone } from '../components/StepDone'
+import { useState } from "react";
+import { Header } from "@features/layout";
+import { Footer } from "@features/layout";
+import type { ProjectForm } from "../types";
+import { useStepTransition } from "../hooks/useStepTransition";
+import { StepWrapper } from "../components/StepWrapper";
+import { StepChoose } from "../components/StepChoose";
+import { StepAIPitch } from "../components/StepAIPitch";
+import { StepGenerating } from "../components/StepGenerating";
+import { StepManualName } from "../components/StepManualName";
+import { StepManualDesc } from "../components/StepManualDesc";
+import { StepManualTags } from "../components/StepManualTags";
+import { StepDone } from "../components/StepDone";
 
 export default function CreateProject() {
-  const { step, visible, goTo } = useStepTransition('choose')
-  const [form, setForm] = useState<ProjectForm>({ name: '', description: '', tags: [] })
+  const { step, visible, goTo } = useStepTransition("choose");
+  const [form, setForm] = useState<ProjectForm>({
+    name: "",
+    description: "",
+    tags: [],
+  });
 
-  function handleChooseAI() { goTo('ai-pitch') }
-
-  function handleAIPitch(pitch: string) {
-    goTo('ai-generating')
-    setTimeout(() => {
-      setForm(f => ({ ...f, name: 'Projet généré', description: pitch }))
-      goTo('done')
-    }, 3200)
+  function handleChooseAI() {
+    goTo("ai-pitch");
   }
 
-  function handleChooseManual() { goTo('manual-name') }
-  function handleManualName()   { goTo('manual-desc')  }
-  function handleManualDesc()   { goTo('manual-tags')  }
+  function handleAIPitch(pitch: string) {
+    goTo("ai-generating");
+    setTimeout(() => {
+      setForm((f) => ({ ...f, name: "Projet généré", description: pitch }));
+      goTo("done");
+    }, 3200);
+  }
+
+  function handleChooseManual() {
+    goTo("manual-name");
+  }
+  function handleManualName() {
+    goTo("manual-desc");
+  }
+  function handleManualDesc() {
+    goTo("manual-tags");
+  }
 
   function handleManualSubmit() {
-    console.log('Créer projet :', form)
-    goTo('done')
+    console.log("Créer projet :", form);
+    goTo("done");
   }
 
   const backs: Partial<Record<typeof step, typeof step>> = {
-    'ai-pitch':    'choose',
-    'manual-name': 'choose',
-    'manual-desc': 'manual-name',
-    'manual-tags': 'manual-desc',
-  }
+    "ai-pitch": "choose",
+    "manual-name": "choose",
+    "manual-desc": "manual-name",
+    "manual-tags": "manual-desc",
+  };
   function handleBack() {
-    const prev = backs[step]
-    if (prev) goTo(prev)
+    const prev = backs[step];
+    if (prev) goTo(prev);
   }
 
   return (
@@ -54,13 +66,42 @@ export default function CreateProject() {
       <main className="min-h-screen bg-background flex items-start justify-center px-6 py-16">
         <div className="w-full max-w-lg">
           <StepWrapper visible={visible}>
-            {step === 'choose'        && <StepChoose    onChoose={m => m === 'ai' ? handleChooseAI() : handleChooseManual()} />}
-            {step === 'ai-pitch'      && <StepAIPitch   onBack={handleBack} onGenerate={handleAIPitch} />}
-            {step === 'ai-generating' && <StepGenerating />}
-            {step === 'manual-name'   && <StepManualName onBack={handleBack} onNext={handleManualName}    value={form.name}        onChange={v => setForm(f => ({ ...f, name: v }))} />}
-            {step === 'manual-desc'   && <StepManualDesc onBack={handleBack} onNext={handleManualDesc}    value={form.description} onChange={v => setForm(f => ({ ...f, description: v }))} />}
-            {step === 'manual-tags'   && <StepManualTags onBack={handleBack} onSubmit={handleManualSubmit} value={form.tags}       onChange={t => setForm(f => ({ ...f, tags: t }))} />}
-            {step === 'done'          && <StepDone       projectName={form.name} />}
+            {step === "choose" && (
+              <StepChoose
+                onChoose={(m) =>
+                  m === "ai" ? handleChooseAI() : handleChooseManual()
+                }
+              />
+            )}
+            {step === "ai-pitch" && (
+              <StepAIPitch onBack={handleBack} onGenerate={handleAIPitch} />
+            )}
+            {step === "ai-generating" && <StepGenerating />}
+            {step === "manual-name" && (
+              <StepManualName
+                onBack={handleBack}
+                onNext={handleManualName}
+                value={form.name}
+                onChange={(v) => setForm((f) => ({ ...f, name: v }))}
+              />
+            )}
+            {step === "manual-desc" && (
+              <StepManualDesc
+                onBack={handleBack}
+                onNext={handleManualDesc}
+                value={form.description}
+                onChange={(v) => setForm((f) => ({ ...f, description: v }))}
+              />
+            )}
+            {step === "manual-tags" && (
+              <StepManualTags
+                onBack={handleBack}
+                onSubmit={handleManualSubmit}
+                value={form.tags}
+                onChange={(t) => setForm((f) => ({ ...f, tags: t }))}
+              />
+            )}
+            {step === "done" && <StepDone projectName={form.name} />}
           </StepWrapper>
         </div>
       </main>
@@ -76,5 +117,5 @@ export default function CreateProject() {
         }
       `}</style>
     </>
-  )
+  );
 }

@@ -1,41 +1,41 @@
-import type { TaskDto } from '@/api/types'
-import { TicketStatus } from '@plic-mti-highfive/shared-types'
+import type { TaskDto } from "@/api/types";
+import { TicketStatus } from "@plic-mti-highfive/shared-types";
 
 interface TaskCardProps {
-  task: TaskDto
-  assigneeName?: string
+  task: TaskDto;
+  assigneeName?: string;
 }
 
 export function TaskCard({ task, assigneeName }: TaskCardProps) {
   const getStatusColor = (status: TicketStatus) => {
     switch (status) {
       case TicketStatus.TODO:
-        return 'bg-gray-100 text-gray-700 border-gray-200'
+        return "bg-gray-100 text-gray-700 border-gray-200";
       case TicketStatus.IN_PROGRESS:
-        return 'bg-blue-100 text-blue-700 border-blue-200'
+        return "bg-blue-100 text-blue-700 border-blue-200";
       case TicketStatus.IN_REVIEW:
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
       case TicketStatus.DONE:
-        return 'bg-green-100 text-green-700 border-green-200'
+        return "bg-green-100 text-green-700 border-green-200";
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200'
+        return "bg-gray-100 text-gray-700 border-gray-200";
     }
-  }
+  };
 
   const getStatusLabel = (status: TicketStatus) => {
     switch (status) {
       case TicketStatus.TODO:
-        return 'À faire'
+        return "À faire";
       case TicketStatus.IN_PROGRESS:
-        return 'En cours'
+        return "En cours";
       case TicketStatus.IN_REVIEW:
-        return 'En révision'
+        return "En révision";
       case TicketStatus.DONE:
-        return 'Terminé'
+        return "Terminé";
       default:
-        return status
+        return status;
     }
-  }
+  };
 
   return (
     <div className="p-4 bg-card border border-border rounded-lg hover:border-border/60 transition-colors">
@@ -61,5 +61,5 @@ export function TaskCard({ task, assigneeName }: TaskCardProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

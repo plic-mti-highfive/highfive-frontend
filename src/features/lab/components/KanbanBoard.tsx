@@ -1,48 +1,68 @@
-import { useRef, useState } from 'react'
-import { Plus } from 'lucide-react'
-import { KanbanColumn } from './KanbanColumn'
-import type { KanbanColumnDef, KanbanColumnId, KanbanTicket } from '../types'
+import { useRef, useState } from "react";
+import { Plus } from "lucide-react";
+import { KanbanColumn } from "./KanbanColumn";
+import type { KanbanColumnDef, KanbanColumnId, KanbanTicket } from "../types";
 
 interface KanbanBoardProps {
-  columns: KanbanColumnDef[]
-  tickets: Record<KanbanColumnId, KanbanTicket[]>
-  customTags: import('../types').CustomTag[]
-  addTicket: (columnId: KanbanColumnId, title: string) => void
-  moveTicket: (ticketId: string, from: KanbanColumnId, to: KanbanColumnId) => void
-  deleteTicket: (ticketId: string, columnId: KanbanColumnId) => void
-  onOpenTicket: (ticketId: string, columnId: KanbanColumnId) => void
-  onAddColumn: (label: string) => void
-  onDeleteColumn: (columnId: KanbanColumnId) => void
+  columns: KanbanColumnDef[];
+  tickets: Record<KanbanColumnId, KanbanTicket[]>;
+  customTags: import("../types").CustomTag[];
+  addTicket: (columnId: KanbanColumnId, title: string) => void;
+  moveTicket: (
+    ticketId: string,
+    from: KanbanColumnId,
+    to: KanbanColumnId,
+  ) => void;
+  deleteTicket: (ticketId: string, columnId: KanbanColumnId) => void;
+  onOpenTicket: (ticketId: string, columnId: KanbanColumnId) => void;
+  onAddColumn: (label: string) => void;
+  onDeleteColumn: (columnId: KanbanColumnId) => void;
 }
 
-export function KanbanBoard({ columns, tickets, customTags, addTicket, moveTicket, deleteTicket, onOpenTicket, onAddColumn, onDeleteColumn }: KanbanBoardProps) {
-  const dragRef = useRef<{ ticketId: string; fromColumnId: KanbanColumnId } | null>(null)
-  const [addingColumn, setAddingColumn] = useState(false)
-  const [newColLabel, setNewColLabel] = useState('')
+export function KanbanBoard({
+  columns,
+  tickets,
+  customTags,
+  addTicket,
+  moveTicket,
+  deleteTicket,
+  onOpenTicket,
+  onAddColumn,
+  onDeleteColumn,
+}: KanbanBoardProps) {
+  const dragRef = useRef<{
+    ticketId: string;
+    fromColumnId: KanbanColumnId;
+  } | null>(null);
+  const [addingColumn, setAddingColumn] = useState(false);
+  const [newColLabel, setNewColLabel] = useState("");
 
   const handleDragStart = (ticketId: string, columnId: KanbanColumnId) => {
-    dragRef.current = { ticketId, fromColumnId: columnId }
-  }
+    dragRef.current = { ticketId, fromColumnId: columnId };
+  };
 
   const handleDrop = (targetColumnId: KanbanColumnId, dropIndex?: number) => {
-    if (!dragRef.current) return
-    const { ticketId, fromColumnId } = dragRef.current
-    moveTicket(ticketId, fromColumnId, targetColumnId, dropIndex)
-    dragRef.current = null
-  }
+    if (!dragRef.current) return;
+    const { ticketId, fromColumnId } = dragRef.current;
+    moveTicket(ticketId, fromColumnId, targetColumnId, dropIndex);
+    dragRef.current = null;
+  };
 
   function submitNewColumn() {
     if (newColLabel.trim()) {
-      onAddColumn(newColLabel.trim())
+      onAddColumn(newColLabel.trim());
     }
-    setNewColLabel('')
-    setAddingColumn(false)
+    setNewColLabel("");
+    setAddingColumn(false);
   }
 
   return (
     <div className="overflow-x-auto pb-4 px-1 pt-1">
-      <div className="flex gap-4 items-start" style={{ minWidth: 'max-content' }}>
-        {columns.map(col => (
+      <div
+        className="flex gap-4 items-start"
+        style={{ minWidth: "max-content" }}
+      >
+        {columns.map((col) => (
           <KanbanColumn
             key={col.id}
             id={col.id}
@@ -61,17 +81,20 @@ export function KanbanBoard({ columns, tickets, customTags, addTicket, moveTicke
         ))}
 
         {/* Add column */}
-        <div className="shrink-0" style={{ width: '280px' }}>
+        <div className="shrink-0" style={{ width: "280px" }}>
           {addingColumn ? (
             <div className="bg-card/70 dark:bg-card/50 rounded-2xl border-2 border-dashed border-border p-4 space-y-2">
               <input
                 autoFocus
                 type="text"
                 value={newColLabel}
-                onChange={e => setNewColLabel(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') submitNewColumn()
-                  if (e.key === 'Escape') { setAddingColumn(false); setNewColLabel('') }
+                onChange={(e) => setNewColLabel(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") submitNewColumn();
+                  if (e.key === "Escape") {
+                    setAddingColumn(false);
+                    setNewColLabel("");
+                  }
                 }}
                 placeholder="Nom de la colonne…"
                 className="w-full text-body-md text-foreground bg-transparent outline-none placeholder:text-muted-foreground"
@@ -84,7 +107,10 @@ export function KanbanBoard({ columns, tickets, customTags, addTicket, moveTicke
                   Ajouter
                 </button>
                 <button
-                  onClick={() => { setAddingColumn(false); setNewColLabel('') }}
+                  onClick={() => {
+                    setAddingColumn(false);
+                    setNewColLabel("");
+                  }}
                   className="px-3 py-1.5 rounded-lg text-ui-sm text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
                 >
                   Annuler
@@ -103,5 +129,5 @@ export function KanbanBoard({ columns, tickets, customTags, addTicket, moveTicke
         </div>
       </div>
     </div>
-  )
+  );
 }

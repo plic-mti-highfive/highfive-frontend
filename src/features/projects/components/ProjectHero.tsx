@@ -1,20 +1,27 @@
-import { Hand, Bookmark, Share2, Flag } from 'lucide-react'
-import { Thumbnail } from '@shared/components/projects/shared/Thumbnail'
-import { DropdownMenu } from '@shared/components/DropdownMenu'
-import type { ProjectDto } from '@/api/types'
-import { ProjectStatus } from '@plic-mti-highfive/shared-types'
+import { Hand, Bookmark, Share2, Flag } from "lucide-react";
+import { Thumbnail } from "@shared/components/projects/shared/Thumbnail";
+import { DropdownMenu } from "@shared/components/DropdownMenu";
+import type { ProjectDto } from "@/api/types";
+import { ProjectStatus } from "@plic-mti-highfive/shared-types";
 
 interface ProjectHeroProps {
-  project: ProjectDto
-  memberCount: number
-  creator?: { email: string; avatar?: string }
-  highfiveCount?: number
-  onJoinClick?: () => void
-  onHighfiveClick?: () => void
+  project: ProjectDto;
+  memberCount: number;
+  creator?: { email: string; avatar?: string };
+  highfiveCount?: number;
+  onJoinClick?: () => void;
+  onHighfiveClick?: () => void;
 }
 
-export function ProjectHero({ project, memberCount, creator, highfiveCount = 0, onJoinClick, onHighfiveClick }: ProjectHeroProps) {
-  const creatorName = creator?.email.split('@')[0] || 'Créateur inconnu'
+export function ProjectHero({
+  project,
+  memberCount,
+  creator,
+  highfiveCount = 0,
+  onJoinClick,
+  onHighfiveClick,
+}: ProjectHeroProps) {
+  const creatorName = creator?.email.split("@")[0] || "Créateur inconnu";
   return (
     <div className="bg-background">
       <div className="relative h-80 sm:h-96 overflow-hidden border-b border-border">
@@ -41,14 +48,18 @@ export function ProjectHero({ project, memberCount, creator, highfiveCount = 0, 
                       background: creator.avatar
                         ? `url(${creator.avatar}) center/cover`
                         : `hsl(${(creatorName.charCodeAt(0) * 37) % 360} 45% 80%)`,
-                      color: creator.avatar ? 'transparent' : `hsl(${(creatorName.charCodeAt(0) * 37) % 360} 45% 30%)`,
+                      color: creator.avatar
+                        ? "transparent"
+                        : `hsl(${(creatorName.charCodeAt(0) * 37) % 360} 45% 30%)`,
                     }}
                   >
                     {!creator.avatar && creatorName.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
                     <p className="text-sm text-foreground">Créateur</p>
-                    <p className="text-sm font-medium text-foreground">{creatorName}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {creatorName}
+                    </p>
                   </div>
                 </div>
               )}
@@ -59,19 +70,21 @@ export function ProjectHero({ project, memberCount, creator, highfiveCount = 0, 
               offset={8}
               items={[
                 {
-                  icon: <Bookmark size={16} className="text-muted-foreground" />,
-                  label: 'Enregistrer',
-                  onClick: () => console.log('Enregistrer'),
+                  icon: (
+                    <Bookmark size={16} className="text-muted-foreground" />
+                  ),
+                  label: "Enregistrer",
+                  onClick: () => console.log("Enregistrer"),
                 },
                 {
                   icon: <Share2 size={16} className="text-muted-foreground" />,
-                  label: 'Partager',
-                  onClick: () => console.log('Partager'),
+                  label: "Partager",
+                  onClick: () => console.log("Partager"),
                 },
                 {
                   icon: <Flag size={16} className="text-muted-foreground" />,
-                  label: 'Signaler',
-                  onClick: () => console.log('Signaler'),
+                  label: "Signaler",
+                  onClick: () => console.log("Signaler"),
                 },
               ]}
             />
@@ -81,17 +94,22 @@ export function ProjectHero({ project, memberCount, creator, highfiveCount = 0, 
         {/* Bottom: Stats + Boutons */}
         <div className="absolute bottom-0 left-0 right-0 px-6 pb-6">
           <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
-
             {/* Stats et boutons en ligne */}
             <div className="flex items-center justify-between gap-8">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Hand size={20} className="text-muted-foreground" />
-                  <span className="text-lg font-semibold text-foreground">{highfiveCount}</span>
+                  <span className="text-lg font-semibold text-foreground">
+                    {highfiveCount}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm text-muted-foreground">Contributeurs:</p>
-                  <p className="text-lg font-bold text-foreground">{memberCount}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Contributeurs:
+                  </p>
+                  <p className="text-lg font-bold text-foreground">
+                    {memberCount}
+                  </p>
                 </div>
               </div>
 
@@ -117,5 +135,5 @@ export function ProjectHero({ project, memberCount, creator, highfiveCount = 0, 
         </div>
       </div>
     </div>
-  )
+  );
 }

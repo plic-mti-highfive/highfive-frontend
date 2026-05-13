@@ -1,12 +1,12 @@
-import { Dialog } from '@base-ui/react/dialog'
-import { X } from 'lucide-react'
-import { Button } from '@shared/components/ui/button'
+import { Dialog } from "@base-ui/react/dialog";
+import { X } from "lucide-react";
+import { Button } from "@shared/components/ui/button";
 
 interface UnfollowConfirmDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  displayName: string
-  onConfirm: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  displayName: string;
+  onConfirm: () => void;
 }
 
 export function UnfollowConfirmDialog({
@@ -16,9 +16,9 @@ export function UnfollowConfirmDialog({
   onConfirm,
 }: UnfollowConfirmDialogProps) {
   const handleConfirm = () => {
-    onConfirm()
-    onOpenChange(false)
-  }
+    onConfirm();
+    onOpenChange(false);
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -37,7 +37,7 @@ export function UnfollowConfirmDialog({
             </div>
 
             <p className="text-body-md text-ink-muted mb-6">
-              Êtes-vous sûr de vouloir vous désabonner de{' '}
+              Êtes-vous sûr de vouloir vous désabonner de{" "}
               <span className="font-semibold text-ink">{displayName}</span> ?
             </p>
 
@@ -61,5 +61,5 @@ export function UnfollowConfirmDialog({
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
-  )
+  );
 }

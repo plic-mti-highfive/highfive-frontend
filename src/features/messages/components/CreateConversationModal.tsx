@@ -1,63 +1,66 @@
-import { useState } from 'react'
-import { Dialog } from '@base-ui/react/dialog'
-import { X, Search } from 'lucide-react'
+import { useState } from "react";
+import { Dialog } from "@base-ui/react/dialog";
+import { X, Search } from "lucide-react";
 
 interface CreateConversationModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onCreateConversation: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onCreateConversation: () => void;
 }
 
 interface AvailableUser {
-  id: string
-  username: string
-  displayName: string
+  id: string;
+  username: string;
+  displayName: string;
 }
 
 const availableUsers: AvailableUser[] = [
-  { id: 'user-2', username: 'sophie_martin', displayName: 'Sophie Martin' },
-  { id: 'user-3', username: 'thomas_dupont', displayName: 'Thomas Dupont' },
-  { id: 'user-4', username: 'marie_laurent', displayName: 'Marie Laurent' },
-  { id: 'user-5', username: 'jean_claude', displayName: 'Jean Claude' },
-  { id: 'user-6', username: 'lisa_moreau', displayName: 'Lisa Moreau' },
-]
+  { id: "user-2", username: "sophie_martin", displayName: "Sophie Martin" },
+  { id: "user-3", username: "thomas_dupont", displayName: "Thomas Dupont" },
+  { id: "user-4", username: "marie_laurent", displayName: "Marie Laurent" },
+  { id: "user-5", username: "jean_claude", displayName: "Jean Claude" },
+  { id: "user-6", username: "lisa_moreau", displayName: "Lisa Moreau" },
+];
 
 export function CreateConversationModal({
   isOpen,
   onClose,
   onCreateConversation,
 }: CreateConversationModalProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [isGroup, setIsGroup] = useState(false)
-  const [groupName, setGroupName] = useState('')
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [isGroup, setIsGroup] = useState(false);
+  const [groupName, setGroupName] = useState("");
 
-  const filteredUsers = availableUsers.filter(user =>
-    user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.username.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredUsers = availableUsers.filter(
+    (user) =>
+      user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.username.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const handleToggleUser = (userId: string) => {
-    setSelectedUsers(prev =>
-      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
-    )
-  }
+    setSelectedUsers((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId],
+    );
+  };
 
   const handleCreate = () => {
-    if (selectedUsers.length === 0) return
+    if (selectedUsers.length === 0) return;
 
-    if (isGroup && !groupName.trim()) return
+    if (isGroup && !groupName.trim()) return;
 
     // Mock: just close the modal for now
-    setSearchQuery('')
-    setSelectedUsers([])
-    setIsGroup(false)
-    setGroupName('')
-    onCreateConversation()
-    onClose()
-  }
+    setSearchQuery("");
+    setSelectedUsers([]);
+    setIsGroup(false);
+    setGroupName("");
+    onCreateConversation();
+    onClose();
+  };
 
-  const isValid = selectedUsers.length > 0 && (!isGroup || groupName.trim())
+  const isValid = selectedUsers.length > 0 && (!isGroup || groupName.trim());
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
@@ -94,14 +97,14 @@ export function CreateConversationModal({
 
               {/* Users List */}
               <div className="space-y-1 mb-2">
-                {filteredUsers.map(user => (
+                {filteredUsers.map((user) => (
                   <button
                     key={user.id}
                     onClick={() => handleToggleUser(user.id)}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
                       selectedUsers.includes(user.id)
-                        ? 'bg-primary/10 border border-primary'
-                        : 'hover:bg-muted border border-transparent'
+                        ? "bg-primary/10 border border-primary"
+                        : "hover:bg-muted border border-transparent"
                     }`}
                   >
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
@@ -120,8 +123,8 @@ export function CreateConversationModal({
                     <div
                       className={`flex-shrink-0 w-5 h-5 rounded border transition-colors ${
                         selectedUsers.includes(user.id)
-                          ? 'bg-primary border-primary'
-                          : 'border-border'
+                          ? "bg-primary border-primary"
+                          : "border-border"
                       } flex items-center justify-center`}
                     >
                       {selectedUsers.includes(user.id) && (
@@ -133,7 +136,9 @@ export function CreateConversationModal({
 
                 {filteredUsers.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-muted-foreground">Aucun utilisateur trouvé</p>
+                    <p className="text-muted-foreground">
+                      Aucun utilisateur trouvé
+                    </p>
                   </div>
                 )}
               </div>
@@ -176,12 +181,12 @@ export function CreateConversationModal({
                 disabled={!isValid}
                 className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isGroup ? 'Créer le groupe' : 'Créer'}
+                {isGroup ? "Créer le groupe" : "Créer"}
               </button>
             </div>
           </div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
-  )
+  );
 }

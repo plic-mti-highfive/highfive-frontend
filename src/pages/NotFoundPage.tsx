@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom'
-import { Header } from '@features/layout'
-import { Footer } from '@features/layout'
+import { useNavigate } from "react-router-dom";
+import { Header } from "@features/layout";
+import { Footer } from "@features/layout";
 
 export default function NotFoundPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <>
@@ -15,7 +15,7 @@ export default function NotFoundPage() {
             Oups ! La page que vous recherchez n'existe pas.
           </p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
           >
             Retour à l'accueil
@@ -24,5 +24,5 @@ export default function NotFoundPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }

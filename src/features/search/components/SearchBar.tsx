@@ -1,28 +1,28 @@
-import { Search, X } from 'lucide-react'
-import { useState } from 'react'
-import { SearchResultsDropdown } from './SearchResultsDropdown'
+import { Search, X } from "lucide-react";
+import { useState } from "react";
+import { SearchResultsDropdown } from "./SearchResultsDropdown";
 
 type SearchBarProps = {
-  navigate: (to: string) => void
-}
+  navigate: (to: string) => void;
+};
 
 export function SearchBar({ navigate }: SearchBarProps) {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      navigate(`/search/projects?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery('')
+      navigate(`/search/projects?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch()
-    } else if (e.key === 'Escape') {
-      setSearchQuery('')
+    if (e.key === "Enter") {
+      handleSearch();
+    } else if (e.key === "Escape") {
+      setSearchQuery("");
     }
-  }
+  };
 
   return (
     <div className="w-96">
@@ -44,7 +44,7 @@ export function SearchBar({ navigate }: SearchBarProps) {
 
         {searchQuery && (
           <button
-            onClick={() => setSearchQuery('')}
+            onClick={() => setSearchQuery("")}
             className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hover:text-foreground transition-colors z-10"
             aria-label="Effacer la recherche"
           >
@@ -60,5 +60,5 @@ export function SearchBar({ navigate }: SearchBarProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

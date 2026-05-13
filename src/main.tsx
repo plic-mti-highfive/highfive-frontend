@@ -1,13 +1,15 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import './index.css'
-import App from './App.tsx'
-import { AuthProvider } from './contexts'
-import { ThemeProvider } from '@shared/contexts'
-import { ErrorBoundary } from './components/ErrorBoundary'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
-createRoot(document.getElementById('root')!).render(
+import "./index.css";
+import App from "./App.tsx";
+
+import { AuthProvider } from "./contexts";
+import { ThemeProvider } from "@shared/contexts";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
       <ThemeProvider>
@@ -18,5 +20,5 @@ createRoot(document.getElementById('root')!).render(
         </BrowserRouter>
       </ThemeProvider>
     </ErrorBoundary>
-  </StrictMode>
-)
+  </StrictMode>,
+);

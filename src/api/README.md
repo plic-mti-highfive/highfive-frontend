@@ -50,11 +50,11 @@ VITE_TENANT_ID=your-tenant-id
 ### Exemple : Liste des projets
 
 ```typescript
-import { projectService } from '@/api'
+import { projectService } from "@/api";
 
 function ProjectList() {
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -63,17 +63,17 @@ function ProjectList() {
           status: ProjectStatus.ACTIVE,
           page: 1,
           limit: 20,
-        })
-        setProjects(response.data)
+        });
+        setProjects(response.data);
       } catch (error) {
-        console.error('Failed to fetch projects:', error)
+        console.error("Failed to fetch projects:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchProjects()
-  }, [])
+    fetchProjects();
+  }, []);
 
   // ...
 }
@@ -82,26 +82,26 @@ function ProjectList() {
 ### Exemple : Authentification
 
 ```typescript
-import { authService, tokenStorage } from '@/api'
+import { authService, tokenStorage } from "@/api";
 
 async function handleLogin(email: string, password: string) {
   try {
-    const response = await authService.login({ email, password })
+    const response = await authService.login({ email, password });
     // Les tokens sont automatiquement stockés dans localStorage
-    console.log('Logged in:', response.user)
-    return response.user
+    console.log("Logged in:", response.user);
+    return response.user;
   } catch (error) {
-    console.error('Login failed:', error)
-    throw error
+    console.error("Login failed:", error);
+    throw error;
   }
 }
 
 async function handleLogout() {
   try {
-    await authService.logout()
-    tokenStorage.clearTokens()
+    await authService.logout();
+    tokenStorage.clearTokens();
   } catch (error) {
-    console.error('Logout failed:', error)
+    console.error("Logout failed:", error);
   }
 }
 ```
@@ -109,7 +109,7 @@ async function handleLogout() {
 ### Exemple : Créer un projet
 
 ```typescript
-import { projectService, ProjectStatus, ProjectVisibility } from '@/api'
+import { projectService, ProjectStatus, ProjectVisibility } from "@/api";
 
 async function handleCreateProject(name: string, description: string) {
   try {
@@ -118,12 +118,12 @@ async function handleCreateProject(name: string, description: string) {
       description,
       status: ProjectStatus.DRAFT,
       visibility: ProjectVisibility.PRIVATE,
-    })
-    console.log('Project created:', newProject)
-    return newProject
+    });
+    console.log("Project created:", newProject);
+    return newProject;
   } catch (error) {
-    console.error('Failed to create project:', error)
-    throw error
+    console.error("Failed to create project:", error);
+    throw error;
   }
 }
 ```
@@ -131,14 +131,14 @@ async function handleCreateProject(name: string, description: string) {
 ## Gestion des erreurs
 
 ```typescript
-import { ApiError } from '@/api'
+import { ApiError } from "@/api";
 
 try {
-  await projectService.getProjectById('some-id')
+  await projectService.getProjectById("some-id");
 } catch (error) {
   if (error instanceof ApiError) {
-    console.error(`API Error ${error.status}: ${error.statusText}`)
-    console.error('Response data:', error.data)
+    console.error(`API Error ${error.status}: ${error.statusText}`);
+    console.error("Response data:", error.data);
 
     if (error.status === 401) {
       // Rediriger vers login
@@ -146,7 +146,7 @@ try {
       // Afficher "not found"
     }
   } else {
-    console.error('Unknown error:', error)
+    console.error("Unknown error:", error);
   }
 }
 ```
@@ -154,15 +154,15 @@ try {
 ## Changer de mode à runtime
 
 ```typescript
-import { setApiMode, serviceFactory } from '@/api'
+import { setApiMode, serviceFactory } from "@/api";
 
 // Passer en mode HTTP
-setApiMode('http')
-serviceFactory.reset() // Réinitialiser les instances de services
+setApiMode("http");
+serviceFactory.reset(); // Réinitialiser les instances de services
 
 // Passer en mode mock
-setApiMode('mock')
-serviceFactory.reset()
+setApiMode("mock");
+serviceFactory.reset();
 ```
 
 ## Services disponibles
@@ -178,6 +178,7 @@ serviceFactory.reset()
 ### ProjectService
 
 **Projects:**
+
 - `createProject(dto)` - Créer un projet
 - `getProjects(query)` - Liste paginée des projets
 - `getProjectById(id)` - Obtenir un projet
@@ -185,12 +186,14 @@ serviceFactory.reset()
 - `deleteProject(id)` - Supprimer un projet
 
 **Members:**
+
 - `getProjectMembers(projectId)` - Liste des membres
 - `addProjectMember(projectId, dto)` - Ajouter un membre
 - `updateProjectMember(projectId, userId, dto)` - Modifier le rôle
 - `removeProjectMember(projectId, userId)` - Retirer un membre
 
 **Tasks:**
+
 - `createTask(projectId, dto)` - Créer un task
 - `getProjectTasks(projectId)` - Liste des tasks
 - `getTaskById(projectId, taskId)` - Obtenir un task
@@ -225,7 +228,7 @@ import {
   UpdateProjectDto,
   TaskDto,
   // ... etc
-} from '@/api'
+} from "@/api";
 ```
 
 ## Migration progressive

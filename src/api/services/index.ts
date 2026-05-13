@@ -1,54 +1,60 @@
-import { isMockMode } from '../config'
-import type { IAuthService, IProjectService, IUserService } from './interfaces'
+import { isMockMode } from "../config";
+import type { IAuthService, IProjectService, IUserService } from "./interfaces";
 
 // Import des implémentations
-import { AuthServiceMock, ProjectServiceMock, UserServiceMock } from './mock'
-import { AuthServiceHttp, ProjectServiceHttp, UserServiceHttp } from './http'
+import { AuthServiceMock, ProjectServiceMock, UserServiceMock } from "./mock";
+import { AuthServiceHttp, ProjectServiceHttp, UserServiceHttp } from "./http";
 
 // Factory pour créer les instances appropriées
 class ServiceFactory {
-  private _authService: IAuthService | null = null
-  private _projectService: IProjectService | null = null
-  private _userService: IUserService | null = null
+  private _authService: IAuthService | null = null;
+  private _projectService: IProjectService | null = null;
+  private _userService: IUserService | null = null;
 
   get authService(): IAuthService {
     if (!this._authService) {
-      this._authService = isMockMode() ? new AuthServiceMock() : new AuthServiceHttp()
+      this._authService = isMockMode()
+        ? new AuthServiceMock()
+        : new AuthServiceHttp();
     }
-    return this._authService
+    return this._authService;
   }
 
   get projectService(): IProjectService {
     if (!this._projectService) {
-      this._projectService = isMockMode() ? new ProjectServiceMock() : new ProjectServiceHttp()
+      this._projectService = isMockMode()
+        ? new ProjectServiceMock()
+        : new ProjectServiceHttp();
     }
-    return this._projectService
+    return this._projectService;
   }
 
   get userService(): IUserService {
     if (!this._userService) {
-      this._userService = isMockMode() ? new UserServiceMock() : new UserServiceHttp()
+      this._userService = isMockMode()
+        ? new UserServiceMock()
+        : new UserServiceHttp();
     }
-    return this._userService
+    return this._userService;
   }
 
   // Réinitialiser les services (utile si on change le mode à runtime)
   reset() {
-    this._authService = null
-    this._projectService = null
-    this._userService = null
+    this._authService = null;
+    this._projectService = null;
+    this._userService = null;
   }
 }
 
-const factory = new ServiceFactory()
+const factory = new ServiceFactory();
 
 // Export des services
-export const authService = factory.authService
-export const projectService = factory.projectService
-export const userService = factory.userService
+export const authService = factory.authService;
+export const projectService = factory.projectService;
+export const userService = factory.userService;
 
 // Export de la factory pour pouvoir reset si besoin
-export { factory as serviceFactory }
+export { factory as serviceFactory };
 
 // Re-export des types
-export type { IAuthService, IProjectService, IUserService }
+export type { IAuthService, IProjectService, IUserService };

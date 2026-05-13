@@ -1,16 +1,19 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { HomePage } from '@features/home'
-import { LoginPage, RegisterPage } from '@features/auth'
-import { CreateProjectPage, ProjectDetailPage } from '@features/projects'
-import { UserProfilePage } from '@features/user'
-import { SearchPage } from '@features/search'
-import { MessagesPage } from '@features/messages'
-import { ScrollToTop } from '@shared/components/ScrollToTop'
-import { ScrollToTopButton } from '@shared/components/ScrollToTopButton'
-import { LabPage, MoodboardPage } from '@features/lab'
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import Debug from './pages/Debug'
-import NotFoundPage from './pages/NotFoundPage'
+import { HomePage } from "@features/home";
+import { LoginPage, RegisterPage } from "@features/auth";
+import { CreateProjectPage, ProjectDetailPage } from "@features/projects";
+import { UserProfilePage } from "@features/user";
+import { SearchPage } from "@features/search";
+import { MessagesPage } from "@features/messages";
+
+import { LabPage, MoodboardPage } from "@features/lab";
+
+import Debug from "./pages/Debug";
+import NotFoundPage from "./pages/NotFoundPage";
+
+import { ScrollToTop } from "@shared/components/ScrollToTop";
+import { ScrollToTopButton } from "@shared/components/ScrollToTopButton";
 
 export default function App() {
   return (
@@ -22,7 +25,10 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/search" element={<Navigate to="/search/projects" replace />} />
+        <Route
+          path="/search"
+          element={<Navigate to="/search/projects" replace />}
+        />
         <Route path="/search/projects" element={<SearchPage />} />
         <Route path="/search/users" element={<SearchPage />} />
         <Route path="/search/tags" element={<SearchPage />} />
@@ -32,7 +38,10 @@ export default function App() {
         <Route path="/user/:userId" element={<UserProfilePage />} />
 
         <Route path="/projects/:projectId/lab" element={<LabPage />} />
-        <Route path="/projects/:projectId/moodboard" element={<MoodboardPage />} />
+        <Route
+          path="/projects/:projectId/moodboard"
+          element={<MoodboardPage />}
+        />
 
         <Route path="/messages" element={<MessagesPage />} />
 
@@ -40,5 +49,5 @@ export default function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
-  )
+  );
 }

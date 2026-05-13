@@ -1,55 +1,65 @@
-import type { ProjectDto, ProjectMemberDto } from '@/api/types'
-import { ProjectRole } from '@plic-mti-highfive/shared-types'
-import { TagPill } from '@shared/components/projects/shared/TagPill'
+import type { ProjectDto, ProjectMemberDto } from "@/api/types";
+import { ProjectRole } from "@plic-mti-highfive/shared-types";
+import { TagPill } from "@shared/components/projects/shared/TagPill";
 
 interface ProjectSidebarProps {
-  project: ProjectDto
-  members: ProjectMemberDto[]
+  project: ProjectDto;
+  members: ProjectMemberDto[];
 }
 
 export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
-  const owner = members.find((m) => m.role === ProjectRole.OWNER)
-  const otherMembers = members.filter((m) => m.role !== ProjectRole.OWNER)
+  const owner = members.find((m) => m.role === ProjectRole.OWNER);
+  const otherMembers = members.filter((m) => m.role !== ProjectRole.OWNER);
 
   const getRoleLabel = (role: ProjectRole) => {
     switch (role) {
       case ProjectRole.OWNER:
-        return 'Propriétaire'
+        return "Propriétaire";
       case ProjectRole.ADMIN:
-        return 'Administrateur'
+        return "Administrateur";
       case ProjectRole.MEMBER:
-        return 'Membre'
+        return "Membre";
       case ProjectRole.VIEWER:
-        return 'Observateur'
+        return "Observateur";
       default:
-        return role
+        return role;
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
-  }
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   const getInitials = (email: string) => {
-    return email.slice(0, 2).toUpperCase()
-  }
+    return email.slice(0, 2).toUpperCase();
+  };
 
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Informations</h3>
+        <h3 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">
+          Informations
+        </h3>
         <div className="space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Date de création</p>
-            <p className="text-sm text-foreground">{formatDate(project.createdAt)}</p>
+            <p className="text-xs text-muted-foreground mb-1">
+              Date de création
+            </p>
+            <p className="text-sm text-foreground">
+              {formatDate(project.createdAt)}
+            </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Dernière mise à jour</p>
-            <p className="text-sm text-foreground">{formatDate(project.updatedAt)}</p>
+            <p className="text-xs text-muted-foreground mb-1">
+              Dernière mise à jour
+            </p>
+            <p className="text-sm text-foreground">
+              {formatDate(project.updatedAt)}
+            </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground mb-2">Tags</p>
@@ -62,7 +72,9 @@ export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
       </div>
 
       <div className="border-t border-border pt-8">
-        <h3 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Équipe</h3>
+        <h3 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">
+          Équipe
+        </h3>
 
         {owner && (
           <div className="mb-4 pb-4 border-b border-border">
@@ -73,17 +85,18 @@ export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
                 style={{
                   background: owner.user?.profile?.avatarPath
                     ? `url(${owner.user.profile.avatarPath}) center/cover`
-                    : `hsl(${((owner.user?.email || '').charCodeAt(0) * 37) % 360} 45% 80%)`,
+                    : `hsl(${((owner.user?.email || "").charCodeAt(0) * 37) % 360} 45% 80%)`,
                   color: owner.user?.profile?.avatarPath
-                    ? 'transparent'
-                    : `hsl(${((owner.user?.email || '').charCodeAt(0) * 37) % 360} 45% 30%)`,
+                    ? "transparent"
+                    : `hsl(${((owner.user?.email || "").charCodeAt(0) * 37) % 360} 45% 30%)`,
                 }}
               >
-                {!owner.user?.profile?.avatarPath && getInitials(owner.user?.email || 'U')}
+                {!owner.user?.profile?.avatarPath &&
+                  getInitials(owner.user?.email || "U")}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
-                  {owner.user?.email.split('@')[0] || 'Inconnu'}
+                  {owner.user?.email.split("@")[0] || "Inconnu"}
                 </p>
               </div>
             </div>
@@ -103,17 +116,18 @@ export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
                     style={{
                       background: member.user?.profile?.avatarPath
                         ? `url(${member.user.profile.avatarPath}) center/cover`
-                        : `hsl(${((member.user?.email || '').charCodeAt(0) * 37) % 360} 45% 80%)`,
+                        : `hsl(${((member.user?.email || "").charCodeAt(0) * 37) % 360} 45% 80%)`,
                       color: member.user?.profile?.avatarPath
-                        ? 'transparent'
-                        : `hsl(${((member.user?.email || '').charCodeAt(0) * 37) % 360} 45% 30%)`,
+                        ? "transparent"
+                        : `hsl(${((member.user?.email || "").charCodeAt(0) * 37) % 360} 45% 30%)`,
                     }}
                   >
-                    {!member.user?.profile?.avatarPath && getInitials(member.user?.email || 'U')}
+                    {!member.user?.profile?.avatarPath &&
+                      getInitials(member.user?.email || "U")}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-foreground truncate">
-                      {member.user?.email.split('@')[0] || 'Inconnu'}
+                      {member.user?.email.split("@")[0] || "Inconnu"}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {getRoleLabel(member.role)}
@@ -131,9 +145,11 @@ export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
         )}
 
         {members.length === 0 && (
-          <p className="text-sm text-muted-foreground">Aucun membre pour le moment.</p>
+          <p className="text-sm text-muted-foreground">
+            Aucun membre pour le moment.
+          </p>
         )}
       </div>
     </div>
-  )
+  );
 }

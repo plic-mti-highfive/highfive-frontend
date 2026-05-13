@@ -1,27 +1,43 @@
-import { useState, useEffect, useRef } from 'react'
-import { X, Trash2, Plus, Check } from 'lucide-react'
-import type { KanbanTicket, KanbanColumnId, KanbanPriority, KanbanColumnDef, CustomTag, ChecklistItem, TicketComment } from '../types'
+import { useState, useEffect, useRef } from "react";
+import { X, Trash2, Plus, Check } from "lucide-react";
+import type {
+  KanbanTicket,
+  KanbanColumnId,
+  KanbanPriority,
+  KanbanColumnDef,
+  CustomTag,
+  ChecklistItem,
+  TicketComment,
+} from "../types";
 import {
   PRIORITY_CONFIG,
   TAG_COLOR_PALETTE,
   getAssigneeColor,
   assigneeInitials,
   tagBg,
-} from '../utils/kanbanConfig'
-import type { Member } from '../data/members'
+} from "../utils/kanbanConfig";
+import type { Member } from "../data/members";
 
 interface TicketDrawerProps {
-  ticket: KanbanTicket | null
-  columnId: KanbanColumnId | null
-  isOpen: boolean
-  members: Member[]
-  columns: KanbanColumnDef[]
-  customTags: CustomTag[]
-  onClose: () => void
-  onUpdate: (ticketId: string, columnId: KanbanColumnId, updates: Partial<KanbanTicket>) => void
-  onMoveColumn: (ticketId: string, from: KanbanColumnId, to: KanbanColumnId) => void
-  onDelete: (ticketId: string, columnId: KanbanColumnId) => void
-  onAddTag: (label: string, color: string) => void
+  ticket: KanbanTicket | null;
+  columnId: KanbanColumnId | null;
+  isOpen: boolean;
+  members: Member[];
+  columns: KanbanColumnDef[];
+  customTags: CustomTag[];
+  onClose: () => void;
+  onUpdate: (
+    ticketId: string,
+    columnId: KanbanColumnId,
+    updates: Partial<KanbanTicket>,
+  ) => void;
+  onMoveColumn: (
+    ticketId: string,
+    from: KanbanColumnId,
+    to: KanbanColumnId,
+  ) => void;
+  onDelete: (ticketId: string, columnId: KanbanColumnId) => void;
+  onAddTag: (label: string, color: string) => void;
 }
 
 function Section({
@@ -29,29 +45,31 @@ function Section({
   aside,
   children,
 }: {
-  label: string
-  aside?: React.ReactNode
-  children: React.ReactNode
+  label: string;
+  aside?: React.ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <p className="text-label uppercase tracking-wider font-bold text-[var(--color-ink-muted)]">{label}</p>
+        <p className="text-label uppercase tracking-wider font-bold text-[var(--color-ink-muted)]">
+          {label}
+        </p>
         {aside}
       </div>
       {children}
     </div>
-  )
+  );
 }
 
 function formatRelative(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return "à l'instant"
-  if (minutes < 60) return `il y a ${minutes} min`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `il y a ${hours}h`
-  return `il y a ${Math.floor(hours / 24)}j`
+  const diff = Date.now() - new Date(iso).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "à l'instant";
+  if (minutes < 60) return `il y a ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `il y a ${hours}h`;
+  return `il y a ${Math.floor(hours / 24)}j`;
 }
 
 export function TicketDrawer({
@@ -67,103 +85,127 @@ export function TicketDrawer({
   onDelete,
   onAddTag,
 }: TicketDrawerProps) {
-  const [titleDraft, setTitleDraft] = useState<{ ticketId: string | null; value: string }>({
+  const [titleDraft, setTitleDraft] = useState<{
+    ticketId: string | null;
+    value: string;
+  }>({
     ticketId: null,
-    value: '',
-  })
-  const [newChecklistText, setNewChecklistText] = useState('')
-  const [newComment, setNewComment] = useState('')
-  const [deleteConfirmFor, setDeleteConfirmFor] = useState<string | null>(null)
-  const [newTagLabel, setNewTagLabel] = useState('')
-  const [newTagColor, setNewTagColor] = useState(TAG_COLOR_PALETTE[0])
-  const [showTagForm, setShowTagForm] = useState(false)
-  const titleRef = useRef<HTMLTextAreaElement>(null)
-  const visibleTicket = ticket
-  const visibleColumnId = columnId
-  const title = titleDraft.ticketId === visibleTicket?.id ? titleDraft.value : visibleTicket?.title ?? ''
-  const deleteConfirm = deleteConfirmFor === visibleTicket?.id
+    value: "",
+  });
+  const [newChecklistText, setNewChecklistText] = useState("");
+  const [newComment, setNewComment] = useState("");
+  const [deleteConfirmFor, setDeleteConfirmFor] = useState<string | null>(null);
+  const [newTagLabel, setNewTagLabel] = useState("");
+  const [newTagColor, setNewTagColor] = useState(TAG_COLOR_PALETTE[0]);
+  const [showTagForm, setShowTagForm] = useState(false);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+  const visibleTicket = ticket;
+  const visibleColumnId = columnId;
+  const title =
+    titleDraft.ticketId === visibleTicket?.id
+      ? titleDraft.value
+      : (visibleTicket?.title ?? "");
+  const deleteConfirm = deleteConfirmFor === visibleTicket?.id;
 
   // Auto-resize title textarea
   useEffect(() => {
-    const el = titleRef.current
-    if (!el) return
-    el.style.height = 'auto'
-    el.style.height = `${el.scrollHeight}px`
-  }, [title])
+    const el = titleRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [title]);
 
   // Focus title on open
   useEffect(() => {
-    if (isOpen) setTimeout(() => titleRef.current?.focus(), 80)
-  }, [isOpen, ticket?.id])
+    if (isOpen) setTimeout(() => titleRef.current?.focus(), 80);
+  }, [isOpen, ticket?.id]);
 
   // Escape to close
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [onClose])
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
 
-  const colMeta = columns.find(c => c.id === visibleColumnId) ?? columns[0]
-  const checklistDone = visibleTicket?.checklistItems?.filter(i => i.done).length ?? 0
-  const checklistTotal = visibleTicket?.checklistItems?.length ?? 0
-  const checklistPct = checklistTotal > 0 ? Math.round((checklistDone / checklistTotal) * 100) : 0
-  const commentsCount = visibleTicket?.ticketComments?.length ?? 0
+  const colMeta = columns.find((c) => c.id === visibleColumnId) ?? columns[0];
+  const checklistDone =
+    visibleTicket?.checklistItems?.filter((i) => i.done).length ?? 0;
+  const checklistTotal = visibleTicket?.checklistItems?.length ?? 0;
+  const checklistPct =
+    checklistTotal > 0 ? Math.round((checklistDone / checklistTotal) * 100) : 0;
+  const commentsCount = visibleTicket?.ticketComments?.length ?? 0;
 
   function saveTitle() {
-    if (!visibleTicket || !visibleColumnId) return
-    const trimmed = title.trim()
+    if (!visibleTicket || !visibleColumnId) return;
+    const trimmed = title.trim();
     if (trimmed && trimmed !== visibleTicket.title) {
-      onUpdate(visibleTicket.id, visibleColumnId, { title: trimmed })
+      onUpdate(visibleTicket.id, visibleColumnId, { title: trimmed });
     } else {
-      setTitleDraft({ ticketId: visibleTicket.id, value: visibleTicket.title })
+      setTitleDraft({ ticketId: visibleTicket.id, value: visibleTicket.title });
     }
   }
 
   function togglePriority(p: KanbanPriority) {
-    if (!visibleTicket || !visibleColumnId) return
-    onUpdate(visibleTicket.id, visibleColumnId, { priority: visibleTicket.priority === p ? undefined : p })
+    if (!visibleTicket || !visibleColumnId) return;
+    onUpdate(visibleTicket.id, visibleColumnId, {
+      priority: visibleTicket.priority === p ? undefined : p,
+    });
   }
 
   function toggleAssignee(name: string) {
-    if (!visibleTicket || !visibleColumnId) return
-    onUpdate(visibleTicket.id, visibleColumnId, { assignee: visibleTicket.assignee === name ? undefined : name })
+    if (!visibleTicket || !visibleColumnId) return;
+    onUpdate(visibleTicket.id, visibleColumnId, {
+      assignee: visibleTicket.assignee === name ? undefined : name,
+    });
   }
 
   function toggleChecklistItem(itemId: string) {
-    if (!visibleTicket || !visibleColumnId) return
+    if (!visibleTicket || !visibleColumnId) return;
     onUpdate(visibleTicket.id, visibleColumnId, {
-      checklistItems: (visibleTicket.checklistItems ?? []).map(i =>
-        i.id === itemId ? { ...i, done: !i.done } : i
+      checklistItems: (visibleTicket.checklistItems ?? []).map((i) =>
+        i.id === itemId ? { ...i, done: !i.done } : i,
       ),
-    })
+    });
   }
 
   function deleteChecklistItem(itemId: string) {
-    if (!visibleTicket || !visibleColumnId) return
+    if (!visibleTicket || !visibleColumnId) return;
     onUpdate(visibleTicket.id, visibleColumnId, {
-      checklistItems: (visibleTicket.checklistItems ?? []).filter(i => i.id !== itemId),
-    })
+      checklistItems: (visibleTicket.checklistItems ?? []).filter(
+        (i) => i.id !== itemId,
+      ),
+    });
   }
 
   function addChecklistItem(e: React.FormEvent) {
-    e.preventDefault()
-    if (!visibleTicket || !visibleColumnId || !newChecklistText.trim()) return
-    const item: ChecklistItem = { id: crypto.randomUUID(), text: newChecklistText.trim(), done: false }
-    onUpdate(visibleTicket.id, visibleColumnId, { checklistItems: [...(visibleTicket.checklistItems ?? []), item] })
-    setNewChecklistText('')
+    e.preventDefault();
+    if (!visibleTicket || !visibleColumnId || !newChecklistText.trim()) return;
+    const item: ChecklistItem = {
+      id: crypto.randomUUID(),
+      text: newChecklistText.trim(),
+      done: false,
+    };
+    onUpdate(visibleTicket.id, visibleColumnId, {
+      checklistItems: [...(visibleTicket.checklistItems ?? []), item],
+    });
+    setNewChecklistText("");
   }
 
   function addComment(e: React.FormEvent) {
-    e.preventDefault()
-    if (!visibleTicket || !visibleColumnId || !newComment.trim()) return
+    e.preventDefault();
+    if (!visibleTicket || !visibleColumnId || !newComment.trim()) return;
     const comment: TicketComment = {
       id: crypto.randomUUID(),
-      author: 'Alice M.',
+      author: "Alice M.",
       text: newComment.trim(),
       createdAt: new Date().toISOString(),
-    }
-    onUpdate(visibleTicket.id, visibleColumnId, { ticketComments: [...(visibleTicket.ticketComments ?? []), comment] })
-    setNewComment('')
+    };
+    onUpdate(visibleTicket.id, visibleColumnId, {
+      ticketComments: [...(visibleTicket.ticketComments ?? []), comment],
+    });
+    setNewComment("");
   }
 
   return (
@@ -171,7 +213,7 @@ export function TicketDrawer({
       {/* Backdrop */}
       <div
         className={`fixed inset-0 z-[100] bg-black/25 backdrop-blur-[2px] transition-opacity duration-200 ${
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
       />
@@ -181,19 +223,25 @@ export function TicketDrawer({
         className={`fixed right-0 top-0 h-full z-[101] bg-white flex flex-col
           shadow-[-8px_0_40px_rgba(0,0,0,0.12)]
           transition-[transform,opacity] duration-[320ms] ease-[cubic-bezier(0.32,0.72,0,1)]
-          ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[40px] opacity-0 pointer-events-none'}
+          ${isOpen ? "translate-x-0 opacity-100" : "translate-x-[40px] opacity-0 pointer-events-none"}
         `}
-        style={{ width: '440px', maxWidth: '100vw' }}
+        style={{ width: "440px", maxWidth: "100vw" }}
       >
-        {/* ── Header ── */}
+        {/* -- Header -- */}
         <div className="flex-none px-6 pt-5 pb-5 border-b border-[var(--color-cream-mid)]">
           {/* Column badge + close */}
           <div className="flex items-center justify-between mb-4">
             <span
               className="inline-flex items-center gap-1.5 text-ui-sm font-bold px-2.5 py-1 rounded-full"
-              style={{ backgroundColor: colMeta.accentColor + '22', color: colMeta.accentColor }}
+              style={{
+                backgroundColor: colMeta.accentColor + "22",
+                color: colMeta.accentColor,
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colMeta.accentColor }} />
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: colMeta.accentColor }}
+              />
               {colMeta.label}
             </span>
             <button
@@ -209,9 +257,20 @@ export function TicketDrawer({
           <textarea
             ref={titleRef}
             value={title}
-            onChange={e => setTitleDraft({ ticketId: visibleTicket?.id ?? null, value: e.target.value })}
+            onChange={(e) =>
+              setTitleDraft({
+                ticketId: visibleTicket?.id ?? null,
+                value: e.target.value,
+              })
+            }
             onBlur={saveTitle}
-            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); saveTitle(); titleRef.current?.blur() } }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                saveTitle();
+                titleRef.current?.blur();
+              }
+            }}
             placeholder="Titre du ticket"
             spellCheck={false}
             rows={1}
@@ -219,30 +278,38 @@ export function TicketDrawer({
           />
         </div>
 
-        {/* ── Body (scrollable) ── */}
+        {/* -- Body (scrollable) -- */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-
           {/* Column move */}
           <Section label="Colonne">
             <div className="flex flex-wrap gap-1.5">
-              {columns.map(col => {
-                const isActive = col.id === visibleColumnId
+              {columns.map((col) => {
+                const isActive = col.id === visibleColumnId;
                 return (
                   <button
                     key={col.id}
-                    onClick={() => !isActive && visibleTicket && visibleColumnId && onMoveColumn(visibleTicket.id, visibleColumnId, col.id)}
+                    onClick={() =>
+                      !isActive &&
+                      visibleTicket &&
+                      visibleColumnId &&
+                      onMoveColumn(visibleTicket.id, visibleColumnId, col.id)
+                    }
                     disabled={isActive}
                     className={`text-ui-sm px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                      isActive ? 'cursor-default' : 'cursor-pointer hover:opacity-90 active:scale-[0.97]'
+                      isActive
+                        ? "cursor-default"
+                        : "cursor-pointer hover:opacity-90 active:scale-[0.97]"
                     }`}
                     style={{
-                      backgroundColor: isActive ? col.accentColor : col.accentColor + '20',
-                      color: isActive ? 'white' : col.accentColor,
+                      backgroundColor: isActive
+                        ? col.accentColor
+                        : col.accentColor + "20",
+                      color: isActive ? "white" : col.accentColor,
                     }}
                   >
                     {col.label}
                   </button>
-                )
+                );
               })}
             </div>
           </Section>
@@ -250,25 +317,29 @@ export function TicketDrawer({
           {/* Priority */}
           <Section label="Priorité">
             <div className="flex gap-2">
-              {(['high', 'medium', 'low'] as KanbanPriority[]).map(p => {
-                const cfg = PRIORITY_CONFIG[p]
-                const isActive = visibleTicket?.priority === p
+              {(["high", "medium", "low"] as KanbanPriority[]).map((p) => {
+                const cfg = PRIORITY_CONFIG[p];
+                const isActive = visibleTicket?.priority === p;
                 return (
                   <button
                     key={p}
                     onClick={() => togglePriority(p)}
                     className={`flex-1 text-ui-sm font-semibold py-2 rounded-xl transition-all cursor-pointer active:scale-[0.97] border ${
-                      isActive ? 'shadow-sm' : 'hover:opacity-80'
+                      isActive ? "shadow-sm" : "hover:opacity-80"
                     }`}
                     style={{
-                      backgroundColor: isActive ? cfg.color + '18' : 'transparent',
-                      color: isActive ? cfg.color : 'var(--color-ink-muted)',
-                      borderColor: isActive ? cfg.color + '60' : 'var(--color-cream-mid)',
+                      backgroundColor: isActive
+                        ? cfg.color + "18"
+                        : "transparent",
+                      color: isActive ? cfg.color : "var(--color-ink-muted)",
+                      borderColor: isActive
+                        ? cfg.color + "60"
+                        : "var(--color-cream-mid)",
                     }}
                   >
                     {cfg.label}
                   </button>
-                )
+                );
               })}
             </div>
           </Section>
@@ -276,29 +347,31 @@ export function TicketDrawer({
           {/* Assignee */}
           <Section label="Responsable">
             <div className="flex flex-wrap gap-2">
-              {members.map(m => {
-                const c = getAssigneeColor(m.name)
-                const isActive = visibleTicket?.assignee === m.name
+              {members.map((m) => {
+                const c = getAssigneeColor(m.name);
+                const isActive = visibleTicket?.assignee === m.name;
                 return (
                   <button
                     key={m.name}
                     onClick={() => toggleAssignee(m.name)}
                     title={m.name}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-ui-sm font-semibold cursor-pointer transition-all active:scale-[0.97] border ${
-                      isActive ? 'border-current' : 'border-transparent opacity-55 hover:opacity-100'
+                      isActive
+                        ? "border-current"
+                        : "border-transparent opacity-55 hover:opacity-100"
                     }`}
                     style={{ backgroundColor: c.bg, color: c.text }}
                   >
                     <span
                       className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
-                      style={{ backgroundColor: c.text + '25', color: c.text }}
+                      style={{ backgroundColor: c.text + "25", color: c.text }}
                     >
                       {assigneeInitials(m.name)}
                     </span>
                     {m.name}
                     {isActive && <Check size={11} strokeWidth={2.5} />}
                   </button>
-                )
+                );
               })}
             </div>
           </Section>
@@ -306,27 +379,34 @@ export function TicketDrawer({
           {/* Tags */}
           <Section label="Étiquettes">
             <div className="flex flex-wrap gap-1.5 mb-2">
-              {customTags.map(tag => {
-                const isActive = visibleTicket?.tags?.includes(tag.id) ?? false
+              {customTags.map((tag) => {
+                const isActive = visibleTicket?.tags?.includes(tag.id) ?? false;
                 return (
                   <button
                     key={tag.id}
                     onClick={() => {
-                      if (!visibleTicket || !visibleColumnId) return
-                      const current = visibleTicket.tags ?? []
+                      if (!visibleTicket || !visibleColumnId) return;
+                      const current = visibleTicket.tags ?? [];
                       onUpdate(visibleTicket.id, visibleColumnId, {
-                        tags: isActive ? current.filter(id => id !== tag.id) : [...current, tag.id],
-                      })
+                        tags: isActive
+                          ? current.filter((id) => id !== tag.id)
+                          : [...current, tag.id],
+                      });
                     }}
                     className={`inline-flex items-center gap-1 text-label font-bold px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-[0.97] border ${
-                      isActive ? 'border-current' : 'border-transparent opacity-40 hover:opacity-75'
+                      isActive
+                        ? "border-current"
+                        : "border-transparent opacity-40 hover:opacity-75"
                     }`}
-                    style={{ backgroundColor: tagBg(tag.color), color: tag.color }}
+                    style={{
+                      backgroundColor: tagBg(tag.color),
+                      color: tag.color,
+                    }}
                   >
                     {isActive && <Check size={8} strokeWidth={3} />}
                     {tag.label}
                   </button>
-                )
+                );
               })}
             </div>
             {/* Create new tag */}
@@ -336,20 +416,27 @@ export function TicketDrawer({
                   autoFocus
                   type="text"
                   value={newTagLabel}
-                  onChange={e => setNewTagLabel(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Escape') { setShowTagForm(false); setNewTagLabel('') } }}
+                  onChange={(e) => setNewTagLabel(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setShowTagForm(false);
+                      setNewTagLabel("");
+                    }
+                  }}
                   placeholder="Nom de l'étiquette…"
                   className="flex-1 text-body-sm text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
                 />
                 {/* Color picker */}
                 <div className="flex gap-1">
-                  {TAG_COLOR_PALETTE.slice(0, 5).map(c => (
+                  {TAG_COLOR_PALETTE.slice(0, 5).map((c) => (
                     <button
                       key={c}
                       type="button"
                       onClick={() => setNewTagColor(c)}
                       className={`w-4 h-4 rounded-full cursor-pointer transition-transform ${
-                        newTagColor === c ? 'scale-125 ring-2 ring-offset-1 ring-current' : 'hover:scale-110'
+                        newTagColor === c
+                          ? "scale-125 ring-2 ring-offset-1 ring-current"
+                          : "hover:scale-110"
                       }`}
                       style={{ backgroundColor: c, color: c }}
                     />
@@ -359,10 +446,10 @@ export function TicketDrawer({
                   type="button"
                   disabled={!newTagLabel.trim()}
                   onClick={() => {
-                    if (!newTagLabel.trim()) return
-                    onAddTag(newTagLabel.trim(), newTagColor)
-                    setNewTagLabel('')
-                    setShowTagForm(false)
+                    if (!newTagLabel.trim()) return;
+                    onAddTag(newTagLabel.trim(), newTagColor);
+                    setNewTagLabel("");
+                    setShowTagForm(false);
                   }}
                   className="text-ui-sm font-semibold px-2.5 py-1 rounded-lg border border-[var(--color-cream-mid)] text-[var(--color-ink)] bg-white cursor-pointer hover:bg-[var(--color-cream-dark)] disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -385,12 +472,17 @@ export function TicketDrawer({
 
           {/* Checklist */}
           <Section
-            label={`Checklist${checklistTotal > 0 ? ` · ${checklistDone}/${checklistTotal}` : ''}`}
+            label={`Checklist${checklistTotal > 0 ? ` · ${checklistDone}/${checklistTotal}` : ""}`}
             aside={
               checklistTotal > 0 ? (
                 <span
                   className="text-body-sm font-bold tabular-nums"
-                  style={{ color: checklistDone === checklistTotal ? '#2A8C1E' : 'var(--color-ink-muted)' }}
+                  style={{
+                    color:
+                      checklistDone === checklistTotal
+                        ? "#2A8C1E"
+                        : "var(--color-ink-muted)",
+                  }}
                 >
                   {checklistPct}%
                 </span>
@@ -403,25 +495,33 @@ export function TicketDrawer({
                   className="h-full rounded-full transition-all duration-300"
                   style={{
                     width: `${checklistPct}%`,
-                    backgroundColor: checklistDone === checklistTotal ? '#5ED651' : '#3EC6F5',
+                    backgroundColor:
+                      checklistDone === checklistTotal ? "#5ED651" : "#3EC6F5",
                   }}
                 />
               </div>
             )}
             <div className="space-y-1">
-              {visibleTicket?.checklistItems?.map(item => (
-                <div key={item.id} className="group flex items-center gap-2.5 py-1 px-1 rounded-lg hover:bg-[var(--color-cream)] transition-colors">
+              {visibleTicket?.checklistItems?.map((item) => (
+                <div
+                  key={item.id}
+                  className="group flex items-center gap-2.5 py-1 px-1 rounded-lg hover:bg-[var(--color-cream)] transition-colors"
+                >
                   <button
                     onClick={() => toggleChecklistItem(item.id)}
                     className={`shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer transition-all ${
                       item.done
-                        ? 'bg-[#5ED651] border-[#5ED651]'
-                        : 'border-[var(--color-cream-mid)] hover:border-[var(--color-ink-muted)]'
+                        ? "bg-[#5ED651] border-[#5ED651]"
+                        : "border-[var(--color-cream-mid)] hover:border-[var(--color-ink-muted)]"
                     }`}
                   >
-                    {item.done && <Check size={9} strokeWidth={3} className="text-white" />}
+                    {item.done && (
+                      <Check size={9} strokeWidth={3} className="text-white" />
+                    )}
                   </button>
-                  <span className={`flex-1 text-body-sm ${item.done ? 'line-through text-[var(--color-ink-muted)]' : 'text-[var(--color-ink)]'}`}>
+                  <span
+                    className={`flex-1 text-body-sm ${item.done ? "line-through text-[var(--color-ink-muted)]" : "text-[var(--color-ink)]"}`}
+                  >
                     {item.text}
                   </span>
                   <button
@@ -437,11 +537,14 @@ export function TicketDrawer({
               {/* Add item */}
               <form onSubmit={addChecklistItem} className="mt-1.5">
                 <div className="flex items-center gap-2 bg-[var(--color-cream)] rounded-xl px-3 py-2 border border-transparent focus-within:border-[var(--color-cream-mid)] transition-colors">
-                  <Plus size={13} className="shrink-0 text-[var(--color-ink-muted)]" />
+                  <Plus
+                    size={13}
+                    className="shrink-0 text-[var(--color-ink-muted)]"
+                  />
                   <input
                     type="text"
                     value={newChecklistText}
-                    onChange={e => setNewChecklistText(e.target.value)}
+                    onChange={(e) => setNewChecklistText(e.target.value)}
                     placeholder="Nouvel élément…"
                     className="flex-1 text-body-sm text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
                   />
@@ -461,35 +564,42 @@ export function TicketDrawer({
           <div className="border-t border-[var(--color-cream-mid)]" />
 
           {/* Comments */}
-          <Section label={`Commentaires${commentsCount > 0 ? ` · ${commentsCount}` : ''}`}>
-            {visibleTicket?.ticketComments && visibleTicket.ticketComments.length > 0 && (
-              <div className="space-y-4 mb-4">
-                {visibleTicket.ticketComments.map(comment => {
-                  const c = getAssigneeColor(comment.author)
-                  return (
-                    <div key={comment.id} className="flex gap-3">
-                      <span
-                        className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
-                        style={{ backgroundColor: c.bg, color: c.text }}
-                      >
-                        {assigneeInitials(comment.author)}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-ui-sm text-[var(--color-ink)]">
-                          {comment.author}
-                          <span className="text-[var(--color-ink-muted)] font-normal ml-2">{formatRelative(comment.createdAt)}</span>
-                        </p>
-                        <p className="text-body-sm text-[var(--color-ink)] mt-1 leading-relaxed">{comment.text}</p>
+          <Section
+            label={`Commentaires${commentsCount > 0 ? ` · ${commentsCount}` : ""}`}
+          >
+            {visibleTicket?.ticketComments &&
+              visibleTicket.ticketComments.length > 0 && (
+                <div className="space-y-4 mb-4">
+                  {visibleTicket.ticketComments.map((comment) => {
+                    const c = getAssigneeColor(comment.author);
+                    return (
+                      <div key={comment.id} className="flex gap-3">
+                        <span
+                          className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                          style={{ backgroundColor: c.bg, color: c.text }}
+                        >
+                          {assigneeInitials(comment.author)}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-ui-sm text-[var(--color-ink)]">
+                            {comment.author}
+                            <span className="text-[var(--color-ink-muted)] font-normal ml-2">
+                              {formatRelative(comment.createdAt)}
+                            </span>
+                          </p>
+                          <p className="text-body-sm text-[var(--color-ink)] mt-1 leading-relaxed">
+                            {comment.text}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+                    );
+                  })}
+                </div>
+              )}
             <form onSubmit={addComment} className="space-y-2">
               <textarea
                 value={newComment}
-                onChange={e => setNewComment(e.target.value)}
+                onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Écrire un commentaire…"
                 rows={2}
                 className="w-full resize-none text-body-sm text-[var(--color-ink)] bg-[var(--color-cream)] rounded-xl px-3.5 py-2.5 outline-none placeholder:text-[var(--color-ink-muted)] focus:bg-[var(--color-cream-dark)] transition-colors"
@@ -504,11 +614,12 @@ export function TicketDrawer({
               )}
             </form>
           </Section>
-
         </div>
 
-        {/* ── Footer / Danger zone ── */}
-        <div className={`flex-none px-6 py-4 border-t transition-colors ${deleteConfirm ? 'border-red-200 bg-red-50/60' : 'border-[var(--color-cream-mid)]'}`}>
+        {/* -- Footer / Danger zone -- */}
+        <div
+          className={`flex-none px-6 py-4 border-t transition-colors ${deleteConfirm ? "border-red-200 bg-red-50/60" : "border-[var(--color-cream-mid)]"}`}
+        >
           {!deleteConfirm ? (
             <button
               onClick={() => setDeleteConfirmFor(visibleTicket?.id ?? null)}
@@ -519,7 +630,9 @@ export function TicketDrawer({
             </button>
           ) : (
             <div className="space-y-2.5">
-              <p className="text-body-sm font-semibold text-red-600">Supprimer définitivement ce ticket ?</p>
+              <p className="text-body-sm font-semibold text-red-600">
+                Supprimer définitivement ce ticket ?
+              </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setDeleteConfirmFor(null)}
@@ -528,7 +641,12 @@ export function TicketDrawer({
                   Annuler
                 </button>
                 <button
-                  onClick={() => { if (visibleTicket && visibleColumnId) { onDelete(visibleTicket.id, visibleColumnId); onClose() } }}
+                  onClick={() => {
+                    if (visibleTicket && visibleColumnId) {
+                      onDelete(visibleTicket.id, visibleColumnId);
+                      onClose();
+                    }
+                  }}
                   className="flex-1 text-ui-sm font-semibold py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 cursor-pointer transition-colors active:scale-[0.97]"
                 >
                   Supprimer
@@ -539,5 +657,5 @@ export function TicketDrawer({
         </div>
       </div>
     </>
-  )
+  );
 }

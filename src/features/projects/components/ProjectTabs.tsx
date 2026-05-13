@@ -1,20 +1,20 @@
-type TabId = 'overview' | 'tasks' | 'milestones' | 'announcement'
+type TabId = "overview" | "tasks" | "milestones" | "announcement";
 
 interface Tab {
-  id: TabId
-  label: string
+  id: TabId;
+  label: string;
 }
 
 const tabs: Tab[] = [
-  { id: 'overview', label: 'Aperçu' },
-  { id: 'announcement', label: 'Annonces' },
-  { id: 'tasks', label: 'Tâches' },
-  { id: 'milestones', label: 'Étapes' },
-]
+  { id: "overview", label: "Aperçu" },
+  { id: "announcement", label: "Annonces" },
+  { id: "tasks", label: "Tâches" },
+  { id: "milestones", label: "Étapes" },
+];
 
 interface ProjectTabsProps {
-  activeTab: TabId
-  onChange: (tab: TabId) => void
+  activeTab: TabId;
+  onChange: (tab: TabId) => void;
 }
 
 export function ProjectTabs({ activeTab, onChange }: ProjectTabsProps) {
@@ -29,8 +29,8 @@ export function ProjectTabs({ activeTab, onChange }: ProjectTabsProps) {
               px-4 py-3 text-sm font-medium transition-colors relative
               ${
                 activeTab === tab.id
-                  ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }
             `}
           >
@@ -42,7 +42,7 @@ export function ProjectTabs({ activeTab, onChange }: ProjectTabsProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export type { TabId }
+export type { TabId };

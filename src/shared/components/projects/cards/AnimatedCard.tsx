@@ -1,10 +1,10 @@
-import type { Project } from '@shared/types'
-import type { Direction } from '@features/home/hooks/useCarousel'
+import type { Project } from "@shared/types";
+import type { Direction } from "@features/home/hooks/useCarousel";
 
 interface AnimatedCardProps {
-  project: Project
-  animating: boolean
-  direction: Direction
+  project: Project;
+  animating: boolean;
+  direction: Direction;
 }
 
 export function AnimatedCard({
@@ -12,22 +12,27 @@ export function AnimatedCard({
   animating,
   direction,
 }: AnimatedCardProps) {
-  const exitX = direction === 'right' ? '-translate-x-6' : 'translate-x-6'
+  const exitX = direction === "right" ? "-translate-x-6" : "translate-x-6";
 
   return (
     <div
       className={`
         bg-card rounded-2xl p-7 shadow-sm w-full flex flex-col justify-start
         transition-all duration-300 ease-in-out
-        ${animating
-          ? `opacity-0 ${exitX} scale-[0.97]`
-          : `opacity-100 translate-x-0 scale-100`
+        ${
+          animating
+            ? `opacity-0 ${exitX} scale-[0.97]`
+            : `opacity-100 translate-x-0 scale-100`
         }
       `}
-      style={{ minHeight: '9rem' }}
+      style={{ minHeight: "9rem" }}
     >
-      <h3 className="font-bold text-xl mb-3 text-card-foreground">{project.name}</h3>
-      <p className="text-sm text-card-foreground leading-relaxed">{project.description}</p>
+      <h3 className="font-bold text-xl mb-3 text-card-foreground">
+        {project.name}
+      </h3>
+      <p className="text-sm text-card-foreground leading-relaxed">
+        {project.description}
+      </p>
     </div>
-  )
+  );
 }

@@ -1,9 +1,9 @@
 export interface Member {
-  name: string
+  name: string;
 }
 
 export const MOCK_MEMBERS: Member[] = [
-  { name: 'Alice M.' },
-  { name: 'Lucas T.' },
-  { name: 'Sara K.'  },
-]
+  { name: "Alice M." },
+  { name: "Lucas T." },
+  { name: "Sara K." },
+];

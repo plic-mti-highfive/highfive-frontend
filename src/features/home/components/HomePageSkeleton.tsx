@@ -1,4 +1,4 @@
-import { Skeleton } from '@shared/components/ui/skeleton'
+import { Skeleton } from "@shared/components/ui/skeleton";
 
 function CardSkeleton() {
   return (
@@ -11,7 +11,7 @@ function CardSkeleton() {
         <Skeleton className="h-6 w-20 rounded-full" />
       </div>
     </div>
-  )
+  );
 }
 
 function HeroCardSkeleton() {
@@ -27,7 +27,7 @@ function HeroCardSkeleton() {
         <Skeleton className="h-8 w-16 rounded-full" />
       </div>
     </div>
-  )
+  );
 }
 
 export function HomePageSkeleton() {
@@ -65,5 +65,5 @@ export function HomePageSkeleton() {
 
       <div className="pb-20" />
     </div>
-  )
+  );
 }

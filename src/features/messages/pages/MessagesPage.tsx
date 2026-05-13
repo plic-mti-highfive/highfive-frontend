@@ -1,19 +1,23 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Footer, Header } from '@features/layout'
-import { ConversationList } from '../components/ConversationList'
-import { ConversationDetail } from '../components/ConversationDetail'
-import { EmptyConversation } from '../components/EmptyConversation'
-import type { Conversation } from '../types'
-import { mockConversations } from '@/api/services/mock/data/mockConversations'
+import { useState } from "react";
+import { Footer, Header } from "@features/layout";
+import { ConversationList } from "../components/ConversationList";
+import { ConversationDetail } from "../components/ConversationDetail";
+import { EmptyConversation } from "../components/EmptyConversation";
+import type { Conversation } from "../types";
+import { mockConversations } from "@/api/services/mock/data/mockConversations";
 
 export function MessagesPage() {
-  const [conversations] = useState<Conversation[]>(mockConversations)
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
-  const [isListCollapsed, setIsListCollapsed] = useState(false)
+  const [conversations] = useState<Conversation[]>(mockConversations);
+  const [selectedConversationId, setSelectedConversationId] = useState<
+    string | null
+  >(null);
+  const [isListCollapsed, setIsListCollapsed] = useState(false);
 
-  const selectedConversation = conversations.find(c => c.id === selectedConversationId)
+  const selectedConversation = conversations.find(
+    (c) => c.id === selectedConversationId,
+  );
 
   return (
     <>
@@ -23,7 +27,7 @@ export function MessagesPage() {
           {/* Sidebar - Conversation List */}
           <aside
             className={`${
-              isListCollapsed ? 'hidden' : 'w-full lg:w-1/3'
+              isListCollapsed ? "hidden" : "w-full lg:w-1/3"
             } border-r border-border bg-sidebar lg:flex lg:flex-col`}
           >
             <ConversationList
@@ -35,16 +39,22 @@ export function MessagesPage() {
           </aside>
 
           {/* Main Content - Conversation Detail */}
-          <section className={`flex-1 ${isListCollapsed ? 'w-full' : 'hidden lg:flex'} flex flex-col bg-muted/30`}>
+          <section
+            className={`flex-1 ${isListCollapsed ? "w-full" : "hidden lg:flex"} flex flex-col bg-muted/30`}
+          >
             {selectedConversation ? (
               <ConversationDetail
                 conversation={selectedConversation}
-                onToggleListCollapse={() => setIsListCollapsed(!isListCollapsed)}
+                onToggleListCollapse={() =>
+                  setIsListCollapsed(!isListCollapsed)
+                }
               />
             ) : (
               <EmptyConversation
                 isListCollapsed={isListCollapsed}
-                onToggleListCollapse={() => setIsListCollapsed(!isListCollapsed)}
+                onToggleListCollapse={() =>
+                  setIsListCollapsed(!isListCollapsed)
+                }
               />
             )}
           </section>
@@ -52,5 +62,5 @@ export function MessagesPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }

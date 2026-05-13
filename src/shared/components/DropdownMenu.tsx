@@ -1,31 +1,36 @@
-import { MoreVertical } from 'lucide-react'
-import { Menu } from '@base-ui/react/menu'
-import type { ReactNode } from 'react'
+import { MoreVertical } from "lucide-react";
+import { Menu } from "@base-ui/react/menu";
+import type { ReactNode } from "react";
 
 interface DropdownMenuItem {
-  icon: ReactNode
-  label: string
-  onClick: () => void
+  icon: ReactNode;
+  label: string;
+  onClick: () => void;
 }
 
 interface DropdownMenuProps {
-  items: DropdownMenuItem[]
-  triggerSize?: 'sm' | 'md'
-  iconSize?: number
-  offset?: number
+  items: DropdownMenuItem[];
+  triggerSize?: "sm" | "md";
+  iconSize?: number;
+  offset?: number;
 }
 
 const popupCls =
-  'bg-background border border-border rounded-xl shadow-lg py-1.5 w-48 z-[999] origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0'
+  "bg-background border border-border rounded-xl shadow-lg py-1.5 w-48 z-[999] origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0";
 
 const itemCls =
-  'flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors'
+  "flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground rounded-lg cursor-pointer hover:bg-muted outline-none select-none transition-colors";
 
-export function DropdownMenu({ items, triggerSize = 'md', iconSize = 20, offset = 8 }: DropdownMenuProps) {
+export function DropdownMenu({
+  items,
+  triggerSize = "md",
+  iconSize = 20,
+  offset = 8,
+}: DropdownMenuProps) {
   const triggerClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-10 h-10 bg-background/90 backdrop-blur-sm',
-  }
+    sm: "w-8 h-8",
+    md: "w-10 h-10 bg-background/90 backdrop-blur-sm",
+  };
 
   return (
     <Menu.Root>
@@ -47,5 +52,5 @@ export function DropdownMenu({ items, triggerSize = 'md', iconSize = 20, offset 
         </Menu.Positioner>
       </Menu.Portal>
     </Menu.Root>
-  )
+  );
 }

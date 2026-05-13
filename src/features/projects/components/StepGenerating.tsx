@@ -1,27 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 
 const LINES = [
-  'Analyse de ton pitch…',
-  'Génération du titre…',
-  'Rédaction de la description…',
-  'Sélection des tags…',
-  'Finalisation…',
-]
+  "Analyse de ton pitch…",
+  "Génération du titre…",
+  "Rédaction de la description…",
+  "Sélection des tags…",
+  "Finalisation…",
+];
 
 export function StepGenerating() {
-  const [lineIdx, setLineIdx] = useState(0)
+  const [lineIdx, setLineIdx] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setLineIdx(i => Math.min(i + 1, LINES.length - 1)), 600)
-    return () => clearInterval(t)
-  }, [])
+    const t = setInterval(
+      () => setLineIdx((i) => Math.min(i + 1, LINES.length - 1)),
+      600,
+    );
+    return () => clearInterval(t);
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center space-y-8">
       <div className="relative w-16 h-16">
         <div className="absolute inset-0 rounded-full border-4 border-gray-200" />
         <div className="absolute inset-0 rounded-full border-4 border-t-[var(--color-rose-dark)] border-r-transparent border-b-transparent border-l-transparent animate-spin" />
-        <div className="absolute inset-2 rounded-full border-4 border-t-transparent border-r-[var(--color-rose-dark)]/40 border-b-transparent border-l-transparent animate-spin" style={{ animationDuration: '1.8s', animationDirection: 'reverse' }} />
+        <div
+          className="absolute inset-2 rounded-full border-4 border-t-transparent border-r-[var(--color-rose-dark)]/40 border-b-transparent border-l-transparent animate-spin"
+          style={{ animationDuration: "1.8s", animationDirection: "reverse" }}
+        />
       </div>
 
       <div className="space-y-1">
@@ -31,5 +37,5 @@ export function StepGenerating() {
         </p>
       </div>
     </div>
-  )
+  );
 }

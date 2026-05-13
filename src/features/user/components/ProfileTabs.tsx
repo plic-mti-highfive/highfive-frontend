@@ -1,20 +1,20 @@
-import { useState } from 'react'
+import { useState } from "react";
 
 interface Tab {
-  id: string
-  label: string
-  icon: React.ReactNode
-  content: React.ReactNode
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  content: React.ReactNode;
 }
 
 interface ProfileTabsProps {
-  tabs: Tab[]
+  tabs: Tab[];
 }
 
 export function ProfileTabs({ tabs }: ProfileTabsProps) {
-  const [activeTab, setActiveTab] = useState(tabs[0]?.id || '')
+  const [activeTab, setActiveTab] = useState(tabs[0]?.id || "");
 
-  const activeTabData = tabs.find(t => t.id === activeTab)
+  const activeTabData = tabs.find((t) => t.id === activeTab);
 
   return (
     <div className="space-y-4">
@@ -27,9 +27,10 @@ export function ProfileTabs({ tabs }: ProfileTabsProps) {
             className={`
               flex-1 flex items-center justify-center gap-3 px-6 py-5 text-heading-md font-semibold
               transition-colors border-b-4 outline-none
-              ${activeTab === tab.id
-                ? 'text-foreground border-b-foreground'
-                : 'text-muted-foreground border-b-transparent hover:text-foreground'
+              ${
+                activeTab === tab.id
+                  ? "text-foreground border-b-foreground"
+                  : "text-muted-foreground border-b-transparent hover:text-foreground"
               }
             `}
           >
@@ -40,17 +41,15 @@ export function ProfileTabs({ tabs }: ProfileTabsProps) {
       </div>
 
       {/* Tab content */}
-      <div className="animate-fade-in">
-        {activeTabData?.content}
-      </div>
+      <div className="animate-fade-in">{activeTabData?.content}</div>
     </div>
-  )
+  );
 }
 
 interface EmptyStateProps {
-  icon: React.ReactNode
-  title: string
-  description: string
+  icon: React.ReactNode;
+  title: string;
+  description: string;
 }
 
 export function EmptyState({ icon, title, description }: EmptyStateProps) {
@@ -66,6 +65,5 @@ export function EmptyState({ icon, title, description }: EmptyStateProps) {
         {description}
       </p>
     </div>
-  )
+  );
 }
-

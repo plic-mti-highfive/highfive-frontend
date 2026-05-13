@@ -1,84 +1,86 @@
-import { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { MessageSquare, UserPlus, PackageOpen } from 'lucide-react'
-import { Header } from '@features/layout'
-import { Footer } from '@features/layout'
-import { SmallCard } from '@shared/components/projects'
-import { UserNotFound } from '../components/UserNotFound'
-import { UserActionsMenu } from '../components/UserActionsMenu'
-import { EditProfileModal } from '../components/EditProfileModal'
-import { Button } from '@shared/components/ui/button'
-import { ProfileTabs, EmptyState } from '../components/ProfileTabs'
-import { createProjectsTabs } from '../utils/profileTabsUtils'
-import { ProjectFiltersBar } from '../../projects/components/ProjectFilters'
-import { UsersListDialog } from '../components/UsersListDialog'
-import { UnfollowConfirmDialog } from '../components/UnfollowConfirmDialog'
-import { getTagColor } from '@shared/utils/tagColors'
-import type { UserProfileFormData } from '@shared/types/user'
-import { useAuth } from '@/contexts'
-import { useUserProfile } from '../hooks/useUserProfile'
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { MessageSquare, UserPlus, PackageOpen } from "lucide-react";
+import { Header } from "@features/layout";
+import { Footer } from "@features/layout";
+import { SmallCard } from "@shared/components/projects";
+import { UserNotFound } from "../components/UserNotFound";
+import { UserActionsMenu } from "../components/UserActionsMenu";
+import { EditProfileModal } from "../components/EditProfileModal";
+import { Button } from "@shared/components/ui/button";
+import { ProfileTabs, EmptyState } from "../components/ProfileTabs";
+import { createProjectsTabs } from "../utils/profileTabsUtils";
+import { ProjectFiltersBar } from "../../projects/components/ProjectFilters";
+import { UsersListDialog } from "../components/UsersListDialog";
+import { UnfollowConfirmDialog } from "../components/UnfollowConfirmDialog";
+import { getTagColor } from "@shared/utils/tagColors";
+import type { UserProfileFormData } from "@shared/types/user";
+import { useAuth } from "@/contexts";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 function StatItem({
   value,
   label,
   onClick,
 }: {
-  value: number
-  label: string
-  onClick?: () => void
+  value: number;
+  label: string;
+  onClick?: () => void;
 }) {
   return (
     <button
       onClick={onClick}
       className={`flex flex-col items-center gap-1 transition-colors ${
-        onClick ? 'hover:text-ink-muted cursor-pointer' : ''
+        onClick ? "hover:text-ink-muted cursor-pointer" : ""
       }`}
       disabled={!onClick}
     >
-      <span className="text-2xl font-heading font-bold text-foreground">{value}</span>
+      <span className="text-2xl font-heading font-bold text-foreground">
+        {value}
+      </span>
       <span className="text-xs text-muted-foreground text-center">{label}</span>
     </button>
-  )
+  );
 }
 
 export default function UserProfile() {
-  const { userId } = useParams<{ userId: string }>()
-  const { user: currentUser, isAuthenticated } = useAuth()
-  const { user, isLoading, error } = useUserProfile(userId)
+  const { userId } = useParams<{ userId: string }>();
+  const { user: currentUser, isAuthenticated } = useAuth();
+  const { user, isLoading, error } = useUserProfile(userId);
 
-  const isOwnProfile = isAuthenticated && currentUser?.id === userId
+  const isOwnProfile = isAuthenticated && currentUser?.id === userId;
 
   // For display name / username: prefer the email prefix when viewing own profile
   const displayUsername =
     isOwnProfile && currentUser?.email
-      ? currentUser.email.split('@')[0]
-      : (user?.username ?? userId ?? '')
+      ? currentUser.email.split("@")[0]
+      : (user?.username ?? userId ?? "");
   const displayName =
     isOwnProfile && currentUser?.email
-      ? currentUser.email.split('@')[0]
-      : (user?.displayName ?? userId ?? '')
+      ? currentUser.email.split("@")[0]
+      : (user?.displayName ?? userId ?? "");
 
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [following, setFollowing] = useState(false)
-  const [followersDialogOpen, setFollowersDialogOpen] = useState(false)
-  const [followingDialogOpen, setFollowingDialogOpen] = useState(false)
-  const [unfollowConfirmOpen, setUnfollowConfirmOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [following, setFollowing] = useState(false);
+  const [followersDialogOpen, setFollowersDialogOpen] = useState(false);
+  const [followingDialogOpen, setFollowingDialogOpen] = useState(false);
+  const [unfollowConfirmOpen, setUnfollowConfirmOpen] = useState(false);
 
   const handleSaveProfile = (data: UserProfileFormData) => {
-    console.log('Saving profile:', data)
-  }
+    console.log("Saving profile:", data);
+  };
 
   const handleShare = () => {
-    console.log('Partager le profil')
-  }
+    console.log("Partager le profil");
+  };
 
   const handleFollow = () => {
-    setFollowing(!following)
-  }
+    setFollowing(!following);
+  };
 
   const handleMessage = () => {
-    console.log('Envoyer un message')
-  }
+    console.log("Envoyer un message");
+  };
 
   if (isLoading) {
     return (
@@ -89,7 +91,7 @@ export default function UserProfile() {
         </div>
         <Footer />
       </>
-    )
+    );
   }
 
   if (error || !user) {
@@ -99,7 +101,7 @@ export default function UserProfile() {
         <UserNotFound />
         <Footer />
       </>
-    )
+    );
   }
 
   return (
@@ -111,113 +113,114 @@ export default function UserProfile() {
           {/* Pan gauche - Profil */}
           <aside className="lg:w-1/3 lg:min-h-screen">
             <div className="bg-card border-r border-border lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
-                {/* Bande horizontale en haut - Avatar + Infos + Menu */}
-                <div className="flex items-center gap-4 p-6 border-b border-border">
-                  {/* Avatar à gauche */}
-                  <img
-                    src={user.avatar}
-                    alt={displayName}
-                    className="w-24 h-24 rounded-3xl object-cover bg-muted flex-shrink-0"
+              {/* Bande horizontale en haut - Avatar + Infos + Menu */}
+              <div className="flex items-center gap-4 p-6 border-b border-border">
+                {/* Avatar à gauche */}
+                <img
+                  src={user.avatar}
+                  alt={displayName}
+                  className="w-24 h-24 rounded-3xl object-cover bg-muted flex-shrink-0"
+                />
+
+                {/* Infos au centre */}
+                <div className="flex-1">
+                  <h1 className="text-xl font-heading font-bold text-foreground">
+                    {displayName}
+                  </h1>
+                  <p className="text-body-md text-muted-foreground">
+                    @{displayUsername}
+                  </p>
+                </div>
+
+                {/* Menu 3 points à droite */}
+                <UserActionsMenu
+                  isOwnProfile={isOwnProfile}
+                  onShare={handleShare}
+                  onEdit={() => setEditModalOpen(true)}
+                />
+              </div>
+
+              {/* Contenu principal du profil */}
+              <div className="p-6 space-y-6">
+                {/* Statistiques */}
+                <div className="grid grid-cols-4 gap-2 pb-6 border-b border-border">
+                  <StatItem
+                    value={user.stats.projectsCreated}
+                    label="Projets"
                   />
-
-                  {/* Infos au centre */}
-                  <div className="flex-1">
-                    <h1 className="text-xl font-heading font-bold text-foreground">
-                      {displayName}
-                    </h1>
-                    <p className="text-body-md text-muted-foreground">@{displayUsername}</p>
-                  </div>
-
-                  {/* Menu 3 points à droite */}
-                  <UserActionsMenu
-                    isOwnProfile={isOwnProfile}
-                    onShare={handleShare}
-                    onEdit={() => setEditModalOpen(true)}
+                  <StatItem
+                    value={user.stats.projectsContributed}
+                    label="Contributions"
+                  />
+                  <StatItem
+                    value={user.stats.followers}
+                    label="Abonnés"
+                    onClick={() => setFollowersDialogOpen(true)}
+                  />
+                  <StatItem
+                    value={user.stats.following}
+                    label="Abonnements"
+                    onClick={() => setFollowingDialogOpen(true)}
                   />
                 </div>
 
-                {/* Contenu principal du profil */}
-                <div className="p-6 space-y-6">
+                {/* Biographie */}
+                {user.bio && (
+                  <p className="text-body-md text-foreground text-center leading-relaxed">
+                    {user.bio}
+                  </p>
+                )}
 
-                  {/* Statistiques */}
-                  <div className="grid grid-cols-4 gap-2 pb-6 border-b border-border">
-                    <StatItem
-                      value={user.stats.projectsCreated}
-                      label="Projets"
-                    />
-                    <StatItem
-                      value={user.stats.projectsContributed}
-                      label="Contributions"
-                    />
-                    <StatItem
-                      value={user.stats.followers}
-                      label="Abonnés"
-                      onClick={() => setFollowersDialogOpen(true)}
-                    />
-                    <StatItem
-                      value={user.stats.following}
-                      label="Abonnements"
-                      onClick={() => setFollowingDialogOpen(true)}
-                    />
-                  </div>
-
-                  {/* Biographie */}
-                  {user.bio && (
-                    <p className="text-body-md text-foreground text-center leading-relaxed">
-                      {user.bio}
-                    </p>
-                  )}
-
-                  {/* Tags */}
-                  {user.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {user.tags.map((tag) => {
-                        const colors = getTagColor(tag)
-                        return (
-                          <span
-                            key={tag}
-                            className={`
+                {/* Tags */}
+                {user.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {user.tags.map((tag) => {
+                      const colors = getTagColor(tag);
+                      return (
+                        <span
+                          key={tag}
+                          className={`
                               px-3 py-1.5 rounded-full text-xs font-semibold
                               border ${colors.bg} ${colors.text} ${colors.border}
                             `}
-                          >
-                            {tag}
-                          </span>
-                        )
-                      })}
-                    </div>
-                  )}
+                        >
+                          {tag}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
 
-                  {/* Boutons d'action */}
-                  {!isOwnProfile && (
-                    <div className="space-y-2 pt-2">
-                      <Button
-                        onClick={() => {
-                          if (following) {
-                            setUnfollowConfirmOpen(true)
-                          } else {
-                            handleFollow()
-                          }
-                        }}
-                        className="w-full"
-                        size="lg"
-                        variant={following ? "outline" : "default"}
-                      >
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        {following ? 'Abonné' : 'Suivre'}
-                      </Button>
-                      <Button
-                        onClick={handleMessage}
-                        className="w-full"
-                        size="lg"
-                        variant="outline"
-                      >
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Envoyer un message
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                {/* Boutons d'action */}
+                {!isOwnProfile && (
+                  <div className="space-y-2 pt-2">
+                    <Button
+                      onClick={() => {
+                        if (following) {
+                          setUnfollowConfirmOpen(true);
+                        } else {
+                          handleFollow();
+                        }
+                      }}
+                      className="w-full"
+                      size="lg"
+                      variant={following ? "outline" : "default"}
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      {following ? "Abonné" : "Suivre"}
+                    </Button>
+                    <Button
+                      onClick={handleMessage}
+                      className="w-full"
+                      size="lg"
+                      variant="outline"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Envoyer un message
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </aside>
 
@@ -232,16 +235,15 @@ export default function UserProfile() {
                         <ProjectFiltersBar />
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
                           {user.projects.created.map((project) => (
-                            <SmallCard
-                              key={project.id}
-                              project={project}
-                            />
+                            <SmallCard key={project.id} project={project} />
                           ))}
                         </div>
                       </div>
                     ) : (
                       <EmptyState
-                        icon={<PackageOpen className="w-8 h-8 text-ink-muted" />}
+                        icon={
+                          <PackageOpen className="w-8 h-8 text-ink-muted" />
+                        }
                         title="Aucun projet créé"
                         description={
                           isOwnProfile
@@ -256,16 +258,15 @@ export default function UserProfile() {
                         <ProjectFiltersBar />
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
                           {user.projects.collaborations.map((project) => (
-                            <SmallCard
-                              key={project.id}
-                              project={project}
-                            />
+                            <SmallCard key={project.id} project={project} />
                           ))}
                         </div>
                       </div>
                     ) : (
                       <EmptyState
-                        icon={<PackageOpen className="w-8 h-8 text-ink-muted" />}
+                        icon={
+                          <PackageOpen className="w-8 h-8 text-ink-muted" />
+                        }
                         title="Aucune collaboration"
                         description={
                           isOwnProfile
@@ -280,16 +281,15 @@ export default function UserProfile() {
                         <ProjectFiltersBar />
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
                           {user.projects.liked.map((project) => (
-                            <SmallCard
-                              key={project.id}
-                              project={project}
-                            />
+                            <SmallCard key={project.id} project={project} />
                           ))}
                         </div>
                       </div>
                     ) : (
                       <EmptyState
-                        icon={<PackageOpen className="w-8 h-8 text-ink-muted" />}
+                        icon={
+                          <PackageOpen className="w-8 h-8 text-ink-muted" />
+                        }
                         title="Aucun High Five"
                         description={
                           isOwnProfile
@@ -337,5 +337,5 @@ export default function UserProfile() {
         onConfirm={handleFollow}
       />
     </>
-  )
+  );
 }

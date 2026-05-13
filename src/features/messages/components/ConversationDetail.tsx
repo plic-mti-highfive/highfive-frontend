@@ -1,100 +1,109 @@
-import { useState, useEffect, useRef } from 'react'
-import { ChevronRight } from 'lucide-react'
-import type { Conversation, Message } from '../types'
-import { mockMessages } from '@/api/services/mock/data/mockMessages'
-import { MessageBubble } from './MessageBubble'
-import { MessageDateSeparator } from './MessageDateSeparator'
-import { NewMessagesSeparator } from './NewMessagesSeparator'
-import { MessageInput } from './MessageInput'
-import { isSameDay } from 'date-fns'
+import { useState, useEffect, useRef } from "react";
+import { ChevronRight } from "lucide-react";
+import type { Conversation, Message } from "../types";
+import { mockMessages } from "@/api/services/mock/data/mockMessages";
+import { MessageBubble } from "./MessageBubble";
+import { MessageDateSeparator } from "./MessageDateSeparator";
+import { NewMessagesSeparator } from "./NewMessagesSeparator";
+import { MessageInput } from "./MessageInput";
+import { isSameDay } from "date-fns";
 
 interface ConversationDetailProps {
-  conversation: Conversation
-  onToggleListCollapse: () => void
+  conversation: Conversation;
+  onToggleListCollapse: () => void;
 }
 
 function getConversationName(conversation: Conversation): string {
-  if (conversation.type === 'group') {
-    return conversation.name || 'Groupe sans nom'
+  if (conversation.type === "group") {
+    return conversation.name || "Groupe sans nom";
   }
 
   const names: { [key: string]: string } = {
-    'user-2': 'Sophie Martin',
-    'user-3': 'Thomas Dupont',
-    'user-4': 'Marie Laurent',
-    'user-5': 'Jean Claude',
-    'user-6': 'Lisa Moreau',
-  }
+    "user-2": "Sophie Martin",
+    "user-3": "Thomas Dupont",
+    "user-4": "Marie Laurent",
+    "user-5": "Jean Claude",
+    "user-6": "Lisa Moreau",
+  };
 
-  const otherUserId = conversation.participants.find(id => id !== 'user-1')
-  return names[otherUserId || 'user-1'] || 'Utilisateur'
+  const otherUserId = conversation.participants.find((id) => id !== "user-1");
+  return names[otherUserId || "user-1"] || "Utilisateur";
 }
 
 function getSenderName(senderId: string): string {
   const names: { [key: string]: string } = {
-    'user-1': 'Vous',
-    'user-2': 'Sophie Martin',
-    'user-3': 'Thomas Dupont',
-    'user-4': 'Marie Laurent',
-    'user-5': 'Jean Claude',
-    'user-6': 'Lisa Moreau',
-  }
-  return names[senderId] || 'Utilisateur'
+    "user-1": "Vous",
+    "user-2": "Sophie Martin",
+    "user-3": "Thomas Dupont",
+    "user-4": "Marie Laurent",
+    "user-5": "Jean Claude",
+    "user-6": "Lisa Moreau",
+  };
+  return names[senderId] || "Utilisateur";
 }
 
-export function ConversationDetail({ conversation, onToggleListCollapse }: ConversationDetailProps) {
+export function ConversationDetail({
+  conversation,
+  onToggleListCollapse,
+}: ConversationDetailProps) {
   const [messages, setMessages] = useState<Message[]>(() => {
-    return mockMessages.filter((m: Message) => m.conversationId === conversation.id)
-  })
+    return mockMessages.filter(
+      (m: Message) => m.conversationId === conversation.id,
+    );
+  });
 
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom on mount and when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSendMessage = (content: string) => {
     const newMessage: Message = {
       id: `msg-${Date.now()}`,
       conversationId: conversation.id,
-      senderId: 'user-1',
+      senderId: "user-1",
       content,
       timestamp: new Date(),
       read: true,
-    }
-    setMessages([...messages, newMessage])
-  }
+    };
+    setMessages([...messages, newMessage]);
+  };
 
   // Find the unread separator position
-  const firstUnreadIndex = messages.findIndex(m => !m.read)
+  const firstUnreadIndex = messages.findIndex((m) => !m.read);
 
   // Group messages by date
   const groupedMessages = messages.reduce(
     (acc, message, index) => {
-      const lastGroup = acc[acc.length - 1]
+      const lastGroup = acc[acc.length - 1];
 
-      if (!lastGroup || !isSameDay(new Date(lastGroup.date), new Date(message.timestamp))) {
+      if (
+        !lastGroup ||
+        !isSameDay(new Date(lastGroup.date), new Date(message.timestamp))
+      ) {
         acc.push({
           date: message.timestamp,
           messages: [{ message, index }],
-          showUnreadSeparator: index === firstUnreadIndex && firstUnreadIndex !== -1,
-        })
+          showUnreadSeparator:
+            index === firstUnreadIndex && firstUnreadIndex !== -1,
+        });
       } else {
-        lastGroup.messages.push({ message, index })
+        lastGroup.messages.push({ message, index });
         if (index === firstUnreadIndex && firstUnreadIndex !== -1) {
-          lastGroup.showUnreadSeparator = true
+          lastGroup.showUnreadSeparator = true;
         }
       }
 
-      return acc
+      return acc;
     },
     [] as Array<{
-      date: Date
-      messages: Array<{ message: Message; index: number }>
-      showUnreadSeparator: boolean
-    }>
-  )
+      date: Date;
+      messages: Array<{ message: Message; index: number }>;
+      showUnreadSeparator: boolean;
+    }>,
+  );
 
   return (
     <div className="flex flex-col h-full">
@@ -109,8 +118,10 @@ export function ConversationDetail({ conversation, onToggleListCollapse }: Conve
             <ChevronRight className="w-5 h-5" />
           </button>
           <div>
-            <h2 className="font-semibold text-foreground">{getConversationName(conversation)}</h2>
-            {conversation.type === 'group' && (
+            <h2 className="font-semibold text-foreground">
+              {getConversationName(conversation)}
+            </h2>
+            {conversation.type === "group" && (
               <p className="text-xs text-muted-foreground">
                 {conversation.participants.length} participants
               </p>
@@ -137,13 +148,17 @@ export function ConversationDetail({ conversation, onToggleListCollapse }: Conve
                   <MessageBubble
                     key={message.id}
                     message={message}
-                    isSent={message.senderId === 'user-1'}
+                    isSent={message.senderId === "user-1"}
                     senderName={
-                      conversation.type === 'group' && message.senderId !== 'user-1'
+                      conversation.type === "group" &&
+                      message.senderId !== "user-1"
                         ? getSenderName(message.senderId)
                         : undefined
                     }
-                    showSenderInfo={conversation.type === 'group' && message.senderId !== 'user-1'}
+                    showSenderInfo={
+                      conversation.type === "group" &&
+                      message.senderId !== "user-1"
+                    }
                   />
                 ))}
               </div>
@@ -156,5 +171,5 @@ export function ConversationDetail({ conversation, onToggleListCollapse }: Conve
       {/* Message Input */}
       <MessageInput onSendMessage={handleSendMessage} />
     </div>
-  )
+  );
 }

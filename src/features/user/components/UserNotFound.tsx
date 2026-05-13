@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom'
-import { UserX } from 'lucide-react'
-import { Button } from '@shared/components/ui/button'
+import { useNavigate } from "react-router-dom";
+import { UserX } from "lucide-react";
+import { Button } from "@shared/components/ui/button";
 
 export function UserNotFound() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-cream px-4">
@@ -21,14 +21,10 @@ export function UserNotFound() {
           </p>
         </div>
 
-        <Button
-          onClick={() => navigate('/')}
-          className="mt-4"
-          size="lg"
-        >
+        <Button onClick={() => navigate("/")} className="mt-4" size="lg">
           Retour à l'accueil
         </Button>
       </div>
     </main>
-  )
+  );
 }

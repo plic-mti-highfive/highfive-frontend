@@ -1,33 +1,33 @@
-import { useState, useRef } from 'react'
-import { Dialog } from '@base-ui/react/dialog'
-import { X } from 'lucide-react'
-import { TagSearchDropdown } from '../../projects/components/TagSearchDropdown'
-import type { User, UserProfileFormData } from '@shared/types'
+import { useState, useRef } from "react";
+import { Dialog } from "@base-ui/react/dialog";
+import { X } from "lucide-react";
+import { TagSearchDropdown } from "../../projects/components/TagSearchDropdown";
+import type { User, UserProfileFormData } from "@shared/types";
 
 interface EditProfileModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  user: User
-  onSave: (data: UserProfileFormData) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user: User;
+  onSave: (data: UserProfileFormData) => void;
 }
 
 function AvatarUpload({
   currentAvatar,
-  onChange
+  onChange,
 }: {
-  currentAvatar: string
-  onChange: (url: string) => void
+  currentAvatar: string;
+  onChange: (url: string) => void;
 }) {
-  const [preview, setPreview] = useState<string>(currentAvatar)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [preview, setPreview] = useState<string>(currentAvatar);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const url = URL.createObjectURL(file)
-    setPreview(url)
-    onChange(url)
-  }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    onChange(url);
+  };
 
   return (
     <button
@@ -43,14 +43,18 @@ function AvatarUpload({
     >
       <img src={preview} alt="Avatar" className="w-full h-full object-cover" />
 
-      <div className="
+      <div
+        className="
         absolute inset-0 bg-black/0 group-hover:bg-black/20
         flex items-center justify-center transition-all
-      ">
-        <span className="
+      "
+      >
+        <span
+          className="
           text-white text-xs font-semibold opacity-0 group-hover:opacity-100
           transition-opacity bg-black/50 px-2 py-1 rounded-lg
-        ">
+        "
+        >
           Modifier
         </span>
       </div>
@@ -63,27 +67,32 @@ function AvatarUpload({
         onChange={handleFile}
       />
     </button>
-  )
+  );
 }
 
-export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfileModalProps) {
+export function EditProfileModal({
+  open,
+  onOpenChange,
+  user,
+  onSave,
+}: EditProfileModalProps) {
   const [formData, setFormData] = useState<UserProfileFormData>({
     displayName: user.displayName,
     bio: user.bio,
     avatar: user.avatar,
     tags: user.tags,
-  })
-  const [saved, setSaved] = useState(false)
+  });
+  const [saved, setSaved] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-    setSaved(true)
+    e.preventDefault();
+    onSave(formData);
+    setSaved(true);
     setTimeout(() => {
-      setSaved(false)
-      onOpenChange(false)
-    }, 1000)
-  }
+      setSaved(false);
+      onOpenChange(false);
+    }, 1000);
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -105,7 +114,9 @@ export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfi
               <div className="flex items-start gap-6">
                 <AvatarUpload
                   currentAvatar={formData.avatar}
-                  onChange={(url) => setFormData(prev => ({ ...prev, avatar: url }))}
+                  onChange={(url) =>
+                    setFormData((prev) => ({ ...prev, avatar: url }))
+                  }
                 />
 
                 <div className="flex-1 space-y-4">
@@ -116,7 +127,12 @@ export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfi
                     <input
                       type="text"
                       value={formData.displayName}
-                      onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          displayName: e.target.value,
+                        }))
+                      }
                       placeholder="John Doe"
                       className="
                         w-full rounded-xl border border-cream-mid bg-white px-4 py-3
@@ -154,7 +170,9 @@ export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfi
                 </label>
                 <textarea
                   value={formData.bio}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, bio: e.target.value }))
+                  }
                   placeholder="Parlez un peu de vous..."
                   rows={4}
                   className="
@@ -172,7 +190,9 @@ export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfi
                 </label>
                 <TagSearchDropdown
                   selected={formData.tags}
-                  onChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
+                  onChange={(tags) =>
+                    setFormData((prev) => ({ ...prev, tags }))
+                  }
                 />
               </div>
 
@@ -193,13 +213,14 @@ export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfi
                   className={`
                     px-6 py-2.5 rounded-xl font-semibold text-sm
                     transition-all shadow-sm
-                    ${saved
-                      ? 'bg-apple text-white scale-[0.98]'
-                      : 'bg-ink text-cream hover:bg-ink-soft active:scale-[0.97]'
+                    ${
+                      saved
+                        ? "bg-apple text-white scale-[0.98]"
+                        : "bg-ink text-cream hover:bg-ink-soft active:scale-[0.97]"
                     }
                   `}
                 >
-                  {saved ? 'Enregistré !' : 'Enregistrer'}
+                  {saved ? "Enregistré !" : "Enregistrer"}
                 </button>
               </div>
             </form>
@@ -207,5 +228,5 @@ export function EditProfileModal({ open, onOpenChange, user, onSave }: EditProfi
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
-  )
+  );
 }

@@ -1,52 +1,52 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { Button } from '@shared/components/ui/button'
-import { Input } from '@shared/components/ui/input'
-import { Label } from '@shared/components/ui/label'
-import { AuthLayout } from '../components/AuthLayout'
-import { PasswordInput } from '@shared/components/ui/password-input'
-import { useAuth } from '../hooks/useAuth'
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
+import { Label } from "@shared/components/ui/label";
+import { AuthLayout } from "../components/AuthLayout";
+import { PasswordInput } from "@shared/components/ui/password-input";
+import { useAuth } from "../hooks/useAuth";
 
 export default function RegisterPage() {
-  const navigate = useNavigate()
-  const { register } = useAuth()
+  const navigate = useNavigate();
+  const { register } = useAuth();
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     if (!email.trim() || !password.trim()) {
-      setError('Veuillez remplir tous les champs.')
-      return
+      setError("Veuillez remplir tous les champs.");
+      return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Adresse e-mail invalide.')
-      return
+      setError("Adresse e-mail invalide.");
+      return;
     }
     if (password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères.')
-      return
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
     }
     if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas.')
-      return
+      setError("Les mots de passe ne correspondent pas.");
+      return;
     }
 
     try {
-      setIsSubmitting(true)
-      await register(email, password)
-      navigate('/')
+      setIsSubmitting(true);
+      await register(email, password);
+      navigate("/");
     } catch {
-      setError('Une erreur est survenue lors de la création du compte.')
+      setError("Une erreur est survenue lors de la création du compte.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -57,11 +57,14 @@ export default function RegisterPage() {
       imageUrl="https://images.unsplash.com/photo-1496115965489-21be7e6e59a0"
       onSubmit={handleSubmit}
       footerText="Vous avez déjà un compte ?"
-      footerLink={{ text: 'Connectez-vous.', href: '/login' }}
+      footerLink={{ text: "Connectez-vous.", href: "/login" }}
     >
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-body-md text-foreground font-semibold">
+        <Label
+          htmlFor="email"
+          className="text-body-md text-foreground font-semibold"
+        >
           Adresse e-mail
         </Label>
         <Input
@@ -69,7 +72,9 @@ export default function RegisterPage() {
           type="email"
           placeholder="vous@exemple.com"
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           className="h-13 text-body-md"
         />
       </div>
@@ -91,9 +96,7 @@ export default function RegisterPage() {
       />
 
       {/* Erreur */}
-      {error && (
-        <p className="text-body-md text-rose-dark">{error}</p>
-      )}
+      {error && <p className="text-body-md text-rose-dark">{error}</p>}
 
       {/* Bouton */}
       <Button
@@ -101,8 +104,8 @@ export default function RegisterPage() {
         disabled={isSubmitting}
         className="w-full h-13 text-body-lg font-semibold rounded-lg mt-2 dark:bg-foreground dark:text-background dark:hover:bg-foreground/90"
       >
-        {isSubmitting ? 'Création…' : 'Créer mon compte'}
+        {isSubmitting ? "Création…" : "Créer mon compte"}
       </Button>
     </AuthLayout>
-  )
+  );
 }

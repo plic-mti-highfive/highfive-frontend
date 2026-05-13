@@ -1,14 +1,14 @@
-import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { LayoutTemplate, Kanban } from 'lucide-react'
-import { Header } from '@features/layout'
-import { Footer } from '@features/layout'
-import { KanbanBoard } from '../components/KanbanBoard'
-import { TicketDrawer } from '../components/TicketDrawer'
-import { useKanban } from '../hooks/useKanban'
-import { MOCK_MEMBERS } from '../data/members'
-import { getAssigneeColor, assigneeInitials } from '../utils/kanbanConfig'
-import type { KanbanColumnId } from '../types'
+import { useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { LayoutTemplate, Kanban } from "lucide-react";
+import { Header } from "@features/layout";
+import { Footer } from "@features/layout";
+import { KanbanBoard } from "../components/KanbanBoard";
+import { TicketDrawer } from "../components/TicketDrawer";
+import { useKanban } from "../hooks/useKanban";
+import { MOCK_MEMBERS } from "../data/members";
+import { getAssigneeColor, assigneeInitials } from "../utils/kanbanConfig";
+import type { KanbanColumnId } from "../types";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -16,45 +16,66 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+} from "@/components/ui/breadcrumb";
 
 export default function LabPage() {
-  const { projectId } = useParams<{ projectId: string }>()
-  const { tickets, columns, customTags, addTicket, moveTicket, deleteTicket, updateTicket, addColumn, deleteColumn, addCustomTag } = useKanban()
-  const [openTicket, setOpenTicket] = useState<{ ticketId: string; columnId: KanbanColumnId } | null>(null)
+  const { projectId } = useParams<{ projectId: string }>();
+  const {
+    tickets,
+    columns,
+    customTags,
+    addTicket,
+    moveTicket,
+    deleteTicket,
+    updateTicket,
+    addColumn,
+    deleteColumn,
+    addCustomTag,
+  } = useKanban();
+  const [openTicket, setOpenTicket] = useState<{
+    ticketId: string;
+    columnId: KanbanColumnId;
+  } | null>(null);
 
   const { total, done } = useMemo(() => {
-    const all = Object.values(tickets).flat()
-    return { total: all.length, done: tickets.done.length }
-  }, [tickets])
+    const all = Object.values(tickets).flat();
+    return { total: all.length, done: tickets.done.length };
+  }, [tickets]);
 
-  const progressPct = total > 0 ? Math.round((done / total) * 100) : 0
+  const progressPct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const activeTicket = openTicket
-    ? (tickets[openTicket.columnId]?.find(t => t.id === openTicket.ticketId) ?? null)
-    : null
+    ? (tickets[openTicket.columnId]?.find(
+        (t) => t.id === openTicket.ticketId,
+      ) ?? null)
+    : null;
 
-  function handleDrawerMove(ticketId: string, from: KanbanColumnId, to: KanbanColumnId) {
-    moveTicket(ticketId, from, to)
-    setOpenTicket({ ticketId, columnId: to })
+  function handleDrawerMove(
+    ticketId: string,
+    from: KanbanColumnId,
+    to: KanbanColumnId,
+  ) {
+    moveTicket(ticketId, from, to);
+    setOpenTicket({ ticketId, columnId: to });
   }
 
   return (
     <>
       <Header />
-      <div className="bg-background" style={{ height: '2.75rem' }} />
+      <div className="bg-background" style={{ height: "2.75rem" }} />
       <main className="relative z-0 flex flex-col min-h-screen bg-background">
         <div className="flex-1 max-w-7xl w-full mx-auto px-6 pb-12">
-
           {/* Breadcrumb */}
           <Breadcrumb className="mb-5">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink render={(props) => (
-                  <Link {...props} to={`/projects/${projectId}`}>
-                    Projet #{projectId}
-                  </Link>
-                )} />
+                <BreadcrumbLink
+                  render={(props) => (
+                    <Link {...props} to={`/projects/${projectId}`}>
+                      Projet #{projectId}
+                    </Link>
+                  )}
+                />
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -66,15 +87,17 @@ export default function LabPage() {
           {/* Project context bar */}
           <div className="flex items-center justify-between gap-6 mb-6 pb-6 border-b border-border">
             <div>
-              <h1 className="text-heading-lg font-semibold text-foreground">Tableau de bord</h1>
+              <h1 className="text-heading-lg font-semibold text-foreground">
+                Tableau de bord
+              </h1>
             </div>
 
             <div className="flex items-center gap-5">
               {/* Members */}
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {MOCK_MEMBERS.map(m => {
-                    const c = getAssigneeColor(m.name)
+                  {MOCK_MEMBERS.map((m) => {
+                    const c = getAssigneeColor(m.name);
                     return (
                       <span
                         key={m.name}
@@ -84,10 +107,12 @@ export default function LabPage() {
                       >
                         {assigneeInitials(m.name)}
                       </span>
-                    )
+                    );
                   })}
                 </div>
-                <span className="text-body-sm text-muted-foreground">{MOCK_MEMBERS.length} membres</span>
+                <span className="text-body-sm text-muted-foreground">
+                  {MOCK_MEMBERS.length} membres
+                </span>
               </div>
 
               {/* Progress */}
@@ -95,7 +120,10 @@ export default function LabPage() {
                 <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${progressPct}%`, backgroundColor: 'var(--color-apple)' }}
+                    style={{
+                      width: `${progressPct}%`,
+                      backgroundColor: "var(--color-apple)",
+                    }}
                   />
                 </div>
                 <span className="text-body-sm font-semibold text-foreground tabular-nums">
@@ -136,11 +164,12 @@ export default function LabPage() {
             addTicket={addTicket}
             moveTicket={moveTicket}
             deleteTicket={deleteTicket}
-            onOpenTicket={(ticketId, columnId) => setOpenTicket({ ticketId, columnId })}
+            onOpenTicket={(ticketId, columnId) =>
+              setOpenTicket({ ticketId, columnId })
+            }
             onAddColumn={addColumn}
             onDeleteColumn={deleteColumn}
           />
-
         </div>
       </main>
       <Footer />
@@ -155,9 +184,12 @@ export default function LabPage() {
         onClose={() => setOpenTicket(null)}
         onUpdate={updateTicket}
         onMoveColumn={handleDrawerMove}
-        onDelete={(id, col) => { deleteTicket(id, col); setOpenTicket(null) }}
+        onDelete={(id, col) => {
+          deleteTicket(id, col);
+          setOpenTicket(null);
+        }}
         onAddTag={addCustomTag}
       />
     </>
-  )
+  );
 }
