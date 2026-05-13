@@ -7,7 +7,7 @@ import { SearchPage } from '@features/search'
 import { MessagesPage } from '@features/messages'
 import { ScrollToTop } from '@shared/components/ScrollToTop'
 import { ScrollToTopButton } from '@shared/components/ScrollToTopButton'
-import { LabPage } from '@features/lab'
+import { LabPage, MoodboardPage } from '@features/lab'
 
 import Debug from './pages/Debug'
 import NotFoundPage from './pages/NotFoundPage'
@@ -32,6 +32,7 @@ export default function App() {
         <Route path="/user/:userId" element={<UserProfilePage />} />
 
         <Route path="/projects/:projectId/lab" element={<LabPage />} />
+        <Route path="/projects/:projectId/moodboard" element={<MoodboardPage />} />
 
         <Route path="/messages" element={<MessagesPage />} />
 
