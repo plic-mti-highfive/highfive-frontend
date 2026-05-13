@@ -16,7 +16,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@shared/components/ui/breadcrumb";
 
 export default function LabPage() {
   const { projectId } = useParams<{ projectId: string }>();

@@ -21,7 +21,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@shared/components/ui/breadcrumb";
 import { useRef, useState } from "react";
 
 const RECT_COLORS = [

@@ -7,7 +7,7 @@ import App from "./App.tsx";
 
 import { AuthProvider } from "./contexts";
 import { ThemeProvider } from "@shared/contexts";
-import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ErrorBoundary } from "@shared/components/ErrorBoundary";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
