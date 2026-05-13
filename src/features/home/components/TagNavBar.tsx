@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { TAG_COLORS } from "@shared/components/projects";
+import { getTagColor } from "@shared/utils/tagColors";
 
 const NAV_TAGS = [
   "Créatif",
@@ -46,7 +46,7 @@ export function TagNavBar() {
         <div className="flex items-center justify-center gap-1 scrollbar-none py-1">
           {NAV_TAGS.map((tag) => {
             const isActive = active === tag;
-            const colors = TAG_COLORS[tag] ?? "";
+            const { bg, text } = getTagColor(tag);
             return (
               <button
                 key={tag}
@@ -58,7 +58,7 @@ export function TagNavBar() {
                   relative px-3.5 py-2 rounded-full text-[14px] font-bold transition-all duration-150 whitespace-nowrap shrink-0
                   ${
                     isActive
-                      ? `${colors} ring-1 ring-current/20`
+                      ? `${bg} ${text} ring-1 ring-current/20`
                       : "text-foreground hover:bg-muted"
                   }
                 `}

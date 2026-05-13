@@ -7,4 +7,3 @@ export {
   DaysLeftBadge,
   TagPill,
 } from "./shared";
-export { TAG_COLORS } from "./utils";

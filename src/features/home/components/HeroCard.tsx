@@ -4,7 +4,7 @@ import { Thumbnail } from "./Thumbnail";
 import { AuthorChip } from "./AuthorChip";
 import { DaysLeftBadge } from "./DaysLeftBadge";
 import { ProgressBar } from "./ProgressBar";
-import { TagPill } from "./TagPill";
+import { TagPill } from "@shared/components/projects";
 
 export function HeroCard({ project }: { project: Project }) {
   const navigate = useNavigate();

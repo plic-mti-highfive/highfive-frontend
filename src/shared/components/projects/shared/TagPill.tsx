@@ -1,4 +1,4 @@
-import { TAG_COLORS } from "../utils/tagColors";
+import { getTagColor } from "@shared/utils/tagColors";
 
 export function TagPill({
   tag,
@@ -7,10 +7,12 @@ export function TagPill({
   tag: string;
   size?: "sm" | "xs";
 }) {
-  const colors = TAG_COLORS[tag] ?? "bg-muted text-foreground";
+  const { bg, text } = getTagColor(tag);
   const cls =
     size === "xs" ? "text-[10px] px-1.5 py-0.5" : "text-[11px] px-2 py-0.5";
   return (
-    <span className={`${cls} font-medium rounded-full ${colors}`}>{tag}</span>
+    <span className={`${cls} font-medium rounded-full ${bg} ${text}`}>
+      {tag}
+    </span>
   );
 }
