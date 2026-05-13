@@ -1,5 +1,6 @@
 import type { Project } from "@shared/types";
-import type { Direction } from "@features/home/hooks/useCarousel";
+
+type Direction = "left" | "right";
 
 interface AnimatedCardProps {
   project: Project;
