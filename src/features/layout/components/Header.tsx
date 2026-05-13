@@ -12,7 +12,7 @@ import { Menu } from "@base-ui/react/menu";
 import { Logo } from "@features/layout";
 import { Button } from "@shared/components/ui/button";
 import { SearchBar } from "@features/search";
-import { useAuth } from "@features/auth";
+import { useAuth } from "@shared/contexts";
 
 const popupCls =
   "bg-background border border-border rounded-xl shadow-lg py-1.5 w-80 origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0";

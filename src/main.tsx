@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
 
-import { AuthProvider } from "./contexts";
+import { AuthProvider } from "@shared/contexts";
 import { ThemeProvider } from "@shared/contexts";
 import { ErrorBoundary } from "@shared/components/ErrorBoundary";
 

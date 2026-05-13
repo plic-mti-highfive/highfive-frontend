@@ -15,7 +15,7 @@ import { UsersListDialog } from "../components/UsersListDialog";
 import { UnfollowConfirmDialog } from "../components/UnfollowConfirmDialog";
 import { getTagColor } from "@shared/utils/tagColors";
 import type { UserProfileFormData } from "@shared/types/user";
-import { useAuth } from "@/contexts";
+import { useAuth } from "@shared/contexts";
 import { useUserProfile } from "../hooks/useUserProfile";
 
 function StatItem({

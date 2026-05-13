@@ -7,7 +7,7 @@ import { Label } from "@shared/components/ui/label";
 import { Checkbox } from "@shared/components/ui/checkbox";
 import { AuthLayout } from "../components/AuthLayout";
 import { PasswordInput } from "@shared/components/ui/password-input";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@shared/contexts";
 
 export default function LoginPage() {
   const navigate = useNavigate();

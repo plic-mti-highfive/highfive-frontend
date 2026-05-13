@@ -6,7 +6,7 @@ import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
 import { AuthLayout } from "../components/AuthLayout";
 import { PasswordInput } from "@shared/components/ui/password-input";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@shared/contexts";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
