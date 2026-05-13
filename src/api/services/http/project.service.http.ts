@@ -73,7 +73,8 @@ export class ProjectServiceHttp implements IProjectService {
   }
 
   async getProjectTickets(projectId: string): Promise<TicketDto[]> {
-    return httpClient.get<TicketDto[]>(`/projects/${projectId}/tickets`)
+    const res = await httpClient.get<{ data: TicketDto[]; total: number }>(`/projects/${projectId}/tickets`)
+    return res.data
   }
 
   async getTicketById(projectId: string, ticketId: string): Promise<TicketDto> {
@@ -94,6 +95,7 @@ export class ProjectServiceHttp implements IProjectService {
   }
 
   async getProjectMessages(projectId: string): Promise<ProjectMessageDto[]> {
-    return httpClient.get<ProjectMessageDto[]>(`/projects/${projectId}/messages`)
+    const res = await httpClient.get<{ data: ProjectMessageDto[]; total: number }>(`/projects/${projectId}/messages`)
+    return res.data
   }
 }

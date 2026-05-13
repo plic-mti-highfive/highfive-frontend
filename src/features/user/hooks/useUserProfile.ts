@@ -1,29 +1,42 @@
 import { useState, useEffect } from 'react'
-import { userService } from '@/api'
+import { userService, projectService, type ProjectDto } from '@/api'
 import type { User } from '@shared/types/user'
+import type { Project } from '@shared/types/project'
 import type { UserProfileResponse } from '@/api/types/user.types'
 
+const adaptProjectDto = (dto: ProjectDto): Project => ({
+  id: dto.id,
+  name: dto.name,
+  description: dto.description || '',
+  tags: dto.tags || [],
+  author: 'unknown',
+  contributorsCount: 0,
+  highfiveCount: dto.highfiveCount || 0,
+  successRate: 100,
+  daysLeft: null,
+})
+
 // Adapter la réponse API vers le format User attendu par les composants
-const adaptUserProfile = (profile: UserProfileResponse): User => ({
+const adaptUserProfile = (profile: UserProfileResponse, createdProjects: Project[]): User => ({
   username: profile.userId,
   displayName: profile.userId,
   avatar: profile.avatarPath || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.userId}`,
   bio: profile.bio || '',
   createdAt: '',
-  tags: [], // TODO: implémenter quand le backend supporte les tags
+  tags: [],
   stats: {
-    projectsCreated: 0, // TODO: récupérer depuis API
-    projectsContributed: 0, // TODO: récupérer depuis API
-    followers: 0, // TODO: récupérer depuis API
-    following: 0, // TODO: récupérer depuis API
+    projectsCreated: createdProjects.length,
+    projectsContributed: 0,
+    followers: 0,
+    following: 0,
   },
   projects: {
-    created: [], // TODO: récupérer depuis API
-    collaborations: [], // TODO: récupérer depuis API
-    liked: [], // TODO: récupérer depuis API
+    created: createdProjects,
+    collaborations: [],
+    liked: [],
   },
-  followers: [], // TODO: récupérer depuis API
-  following: [], // TODO: récupérer depuis API
+  followers: [],
+  following: [],
 })
 
 export function useUserProfile(userId: string | undefined) {
@@ -40,8 +53,12 @@ export function useUserProfile(userId: string | undefined) {
     const fetchUserProfile = async () => {
       try {
         setIsLoading(true)
-        const profile = await userService.getUserProfile(userId)
-        const adaptedUser = adaptUserProfile(profile)
+        const [profile, projectsResponse] = await Promise.all([
+          userService.getUserProfile(userId),
+          projectService.getProjects({ userId, limit: 50 }),
+        ])
+        const createdProjects = projectsResponse.data.map(adaptProjectDto)
+        const adaptedUser = adaptUserProfile(profile, createdProjects)
         setUser(adaptedUser)
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch user profile'))

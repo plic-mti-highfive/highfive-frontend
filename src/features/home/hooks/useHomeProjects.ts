@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { projectService, type ProjectDto } from '@/api'
-import { ProjectStatus } from '@plic-mti-highfive/shared-types'
 import type { Project } from '@shared/types'
 
 // Adapter ProjectDto vers l'ancien format Project pour compatibilité
@@ -27,8 +26,7 @@ export function useHomeProjects() {
         setIsLoading(true)
         setError(null)
         const response = await projectService.getProjects({
-          status: ProjectStatus.ACTIVE,
-          limit: 50, // Charger plus de projets pour avoir assez pour toutes les catégories
+          limit: 50,
         })
 
         const adaptedProjects = response.data.map(adaptProjectDto)

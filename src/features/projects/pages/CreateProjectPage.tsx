@@ -13,10 +13,12 @@ import { StepManualName } from '../components/StepManualName'
 import { StepManualDesc } from '../components/StepManualDesc'
 import { StepManualTags } from '../components/StepManualTags'
 import { StepDone } from '../components/StepDone'
+import { projectService } from '@/api'
 
 export default function CreateProject() {
   const { step, visible, goTo } = useStepTransition('choose')
   const [form, setForm] = useState<ProjectForm>({ name: '', description: '', tags: [] })
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null)
 
   function handleChooseAI() { goTo('ai-pitch') }
 
@@ -32,9 +34,17 @@ export default function CreateProject() {
   function handleManualName()   { goTo('manual-desc')  }
   function handleManualDesc()   { goTo('manual-tags')  }
 
-  function handleManualSubmit() {
-    console.log('Créer projet :', form)
-    goTo('done')
+  async function handleManualSubmit() {
+    try {
+      const created = await projectService.createProject({
+        name: form.name,
+        description: form.description || undefined,
+      })
+      setCreatedProjectId(created.id)
+      goTo('done')
+    } catch (err) {
+      console.error('Erreur lors de la création du projet:', err)
+    }
   }
 
   const backs: Partial<Record<typeof step, typeof step>> = {
@@ -60,7 +70,7 @@ export default function CreateProject() {
             {step === 'manual-name'   && <StepManualName onBack={handleBack} onNext={handleManualName}    value={form.name}        onChange={v => setForm(f => ({ ...f, name: v }))} />}
             {step === 'manual-desc'   && <StepManualDesc onBack={handleBack} onNext={handleManualDesc}    value={form.description} onChange={v => setForm(f => ({ ...f, description: v }))} />}
             {step === 'manual-tags'   && <StepManualTags onBack={handleBack} onSubmit={handleManualSubmit} value={form.tags}       onChange={t => setForm(f => ({ ...f, tags: t }))} />}
-            {step === 'done'          && <StepDone       projectName={form.name} />}
+            {step === 'done'          && <StepDone       projectName={form.name} projectId={createdProjectId} />}
           </StepWrapper>
         </div>
       </main>

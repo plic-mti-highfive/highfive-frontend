@@ -1,6 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { KanbanColumnId, KanbanTicket, KanbanColumnDef, CustomTag } from '../types'
 import { DEFAULT_COLUMNS } from '../utils/kanbanConfig'
+import { projectService } from '@/api'
+import { TicketStatus } from '@plic-mti-highfive/shared-types'
+import type { TicketDto } from '@/api/types'
 
 const INITIAL_COLUMNS: KanbanColumnDef[] = DEFAULT_COLUMNS.map(c => ({ ...c, bgColor: c.bgColor }))
 
@@ -11,92 +14,87 @@ const INITIAL_TAGS: CustomTag[] = [
   { id: 'tag-4', label: 'Créatif',    color: '#FF6B1A' },
 ]
 
-const INITIAL_TICKETS: Record<KanbanColumnId, KanbanTicket[]> = {
-  todo: [
-    {
-      id: '1',
-      title: 'Définir le périmètre du projet',
-      tags: ['tag-1', 'tag-3'],
-      assignee: 'Alice M.',
-      priority: 'high',
-      checklistItems: [
-        { id: 'c1-1', text: 'Définir les objectifs', done: true },
-        { id: 'c1-2', text: 'Identifier les parties prenantes', done: true },
-        { id: 'c1-3', text: 'Rédiger le cahier des charges', done: false },
-        { id: 'c1-4', text: 'Valider le budget', done: false },
-        { id: 'c1-5', text: 'Planifier les jalons', done: false },
-      ],
-      ticketComments: [],
-    },
-    {
-      id: '2',
-      title: 'Préparer les visuels',
-      tags: ['tag-4'],
-      assignee: 'Lucas T.',
-      priority: 'medium',
-      checklistItems: [],
-      ticketComments: [
-        { id: 'cm2-1', author: 'Alice M.', text: 'Penser à inclure les contraintes de format.', createdAt: '2026-04-18T10:00:00Z' },
-        { id: 'cm2-2', author: 'Lucas T.', text: 'Noté, je commence par les formats mobiles.', createdAt: '2026-04-18T11:30:00Z' },
-        { id: 'cm2-3', author: 'Sara K.',  text: 'Prévoir aussi la version print.', createdAt: '2026-04-19T09:15:00Z' },
-      ],
-    },
-  ],
-  'in-progress': [
-    {
-      id: '3',
-      title: 'Rédiger le contenu principal',
-      tags: ['tag-3'],
-      assignee: 'Alice M.',
-      priority: 'high',
-      checklistItems: [
-        { id: 'c3-1', text: 'Introduction', done: true },
-        { id: 'c3-2', text: 'Section 1', done: false },
-        { id: 'c3-3', text: 'Section 2', done: false },
-        { id: 'c3-4', text: 'Conclusion', done: false },
-      ],
-      ticketComments: [
-        { id: 'cm3-1', author: 'Lucas T.', text: 'Est-ce qu\'on a validé le ton éditorial ?', createdAt: '2026-04-19T14:00:00Z' },
-        { id: 'cm3-2', author: 'Alice M.', text: 'Oui, on part sur quelque chose de chaleureux.', createdAt: '2026-04-19T15:00:00Z' },
-      ],
-    },
-  ],
-  done: [
-    {
-      id: '4',
-      title: 'Réunion de lancement',
-      tags: ['tag-2'],
-      assignee: 'Lucas T.',
-      priority: 'low',
-      checklistItems: [
-        { id: 'c4-1', text: 'Préparer l\'ordre du jour', done: true },
-        { id: 'c4-2', text: 'Envoyer les invitations', done: true },
-        { id: 'c4-3', text: 'Rédiger le compte-rendu', done: true },
-      ],
-      ticketComments: [
-        { id: 'cm4-1', author: 'Sara K.', text: 'Très bonne réunion, tout était clair !', createdAt: '2026-04-20T08:00:00Z' },
-      ],
-    },
-  ],
+function ticketStatusToColumnId(status: TicketStatus): KanbanColumnId {
+  switch (status) {
+    case TicketStatus.TODO: return 'todo'
+    case TicketStatus.IN_PROGRESS: return 'in-progress'
+    case TicketStatus.IN_REVIEW: return 'in-progress'
+    case TicketStatus.DONE: return 'done'
+    default: return 'todo'
+  }
 }
 
-export function useKanban() {
+function columnIdToTicketStatus(columnId: KanbanColumnId): TicketStatus {
+  switch (columnId) {
+    case 'todo': return TicketStatus.TODO
+    case 'in-progress': return TicketStatus.IN_PROGRESS
+    case 'done': return TicketStatus.DONE
+    default: return TicketStatus.TODO
+  }
+}
+
+function adaptTicket(dto: TicketDto): KanbanTicket {
+  return {
+    id: dto.id,
+    title: dto.title,
+    checklistItems: [],
+    ticketComments: [],
+  }
+}
+
+const EMPTY_TICKETS: Record<KanbanColumnId, KanbanTicket[]> = {
+  todo: [],
+  'in-progress': [],
+  done: [],
+}
+
+export function useKanban(projectId?: string) {
   const [columns, setColumns] = useState<KanbanColumnDef[]>(INITIAL_COLUMNS)
   const [customTags, setCustomTags] = useState<CustomTag[]>(INITIAL_TAGS)
-  const [tickets, setTickets] = useState<Record<KanbanColumnId, KanbanTicket[]>>(INITIAL_TICKETS)
+  const [tickets, setTickets] = useState<Record<KanbanColumnId, KanbanTicket[]>>(EMPTY_TICKETS)
+  const [isLoading, setIsLoading] = useState(!!projectId)
 
-  function addTicket(columnId: KanbanColumnId, title: string) {
-    if (!title.trim()) return
-    const newTicket: KanbanTicket = {
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      checklistItems: [],
-      ticketComments: [],
+  useEffect(() => {
+    if (!projectId) {
+      setIsLoading(false)
+      return
     }
-    setTickets(prev => ({
-      ...prev,
-      [columnId]: [...(prev[columnId] ?? []), newTicket],
-    }))
+    setIsLoading(true)
+    projectService.getProjectTickets(projectId)
+      .then(apiTickets => {
+        const grouped: Record<KanbanColumnId, KanbanTicket[]> = { todo: [], 'in-progress': [], done: [] }
+        for (const dto of apiTickets) {
+          const colId = ticketStatusToColumnId(dto.status)
+          if (!grouped[colId]) grouped[colId] = []
+          grouped[colId].push(adaptTicket(dto))
+        }
+        setTickets(grouped)
+      })
+      .catch(err => console.error('Failed to load tickets:', err))
+      .finally(() => setIsLoading(false))
+  }, [projectId])
+
+  async function addTicket(columnId: KanbanColumnId, title: string) {
+    if (!title.trim()) return
+    if (projectId) {
+      try {
+        const created = await projectService.createTicket(projectId, { title: title.trim() })
+        if (columnId !== 'todo') {
+          await projectService.updateTicket(projectId, created.id, {
+            status: columnIdToTicketStatus(columnId),
+          })
+        }
+        setTickets(prev => ({
+          ...prev,
+          [columnId]: [...(prev[columnId] ?? []), adaptTicket(created)],
+        }))
+      } catch (err) {
+        console.error('Failed to create ticket:', err)
+      }
+      return
+    }
+    const newTicket: KanbanTicket = { id: crypto.randomUUID(), title: title.trim(), checklistItems: [], ticketComments: [] }
+    setTickets(prev => ({ ...prev, [columnId]: [...(prev[columnId] ?? []), newTicket] }))
   }
 
   function moveTicket(ticketId: string, from: KanbanColumnId, to: KanbanColumnId, toIndex?: number) {
@@ -117,6 +115,13 @@ export function useKanban() {
       const targetList = [...(prev[to] ?? [])]
       const insertIndex = toIndex !== undefined ? toIndex : targetList.length
       targetList.splice(insertIndex, 0, ticket)
+
+      if (projectId && from !== to) {
+        projectService.updateTicket(projectId, ticketId, {
+          status: columnIdToTicketStatus(to),
+        }).catch(err => console.error('Failed to update ticket status:', err))
+      }
+
       return {
         ...prev,
         [from]: prev[from].filter(t => t.id !== ticketId),
@@ -137,6 +142,11 @@ export function useKanban() {
       ...prev,
       [columnId]: prev[columnId].map(t => t.id === ticketId ? { ...t, ...updates } : t),
     }))
+    if (projectId && updates.title !== undefined) {
+      projectService.updateTicket(projectId, ticketId, {
+        title: updates.title,
+      }).catch(err => console.error('Failed to update ticket:', err))
+    }
   }
 
   function addColumn(label: string) {
@@ -185,6 +195,7 @@ export function useKanban() {
     columns,
     customTags,
     tickets,
+    isLoading,
     addTicket,
     moveTicket,
     deleteTicket,

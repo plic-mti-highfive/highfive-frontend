@@ -74,15 +74,16 @@ class HttpClient {
   }
 
   private buildUrl(endpoint: string, params?: Record<string, string | number | boolean>): string {
-    const url = new URL(`${this.baseUrl}${endpoint}`)
+    const path = `${this.baseUrl}${endpoint}`
 
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, String(value))
-      })
-    }
+    if (!params || Object.keys(params).length === 0) return path
 
-    return url.toString()
+    const searchParams = new URLSearchParams()
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.append(key, String(value))
+    })
+
+    return `${path}?${searchParams.toString()}`
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {

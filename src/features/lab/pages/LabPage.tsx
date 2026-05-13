@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { LayoutTemplate, Kanban } from 'lucide-react'
 import { Header } from '@features/layout'
@@ -6,9 +6,10 @@ import { Footer } from '@features/layout'
 import { KanbanBoard } from '../components/KanbanBoard'
 import { TicketDrawer } from '../components/TicketDrawer'
 import { useKanban } from '../hooks/useKanban'
-import { MOCK_MEMBERS } from '../data/members'
+import type { Member } from '../data/members'
 import { getAssigneeColor, assigneeInitials } from '../utils/kanbanConfig'
 import type { KanbanColumnId } from '../types'
+import { projectService } from '@/api'
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -20,8 +21,18 @@ import {
 
 export default function LabPage() {
   const { projectId } = useParams<{ projectId: string }>()
-  const { tickets, columns, customTags, addTicket, moveTicket, deleteTicket, updateTicket, addColumn, deleteColumn, addCustomTag } = useKanban()
+  const { tickets, columns, customTags, addTicket, moveTicket, deleteTicket, updateTicket, addColumn, deleteColumn, addCustomTag } = useKanban(projectId)
   const [openTicket, setOpenTicket] = useState<{ ticketId: string; columnId: KanbanColumnId } | null>(null)
+  const [members, setMembers] = useState<Member[]>([])
+
+  useEffect(() => {
+    if (!projectId) return
+    projectService.getProjectMembers(projectId)
+      .then(data => {
+        setMembers(data.map(m => ({ name: m.user?.email?.split('@')[0] ?? m.userId })))
+      })
+      .catch(err => console.error('Failed to load project members:', err))
+  }, [projectId])
 
   const { total, done } = useMemo(() => {
     const all = Object.values(tickets).flat()
@@ -73,7 +84,7 @@ export default function LabPage() {
               {/* Members */}
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {MOCK_MEMBERS.map(m => {
+                  {members.map(m => {
                     const c = getAssigneeColor(m.name)
                     return (
                       <span
@@ -87,7 +98,7 @@ export default function LabPage() {
                     )
                   })}
                 </div>
-                <span className="text-body-sm text-muted-foreground">{MOCK_MEMBERS.length} membres</span>
+                <span className="text-body-sm text-muted-foreground">{members.length} membres</span>
               </div>
 
               {/* Progress */}
@@ -149,7 +160,7 @@ export default function LabPage() {
         ticket={activeTicket}
         columnId={openTicket?.columnId ?? null}
         isOpen={openTicket !== null}
-        members={MOCK_MEMBERS}
+        members={members}
         columns={columns}
         customTags={customTags}
         onClose={() => setOpenTicket(null)}

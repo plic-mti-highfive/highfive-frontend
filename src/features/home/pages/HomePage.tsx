@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from 'react-router-dom'
 import { Header } from '@features/layout'
 import { Footer } from '@features/layout'
 import { FeaturedLayout } from '../components/FeaturedLayout'
@@ -7,8 +8,10 @@ import { Section } from '../components/Section'
 import { TagNavBar } from '../components/TagNavBar'
 import { HomePageSkeleton } from '../components/HomePageSkeleton'
 import { useHomeProjects } from '../hooks/useHomeProjects'
+import { useAuth } from '@/contexts'
 
 export default function HomePage() {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const {
     featured,
     recommended,
@@ -19,6 +22,46 @@ export default function HomePage() {
     isLoading,
     error,
   } = useHomeProjects()
+
+  if (isAuthLoading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-background" />
+      </>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto px-6">
+            <h1 className="text-3xl font-bold text-ink mb-4">Bienvenue sur HighFive!</h1>
+            <p className="text-ink-muted mb-8">
+              Connectez-vous pour découvrir et rejoindre des projets.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link
+                to="/login"
+                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity"
+              >
+                Se connecter
+              </Link>
+              <Link
+                to="/register"
+                className="px-6 py-3 border border-primary text-primary rounded-lg font-semibold hover:bg-primary/10 transition-colors"
+              >
+                S'inscrire
+              </Link>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    )
+  }
 
   return (
     <>

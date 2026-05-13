@@ -83,6 +83,7 @@ export interface UpdateTicketDto {
 export interface ListProjectsQuery {
   status?: ProjectStatus
   visibility?: ProjectVisibility
+  userId?: string
   page?: number
   limit?: number
 }
