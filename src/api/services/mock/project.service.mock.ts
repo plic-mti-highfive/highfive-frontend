@@ -216,6 +216,17 @@ export class ProjectServiceMock implements IProjectService {
     return project;
   }
 
+  async getProjectsByIds(ids: string[]): Promise<ProjectDto[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    await delay(250);
+    const projects = ids
+      .map((id) => db.getProject(id))
+      .filter((p): p is ProjectDto => p !== undefined);
+    return projects;
+  }
+
   async updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto> {
     await delay(400);
     const updated = db.updateProject(id, dto);

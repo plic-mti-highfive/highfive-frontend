@@ -40,6 +40,13 @@ export class ProjectServiceHttp implements IProjectService {
     return httpClient.get<ProjectDto>(`/projects/${id}`);
   }
 
+  async getProjectsByIds(ids: string[]): Promise<ProjectDto[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    return httpClient.post<ProjectDto[]>("/projects/batch", { ids });
+  }
+
   async updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto> {
     return httpClient.patch<ProjectDto>(`/projects/${id}`, dto);
   }

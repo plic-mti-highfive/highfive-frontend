@@ -21,6 +21,7 @@ export interface IProjectService {
     query?: ListProjectsQuery,
   ): Promise<PaginatedResponse<ProjectDto>>;
   getProjectById(id: string): Promise<ProjectDto>;
+  getProjectsByIds(ids: string[]): Promise<ProjectDto[]>;
   updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto>;
   deleteProject(id: string): Promise<void>;
 
