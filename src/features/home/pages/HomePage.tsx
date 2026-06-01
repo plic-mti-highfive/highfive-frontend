@@ -6,19 +6,30 @@ import { FeaturedLayout } from "../components/FeaturedLayout";
 import { Section } from "@shared/components/projects";
 import { TagNavBar } from "../components/TagNavBar";
 import { HomePageSkeleton } from "../components/HomePageSkeleton";
+import { useHomeTrendingAndRecommended } from "../hooks/useHomeTrendingAndRecommended";
 import { useHomeProjects } from "../hooks/useHomeProjects";
 
 export default function HomePage() {
+  // Fetch other project categories from client-side logic
   const {
     featured,
-    recommended,
-    trending,
     endingSoon,
     successful,
     recent,
-    isLoading,
-    error,
+    isLoading: homeProjectsLoading,
+    error: homeProjectsError,
   } = useHomeProjects();
+
+  // Fetch trending and recommended from IA backend
+  const {
+    trending,
+    recommended,
+    isLoading: iaLoading,
+    error: iaError,
+  } = useHomeTrendingAndRecommended();
+
+  const isLoading = homeProjectsLoading || iaLoading;
+  const error = homeProjectsError || iaError;
 
   return (
     <>

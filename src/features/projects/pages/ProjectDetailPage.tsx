@@ -25,9 +25,10 @@ export function ProjectDetailPage() {
   };
 
   const allMessages = (() => {
-    const messageIds = new Set(messages.map((m) => m.id));
+    const messageArray = Array.isArray(messages) ? messages : [];
+    const messageIds = new Set(messageArray.map((m) => m.id));
     const combined = [
-      ...messages,
+      ...messageArray,
       ...localMessages.filter((m) => !messageIds.has(m.id)),
     ];
     return combined;
