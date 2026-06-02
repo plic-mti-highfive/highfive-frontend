@@ -1,15 +1,23 @@
 import { isMockMode } from '../config'
-import type { IAuthService, IProjectService, IUserService } from './interfaces'
+import type { IAdminService, IAuthService, IProjectService, IUserService } from './interfaces'
 
 // Import des implémentations
 import { AuthServiceMock, ProjectServiceMock, UserServiceMock } from './mock'
-import { AuthServiceHttp, ProjectServiceHttp, UserServiceHttp } from './http'
+import { AdminServiceHttp, AuthServiceHttp, ProjectServiceHttp, UserServiceHttp } from './http'
 
 // Factory pour créer les instances appropriées
 class ServiceFactory {
+  private _adminService: IAdminService | null = null
   private _authService: IAuthService | null = null
   private _projectService: IProjectService | null = null
   private _userService: IUserService | null = null
+
+  get adminService(): IAdminService {
+    if (!this._adminService) {
+      this._adminService = new AdminServiceHttp()
+    }
+    return this._adminService
+  }
 
   get authService(): IAuthService {
     if (!this._authService) {
@@ -34,6 +42,7 @@ class ServiceFactory {
 
   // Réinitialiser les services (utile si on change le mode à runtime)
   reset() {
+    this._adminService = null
     this._authService = null
     this._projectService = null
     this._userService = null
@@ -43,6 +52,7 @@ class ServiceFactory {
 const factory = new ServiceFactory()
 
 // Export des services
+export const adminService = factory.adminService
 export const authService = factory.authService
 export const projectService = factory.projectService
 export const userService = factory.userService
@@ -51,4 +61,4 @@ export const userService = factory.userService
 export { factory as serviceFactory }
 
 // Re-export des types
-export type { IAuthService, IProjectService, IUserService }
+export type { IAdminService, IAuthService, IProjectService, IUserService }

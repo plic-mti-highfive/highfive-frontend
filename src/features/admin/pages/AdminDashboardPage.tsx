@@ -1,17 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Header, Footer } from '@features/layout'
 import { LayoutDashboard, Users, FolderOpen } from 'lucide-react'
 import { OverviewTab } from '../components/OverviewTab'
 import { UsersTable } from '../components/UsersTable'
 import { ProjectsTable } from '../components/ProjectsTable'
-import type { AdminUser, AdminProject, AdminUserStatus } from '../types'
-import {
-  mockAdminUsers,
-  mockAdminProjects,
-  mockAdminStats,
-  mockDailyRegistrations,
-  mockRecentlyClosedProjects,
-} from '@/api/services/mock/data/mockAdmin'
+import type { AdminUser, AdminProject, AdminUserStatus, AdminStats, DailyRegistration, RecentlyClosedProject } from '../types'
+import { adminService } from '@/api/services'
 
 type Tab = 'overview' | 'users' | 'projects'
 
@@ -23,28 +17,40 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 
 export function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
-  const [users, setUsers] = useState<AdminUser[]>(mockAdminUsers)
-  const [projects, setProjects] = useState<AdminProject[]>(mockAdminProjects)
+  const [users, setUsers] = useState<AdminUser[]>([])
+  const [projects, setProjects] = useState<AdminProject[]>([])
+  const [stats, setStats] = useState<AdminStats | null>(null)
+  const [dailyRegistrations, setDailyRegistrations] = useState<DailyRegistration[]>([])
+  const [recentlyClosedProjects, setRecentlyClosedProjects] = useState<RecentlyClosedProject[]>([])
 
-  const handleUserStatusChange = (userId: string, status: AdminUserStatus) => {
-    setUsers(prev => prev.map(u => (u.id === userId ? { ...u, status } : u)))
+  useEffect(() => {
+    adminService.getUsers().then(setUsers)
+    adminService.getProjects().then(setProjects)
+    adminService.getStats().then(setStats)
+    adminService.getDailyRegistrations().then(setDailyRegistrations)
+    adminService.getRecentlyClosedProjects().then(setRecentlyClosedProjects)
+  }, [])
+
+  const handleUserStatusChange = async (userId: string, status: AdminUserStatus) => {
+    const updated = await adminService.updateUserStatus(userId, status)
+    setUsers(prev => prev.map(u => (u.id === userId ? updated : u)))
   }
 
-  const handleUserDelete = (userId: string) => {
+  const handleUserDelete = async (userId: string) => {
+    await adminService.deleteUser(userId)
     setUsers(prev => prev.filter(u => u.id !== userId))
   }
 
-  const handleProjectArchive = (projectId: string) => {
-    setProjects(prev =>
-      prev.map(p =>
-        p.id === projectId
-          ? { ...p, status: p.status === 'active' ? 'archived' : 'active' }
-          : p
-      )
-    )
+  const handleProjectArchive = async (projectId: string) => {
+    const project = projects.find(p => p.id === projectId)
+    if (!project) return
+    const newStatus = project.status === 'active' ? 'archived' : 'active'
+    const updated = await adminService.updateProject(projectId, { status: newStatus })
+    setProjects(prev => prev.map(p => (p.id === projectId ? updated : p)))
   }
 
-  const handleProjectDelete = (projectId: string) => {
+  const handleProjectDelete = async (projectId: string) => {
+    await adminService.deleteProject(projectId)
     setProjects(prev => prev.filter(p => p.id !== projectId))
   }
 
@@ -81,11 +87,11 @@ export function AdminDashboardPage() {
           </div>
 
           {/* Tab content */}
-          {activeTab === 'overview' && (
+          {activeTab === 'overview' && stats && (
             <OverviewTab
-              stats={mockAdminStats}
-              dailyRegistrations={mockDailyRegistrations}
-              recentlyClosedProjects={mockRecentlyClosedProjects}
+              stats={stats}
+              dailyRegistrations={dailyRegistrations}
+              recentlyClosedProjects={recentlyClosedProjects}
             />
           )}
 
