@@ -13,6 +13,10 @@ import type {
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
+  TicketCommentDto,
+  CreateTicketCommentDto,
+  ChecklistItemDto,
+  CreateChecklistItemDto,
 } from "../../types";
 import { httpClient } from "../../http-client";
 
@@ -113,6 +117,39 @@ export class ProjectServiceHttp implements IProjectService {
   ): Promise<TicketDto> {
     return httpClient.patch<TicketDto>(
       `/projects/${projectId}/tickets/${ticketId}`,
+      dto,
+    );
+  }
+
+  async addChecklistItem(
+    projectId: string,
+    ticketId: string,
+    dto: CreateChecklistItemDto,
+  ): Promise<ChecklistItemDto> {
+    return httpClient.post<ChecklistItemDto>(
+      `/projects/${projectId}/tickets/${ticketId}/checklists`,
+      dto,
+    );
+  }
+
+  async toggleChecklistItem(
+    projectId: string,
+    itemId: string,
+    isCompleted: boolean,
+  ): Promise<ChecklistItemDto> {
+    return httpClient.patch<ChecklistItemDto>(
+      `/projects/${projectId}/tickets/checklists/${itemId}`,
+      { isCompleted },
+    );
+  }
+
+  async addTicketComment(
+    projectId: string,
+    ticketId: string,
+    dto: CreateTicketCommentDto,
+  ): Promise<TicketCommentDto> {
+    return httpClient.post<TicketCommentDto>(
+      `/projects/${projectId}/tickets/${ticketId}/comments`,
       dto,
     );
   }
