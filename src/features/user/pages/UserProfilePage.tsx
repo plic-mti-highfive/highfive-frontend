@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { MessageSquare, UserPlus, PackageOpen } from "lucide-react";
 import { Header } from "@features/layout";
@@ -17,6 +17,7 @@ import { getTagColor } from "@shared/utils/tagColors";
 import type { UserProfileFormData } from "@shared/types/user";
 import { useAuth } from "@shared/contexts";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { userService } from "@/api/services";
 
 function StatItem({
   value,
@@ -66,8 +67,30 @@ export default function UserProfile() {
   const [followingDialogOpen, setFollowingDialogOpen] = useState(false);
   const [unfollowConfirmOpen, setUnfollowConfirmOpen] = useState(false);
 
-  const handleSaveProfile = (data: UserProfileFormData) => {
+  const [backendTags, setBackendTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    userService
+      .getSkillSuggestions()
+      .then((suggestions) => setBackendTags(suggestions))
+      .catch(console.error);
+  }, []);
+
+  const handleSaveProfile = async (data: UserProfileFormData) => {
+    if (!userId) return;
     console.log("Saving profile:", data);
+
+    try {
+      await userService.updateUserProfile(userId, {
+        displayName: data.displayName,
+        bio: data.bio,
+        avatarPath: data.avatar,
+        skills: data.tags,
+      });
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
   };
 
   const handleShare = () => {
@@ -313,6 +336,7 @@ export default function UserProfile() {
           onOpenChange={setEditModalOpen}
           user={user}
           onSave={handleSaveProfile}
+          availableTags={backendTags}
         />
       )}
 

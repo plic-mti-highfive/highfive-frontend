@@ -1,15 +1,15 @@
 import type {
   UpdateUserProfileDto,
-  UserProfileResponse,
-  EnrichedUserProfileResponse,
-  UserProjectsResponse,
+  UserProfileDto,
+  UserProjectsDto,
 } from "../../types";
 
 export interface IUserService {
-  getUserProfile(userId: string): Promise<EnrichedUserProfileResponse>;
-  getUserProjects(userId: string): Promise<UserProjectsResponse>;
+  getUserProfile(userId: string): Promise<UserProfileDto>;
+  getUserProjects(userId: string): Promise<UserProjectsDto>;
   updateUserProfile(
     userId: string,
     dto: UpdateUserProfileDto,
-  ): Promise<UserProfileResponse>;
+  ): Promise<UserProfileDto>;
+  getSkillSuggestions(): Promise<string[]>;
 }

@@ -1,7 +1,7 @@
 import type { IUserService } from "../interfaces";
 import type {
   UpdateUserProfileDto,
-  UserProfileResponse,
+  UserProfileDto,
   EnrichedUserProfileResponse,
   UserProjectsResponse,
 } from "../../types";
@@ -10,7 +10,7 @@ import { getAllUsers } from "./data";
 
 // Base de données mock pour les profils utilisateurs
 class MockUserDb {
-  private profiles: Map<string, UserProfileResponse> = new Map();
+  private profiles: Map<string, UserProfileDto> = new Map();
 
   constructor() {
     const allUsers = getAllUsers();
@@ -27,7 +27,7 @@ class MockUserDb {
     });
   }
 
-  getProfile(userId: string): UserProfileResponse {
+  getProfile(userId: string): UserProfileDto {
     return (
       this.profiles.get(userId) ?? {
         userId,
@@ -41,8 +41,8 @@ class MockUserDb {
 
   updateProfile(
     userId: string,
-    updates: Partial<UserProfileResponse>,
-  ): UserProfileResponse {
+    updates: Partial<UserProfileDto>,
+  ): UserProfileDto {
     const existing = this.getProfile(userId);
     const updated = { ...existing, ...updates };
     this.profiles.set(userId, updated);
@@ -87,7 +87,7 @@ export class UserServiceMock implements IUserService {
   async updateUserProfile(
     userId: string,
     dto: UpdateUserProfileDto,
-  ): Promise<UserProfileResponse> {
+  ): Promise<UserProfileDto> {
     await delay(400);
 
     return db.updateProfile(userId, dto);

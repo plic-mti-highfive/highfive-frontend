@@ -43,31 +43,41 @@ interface TagSearchDropdownProps {
   selected: string[];
   onChange: (tags: string[]) => void;
   maxTags?: number;
-  tags?: readonly string[];
+  availableTags?: string[];
 }
 
 export function TagSearchDropdown({
   selected,
   onChange,
   maxTags = 8,
-  tags = ALL_TAGS,
+  availableTags = [],
 }: TagSearchDropdownProps) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const tags = availableTags.concat(
+    ALL_TAGS.filter((t) => !availableTags.includes(t)),
+  );
+
   const filtered = tags.filter((t) =>
     t.toLowerCase().includes(query.toLowerCase()),
   );
 
+  const exactMatchExists = tags.some(
+    (t) => t.toLowerCase() === query.trim().toLowerCase(),
+  );
+
   const toggle = (tag: string) => {
-    onChange(
-      selected.includes(tag)
-        ? selected.filter((t) => t !== tag)
-        : selected.length < maxTags
-          ? [...selected, tag]
-          : selected,
-    );
+    const cleanTag = tag.trim();
+    if (!cleanTag) return;
+
+    if (selected.includes(cleanTag)) {
+      onChange(selected.filter((t) => t !== cleanTag));
+    } else if (selected.length < maxTags) {
+      onChange([...selected, cleanTag]);
+    }
+    setQuery("");
   };
 
   const remove = (tag: string) => onChange(selected.filter((t) => t !== tag));
@@ -77,8 +87,9 @@ export function TagSearchDropdown({
       if (
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
-      )
+      ) {
         setOpen(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -122,30 +133,48 @@ export function TagSearchDropdown({
       </div>
 
       {/* Dropdown */}
-      {open && (
+      {open && (query || filtered.length > 0) && (
         <div className="absolute z-20 top-full mt-1 w-full bg-white border border-cream-mid rounded-xl shadow-lg max-h-48 overflow-y-auto">
-          {filtered.length === 0 ? (
+          {/* Liste des tags filtrés */}
+          {filtered.map((tag) => {
+            const active = selected.includes(tag);
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggle(tag)}
+                className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                  active
+                    ? "bg-cream text-ink font-medium"
+                    : "text-ink-soft hover:bg-cream"
+                }`}
+              >
+                <span>{tag}</span>
+                {active && (
+                  <span className="text-ink font-bold text-xs">[x]</span>
+                )}
+              </button>
+            );
+          })}
+
+          {/* Option "Créer" si le tag n'existe pas */}
+          {query.trim().length > 0 &&
+            !exactMatchExists &&
+            !selected.includes(query.trim()) && (
+              <button
+                type="button"
+                onClick={() => toggle(query)}
+                className="w-full flex items-center justify-start px-4 py-2.5 text-sm transition-colors text-ink font-medium bg-cream-light hover:bg-cream border-t border-cream-mid"
+              >
+                <span className="text-ink-muted mr-2">Créer :</span> "
+                {query.trim()}"
+              </button>
+            )}
+
+          {filtered.length === 0 && query.trim().length === 0 && (
             <p className="text-sm text-ink-muted px-4 py-3">
               Aucun tag trouvé.
             </p>
-          ) : (
-            filtered.map((tag) => {
-              const active = selected.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => toggle(tag)}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors
-                      ${active ? "bg-cream text-ink font-medium" : "text-ink-soft hover:bg-cream"}`}
-                >
-                  <span>{tag}</span>
-                  {active && (
-                    <span className="text-ink font-bold text-xs">[x]</span>
-                  )}
-                </button>
-              );
-            })
           )}
         </div>
       )}

@@ -9,6 +9,7 @@ interface EditProfileModalProps {
   onOpenChange: (open: boolean) => void;
   user: User;
   onSave: (data: UserProfileFormData) => void;
+  availableTags?: string[];
 }
 
 function AvatarUpload({
@@ -75,6 +76,7 @@ export function EditProfileModal({
   onOpenChange,
   user,
   onSave,
+  availableTags,
 }: EditProfileModalProps) {
   const [formData, setFormData] = useState<UserProfileFormData>({
     displayName: user.displayName,
@@ -193,6 +195,7 @@ export function EditProfileModal({
                   onChange={(tags) =>
                     setFormData((prev) => ({ ...prev, tags }))
                   }
+                  availableTags={availableTags}
                 />
               </div>
 

@@ -73,7 +73,7 @@ export function useKanban(projectId: string | undefined) {
             ticketComments:
               ticket.comments?.map((comment) => ({
                 id: comment.id,
-                author: comment.author?.email ?? "Inconnu",
+                author: comment.author?.displayName ?? "Inconnu",
                 text: comment.content,
                 createdAt: comment.createdAt,
               })) ?? [],
@@ -280,7 +280,7 @@ export function useKanban(projectId: string | undefined) {
                   ...(t.ticketComments ?? []),
                   {
                     id: newComment.id,
-                    author: newComment.author?.email ?? "Vous",
+                    author: newComment.author?.displayName ?? "Vous",
                     text: newComment.content,
                     createdAt: newComment.createdAt,
                   },

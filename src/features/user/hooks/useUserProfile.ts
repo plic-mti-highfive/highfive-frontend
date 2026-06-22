@@ -1,25 +1,22 @@
 import { useState, useEffect } from "react";
 import { userService } from "@/api";
 import type { User } from "@shared/types/user";
-import type {
-  EnrichedUserProfileResponse,
-  UserProjectsResponse,
-} from "@/api/types/user.types";
+import type { UserProfileDto, UserProjectsDto } from "@/api/types/user.types";
 
 /**
  * Combine profile and projects data into a unified User object
  * Calculates stats counts from actual data arrays
  */
 const buildUserFromData = (
-  profile: EnrichedUserProfileResponse,
-  projects: UserProjectsResponse,
+  profile: UserProfileDto,
+  projects: UserProjectsDto,
 ): User => ({
   username: profile.username,
   displayName: profile.displayName,
   avatar: profile.avatar,
   bio: profile.bio || "",
   createdAt: profile.createdAt,
-  tags: profile.tags,
+  tags: profile.skills,
   stats: {
     projectsCreated: projects.created.length,
     projectsContributed: projects.collaborations.length,
@@ -31,8 +28,8 @@ const buildUserFromData = (
     collaborations: projects.collaborations,
     liked: projects.liked,
   },
-  followers: [], // TODO: implement when needed
-  following: [], // TODO: implement when needed
+  followers: profile.followers,
+  following: profile.following,
 });
 
 export function useUserProfile(userId: string | undefined) {

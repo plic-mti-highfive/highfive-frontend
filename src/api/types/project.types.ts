@@ -4,7 +4,7 @@ import type {
   ProjectRole,
   TicketStatus,
 } from "@plic-mti-highfive/shared-types";
-import type { UserDto } from "./user.types";
+import type { MinimalProfileDto } from "./user.types";
 
 export interface PaginatedResponse<T> {
   data: T[];
@@ -135,7 +135,7 @@ export interface TicketCommentDto {
   content: string;
   createdAt: string;
   updatedAt: string;
-  author?: UserDto;
+  author?: MinimalProfileDto;
 }
 
 export interface CreateTicketCommentDto {
@@ -153,14 +153,7 @@ export interface ProjectMessageDto {
   attachmentPath: string | null;
   replyToId?: string | null;
   createdAt: string;
-  author?: {
-    id: string;
-    email: string;
-    profile?: {
-      bio: string | null;
-      avatarPath: string | null;
-    };
-  };
+  author?: MinimalProfileDto;
 }
 
 export interface CreateProjectMessageDto {
