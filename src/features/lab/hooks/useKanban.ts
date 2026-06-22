@@ -89,6 +89,8 @@ export function useKanban(projectId: string | undefined) {
     fetchTickets();
   }, [projectId]);
 
+  // ---------- Ticket Operations ----------
+
   async function addTicket(columnId: KanbanColumnId, title: string) {
     if (!title.trim() || !projectId) return;
 
@@ -176,6 +178,110 @@ export function useKanban(projectId: string | undefined) {
     }));
   }
 
+  // ---------- Checklist Operations ----------
+
+  async function addChecklist(
+    ticketId: string,
+    columnId: KanbanColumnId,
+    content: string,
+  ) {
+    if (!projectId) return;
+    try {
+      const newItem = await projectService.addChecklistItem(
+        projectId,
+        ticketId,
+        { content },
+      );
+      setTickets((prev) => ({
+        ...prev,
+        [columnId]: prev[columnId].map((t) =>
+          t.id === ticketId
+            ? {
+                ...t,
+                checklistItems: [
+                  ...(t.checklistItems ?? []),
+                  {
+                    id: newItem.id,
+                    text: newItem.content,
+                    done: newItem.isCompleted,
+                  },
+                ],
+              }
+            : t,
+        ),
+      }));
+    } catch (err) {
+      console.error("Erreur ajout checklist:", err);
+    }
+  }
+
+  async function toggleChecklist(
+    ticketId: string,
+    columnId: KanbanColumnId,
+    itemId: string,
+    isCompleted: boolean,
+  ) {
+    if (!projectId) return;
+    try {
+      setTickets((prev) => ({
+        ...prev,
+        [columnId]: prev[columnId].map((t) =>
+          t.id === ticketId
+            ? {
+                ...t,
+                checklistItems: (t.checklistItems ?? []).map((i) =>
+                  i.id === itemId ? { ...i, done: isCompleted } : i,
+                ),
+              }
+            : t,
+        ),
+      }));
+      await projectService.toggleChecklistItem(projectId, itemId, isCompleted);
+    } catch (err) {
+      console.error("Erreur toggle checklist:", err);
+    }
+  }
+
+  // ---------- Comment Operations ----------
+
+  async function addComment(
+    ticketId: string,
+    columnId: KanbanColumnId,
+    content: string,
+  ) {
+    if (!projectId) return;
+    try {
+      const newComment = await projectService.addTicketComment(
+        projectId,
+        ticketId,
+        { content },
+      );
+      setTickets((prev) => ({
+        ...prev,
+        [columnId]: prev[columnId].map((t) =>
+          t.id === ticketId
+            ? {
+                ...t,
+                ticketComments: [
+                  ...(t.ticketComments ?? []),
+                  {
+                    id: newComment.id,
+                    author: newComment.author?.email ?? "Vous",
+                    text: newComment.content,
+                    createdAt: newComment.createdAt,
+                  },
+                ],
+              }
+            : t,
+        ),
+      }));
+    } catch (err) {
+      console.error("Erreur ajout commentaire:", err);
+    }
+  }
+
+  // ---------- Utility Operations ----------
+
   function addColumn(label: string) {
     const id = crypto.randomUUID();
     const colors = ["#A78BFA", "#34D399", "#F472B6", "#60A5FA", "#FBBF24"];
@@ -230,5 +336,8 @@ export function useKanban(projectId: string | undefined) {
     deleteColumn,
     addCustomTag,
     deleteCustomTag,
+    addChecklist,
+    toggleChecklist,
+    addComment,
   };
 }

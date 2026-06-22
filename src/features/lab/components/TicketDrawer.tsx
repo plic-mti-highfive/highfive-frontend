@@ -6,8 +6,6 @@ import type {
   KanbanPriority,
   KanbanColumnDef,
   CustomTag,
-  ChecklistItem,
-  TicketComment,
 } from "../types";
 import {
   PRIORITY_CONFIG,
@@ -38,6 +36,22 @@ interface TicketDrawerProps {
   ) => void;
   onDelete: (ticketId: string, columnId: KanbanColumnId) => void;
   onAddTag: (label: string, color: string) => void;
+  onAddChecklist: (
+    ticketId: string,
+    columnId: KanbanColumnId,
+    text: string,
+  ) => void;
+  onToggleChecklist: (
+    ticketId: string,
+    columnId: KanbanColumnId,
+    itemId: string,
+    done: boolean,
+  ) => void;
+  onAddComment: (
+    ticketId: string,
+    columnId: KanbanColumnId,
+    text: string,
+  ) => void;
 }
 
 function Section({
@@ -84,6 +98,9 @@ export function TicketDrawer({
   onMoveColumn,
   onDelete,
   onAddTag,
+  onAddChecklist,
+  onToggleChecklist,
+  onAddComment,
 }: TicketDrawerProps) {
   const [titleDraft, setTitleDraft] = useState<{
     ticketId: string | null;
@@ -163,11 +180,10 @@ export function TicketDrawer({
 
   function toggleChecklistItem(itemId: string) {
     if (!visibleTicket || !visibleColumnId) return;
-    onUpdate(visibleTicket.id, visibleColumnId, {
-      checklistItems: (visibleTicket.checklistItems ?? []).map((i) =>
-        i.id === itemId ? { ...i, done: !i.done } : i,
-      ),
-    });
+    const item = visibleTicket.checklistItems?.find((i) => i.id === itemId);
+    if (item) {
+      onToggleChecklist(visibleTicket.id, visibleColumnId, itemId, !item.done);
+    }
   }
 
   function deleteChecklistItem(itemId: string) {
@@ -182,29 +198,16 @@ export function TicketDrawer({
   function addChecklistItem(e: React.FormEvent) {
     e.preventDefault();
     if (!visibleTicket || !visibleColumnId || !newChecklistText.trim()) return;
-    const item: ChecklistItem = {
-      id: crypto.randomUUID(),
-      text: newChecklistText.trim(),
-      done: false,
-    };
-    onUpdate(visibleTicket.id, visibleColumnId, {
-      checklistItems: [...(visibleTicket.checklistItems ?? []), item],
-    });
+
+    onAddChecklist(visibleTicket.id, visibleColumnId, newChecklistText.trim());
     setNewChecklistText("");
   }
 
   function addComment(e: React.FormEvent) {
     e.preventDefault();
     if (!visibleTicket || !visibleColumnId || !newComment.trim()) return;
-    const comment: TicketComment = {
-      id: crypto.randomUUID(),
-      author: "Alice M.",
-      text: newComment.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    onUpdate(visibleTicket.id, visibleColumnId, {
-      ticketComments: [...(visibleTicket.ticketComments ?? []), comment],
-    });
+
+    onAddComment(visibleTicket.id, visibleColumnId, newComment.trim());
     setNewComment("");
   }
 
