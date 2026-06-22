@@ -6,7 +6,7 @@ import type {
   UserProjectsResponse,
 } from "../../types";
 import { delay } from "./utils";
-import { getAllUsers, getAllProjects } from "./data";
+import { getAllUsers } from "./data";
 
 // Base de données mock pour les profils utilisateurs
 class MockUserDb {
@@ -73,6 +73,7 @@ export class UserServiceMock implements IUserService {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getUserProjects(userId: string): Promise<UserProjectsResponse> {
     await delay(300);
     // Mock projects data

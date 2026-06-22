@@ -26,6 +26,7 @@ export interface CreateProjectDto {
   description?: string;
   status?: ProjectStatus;
   visibility?: ProjectVisibility;
+  tags?: string[];
 }
 
 export interface UpdateProjectDto {
