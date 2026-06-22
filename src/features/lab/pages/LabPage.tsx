@@ -31,7 +31,7 @@ export default function LabPage() {
     addColumn,
     deleteColumn,
     addCustomTag,
-  } = useKanban();
+  } = useKanban(projectId);
   const [openTicket, setOpenTicket] = useState<{
     ticketId: string;
     columnId: KanbanColumnId;
