@@ -30,3 +30,31 @@ export interface UserProfileResponse {
   themePreference: string;
   emailNotifications: boolean;
 }
+
+/**
+ * Enriched user profile response from backend
+ * Includes skills, stats (follower/following counts only)
+ */
+export interface EnrichedUserProfileResponse {
+  userId: string;
+  username: string;
+  displayName: string;
+  avatar: string;
+  bio: string | null;
+  createdAt: string;
+  tags: string[];
+  stats: {
+    followers: number;
+    following: number;
+  };
+}
+
+/**
+ * User projects grouped by category
+ * calculated from backend database relationships
+ */
+export interface UserProjectsResponse {
+  created: import("@shared/types/project").Project[];
+  collaborations: import("@shared/types/project").Project[];
+  liked: import("@shared/types/project").Project[];
+}

@@ -1,31 +1,38 @@
 import { useState, useEffect } from "react";
 import { userService } from "@/api";
 import type { User } from "@shared/types/user";
-import type { UserProfileResponse } from "@/api/types/user.types";
+import type {
+  EnrichedUserProfileResponse,
+  UserProjectsResponse,
+} from "@/api/types/user.types";
 
-// Adapter la réponse API vers le format User attendu par les composants
-const adaptUserProfile = (profile: UserProfileResponse): User => ({
-  username: profile.userId,
-  displayName: profile.userId,
-  avatar:
-    profile.avatarPath ||
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.userId}`,
+/**
+ * Combine profile and projects data into a unified User object
+ * Calculates stats counts from actual data arrays
+ */
+const buildUserFromData = (
+  profile: EnrichedUserProfileResponse,
+  projects: UserProjectsResponse,
+): User => ({
+  username: profile.username,
+  displayName: profile.displayName,
+  avatar: profile.avatar,
   bio: profile.bio || "",
-  createdAt: "",
-  tags: [], // TODO: implémenter quand le backend supporte les tags
+  createdAt: profile.createdAt,
+  tags: profile.tags,
   stats: {
-    projectsCreated: 0, // TODO: récupérer depuis API
-    projectsContributed: 0, // TODO: récupérer depuis API
-    followers: 0, // TODO: récupérer depuis API
-    following: 0, // TODO: récupérer depuis API
+    projectsCreated: projects.created.length,
+    projectsContributed: projects.collaborations.length,
+    followers: profile.stats.followers,
+    following: profile.stats.following,
   },
   projects: {
-    created: [], // TODO: récupérer depuis API
-    collaborations: [], // TODO: récupérer depuis API
-    liked: [], // TODO: récupérer depuis API
+    created: projects.created,
+    collaborations: projects.collaborations,
+    liked: projects.liked,
   },
-  followers: [], // TODO: récupérer depuis API
-  following: [], // TODO: récupérer depuis API
+  followers: [], // TODO: implement when needed
+  following: [], // TODO: implement when needed
 });
 
 export function useUserProfile(userId: string | undefined) {
@@ -39,9 +46,17 @@ export function useUserProfile(userId: string | undefined) {
     const fetchUserProfile = async () => {
       try {
         setIsLoading(true);
-        const profile = await userService.getUserProfile(userId);
-        const adaptedUser = adaptUserProfile(profile);
-        setUser(adaptedUser);
+        // Fetch both endpoints in parallel
+        const [profile, projects] = await Promise.all([
+          userService.getUserProfile(userId),
+          userService.getUserProjects(userId),
+        ]);
+
+        console.log("Fetched user profile:", profile);
+        console.log("Fetched user projects:", projects);
+
+        const combinedUser = buildUserFromData(profile, projects);
+        setUser(combinedUser);
       } catch (err) {
         setError(
           err instanceof Error

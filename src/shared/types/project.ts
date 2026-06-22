@@ -2,7 +2,7 @@ export interface Project {
   id: number | string;
   name: string;
   description: string;
-  tags: string[];
+  tags?: string[];
   author: string;
   authorAvatar?: string;
   contributorsCount: number;

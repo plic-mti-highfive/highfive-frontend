@@ -1,7 +1,13 @@
-import type { UpdateUserProfileDto, UserProfileResponse } from "../../types";
+import type {
+  UpdateUserProfileDto,
+  UserProfileResponse,
+  EnrichedUserProfileResponse,
+  UserProjectsResponse,
+} from "../../types";
 
 export interface IUserService {
-  getUserProfile(userId: string): Promise<UserProfileResponse>;
+  getUserProfile(userId: string): Promise<EnrichedUserProfileResponse>;
+  getUserProjects(userId: string): Promise<UserProjectsResponse>;
   updateUserProfile(
     userId: string,
     dto: UpdateUserProfileDto,

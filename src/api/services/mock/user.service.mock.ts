@@ -1,7 +1,12 @@
 import type { IUserService } from "../interfaces";
-import type { UpdateUserProfileDto, UserProfileResponse } from "../../types";
+import type {
+  UpdateUserProfileDto,
+  UserProfileResponse,
+  EnrichedUserProfileResponse,
+  UserProjectsResponse,
+} from "../../types";
 import { delay } from "./utils";
-import { getAllUsers } from "./data";
+import { getAllUsers, getAllProjects } from "./data";
 
 // Base de données mock pour les profils utilisateurs
 class MockUserDb {
@@ -48,9 +53,34 @@ class MockUserDb {
 const db = new MockUserDb();
 
 export class UserServiceMock implements IUserService {
-  async getUserProfile(userId: string): Promise<UserProfileResponse> {
+  async getUserProfile(userId: string): Promise<EnrichedUserProfileResponse> {
     await delay(200);
-    return db.getProfile(userId);
+    const profile = db.getProfile(userId);
+    return {
+      userId,
+      username: userId.substring(0, 8),
+      displayName: userId.substring(0, 8),
+      avatar:
+        profile.avatarPath ||
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
+      bio: profile.bio,
+      createdAt: new Date().toISOString(),
+      tags: [],
+      stats: {
+        followers: 0,
+        following: 0,
+      },
+    };
+  }
+
+  async getUserProjects(userId: string): Promise<UserProjectsResponse> {
+    await delay(300);
+    // Mock projects data
+    return {
+      created: [],
+      collaborations: [],
+      liked: [],
+    };
   }
 
   async updateUserProfile(
