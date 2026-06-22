@@ -94,7 +94,10 @@ export class ProjectServiceHttp implements IProjectService {
   }
 
   async getProjectTickets(projectId: string): Promise<TicketDto[]> {
-    return httpClient.get<TicketDto[]>(`/projects/${projectId}/tickets`);
+    const response = await httpClient.get<PaginatedResponse<TicketDto>>(
+      `/projects/${projectId}/tickets`,
+    );
+    return response.data;
   }
 
   async getTicketById(projectId: string, ticketId: string): Promise<TicketDto> {
