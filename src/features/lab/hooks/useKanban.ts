@@ -150,6 +150,20 @@ export function useKanban(projectId: string | undefined) {
       const targetList = [...(prev[to] ?? [])];
       const insertIndex = toIndex !== undefined ? toIndex : targetList.length;
       targetList.splice(insertIndex, 0, ticket);
+
+      if (from !== to && projectId) {
+        const apiStatus: TicketStatus =
+          to === "in-progress"
+            ? TicketStatus.IN_PROGRESS
+            : to === "done"
+              ? TicketStatus.DONE
+              : TicketStatus.TODO;
+
+        projectService
+          .updateTicket(projectId, ticketId, { status: apiStatus })
+          .catch((err) => console.error("Error moving ticket:", err));
+      }
+
       return {
         ...prev,
         [from]: prev[from].filter((t) => t.id !== ticketId),
@@ -211,7 +225,7 @@ export function useKanban(projectId: string | undefined) {
         ),
       }));
     } catch (err) {
-      console.error("Erreur ajout checklist:", err);
+      console.error("Error adding checklist item:", err);
     }
   }
 
@@ -238,7 +252,7 @@ export function useKanban(projectId: string | undefined) {
       }));
       await projectService.toggleChecklistItem(projectId, itemId, isCompleted);
     } catch (err) {
-      console.error("Erreur toggle checklist:", err);
+      console.error("Error toggling checklist item:", err);
     }
   }
 
@@ -276,7 +290,7 @@ export function useKanban(projectId: string | undefined) {
         ),
       }));
     } catch (err) {
-      console.error("Erreur ajout commentaire:", err);
+      console.error("Error adding comment:", err);
     }
   }
 
