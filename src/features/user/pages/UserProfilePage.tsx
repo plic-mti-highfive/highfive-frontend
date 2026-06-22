@@ -18,6 +18,7 @@ import type { UserProfileFormData } from "@shared/types/user";
 import { useAuth } from "@shared/contexts";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { userService } from "@/api/services";
+import { storageService } from "@/api/services/http/storage.service.http";
 
 function StatItem({
   value,
@@ -76,15 +77,24 @@ export default function UserProfile() {
       .catch(console.error);
   }, []);
 
-  const handleSaveProfile = async (data: UserProfileFormData) => {
+  const handleSaveProfile = async (
+    data: UserProfileFormData,
+    fileToUpload?: File,
+  ) => {
     if (!userId) return;
     console.log("Saving profile:", data);
 
     try {
+      let finalAvatarPath = data.avatar;
+
+      if (fileToUpload) {
+        finalAvatarPath = await storageService.upload(fileToUpload, "avatars");
+      }
+
       await userService.updateUserProfile(userId, {
         displayName: data.displayName,
         bio: data.bio,
-        avatarPath: data.avatar,
+        avatarPath: finalAvatarPath,
         skills: data.tags,
       });
       window.location.reload();
