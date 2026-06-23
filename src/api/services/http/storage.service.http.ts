@@ -1,3 +1,4 @@
+import type { StorageFolder } from "@plic-mti-highfive/shared-types";
 import { httpClient } from "../../http-client";
 
 interface PresignedUrlResponse {
@@ -10,7 +11,7 @@ export class StorageServiceHttp {
   async getPresignedUrl(
     fileName: string,
     mimeType: string,
-    folder: string,
+    folder: StorageFolder,
   ): Promise<PresignedUrlResponse> {
     return httpClient.post<PresignedUrlResponse>("/storage/presigned-url", {
       fileName,
@@ -19,10 +20,7 @@ export class StorageServiceHttp {
     });
   }
 
-  async upload(
-    file: File,
-    folder: "avatars" | "banners" | "projects",
-  ): Promise<string> {
+  async upload(file: File, folder: StorageFolder): Promise<string> {
     const { uploadUrl, publicUrl } = await this.getPresignedUrl(
       file.name,
       file.type,

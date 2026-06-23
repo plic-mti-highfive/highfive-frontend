@@ -19,6 +19,7 @@ import { useAuth } from "@shared/contexts";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { userService } from "@/api/services";
 import { storageService } from "@/api/services/http/storage.service.http";
+import { StorageFolder } from "@plic-mti-highfive/shared-types";
 
 function StatItem({
   value,
@@ -88,7 +89,10 @@ export default function UserProfile() {
       let finalAvatarPath = data.avatar;
 
       if (fileToUpload) {
-        finalAvatarPath = await storageService.upload(fileToUpload, "avatars");
+        finalAvatarPath = await storageService.upload(
+          fileToUpload,
+          StorageFolder.AVATARS,
+        );
       }
 
       await userService.updateUserProfile(userId, {
