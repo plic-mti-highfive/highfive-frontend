@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import { HomePage } from "@features/home";
 import { LoginPage, RegisterPage } from "@features/auth";
@@ -25,10 +25,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route
-          path="/search"
-          element={<Navigate to="/search/projects" replace />}
-        />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/search/projects" element={<SearchPage />} />
         <Route path="/search/users" element={<SearchPage />} />
         <Route path="/search/tags" element={<SearchPage />} />

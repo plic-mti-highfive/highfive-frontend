@@ -56,9 +56,9 @@ export function SearchResultsDropdown({
           <div className={sectionTitleCls}>Utilisateurs</div>
           {filteredUsers.map((user) => (
             <button
-              key={user.username}
+              key={user.userId}
               className={resultItemCls}
-              onClick={() => navigate(`/user/${user.id}`)}
+              onClick={() => navigate(`/user/${user.userId}`)}
               type="button"
             >
               <img

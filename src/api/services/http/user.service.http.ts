@@ -1,5 +1,7 @@
 import type { IUserService } from "../interfaces";
 import type {
+  ListUsersQuery,
+  PaginatedUsersResponse,
   UpdateUserProfileDto,
   UserProfileDto,
   UserProjectsDto,
@@ -24,5 +26,15 @@ export class UserServiceHttp implements IUserService {
 
   async getSkillSuggestions(): Promise<string[]> {
     return httpClient.get<string[]>("/users/skills-suggestions");
+  }
+
+  async searchProfiles(query: ListUsersQuery): Promise<PaginatedUsersResponse> {
+    const params: Record<string, any> = { ...query };
+
+    if (query.tags && query.tags.length > 0) {
+      params.tags = query.tags.join(",");
+    }
+
+    return httpClient.get<PaginatedUsersResponse>("/users", { params });
   }
 }

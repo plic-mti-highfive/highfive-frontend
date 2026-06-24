@@ -1,0 +1,4 @@
+allowBuilds:
+  msw: set this to true or false
+minimumReleaseAgeExclude:
+  - "@plic-mti-highfive/shared-types@1.2.0"

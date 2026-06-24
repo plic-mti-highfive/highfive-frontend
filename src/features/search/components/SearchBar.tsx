@@ -11,7 +11,7 @@ export function SearchBar({ navigate }: SearchBarProps) {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      navigate(`/search/projects?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
   };

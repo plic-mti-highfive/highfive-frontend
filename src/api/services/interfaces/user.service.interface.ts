@@ -1,4 +1,6 @@
 import type {
+  ListUsersQuery,
+  PaginatedUsersResponse,
   UpdateUserProfileDto,
   UserProfileDto,
   UserProjectsDto,
@@ -12,4 +14,5 @@ export interface IUserService {
     dto: UpdateUserProfileDto,
   ): Promise<UserProfileDto>;
   getSkillSuggestions(): Promise<string[]>;
+  searchProfiles(query: ListUsersQuery): Promise<PaginatedUsersResponse>;
 }

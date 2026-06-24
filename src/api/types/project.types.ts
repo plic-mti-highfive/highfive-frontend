@@ -48,8 +48,12 @@ export interface UpdateProjectDto {
 export interface ListProjectsQuery {
   status?: ProjectStatus;
   visibility?: ProjectVisibility;
-  page?: number;
+  search?: string;
+  tags?: string[];
+  sortBy?: "date" | "name" | "popularity";
+  sortOrder?: "ASC" | "DESC";
   limit?: number;
+  offset?: number;
 }
 
 // ---------- Member ----------

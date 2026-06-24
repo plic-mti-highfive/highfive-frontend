@@ -37,3 +37,20 @@ export interface UserProjectsDto {
   collaborations: ProjectDto[];
   liked: ProjectDto[];
 }
+
+export interface ListUsersQuery {
+  search?: string;
+  tags?: string[];
+  sortBy?: "date" | "name" | "popularity";
+  sortOrder?: "ASC" | "DESC";
+  limit?: number;
+  offset?: number;
+}
+
+export interface PaginatedUsersResponse {
+  data: MinimalProfileDto[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
