@@ -15,16 +15,31 @@ class MockUserDb {
 
   constructor() {
     const allUsers = getAllUsers();
+
     allUsers.forEach((user) => {
-      if (user.profile) {
-        this.profiles.set(user.id, {
-          userId: user.id,
-          bio: user.profile.bio,
-          avatar: user.profile.avatarPath,
-          themePreference: user.profile.themePreference,
-          emailNotifications: user.profile.emailNotifications,
-        });
-      }
+      const username = user.email.split("@")[0];
+      const displayName = username
+        .split(".")
+        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+        .join(" ");
+
+      this.profiles.set(user.id, {
+        userId: user.id,
+        username: username,
+        displayName: displayName,
+        avatar:
+          user.profile?.avatarPath ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`,
+        bio: user.profile?.bio || null,
+        createdAt: user.createdAt,
+        skills: [],
+        stats: {
+          followers: Math.floor(Math.random() * 50),
+          following: Math.floor(Math.random() * 50),
+        },
+        followers: [],
+        following: [],
+      });
     });
   }
 
@@ -32,10 +47,15 @@ class MockUserDb {
     return (
       this.profiles.get(userId) ?? {
         userId,
-        bio: null,
+        username: "unknown",
+        displayName: "Utilisateur Inconnu",
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
-        themePreference: "light",
-        emailNotifications: true,
+        bio: null,
+        createdAt: new Date().toISOString(),
+        skills: [],
+        stats: { followers: 0, following: 0 },
+        followers: [],
+        following: [],
       }
     );
   }
@@ -54,6 +74,11 @@ class MockUserDb {
 const db = new MockUserDb();
 
 export class UserServiceMock implements IUserService {
+  async getSkillSuggestions(): Promise<string[]> {
+    await delay(100);
+    return ["JavaScript", "TypeScript", "Python", "Java", "C#", "Go", "Rust"];
+  }
+
   async getUserProfile(userId: string): Promise<UserProfileDto> {
     await delay(200);
     const profile = db.getProfile(userId);
@@ -77,7 +102,7 @@ export class UserServiceMock implements IUserService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getUserProjects(userId: string): Promise<UserProjectsDto> {
+  async getUserProjects(_userId: string): Promise<UserProjectsDto> {
     await delay(300);
     // Mock projects data
     return {

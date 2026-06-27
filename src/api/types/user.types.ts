@@ -1,4 +1,5 @@
 import type { ProjectDto } from "./project.types";
+import type { UserStatus } from "@plic-mti-highfive/shared-types";
 
 export interface MinimalProfileDto {
   userId: string;
@@ -53,4 +54,22 @@ export interface PaginatedUsersResponse {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+// Private User DTOs
+export interface ProfileBaseDto {
+  bio: string | null;
+  avatarPath: string | null;
+  themePreference: string;
+  emailNotifications: boolean;
+}
+
+export interface UserDto {
+  id: string;
+  email: string;
+  status: UserStatus;
+  tenantId: string;
+  createdAt: string;
+  updatedAt: string;
+  profile?: ProfileBaseDto;
 }

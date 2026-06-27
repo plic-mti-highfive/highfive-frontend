@@ -10,8 +10,9 @@ interface MessageCardProps {
 }
 
 export function MessageCard({ message, onReply, onReport }: MessageCardProps) {
-  const authorName = message.author?.email.split("@")[0] || "Utilisateur";
-  const avatarPath = message.author?.profile?.avatarPath;
+  const authorName =
+    message.author?.displayName || message.author?.username || "Utilisateur";
+  const avatarPath = message.author?.avatar;
 
   const getInitials = (name: string) => {
     return name.slice(0, 2).toUpperCase();

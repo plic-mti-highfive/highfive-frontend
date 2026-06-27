@@ -14,7 +14,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-20T10:00:00Z",
     updatedAt: "2024-03-20T10:00:00Z",
     profile: {
-      userId: "user-1",
       bio: "Nouvelle sur la plateforme, j'adore les projets créatifs et la rencontre avec de nouvelles personnes !",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=sophie",
       themePreference: "light",
@@ -29,7 +28,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-01-15T10:00:00Z",
     updatedAt: "2024-01-15T10:00:00Z",
     profile: {
-      userId: "user-2",
       bio: "Photographe amateur passionné par les portraits et la vie urbaine. J'aime capturer l'authenticité des moments et des rencontres. Toujours partant pour de nouveaux projets photo collaboratifs et des expos de quartier. Le partage et l'entraide sont mes moteurs !",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=thomas",
       themePreference: "light",
@@ -44,7 +42,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2023-11-20T10:00:00Z",
     updatedAt: "2023-11-20T10:00:00Z",
     profile: {
-      userId: "user-3",
       bio: "Professeure de yoga et grande amatrice de bien-être. Convaincue qu'ensemble on peut créer des choses merveilleuses pour notre communauté.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=marie",
       themePreference: "light",
@@ -59,7 +56,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-10T10:00:00Z",
     updatedAt: "2024-03-10T10:00:00Z",
     profile: {
-      userId: "user-4",
       bio: "Artiste peintre et illustrateur. Je cherche toujours de nouveaux murs à peindre et des collaborations artistiques.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
       themePreference: "dark",
@@ -74,7 +70,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-02-05T10:00:00Z",
     updatedAt: "2024-02-05T10:00:00Z",
     profile: {
-      userId: "user-5",
       bio: "Bénévole active dans plusieurs assos. Mon truc c'est l'action concrète et l'entraide.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=julie",
       themePreference: "light",
@@ -89,7 +84,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-01-01T10:00:00Z",
     updatedAt: "2024-01-01T10:00:00Z",
     profile: {
-      userId: "user-6",
       bio: "Jardinier urbain. Convaincu qu'on peut verdir nos villes et cultiver du lien social en même temps. Expertise en permaculture et compostage à partager.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=pierre",
       themePreference: "light",
@@ -104,7 +98,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2023-12-15T10:00:00Z",
     updatedAt: "2023-12-15T10:00:00Z",
     profile: {
-      userId: "user-7",
       bio: "Musicienne et prof de chant. J'organise des ateliers et j'adore les projets musicaux collectifs.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=camille",
       themePreference: "dark",
@@ -119,7 +112,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-02-20T10:00:00Z",
     updatedAt: "2024-02-20T10:00:00Z",
     profile: {
-      userId: "user-8",
       bio: null,
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=lucas",
       themePreference: "light",
@@ -134,7 +126,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-05T10:00:00Z",
     updatedAt: "2024-03-05T10:00:00Z",
     profile: {
-      userId: "user-9",
       bio: "Cuisinière passionnée qui aime transmettre les recettes de famille et découvrir de nouvelles saveurs du monde entier.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=emma",
       themePreference: "light",
@@ -149,7 +140,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-01-25T10:00:00Z",
     updatedAt: "2024-01-25T10:00:00Z",
     profile: {
-      userId: "user-10",
       bio: "Réalisateur de documentaires indépendants. Intéressé par les histoires humaines et les initiatives locales. Toujours à la recherche de nouveaux sujets qui mettent en lumière les talents et les solidarités de proximité.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=maxime",
       themePreference: "dark",
@@ -164,7 +154,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2023-10-10T10:00:00Z",
     updatedAt: "2023-10-10T10:00:00Z",
     profile: {
-      userId: "user-11",
       bio: "Fan de sport et de nature. J'organise des sorties rando et des événements sportifs.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=lea",
       themePreference: "light",
@@ -179,7 +168,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-02-14T10:00:00Z",
     updatedAt: "2024-02-14T10:00:00Z",
     profile: {
-      userId: "user-12",
       bio: "Développeur full-stack (React/Node.js) qui aime mettre mes compétences au service de projets à impact social. Contributeur open source et mentor pour débutants.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=antoine",
       themePreference: "dark",
@@ -194,7 +182,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-30T10:00:00Z",
     updatedAt: "2024-03-30T10:00:00Z",
     profile: {
-      userId: "user-13",
       bio: "Comédienne amateur cherchant à monter des projets théâtraux dans le quartier.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=clara",
       themePreference: "light",
@@ -209,7 +196,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-01-18T10:00:00Z",
     updatedAt: "2024-01-18T10:00:00Z",
     profile: {
-      userId: "user-14",
       bio: "Bricoleur et adepte du DIY. Si ça peut se réparer, je vais essayer !",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=hugo",
       themePreference: "light",
@@ -224,7 +210,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-04-02T10:00:00Z",
     updatedAt: "2024-04-02T10:00:00Z",
     profile: {
-      userId: "user-15",
       bio: "Étudiante en environnement et militante écolo. Motivée pour agir localement.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
       themePreference: "light",
@@ -239,7 +224,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2023-09-22T10:00:00Z",
     updatedAt: "2023-09-22T10:00:00Z",
     profile: {
-      userId: "user-16",
       bio: "Passionné de jeux de société. J'en ai des centaines et j'adore les partager.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=nicolas",
       themePreference: "dark",
@@ -254,7 +238,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-22T10:00:00Z",
     updatedAt: "2024-03-22T10:00:00Z",
     profile: {
-      userId: "user-17",
       bio: null,
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=amelie",
       themePreference: "light",
@@ -269,7 +252,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-02-08T10:00:00Z",
     updatedAt: "2024-02-08T10:00:00Z",
     profile: {
-      userId: "user-18",
       bio: "Bibliothécaire et amoureux des livres. J'organise des clubs de lecture et des ateliers d'écriture pour tous âges.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=julien",
       themePreference: "light",
@@ -284,7 +266,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-16T10:00:00Z",
     updatedAt: "2024-03-16T10:00:00Z",
     profile: {
-      userId: "user-19",
       bio: "Coach sportif bénévole. Le sport pour tous, peu importe le niveau !",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=laura",
       themePreference: "light",
@@ -299,7 +280,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-01-29T10:00:00Z",
     updatedAt: "2024-01-29T10:00:00Z",
     profile: {
-      userId: "user-20",
       bio: "Apiculteur amateur. Je partage ma passion pour les abeilles et la biodiversité urbaine.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=raphael",
       themePreference: "light",
@@ -314,7 +294,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-11T10:00:00Z",
     updatedAt: "2024-03-11T10:00:00Z",
     profile: {
-      userId: "user-21",
       bio: "Data scientist passionnée par le ML et l'analyse de données. Je cherche des projets où la tech peut aider la société.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=alicedubois",
       themePreference: "dark",
@@ -329,7 +308,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-02-19T10:00:00Z",
     updatedAt: "2024-02-19T10:00:00Z",
     profile: {
-      userId: "user-22",
       bio: "Maker et passionné d'électronique. Arduino, ESP32, Raspberry Pi... Si ça clignote, je suis dedans !",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=kevin",
       themePreference: "dark",
@@ -344,7 +322,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-01-07T10:00:00Z",
     updatedAt: "2024-01-07T10:00:00Z",
     profile: {
-      userId: "user-23",
       bio: "Designeuse UI/UX qui adore créer des interfaces accessibles et inclusives. Figma addict.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=nadia",
       themePreference: "light",
@@ -359,7 +336,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-03-27T10:00:00Z",
     updatedAt: "2024-03-27T10:00:00Z",
     profile: {
-      userId: "user-24",
       bio: "Étudiant en cybersécurité. Intéressé par la protection des données et la sensibilisation aux bonnes pratiques numériques.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=martin",
       themePreference: "dark",
@@ -374,7 +350,6 @@ export const mockUsers: Record<string, UserDto> = {
     createdAt: "2024-02-26T10:00:00Z",
     updatedAt: "2024-02-26T10:00:00Z",
     profile: {
-      userId: "user-25",
       bio: "Dev mobile iOS/Android. J'aime créer des apps qui simplifient la vie.",
       avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=sofia",
       themePreference: "light",

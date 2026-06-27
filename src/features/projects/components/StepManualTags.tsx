@@ -2,7 +2,6 @@ import { BackButton } from "./BackButton";
 import { PrimaryButton } from "./PrimaryButton";
 import { ProgressDots } from "./ProgressDots";
 import { TagSearchDropdown } from "./TagSearchDropdown";
-import { ALL_TAGS } from "@/api/services/mock/data";
 
 export function StepManualTags({
   onBack,
@@ -28,12 +27,7 @@ export function StepManualTags({
           Jusqu'à 5 tags pour aider la communauté à trouver ton projet.
         </p>
       </div>
-      <TagSearchDropdown
-        selected={value}
-        onChange={onChange}
-        tags={ALL_TAGS}
-        maxTags={5}
-      />
+      <TagSearchDropdown selected={value} onChange={onChange} maxTags={5} />
       <PrimaryButton onClick={onSubmit}>Créer le projet →</PrimaryButton>
     </div>
   );

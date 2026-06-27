@@ -49,7 +49,6 @@ export class AuthServiceMock implements IAuthService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       profile: {
-        userId,
         bio: null,
         avatarPath: null,
         themePreference: "light",
@@ -120,7 +119,6 @@ export class AuthServiceMock implements IAuthService {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         profile: {
-          userId: "default-user-id",
           bio: null,
           avatarPath: null,
           themePreference: "light",
@@ -148,7 +146,6 @@ export class AuthServiceMock implements IAuthService {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         profile: {
-          userId: "default-user-id",
           bio: "Mock user bio",
           avatarPath: "https://api.dicebear.com/7.x/avataaars/svg?seed=default",
           themePreference: "light",

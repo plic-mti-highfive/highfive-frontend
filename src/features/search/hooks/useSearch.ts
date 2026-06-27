@@ -48,8 +48,8 @@ export function useSearch(query: string) {
         setResults({
           projects: response.projects?.data || [],
           users: response.users?.data || [],
-          tags: response.tags?.data || [],
-          progress: response.progress?.data || [],
+          tags: (response.tags?.data || []) as SearchTag[],
+          progress: (response.progress?.data || []) as SearchProgress[],
         });
       } catch (error) {
         console.error("Erreur lors de la recherche globale :", error);
