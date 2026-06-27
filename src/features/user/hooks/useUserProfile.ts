@@ -4,13 +4,13 @@ import type { User } from "@shared/types/user";
 import type { UserProfileDto, UserProjectsDto } from "@/api/types/user.types";
 import type { Project } from "@/shared/types/project";
 
-const adaptProject = (p: ProjectDto, user: UserProfileDto): Project => ({
+const adaptProject = (p: ProjectDto): Project => ({
   id: p.id,
   name: p.name,
   description: p.description ?? "",
   tags: p.tags ?? [],
-  author: user.displayName,
-  authorAvatar: user.avatar,
+  author: p.owner?.username ?? "Unknown",
+  authorAvatar: p.owner?.avatar ?? undefined,
   contributorsCount: 0, // TODO
   highfiveCount: p.highfiveCount,
   successRate: 0, // TODO
@@ -38,11 +38,9 @@ const buildUserFromData = (
     following: profile.stats.following,
   },
   projects: {
-    created: projects.created.map((p) => adaptProject(p, profile)),
-    collaborations: projects.collaborations.map((p) =>
-      adaptProject(p, profile),
-    ),
-    liked: projects.liked.map((p) => adaptProject(p, profile)),
+    created: projects.created.map(adaptProject),
+    collaborations: projects.collaborations.map(adaptProject),
+    liked: projects.liked.map(adaptProject),
   },
   followers: profile.followers,
   following: profile.following,

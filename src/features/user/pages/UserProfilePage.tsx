@@ -53,15 +53,8 @@ export default function UserProfile() {
 
   const isOwnProfile = isAuthenticated && currentUser?.id === userId;
 
-  // For display name / username: prefer the email prefix when viewing own profile
-  const displayUsername =
-    isOwnProfile && currentUser?.email
-      ? currentUser.email.split("@")[0]
-      : (user?.username ?? userId ?? "");
-  const displayName =
-    isOwnProfile && currentUser?.email
-      ? currentUser.email.split("@")[0]
-      : (user?.displayName ?? userId ?? "");
+  const displayUsername = user?.username ?? userId ?? "";
+  const displayName = user?.displayName ?? displayUsername;
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [following, setFollowing] = useState(false);

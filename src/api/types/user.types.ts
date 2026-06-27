@@ -71,5 +71,5 @@ export interface UserDto {
   tenantId: string;
   createdAt: string;
   updatedAt: string;
-  profile?: ProfileBaseDto;
+  profile: ProfileBaseDto;
 }

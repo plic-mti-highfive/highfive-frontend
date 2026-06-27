@@ -53,7 +53,7 @@ function NotificationsMenu() {
 
 type UserMenuProps = {
   username: string;
-  initials: string;
+  avatar: string;
   profilePath: string;
   onLogout: () => void;
   navigate: (to: string) => void;
@@ -61,7 +61,7 @@ type UserMenuProps = {
 
 function UserMenu({
   username,
-  initials,
+  avatar,
   profilePath,
   onLogout,
   navigate,
@@ -72,7 +72,11 @@ function UserMenu({
         className="flex items-center justify-center w-10 h-10 rounded-full bg-rose-light text-rose-dark text-body-md font-bold hover:bg-rose-mid transition-colors outline-none select-none"
         aria-label="Mon compte"
       >
-        {initials}
+        <img
+          src={avatar}
+          alt={username}
+          className="w-12 h-12 rounded-full shrink-0 object-cover"
+        />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
@@ -84,7 +88,11 @@ function UserMenu({
           <Menu.Popup className={popupCls}>
             <div className="flex items-center gap-3 px-3 py-2.5 mb-0.5">
               <div className="w-10 h-10 rounded-full bg-rose-light text-rose-dark text-ui-md font-bold flex items-center justify-center shrink-0">
-                {initials}
+                <img
+                  src={avatar}
+                  alt={username}
+                  className="w-12 h-12 rounded-full shrink-0 object-cover"
+                />
               </div>
               <div className="min-w-0">
                 <p className="text-body-lg font-semibold text-foreground truncate">
@@ -144,8 +152,8 @@ function UserMenu({
 export default function Header() {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
+  console.log(user);
   const username = user?.email.split("@")[0] ?? "";
-  const initials = username.slice(0, 2).toUpperCase();
 
   return (
     <header className="sticky top-0 z-[9999] w-full bg-sidebar border-b border-sidebar-border px-8 h-14 flex items-center gap-8">
@@ -174,7 +182,10 @@ export default function Header() {
             <NotificationsMenu />
             <UserMenu
               username={username}
-              initials={initials}
+              avatar={
+                user?.profile?.avatarPath ||
+                `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id}`
+              }
               profilePath={user ? `/user/${user.id}` : "/"}
               onLogout={() => {
                 logout().then(() => navigate("/"));

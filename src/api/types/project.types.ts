@@ -28,6 +28,7 @@ export interface ProjectDto {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  owner?: MinimalProfileDto;
 }
 
 export interface CreateProjectDto {
@@ -43,6 +44,7 @@ export interface UpdateProjectDto {
   description?: string;
   status?: ProjectStatus;
   visibility?: ProjectVisibility;
+  tags?: string[];
 }
 
 export interface ListProjectsQuery {
