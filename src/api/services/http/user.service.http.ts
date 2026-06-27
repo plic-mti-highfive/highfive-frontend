@@ -28,13 +28,23 @@ export class UserServiceHttp implements IUserService {
     return httpClient.get<string[]>("/users/skills-suggestions");
   }
 
-  async searchProfiles(query: ListUsersQuery): Promise<PaginatedUsersResponse> {
-    const params: Record<string, any> = { ...query };
+  async searchProfiles(
+    query?: ListUsersQuery,
+  ): Promise<PaginatedUsersResponse> {
+    const { limit, offset, tags, ...rest } = query ?? {};
 
-    if (query.tags && query.tags.length > 0) {
-      params.tags = query.tags.join(",");
+    const params: Record<string, string | number | boolean> = {
+      ...rest,
+      limit: limit ?? 20,
+      offset: offset ?? 0,
+    };
+
+    if (tags && tags.length > 0) {
+      params.tags = tags.join(",");
     }
 
-    return httpClient.get<PaginatedUsersResponse>("/users", { params });
+    return httpClient.get<PaginatedUsersResponse>("/users", {
+      params,
+    });
   }
 }

@@ -23,6 +23,6 @@ export interface PaginatedSearch<T> {
 export interface GlobalSearchResponse {
   projects?: PaginatedSearch<ProjectDto>;
   users?: PaginatedSearch<MinimalProfileDto>;
-  tags?: PaginatedSearch<any>; // TODO
-  progress?: PaginatedSearch<any>; // TODO
+  tags?: PaginatedSearch<unknown>; // TODO
+  progress?: PaginatedSearch<unknown>; // TODO
 }

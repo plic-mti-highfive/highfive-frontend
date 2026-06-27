@@ -43,7 +43,7 @@ export function SearchPage() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [users, setUsers] = useState<MinimalProfileDto[]>([]);
-  const [tags, setTags] = useState<any[]>([]); // TODO
+  const [, setTags] = useState<unknown[]>([]); // TODO
 
   const [totalCount, setTotalCount] = useState(0);
 

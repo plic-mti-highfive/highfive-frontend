@@ -29,14 +29,20 @@ export class ProjectServiceHttp implements IProjectService {
   async getProjects(
     query?: ListProjectsQuery,
   ): Promise<PaginatedResponse<ProjectDto>> {
-    const { page, limit, ...rest } = query ?? {};
-    const resolvedLimit = limit ?? 20;
-    const offset = page !== undefined ? (page - 1) * resolvedLimit : 0;
+    const { limit, offset, tags, ...rest } = query ?? {};
+
+    const params: Record<string, string | number | boolean> = {
+      ...rest,
+      limit: limit ?? 20,
+      offset: offset ?? 0,
+    };
+
+    if (tags && tags.length > 0) {
+      params.tags = tags.join(",");
+    }
+
     return httpClient.get<PaginatedResponse<ProjectDto>>("/projects", {
-      params: { ...rest, offset, limit: resolvedLimit } as Record<
-        string,
-        string | number | boolean
-      >,
+      params,
     });
   }
 

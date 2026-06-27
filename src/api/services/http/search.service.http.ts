@@ -6,14 +6,20 @@ import type {
 import { httpClient } from "../../http-client";
 
 export class SearchServiceHttp implements ISearchService {
-  async searchGlobal(query: GlobalSearchQuery): Promise<GlobalSearchResponse> {
-    const params: Record<string, any> = { ...query };
+  async searchGlobal(query?: GlobalSearchQuery): Promise<GlobalSearchResponse> {
+    const { limit, offset, types, tags, ...rest } = query ?? {};
 
-    if (query.types && query.types.length > 0) {
-      params.types = query.types.join(",");
+    const params: Record<string, string | number | boolean> = {
+      ...rest,
+      limit: limit ?? 20,
+      offset: offset ?? 0,
+    };
+
+    if (types && types.length > 0) {
+      params.types = types.join(",");
     }
-    if (query.tags && query.tags.length > 0) {
-      params.tags = query.tags.join(",");
+    if (tags && tags.length > 0) {
+      params.tags = tags.join(",");
     }
 
     return httpClient.get<GlobalSearchResponse>("/search", { params });
