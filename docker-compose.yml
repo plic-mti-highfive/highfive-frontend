@@ -2,6 +2,13 @@ services:
   frontend:
     container_name: highfive_frontend
     restart: unless-stopped
-    build: .
+    build:
+      context: .
+      secrets:
+        - github_token
     ports:
       - "8080:8080"
+
+secrets:
+  github_token:
+    environment: "GITHUB_TOKEN"
