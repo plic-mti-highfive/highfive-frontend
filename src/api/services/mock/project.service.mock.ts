@@ -27,7 +27,7 @@ import {
   TicketStatus,
 } from "@plic-mti-highfive/shared-types";
 import { delay, generateId } from "./utils";
-import { getAllProjects } from "./data";
+import { getAllProjects, getAllUsers } from "./data";
 
 class MockProjectDb {
   private projects: Map<string, ProjectDto> = new Map();
@@ -38,16 +38,11 @@ class MockProjectDb {
 
   constructor() {
     const allProjects = getAllProjects();
-    const mockUsers = [
-      { id: "user-1", email: "marie.dupont@example.com", avatar: null },
-      { id: "user-2", email: "jean.martin@example.com", avatar: null },
-      { id: "user-3", email: "sophie.bernard@example.com", avatar: null },
-      { id: "user-4", email: "lucas.petit@example.com", avatar: null },
-    ];
+    const allUsers = getAllUsers();
 
     allProjects.forEach((project, index) => {
       this.projects.set(project.id, project);
-      const creatorUser = mockUsers[index % mockUsers.length];
+      const creatorUser = allUsers[index % allUsers.length];
       const member: ProjectMemberDto = {
         projectId: project.id,
         userId: creatorUser.id,
@@ -58,7 +53,7 @@ class MockProjectDb {
           id: creatorUser.id,
           email: creatorUser.email,
           profile: {
-            avatarPath: creatorUser.avatar,
+            avatarPath: creatorUser.profile?.avatarPath ?? null,
           },
         },
       };
@@ -70,7 +65,7 @@ class MockProjectDb {
           userId: creatorUser.id,
           username: creatorUser.email.split("@")[0],
           displayName: creatorUser.email.split("@")[0],
-          avatar: creatorUser.avatar ?? "",
+          avatar: creatorUser.profile?.avatarPath ?? "",
         };
         this.news.set(project.id, [
           {
@@ -159,6 +154,23 @@ class MockProjectDb {
 
   getMembers(projectId: string): ProjectMemberDto[] {
     return this.members.get(projectId) || [];
+  }
+
+  getOwner(projectId: string): ProjectDto["owner"] {
+    const owner = this.members
+      .get(projectId)
+      ?.find((m) => m.role === ProjectRole.OWNER);
+    if (!owner?.user) return undefined;
+    return {
+      userId: owner.user.id,
+      username: owner.user.email.split("@")[0],
+      displayName: owner.user.email.split("@")[0],
+      avatar: owner.user.profile?.avatarPath || "",
+    };
+  }
+
+  withOwner(project: ProjectDto): ProjectDto {
+    return { ...project, owner: this.getOwner(project.id) };
   }
 
   addMember(projectId: string, member: ProjectMemberDto): void {
@@ -349,7 +361,9 @@ export class ProjectServiceMock implements IProjectService {
     }
     const limit = query?.limit || 20;
     const offset = query?.offset || 0;
-    const paginatedProjects = projects.slice(offset, offset + limit);
+    const paginatedProjects = projects
+      .slice(offset, offset + limit)
+      .map((p) => db.withOwner(p));
     return {
       data: paginatedProjects,
       total: projects.length,
@@ -363,7 +377,7 @@ export class ProjectServiceMock implements IProjectService {
     await delay(200);
     const project = db.getProject(id);
     if (!project) throw new Error("Project not found");
-    return project;
+    return db.withOwner(project);
   }
 
   async getProjectsByIds(ids: string[]): Promise<ProjectDto[]> {
@@ -373,7 +387,8 @@ export class ProjectServiceMock implements IProjectService {
     await delay(250);
     const projects = ids
       .map((id) => db.getProject(id))
-      .filter((p): p is ProjectDto => p !== undefined);
+      .filter((p): p is ProjectDto => p !== undefined)
+      .map((p) => db.withOwner(p));
     return projects;
   }
 

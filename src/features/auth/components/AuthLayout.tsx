@@ -23,11 +23,11 @@ export function AuthLayout({
   return (
     <div className="min-h-screen bg-background flex p-6 gap-6">
       {/* Gauche : image */}
-      <div className="hidden md:flex w-1/2 rounded-xl overflow-hidden">
+      <div className="hidden md:block relative w-1/2 rounded-xl overflow-hidden">
         <img
           src={imageUrl}
           alt="Background"
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
 

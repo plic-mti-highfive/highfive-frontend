@@ -4,12 +4,17 @@ import { Link } from "react-router-dom";
 import { Header } from "@features/layout";
 import { Footer } from "@features/layout";
 import { FeaturedLayout } from "../components/FeaturedLayout";
-import { Section } from "@shared/components/projects";
+import { ProjectFeedSection } from "../components/ProjectFeedSection";
+import { ProfilePanel } from "../components/ProfilePanel";
+import { TrendingUsersPanel } from "../components/TrendingUsersPanel";
+import { TrendingTagsPanel } from "../components/TrendingTagsPanel";
 import { TagNavBar } from "../components/TagNavBar";
 import { HomePageSkeleton } from "../components/HomePageSkeleton";
 import { useHomeTrendingAndRecommended } from "../hooks/useHomeTrendingAndRecommended";
 import { useHomeProjects } from "../hooks/useHomeProjects";
 import { useAuth } from "@shared/contexts";
+
+const SIDEBAR_STICKY_TOP = "6.25rem";
 
 export default function HomePage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
@@ -33,6 +38,15 @@ export default function HomePage() {
 
   const isLoading = homeProjectsLoading || iaLoading;
   const error = homeProjectsError || iaError;
+
+  const allLoadedProjects = [
+    ...(featured ? [featured] : []),
+    ...recommended,
+    ...trending,
+    ...endingSoon,
+    ...successful,
+    ...recent,
+  ];
 
   if (isAuthLoading) {
     return (
@@ -82,7 +96,7 @@ export default function HomePage() {
       <TagNavBar />
       <div className="bg-background" style={{ height: "2.75rem" }} />
       <main className="relative z-0 min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-[100rem] mx-auto px-8 2xl:px-12">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-start gap-3">
@@ -123,21 +137,49 @@ export default function HomePage() {
               </p>
             </div>
           ) : (
-            <>
-              {featured && (
-                <FeaturedLayout
-                  hero={featured}
-                  picks={recommended.slice(0, 4)}
+            <div className="flex items-start gap-10 py-10">
+              {/* LEFT: profil */}
+              <aside
+                className="hidden xl:block w-[260px] shrink-0 sticky self-start"
+                style={{ top: SIDEBAR_STICKY_TOP }}
+              >
+                <ProfilePanel />
+              </aside>
+
+              {/* CENTER: fil */}
+              <div className="flex-1 min-w-0 flex flex-col gap-11 xl:px-10 xl:border-x xl:border-border">
+                {featured && <FeaturedLayout hero={featured} />}
+                <ProjectFeedSection
+                  title="Recommandés"
+                  projects={recommended}
                 />
-              )}
-              <Section title="Recommandés" projects={recommended} />
-              <Section title="Projets tendance" projects={trending} />
-              <Section title="Se terminent bientôt" projects={endingSoon} />
-              <Section title="Projets qui ont réussi" projects={successful} />
-              <Section title="Projets récents" projects={recent} />
-              <div className="pb-20" />
-            </>
+                <ProjectFeedSection
+                  title="Projets tendance"
+                  projects={trending}
+                />
+                <ProjectFeedSection
+                  title="Se terminent bientôt"
+                  projects={endingSoon}
+                />
+                <ProjectFeedSection
+                  title="Projets qui ont réussi"
+                  projects={successful}
+                />
+                <ProjectFeedSection title="Projets récents" projects={recent} />
+              </div>
+
+              {/* RIGHT: tendances */}
+              <aside
+                className="hidden xl:flex w-[280px] shrink-0 flex-col gap-9 sticky self-start"
+                style={{ top: SIDEBAR_STICKY_TOP }}
+              >
+                <TrendingUsersPanel />
+                <TrendingTagsPanel projects={allLoadedProjects} />
+              </aside>
+            </div>
           )}
+
+          <div className="pb-20" />
         </div>
       </main>
       <Footer />

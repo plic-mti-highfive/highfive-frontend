@@ -69,6 +69,10 @@ class MockUserDb {
     this.profiles.set(userId, updated);
     return updated;
   }
+
+  getAllProfiles(): UserProfileDto[] {
+    return Array.from(this.profiles.values());
+  }
 }
 
 const db = new MockUserDb();
@@ -123,12 +127,49 @@ export class UserServiceMock implements IUserService {
 
   async searchProfiles(query: ListUsersQuery): Promise<PaginatedUsersResponse> {
     await delay(300);
+
+    let profiles = db.getAllProfiles();
+
+    if (query.search) {
+      const search = query.search.toLowerCase();
+      profiles = profiles.filter(
+        (p) =>
+          p.displayName.toLowerCase().includes(search) ||
+          p.username.toLowerCase().includes(search),
+      );
+    }
+
+    const sorted = [...profiles].sort((a, b) => {
+      switch (query.sortBy) {
+        case "name":
+          return a.displayName.localeCompare(b.displayName);
+        case "date":
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        case "popularity":
+        default:
+          return b.stats.followers - a.stats.followers;
+      }
+    });
+    if (query.sortOrder === "ASC") sorted.reverse();
+
+    const limit = query.limit || 20;
+    const offset = query.offset || 0;
+    const page = Math.floor(offset / limit) + 1;
+    const data = sorted.slice(offset, offset + limit).map((p) => ({
+      userId: p.userId,
+      username: p.username,
+      displayName: p.displayName,
+      avatar: p.avatar,
+    }));
+
     return {
-      data: [],
-      total: 0,
-      page: 1,
-      limit: query.limit || 20,
-      totalPages: 1,
+      data,
+      total: sorted.length,
+      page,
+      limit,
+      totalPages: Math.ceil(sorted.length / limit) || 1,
     };
   }
 }
