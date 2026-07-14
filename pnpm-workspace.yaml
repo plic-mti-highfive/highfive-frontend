@@ -1,0 +1,7 @@
+packages: []
+
+allowBuilds:
+  msw: true
+
+minimumReleaseAgeExclude:
+  - "@plic-mti-highfive/shared-types@1.2.0"

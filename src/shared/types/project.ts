@@ -1,0 +1,13 @@
+export interface Project {
+  id: number | string;
+  name: string;
+  description: string;
+  tags?: string[];
+  author: string;
+  authorAvatar?: string;
+  contributorsCount: number;
+  highfiveCount?: number;
+  successRate: number;
+  daysLeft: number | null;
+  thumbnailUrl?: string;
+}
