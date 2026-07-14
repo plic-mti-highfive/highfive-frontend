@@ -49,7 +49,7 @@ export default function HomePage() {
         <Header />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-6">
-            <h1 className="text-3xl font-bold text-ink mb-4">
+            <h1 className="text-3xl font-bold text-primary mb-4">
               Bienvenue sur HighFive!
             </h1>
             <p className="text-ink-muted mb-8">
