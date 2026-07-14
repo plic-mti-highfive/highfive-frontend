@@ -174,9 +174,10 @@ export class ProjectServiceHttp implements IProjectService {
   }
 
   async getProjectMessages(projectId: string): Promise<ProjectMessageDto[]> {
-    return httpClient.get<ProjectMessageDto[]>(
+    const response = await httpClient.get<PaginatedResponse<ProjectMessageDto>>(
       `/projects/${projectId}/messages`,
     );
+    return response.data;
   }
 
   // News

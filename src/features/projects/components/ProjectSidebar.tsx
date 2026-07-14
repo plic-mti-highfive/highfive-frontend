@@ -64,8 +64,11 @@ export function ProjectSidebar({ project, members }: ProjectSidebarProps) {
           <div>
             <p className="text-xs text-muted-foreground mb-2">Tags</p>
             <div className="flex flex-wrap gap-2">
-              <TagPill tag="Open Source" />
-              <TagPill tag="Tech" />
+              {project.tags && project.tags.length > 0 ? (
+                project.tags.map((tag) => <TagPill key={tag} tag={tag} />)
+              ) : (
+                <p className="text-sm text-muted-foreground">Aucun tag</p>
+              )}
             </div>
           </div>
         </div>
