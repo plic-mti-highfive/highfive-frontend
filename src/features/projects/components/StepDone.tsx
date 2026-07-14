@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
-export function StepDone({ projectName }: { projectName: string }) {
+export function StepDone({
+  projectName,
+  projectId,
+}: {
+  projectName: string;
+  projectId: string;
+}) {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center text-center py-10 space-y-8">
@@ -32,7 +38,7 @@ export function StepDone({ projectName }: { projectName: string }) {
 
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <button
-          onClick={() => navigate("/projects/new")}
+          onClick={() => navigate(`/projects/${projectId}`)}
           className="w-full py-4 rounded-2xl bg-gray-900 text-white font-bold text-base hover:bg-gray-700 active:scale-[0.98] transition-all duration-200 shadow-sm"
         >
           Voir mon projet →

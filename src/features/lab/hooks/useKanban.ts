@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type {
   KanbanColumnId,
   KanbanTicket,
@@ -6,6 +6,9 @@ import type {
   CustomTag,
 } from "../types";
 import { DEFAULT_COLUMNS } from "../utils/kanbanConfig";
+import type { TicketDto } from "@/api/types/project.types";
+import { projectService } from "@/api/services";
+import { TicketStatus } from "@plic-mti-highfive/shared-types";
 
 const INITIAL_COLUMNS: KanbanColumnDef[] = DEFAULT_COLUMNS.map((c) => ({
   ...c,
@@ -19,123 +22,109 @@ const INITIAL_TAGS: CustomTag[] = [
   { id: "tag-4", label: "Créatif", color: "#FF6B1A" },
 ];
 
-const INITIAL_TICKETS: Record<KanbanColumnId, KanbanTicket[]> = {
-  todo: [
-    {
-      id: "1",
-      title: "Définir le périmètre du projet",
-      tags: ["tag-1", "tag-3"],
-      assignee: "Alice M.",
-      priority: "high",
-      checklistItems: [
-        { id: "c1-1", text: "Définir les objectifs", done: true },
-        { id: "c1-2", text: "Identifier les parties prenantes", done: true },
-        { id: "c1-3", text: "Rédiger le cahier des charges", done: false },
-        { id: "c1-4", text: "Valider le budget", done: false },
-        { id: "c1-5", text: "Planifier les jalons", done: false },
-      ],
-      ticketComments: [],
-    },
-    {
-      id: "2",
-      title: "Préparer les visuels",
-      tags: ["tag-4"],
-      assignee: "Lucas T.",
-      priority: "medium",
-      checklistItems: [],
-      ticketComments: [
-        {
-          id: "cm2-1",
-          author: "Alice M.",
-          text: "Penser à inclure les contraintes de format.",
-          createdAt: "2026-04-18T10:00:00Z",
-        },
-        {
-          id: "cm2-2",
-          author: "Lucas T.",
-          text: "Noté, je commence par les formats mobiles.",
-          createdAt: "2026-04-18T11:30:00Z",
-        },
-        {
-          id: "cm2-3",
-          author: "Sara K.",
-          text: "Prévoir aussi la version print.",
-          createdAt: "2026-04-19T09:15:00Z",
-        },
-      ],
-    },
-  ],
-  "in-progress": [
-    {
-      id: "3",
-      title: "Rédiger le contenu principal",
-      tags: ["tag-3"],
-      assignee: "Alice M.",
-      priority: "high",
-      checklistItems: [
-        { id: "c3-1", text: "Introduction", done: true },
-        { id: "c3-2", text: "Section 1", done: false },
-        { id: "c3-3", text: "Section 2", done: false },
-        { id: "c3-4", text: "Conclusion", done: false },
-      ],
-      ticketComments: [
-        {
-          id: "cm3-1",
-          author: "Lucas T.",
-          text: "Est-ce qu'on a validé le ton éditorial ?",
-          createdAt: "2026-04-19T14:00:00Z",
-        },
-        {
-          id: "cm3-2",
-          author: "Alice M.",
-          text: "Oui, on part sur quelque chose de chaleureux.",
-          createdAt: "2026-04-19T15:00:00Z",
-        },
-      ],
-    },
-  ],
-  done: [
-    {
-      id: "4",
-      title: "Réunion de lancement",
-      tags: ["tag-2"],
-      assignee: "Lucas T.",
-      priority: "low",
-      checklistItems: [
-        { id: "c4-1", text: "Préparer l'ordre du jour", done: true },
-        { id: "c4-2", text: "Envoyer les invitations", done: true },
-        { id: "c4-3", text: "Rédiger le compte-rendu", done: true },
-      ],
-      ticketComments: [
-        {
-          id: "cm4-1",
-          author: "Sara K.",
-          text: "Très bonne réunion, tout était clair !",
-          createdAt: "2026-04-20T08:00:00Z",
-        },
-      ],
-    },
-  ],
-};
-
-export function useKanban() {
+export function useKanban(projectId: string | undefined) {
   const [columns, setColumns] = useState<KanbanColumnDef[]>(INITIAL_COLUMNS);
   const [customTags, setCustomTags] = useState<CustomTag[]>(INITIAL_TAGS);
-  const [tickets, setTickets] =
-    useState<Record<KanbanColumnId, KanbanTicket[]>>(INITIAL_TICKETS);
 
-  function addTicket(columnId: KanbanColumnId, title: string) {
-    if (!title.trim()) return;
-    const newTicket: KanbanTicket = {
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      checklistItems: [],
-      ticketComments: [],
-    };
-    setTickets((prev) => ({
-      ...prev,
-      [columnId]: [...(prev[columnId] ?? []), newTicket],
-    }));
+  const [tickets, setTickets] = useState<
+    Record<KanbanColumnId, KanbanTicket[]>
+  >({
+    todo: [],
+    "in-progress": [],
+    done: [],
+  });
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    async function fetchTickets() {
+      try {
+        const data: TicketDto[] = await projectService.getProjectTickets(
+          projectId!,
+        );
+
+        const groupedTickets: Record<KanbanColumnId, KanbanTicket[]> = {
+          todo: [],
+          "in-progress": [],
+          done: [],
+        };
+
+        data.forEach((ticket: TicketDto) => {
+          const colId: KanbanColumnId =
+            ticket.status === TicketStatus.IN_PROGRESS
+              ? "in-progress"
+              : ticket.status === TicketStatus.DONE
+                ? "done"
+                : "todo";
+
+          // Adaptation TicketDto -> KanbanTicket
+          groupedTickets[colId].push({
+            id: ticket.id,
+            title: ticket.title,
+            priority: undefined, // TODO
+            assignee: ticket.assigneeId ?? undefined,
+            tags: [], // TODO
+            checklistItems:
+              ticket.checklistItems?.map((item) => ({
+                id: item.id,
+                text: item.content,
+                done: item.isCompleted,
+              })) ?? [],
+            ticketComments:
+              ticket.comments?.map((comment) => ({
+                id: comment.id,
+                author: comment.author?.displayName ?? "Inconnu",
+                text: comment.content,
+                createdAt: comment.createdAt,
+              })) ?? [],
+          });
+        });
+
+        setTickets(groupedTickets);
+      } catch (error) {
+        console.error("Error fetching tickets", error);
+      }
+    }
+
+    fetchTickets();
+  }, [projectId]);
+
+  // ---------- Ticket Operations ----------
+
+  async function addTicket(columnId: KanbanColumnId, title: string) {
+    if (!title.trim() || !projectId) return;
+
+    const apiStatus: TicketStatus =
+      columnId === "in-progress"
+        ? TicketStatus.IN_PROGRESS
+        : columnId === "done"
+          ? TicketStatus.DONE
+          : TicketStatus.TODO;
+
+    try {
+      const newTicket: TicketDto = await projectService.createTicket(
+        projectId,
+        {
+          title: title.trim(),
+          status: apiStatus,
+        },
+      );
+
+      setTickets((prev) => ({
+        ...prev,
+        [columnId]: [
+          ...(prev[columnId] ?? []),
+          {
+            id: newTicket.id,
+            title: newTicket.title,
+            checklistItems: [],
+            ticketComments: [],
+          },
+        ],
+      }));
+    } catch (error) {
+      console.error("Error creating ticket", error);
+    }
   }
 
   function moveTicket(
@@ -161,6 +150,20 @@ export function useKanban() {
       const targetList = [...(prev[to] ?? [])];
       const insertIndex = toIndex !== undefined ? toIndex : targetList.length;
       targetList.splice(insertIndex, 0, ticket);
+
+      if (from !== to && projectId) {
+        const apiStatus: TicketStatus =
+          to === "in-progress"
+            ? TicketStatus.IN_PROGRESS
+            : to === "done"
+              ? TicketStatus.DONE
+              : TicketStatus.TODO;
+
+        projectService
+          .updateTicket(projectId, ticketId, { status: apiStatus })
+          .catch((err) => console.error("Error moving ticket:", err));
+      }
+
       return {
         ...prev,
         [from]: prev[from].filter((t) => t.id !== ticketId),
@@ -188,6 +191,110 @@ export function useKanban() {
       ),
     }));
   }
+
+  // ---------- Checklist Operations ----------
+
+  async function addChecklist(
+    ticketId: string,
+    columnId: KanbanColumnId,
+    content: string,
+  ) {
+    if (!projectId) return;
+    try {
+      const newItem = await projectService.addChecklistItem(
+        projectId,
+        ticketId,
+        { content },
+      );
+      setTickets((prev) => ({
+        ...prev,
+        [columnId]: prev[columnId].map((t) =>
+          t.id === ticketId
+            ? {
+                ...t,
+                checklistItems: [
+                  ...(t.checklistItems ?? []),
+                  {
+                    id: newItem.id,
+                    text: newItem.content,
+                    done: newItem.isCompleted,
+                  },
+                ],
+              }
+            : t,
+        ),
+      }));
+    } catch (err) {
+      console.error("Error adding checklist item:", err);
+    }
+  }
+
+  async function toggleChecklist(
+    ticketId: string,
+    columnId: KanbanColumnId,
+    itemId: string,
+    isCompleted: boolean,
+  ) {
+    if (!projectId) return;
+    try {
+      setTickets((prev) => ({
+        ...prev,
+        [columnId]: prev[columnId].map((t) =>
+          t.id === ticketId
+            ? {
+                ...t,
+                checklistItems: (t.checklistItems ?? []).map((i) =>
+                  i.id === itemId ? { ...i, done: isCompleted } : i,
+                ),
+              }
+            : t,
+        ),
+      }));
+      await projectService.toggleChecklistItem(projectId, itemId, isCompleted);
+    } catch (err) {
+      console.error("Error toggling checklist item:", err);
+    }
+  }
+
+  // ---------- Comment Operations ----------
+
+  async function addComment(
+    ticketId: string,
+    columnId: KanbanColumnId,
+    content: string,
+  ) {
+    if (!projectId) return;
+    try {
+      const newComment = await projectService.addTicketComment(
+        projectId,
+        ticketId,
+        { content },
+      );
+      setTickets((prev) => ({
+        ...prev,
+        [columnId]: prev[columnId].map((t) =>
+          t.id === ticketId
+            ? {
+                ...t,
+                ticketComments: [
+                  ...(t.ticketComments ?? []),
+                  {
+                    id: newComment.id,
+                    author: newComment.author?.displayName ?? "Vous",
+                    text: newComment.content,
+                    createdAt: newComment.createdAt,
+                  },
+                ],
+              }
+            : t,
+        ),
+      }));
+    } catch (err) {
+      console.error("Error adding comment:", err);
+    }
+  }
+
+  // ---------- Utility Operations ----------
 
   function addColumn(label: string) {
     const id = crypto.randomUUID();
@@ -243,5 +350,8 @@ export function useKanban() {
     deleteColumn,
     addCustomTag,
     deleteCustomTag,
+    addChecklist,
+    toggleChecklist,
+    addComment,
   };
 }

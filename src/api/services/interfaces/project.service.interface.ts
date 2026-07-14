@@ -12,6 +12,10 @@ import type {
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
+  CreateChecklistItemDto,
+  ChecklistItemDto,
+  TicketCommentDto,
+  CreateTicketCommentDto,
 } from "../../types";
 
 export interface IProjectService {
@@ -21,6 +25,7 @@ export interface IProjectService {
     query?: ListProjectsQuery,
   ): Promise<PaginatedResponse<ProjectDto>>;
   getProjectById(id: string): Promise<ProjectDto>;
+  getProjectsByIds(ids: string[]): Promise<ProjectDto[]>;
   updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto>;
   deleteProject(id: string): Promise<void>;
 
@@ -46,6 +51,21 @@ export interface IProjectService {
     ticketId: string,
     dto: UpdateTicketDto,
   ): Promise<TicketDto>;
+  addChecklistItem(
+    projectId: string,
+    ticketId: string,
+    dto: CreateChecklistItemDto,
+  ): Promise<ChecklistItemDto>;
+  toggleChecklistItem(
+    projectId: string,
+    itemId: string,
+    isCompleted: boolean,
+  ): Promise<ChecklistItemDto>;
+  addTicketComment(
+    projectId: string,
+    ticketId: string,
+    dto: CreateTicketCommentDto,
+  ): Promise<TicketCommentDto>;
 
   // Messages
   createMessage(

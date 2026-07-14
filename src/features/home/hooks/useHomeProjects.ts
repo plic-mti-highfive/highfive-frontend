@@ -1,20 +1,8 @@
 import { useState, useEffect } from "react";
-import { projectService, type ProjectDto } from "@/api";
+import { projectService } from "@/api";
 import { ProjectStatus } from "@plic-mti-highfive/shared-types";
 import type { Project } from "@shared/types";
-
-// Adapter ProjectDto vers l'ancien format Project pour compatibilité
-const adaptProjectDto = (dto: ProjectDto): Project => ({
-  id: dto.id,
-  name: dto.name,
-  description: dto.description || "",
-  tags: dto.tags || [], // Tags disponibles depuis backend
-  author: "unknown", // TODO: récupérer l'auteur via les membres
-  contributorsCount: 0, // TODO: calculer depuis les membres
-  highfiveCount: dto.highfiveCount || 0,
-  successRate: 100, // TODO: calculer selon la logique métier
-  daysLeft: null, // TODO: calculer depuis une date de fin si disponible
-});
+import { adaptProjects } from "../adapters";
 
 export function useHomeProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -31,7 +19,7 @@ export function useHomeProjects() {
           limit: 50, // Charger plus de projets pour avoir assez pour toutes les catégories
         });
 
-        const adaptedProjects = response.data.map(adaptProjectDto);
+        const adaptedProjects = adaptProjects(response.data);
         setProjects(adaptedProjects);
       } catch (err) {
         console.error("Failed to fetch projects:", err);

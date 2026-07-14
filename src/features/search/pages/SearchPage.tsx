@@ -7,7 +7,9 @@ import { SmallCard } from "@shared/components/projects";
 import { ProjectFiltersBar } from "@features/projects";
 import { projectService } from "@/api";
 import type { Project } from "@shared/types";
-import type { ProjectDto } from "@/api/types";
+import type { MinimalProfileDto, ProjectDto } from "@/api/types";
+import { userService } from "@/api/services";
+import { SearchEntityType } from "@plic-mti-highfive/shared-types";
 
 function adaptProject(p: ProjectDto): Project {
   return {
@@ -23,8 +25,6 @@ function adaptProject(p: ProjectDto): Project {
   };
 }
 
-type ResultType = "projects" | "users" | "tags";
-
 export function SearchPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -32,48 +32,67 @@ export function SearchPage() {
   const searchQuery = searchParams.get("q") || "";
   const tagFilter = searchParams.get("tag");
 
-  const resultType: ResultType = location.pathname.includes("/users")
-    ? "users"
+  const resultType: SearchEntityType = location.pathname.includes("/users")
+    ? SearchEntityType.USERS
     : location.pathname.includes("/tags")
-      ? "tags"
-      : "projects";
+      ? SearchEntityType.TAGS
+      : SearchEntityType.PROJECTS;
 
   const [, setActiveSort] = useState<"name" | "date" | "popularity">("date");
   const [, setActiveFilters] = useState<string[]>([]);
 
-  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [users, setUsers] = useState<MinimalProfileDto[]>([]);
+  const [, setTags] = useState<unknown[]>([]); // TODO
+
+  const [totalCount, setTotalCount] = useState(0);
+
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchResults = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        const response = await projectService.getProjects({ limit: 100 });
-        setAllProjects(response.data.map(adaptProject));
+        if (resultType === SearchEntityType.PROJECTS) {
+          const response = await projectService.getProjects({
+            search: searchQuery || undefined,
+            tags: tagFilter ? [tagFilter] : undefined,
+            limit: 20,
+          });
+          setProjects(response.data.map(adaptProject));
+          setTotalCount(response.total);
+        } else if (resultType === SearchEntityType.USERS) {
+          const response = await userService.searchProfiles({
+            search: searchQuery || undefined,
+            limit: 20,
+          });
+          setUsers(response.data);
+          setTotalCount(response.total);
+
+          setProjects([]);
+          setTotalCount(0);
+        } else if (resultType === "tags") {
+          // TODO
+          setProjects([]);
+          setUsers([]);
+          setTotalCount(0);
+        }
       } catch (e) {
-        console.error("Failed to fetch projects:", e);
-        setAllProjects([]);
+        console.error("Failed to fetch results:", e);
+        setProjects([]);
+        setUsers([]);
+        setTags([]);
+        setTotalCount(0);
       } finally {
         setIsLoading(false);
       }
     };
-    fetch();
-  }, []);
 
-  const queryLower = (tagFilter || searchQuery).toLowerCase();
-  const displayedProjects = allProjects.filter((p) => {
-    if (tagFilter) {
-      return p.tags.some((t) => t.toLowerCase() === tagFilter.toLowerCase());
-    }
-    if (!searchQuery) return true;
-    return (
-      p.name.toLowerCase().includes(queryLower) ||
-      p.description.toLowerCase().includes(queryLower) ||
-      p.tags.some((t) => t.toLowerCase().includes(queryLower))
-    );
-  });
+    fetchResults();
+  }, [searchQuery, tagFilter, resultType]);
 
-  const resultsCount = resultType === "projects" ? displayedProjects.length : 0;
+  const resultsCount = totalCount;
+
   const resultsLabel =
     resultType === "projects"
       ? "projet"
@@ -81,7 +100,7 @@ export function SearchPage() {
         ? "utilisateur"
         : "tag";
 
-  const handleTypeChange = (type: ResultType) => {
+  const handleTypeChange = (type: string) => {
     const currentParams = searchParams.toString();
     const path =
       type === "projects"
@@ -169,38 +188,78 @@ export function SearchPage() {
           </div>
         </div>
 
-        {resultType === "projects" ? (
-          isLoading ? (
-            <div className="text-center py-20">
-              <p className="text-xl text-muted-foreground">Chargement...</p>
-            </div>
-          ) : displayedProjects.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-7 gap-y-10">
-              {displayedProjects.map((project) => (
-                <SmallCard key={project.id} project={project} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <p className="text-xl text-muted-foreground">
-                Aucun projet trouvé
-                {tagFilter || searchQuery
-                  ? ` pour "${tagFilter || searchQuery}"`
-                  : ""}
-              </p>
-              <p className="mt-2 text-body-md text-muted-foreground">
-                Essayez avec d'autres mots-clés
-              </p>
-            </div>
-          )
-        ) : (
+        {isLoading ? (
           <div className="text-center py-20">
-            <p className="text-xl text-muted-foreground">
-              {resultType === "users"
-                ? "La recherche d'utilisateurs n'est pas encore disponible."
-                : "La recherche par tags n'est pas encore disponible."}
-            </p>
+            <p className="text-xl text-muted-foreground">Chargement...</p>
           </div>
+        ) : (
+          <>
+            {/* VUE PROJETS */}
+            {resultType === "projects" &&
+              (projects.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-7 gap-y-10">
+                  {projects.map((project) => (
+                    <SmallCard key={project.id} project={project} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-xl text-muted-foreground">
+                    Aucun projet trouvé{" "}
+                    {tagFilter || searchQuery
+                      ? `pour "${tagFilter || searchQuery}"`
+                      : ""}
+                  </p>
+                  <p className="mt-2 text-body-md text-muted-foreground">
+                    Essayez avec d'autres mots-clés
+                  </p>
+                </div>
+              ))}
+
+            {/* VUE UTILISATEURS */}
+            {resultType === "users" &&
+              (users.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {users.map((user) => (
+                    <button
+                      key={user.userId}
+                      onClick={() => navigate(`/user/${user.userId}`)}
+                      className="flex items-center gap-4 p-4 text-left bg-background border border-border rounded-xl cursor-pointer hover:bg-muted transition-colors outline-none"
+                    >
+                      <img
+                        src={user.avatar}
+                        alt={user.displayName}
+                        className="w-12 h-12 rounded-full shrink-0 object-cover"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-body-lg font-bold text-foreground truncate">
+                          {user.displayName}
+                        </p>
+                        <p className="text-body-md text-muted-foreground truncate">
+                          @{user.username}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-xl text-muted-foreground">
+                    Aucun utilisateur trouvé{" "}
+                    {searchQuery ? `pour "${searchQuery}"` : ""}
+                  </p>
+                </div>
+              ))}
+
+            {/* VUE TAGS (TODO) */}
+            {resultType === "tags" && (
+              <div className="text-center py-20">
+                <p className="text-xl text-muted-foreground">
+                  La recherche par tags n'est pas encore disponible.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
 

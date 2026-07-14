@@ -1,32 +1,75 @@
-export interface UserDto {
-  id: string;
-  email: string;
-  status: import("@plic-mti-highfive/shared-types").UserStatus;
-  tenantId: string;
-  createdAt: string;
-  updatedAt: string;
-  profile?: UserProfileDto;
+import type { ProjectDto } from "./project.types";
+import type { UserStatus } from "@plic-mti-highfive/shared-types";
+
+export interface MinimalProfileDto {
+  userId: string;
+  username: string;
+  displayName: string;
+  avatar: string;
 }
 
 export interface UserProfileDto {
   userId: string;
+  username: string;
+  displayName: string;
+  avatar: string;
   bio: string | null;
-  avatarPath: string | null;
-  themePreference: string;
-  emailNotifications: boolean;
+  createdAt: string;
+  skills: string[];
+  stats: {
+    followers: number;
+    following: number;
+  };
+  followers: MinimalProfileDto[];
+  following: MinimalProfileDto[];
 }
 
 export interface UpdateUserProfileDto {
+  displayName?: string;
   bio?: string;
   avatarPath?: string;
   themePreference?: string;
   emailNotifications?: boolean;
+  skills?: string[];
 }
 
-export interface UserProfileResponse {
-  userId: string;
+export interface UserProjectsDto {
+  created: ProjectDto[];
+  collaborations: ProjectDto[];
+  liked: ProjectDto[];
+}
+
+export interface ListUsersQuery {
+  search?: string;
+  tags?: string[];
+  sortBy?: "date" | "name" | "popularity";
+  sortOrder?: "ASC" | "DESC";
+  limit?: number;
+  offset?: number;
+}
+
+export interface PaginatedUsersResponse {
+  data: MinimalProfileDto[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Private User DTOs
+export interface ProfileBaseDto {
   bio: string | null;
   avatarPath: string | null;
   themePreference: string;
   emailNotifications: boolean;
+}
+
+export interface UserDto {
+  id: string;
+  email: string;
+  status: UserStatus;
+  tenantId: string;
+  createdAt: string;
+  updatedAt: string;
+  profile: ProfileBaseDto;
 }

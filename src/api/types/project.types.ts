@@ -4,8 +4,17 @@ import type {
   ProjectRole,
   TicketStatus,
 } from "@plic-mti-highfive/shared-types";
+import type { MinimalProfileDto } from "./user.types";
 
-// DTOs Project - alignés avec backend
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// ---------- Project ----------
 
 export interface ProjectDto {
   id: string;
@@ -19,6 +28,7 @@ export interface ProjectDto {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  owner?: MinimalProfileDto;
 }
 
 export interface CreateProjectDto {
@@ -26,6 +36,7 @@ export interface CreateProjectDto {
   description?: string;
   status?: ProjectStatus;
   visibility?: ProjectVisibility;
+  tags?: string[];
 }
 
 export interface UpdateProjectDto {
@@ -33,7 +44,21 @@ export interface UpdateProjectDto {
   description?: string;
   status?: ProjectStatus;
   visibility?: ProjectVisibility;
+  tags?: string[];
 }
+
+export interface ListProjectsQuery {
+  status?: ProjectStatus;
+  visibility?: ProjectVisibility;
+  search?: string;
+  tags?: string[];
+  sortBy?: "date" | "name" | "popularity";
+  sortOrder?: "ASC" | "DESC";
+  limit?: number;
+  offset?: number;
+}
+
+// ---------- Member ----------
 
 export interface ProjectMemberDto {
   projectId: string;
@@ -59,6 +84,8 @@ export interface UpdateProjectMemberDto {
   role: ProjectRole;
 }
 
+// ---------- Ticket ----------
+
 export interface TicketDto {
   id: string;
   projectId: string;
@@ -69,6 +96,8 @@ export interface TicketDto {
   assigneeId: string | null;
   createdAt: string;
   updatedAt: string;
+  checklistItems?: ChecklistItemDto[];
+  comments?: TicketCommentDto[];
 }
 
 export interface CreateTicketDto {
@@ -85,20 +114,41 @@ export interface UpdateTicketDto {
   assigneeId?: string;
 }
 
-export interface ListProjectsQuery {
-  status?: ProjectStatus;
-  visibility?: ProjectVisibility;
-  page?: number;
-  limit?: number;
+// Checklist
+
+export interface ChecklistItemDto {
+  id: string;
+  ticketId: string;
+  tenantId: string;
+  content: string;
+  isCompleted: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+export interface CreateChecklistItemDto {
+  content: string;
+  isCompleted?: boolean;
 }
+
+// Comments
+
+export interface TicketCommentDto {
+  id: string;
+  ticketId: string;
+  authorId: string;
+  tenantId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  author?: MinimalProfileDto;
+}
+
+export interface CreateTicketCommentDto {
+  content: string;
+}
+
+// ---------- Message ----------
 
 export interface ProjectMessageDto {
   id: string;
@@ -109,14 +159,7 @@ export interface ProjectMessageDto {
   attachmentPath: string | null;
   replyToId?: string | null;
   createdAt: string;
-  author?: {
-    id: string;
-    email: string;
-    profile?: {
-      bio: string | null;
-      avatarPath: string | null;
-    };
-  };
+  author?: MinimalProfileDto;
 }
 
 export interface CreateProjectMessageDto {

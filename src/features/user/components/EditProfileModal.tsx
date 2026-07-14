@@ -8,15 +8,18 @@ interface EditProfileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: User;
-  onSave: (data: UserProfileFormData) => void;
+  onSave: (data: UserProfileFormData, file?: File) => void;
+  availableTags?: string[];
 }
 
 function AvatarUpload({
   currentAvatar,
   onChange,
+  onFileSelect,
 }: {
   currentAvatar: string;
   onChange: (url: string) => void;
+  onFileSelect: (file: File) => void;
 }) {
   const [preview, setPreview] = useState<string>(currentAvatar);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +30,7 @@ function AvatarUpload({
     const url = URL.createObjectURL(file);
     setPreview(url);
     onChange(url);
+    onFileSelect(file);
   };
 
   return (
@@ -75,7 +79,10 @@ export function EditProfileModal({
   onOpenChange,
   user,
   onSave,
+  availableTags,
 }: EditProfileModalProps) {
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
   const [formData, setFormData] = useState<UserProfileFormData>({
     displayName: user.displayName,
     bio: user.bio,
@@ -86,7 +93,7 @@ export function EditProfileModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    onSave(formData, avatarFile ?? undefined);
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
@@ -117,6 +124,7 @@ export function EditProfileModal({
                   onChange={(url) =>
                     setFormData((prev) => ({ ...prev, avatar: url }))
                   }
+                  onFileSelect={setAvatarFile}
                 />
 
                 <div className="flex-1 space-y-4">
@@ -193,6 +201,7 @@ export function EditProfileModal({
                   onChange={(tags) =>
                     setFormData((prev) => ({ ...prev, tags }))
                   }
+                  availableTags={availableTags}
                 />
               </div>
 

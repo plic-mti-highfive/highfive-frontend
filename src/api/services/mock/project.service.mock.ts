@@ -13,6 +13,10 @@ import type {
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
+  ChecklistItemDto,
+  CreateChecklistItemDto,
+  CreateTicketCommentDto,
+  TicketCommentDto,
 } from "../../types";
 import {
   ProjectStatus,
@@ -168,6 +172,80 @@ class MockProjectDb {
 const db = new MockProjectDb();
 
 export class ProjectServiceMock implements IProjectService {
+  async addChecklistItem(
+    projectId: string,
+    ticketId: string,
+    dto: CreateChecklistItemDto,
+  ): Promise<ChecklistItemDto> {
+    await delay(300);
+    const ticket = db.getTicket(projectId, ticketId);
+    if (!ticket) throw new Error("Ticket not found");
+
+    const checklistItem: ChecklistItemDto = {
+      id: generateId(),
+      ticketId,
+      tenantId: "default-tenant",
+      content: dto.content,
+      isCompleted: dto.isCompleted || false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    ticket.checklistItems = ticket.checklistItems || [];
+    ticket.checklistItems.push(checklistItem);
+    db.updateTicket(projectId, ticketId, {
+      checklistItems: ticket.checklistItems,
+    });
+
+    return checklistItem;
+  }
+  async toggleChecklistItem(
+    projectId: string,
+    itemId: string,
+    isCompleted: boolean,
+  ): Promise<ChecklistItemDto> {
+    await delay(300);
+    const ticket = db.getTicket(projectId, itemId);
+    if (!ticket) throw new Error("Ticket not found");
+
+    const checklistItem = ticket.checklistItems?.find((i) => i.id === itemId);
+    if (!checklistItem) throw new Error("Checklist item not found");
+
+    const updatedItem = { ...checklistItem, isCompleted };
+    db.updateTicket(projectId, itemId, {
+      checklistItems: ticket.checklistItems?.map((i) =>
+        i.id === itemId ? updatedItem : i,
+      ),
+    });
+
+    return updatedItem;
+  }
+  async addTicketComment(
+    projectId: string,
+    ticketId: string,
+    dto: CreateTicketCommentDto,
+  ): Promise<TicketCommentDto> {
+    await delay(300);
+    const ticket = db.getTicket(projectId, ticketId);
+    if (!ticket) throw new Error("Ticket not found");
+
+    const comment: TicketCommentDto = {
+      id: generateId(),
+      ticketId,
+      authorId: "current-user-id",
+      tenantId: "default-tenant",
+      content: dto.content,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    ticket.comments = ticket.comments || [];
+    ticket.comments.push(comment);
+    db.updateTicket(projectId, ticketId, { comments: ticket.comments });
+
+    return comment;
+  }
+
   async createProject(dto: CreateProjectDto): Promise<ProjectDto> {
     await delay(500);
     const project: ProjectDto = {
@@ -196,14 +274,13 @@ export class ProjectServiceMock implements IProjectService {
     if (query?.visibility) {
       projects = projects.filter((p) => p.visibility === query.visibility);
     }
-    const page = query?.page || 1;
     const limit = query?.limit || 20;
-    const start = (page - 1) * limit;
-    const paginatedProjects = projects.slice(start, start + limit);
+    const offset = query?.offset || 0;
+    const paginatedProjects = projects.slice(offset, offset + limit);
     return {
       data: paginatedProjects,
       total: projects.length,
-      page,
+      page: Math.ceil(offset / limit) + 1,
       limit,
       totalPages: Math.ceil(projects.length / limit),
     };
@@ -214,6 +291,17 @@ export class ProjectServiceMock implements IProjectService {
     const project = db.getProject(id);
     if (!project) throw new Error("Project not found");
     return project;
+  }
+
+  async getProjectsByIds(ids: string[]): Promise<ProjectDto[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    await delay(250);
+    const projects = ids
+      .map((id) => db.getProject(id))
+      .filter((p): p is ProjectDto => p !== undefined);
+    return projects;
   }
 
   async updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto> {
@@ -325,12 +413,10 @@ export class ProjectServiceMock implements IProjectService {
       replyToId: dto.replyToId || null,
       createdAt: new Date().toISOString(),
       author: {
-        id: "current-user-id",
-        email: "utilisateur@example.com",
-        profile: {
-          bio: "Développeur passionné",
-          avatarPath: null,
-        },
+        userId: "current-user-id",
+        username: "currentuser",
+        displayName: "Current User",
+        avatar: "",
       },
     };
     db.addMessage(projectId, message);

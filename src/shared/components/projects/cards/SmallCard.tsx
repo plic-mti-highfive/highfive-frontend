@@ -56,7 +56,7 @@ export function SmallCard({ project }: { project: Project }) {
           </div>
         </div>
         <div className="flex gap-1 flex-wrap pt-2">
-          {project.tags.slice(0, 3).map((t) => (
+          {project.tags?.slice(0, 3).map((t) => (
             <TagPill key={t} tag={t} size="xs" />
           ))}
         </div>

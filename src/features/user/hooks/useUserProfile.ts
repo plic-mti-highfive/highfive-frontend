@@ -1,31 +1,49 @@
 import { useState, useEffect } from "react";
-import { userService } from "@/api";
+import { userService, type ProjectDto } from "@/api";
 import type { User } from "@shared/types/user";
-import type { UserProfileResponse } from "@/api/types/user.types";
+import type { UserProfileDto, UserProjectsDto } from "@/api/types/user.types";
+import type { Project } from "@/shared/types/project";
 
-// Adapter la réponse API vers le format User attendu par les composants
-const adaptUserProfile = (profile: UserProfileResponse): User => ({
-  username: profile.userId,
-  displayName: profile.userId,
-  avatar:
-    profile.avatarPath ||
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.userId}`,
+const adaptProject = (p: ProjectDto): Project => ({
+  id: p.id,
+  name: p.name,
+  description: p.description ?? "",
+  tags: p.tags ?? [],
+  author: p.owner?.username ?? "Unknown",
+  authorAvatar: p.owner?.avatar ?? undefined,
+  contributorsCount: 0, // TODO
+  highfiveCount: p.highfiveCount,
+  successRate: 0, // TODO
+  daysLeft: null, // TODO
+});
+
+/**
+ * Combine profile and projects data into a unified User object
+ * Calculates stats counts from actual data arrays
+ */
+const buildUserFromData = (
+  profile: UserProfileDto,
+  projects: UserProjectsDto,
+): User => ({
+  username: profile.username,
+  displayName: profile.displayName,
+  avatar: profile.avatar,
   bio: profile.bio || "",
-  createdAt: "",
-  tags: [], // TODO: implémenter quand le backend supporte les tags
+  createdAt: profile.createdAt,
+  tags: profile.skills,
   stats: {
-    projectsCreated: 0, // TODO: récupérer depuis API
-    projectsContributed: 0, // TODO: récupérer depuis API
-    followers: 0, // TODO: récupérer depuis API
-    following: 0, // TODO: récupérer depuis API
+    projectsCreated: projects.created.length,
+    projectsContributed: projects.collaborations.length,
+    followers: profile.stats.followers,
+    following: profile.stats.following,
   },
   projects: {
-    created: [], // TODO: récupérer depuis API
-    collaborations: [], // TODO: récupérer depuis API
-    liked: [], // TODO: récupérer depuis API
+    created: projects.created.map(adaptProject),
+    collaborations: projects.collaborations.map(adaptProject),
+    liked: projects.liked.map(adaptProject),
   },
-  followers: [], // TODO: récupérer depuis API
-  following: [], // TODO: récupérer depuis API
+  followers: profile.followers,
+  following: profile.following,
 });
 
 export function useUserProfile(userId: string | undefined) {
@@ -39,9 +57,17 @@ export function useUserProfile(userId: string | undefined) {
     const fetchUserProfile = async () => {
       try {
         setIsLoading(true);
-        const profile = await userService.getUserProfile(userId);
-        const adaptedUser = adaptUserProfile(profile);
-        setUser(adaptedUser);
+        // Fetch both endpoints in parallel
+        const [profile, projects] = await Promise.all([
+          userService.getUserProfile(userId),
+          userService.getUserProjects(userId),
+        ]);
+
+        console.log("Fetched user profile:", profile);
+        console.log("Fetched user projects:", projects);
+
+        const combinedUser = buildUserFromData(profile, projects);
+        setUser(combinedUser);
       } catch (err) {
         setError(
           err instanceof Error

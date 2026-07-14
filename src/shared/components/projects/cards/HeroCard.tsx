@@ -45,7 +45,7 @@ export function HeroCard({ project }: { project: Project }) {
         </div>
         <div className="flex items-center justify-between pt-1">
           <div className="flex gap-1.5 flex-wrap">
-            {project.tags.slice(0, 3).map((t) => (
+            {project.tags?.slice(0, 3).map((t) => (
               <TagPill key={t} tag={t} size="sm" />
             ))}
           </div>

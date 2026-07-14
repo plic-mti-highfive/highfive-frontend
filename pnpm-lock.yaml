@@ -17,8 +17,8 @@ importers:
         specifier: ^5.2.8
         version: 5.2.8
       "@plic-mti-highfive/shared-types":
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.2.0
+        version: 1.2.0
       "@tailwindcss/vite":
         specifier: ^4.3.0
         version: 4.3.0(vite@8.0.12(@types/node@25.7.0)(jiti@2.6.1)(yaml@2.9.0))
@@ -721,11 +721,11 @@ packages:
         integrity: sha512-3oz8m3FGdr2nDXVqmFUw7jolKliC4MoyXYIG2c7gpjBnzUWQpUGIYcXYKxTdTi+N2jusvt610ckTMkxdwHkYEg==,
       }
 
-  "@plic-mti-highfive/shared-types@1.0.1":
+  "@plic-mti-highfive/shared-types@1.2.0":
     resolution:
       {
-        integrity: sha512-fDhLFdPKi0ErlB/hOu4L+OOT3iU7IZ+6BMO4KqGwnhQkemZQjVWNZo8jVxCGMS1KgIq2CviEOQstSKguMZNp2g==,
-        tarball: https://npm.pkg.github.com/download/@plic-mti-highfive/shared-types/1.0.1/92f32cc68c55a864e27f37ccf6ae5b149b454301,
+        integrity: sha512-SFu9BEFRI4Hd8qwaMXLsVF0LZ9PBdg5Mlr4chUZvv3S08cPTxiElV6v5V5R9HoUAlbV4nDlVbKnndBD8YhDpDw==,
+        tarball: https://npm.pkg.github.com/download/@plic-mti-highfive/shared-types/1.2.0/0f30e5d21aab4853da120452e8edd347f07723c6,
       }
 
   "@radix-ui/number@1.1.1":
@@ -6266,7 +6266,7 @@ snapshots:
 
   "@oxc-project/types@0.129.0": {}
 
-  "@plic-mti-highfive/shared-types@1.0.1": {}
+  "@plic-mti-highfive/shared-types@1.2.0": {}
 
   "@radix-ui/number@1.1.1": {}
 

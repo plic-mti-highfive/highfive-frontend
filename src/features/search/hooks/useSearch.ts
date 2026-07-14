@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { projectService } from "@/api";
-import { ProjectStatus } from "@plic-mti-highfive/shared-types";
+import { type MinimalProfileDto, type ProjectDto } from "@/api";
+import { searchService } from "@/api/services";
 
 export interface SearchTag {
   name: string;
@@ -14,63 +14,71 @@ export interface SearchProgress {
   description: string;
 }
 
+interface SearchResultsState {
+  projects: ProjectDto[];
+  users: MinimalProfileDto[];
+  tags: SearchTag[];
+  progress: SearchProgress[];
+}
+
 export function useSearch(query: string) {
-  const [projects, setProjects] = useState<
-    Array<{ id: string | number; name: string; description: string }>
-  >([]);
+  const [results, setResults] = useState<SearchResultsState>({
+    projects: [],
+    users: [],
+    tags: [],
+    progress: [],
+  });
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      if (!query) {
-        setProjects([]);
-        return;
-      }
+  const isQueryEmpty = !query || query.trim() === "";
 
+  useEffect(() => {
+    if (isQueryEmpty) {
+      return;
+    }
+
+    const fetchSearchResults = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        const response = await projectService.getProjects({
-          status: ProjectStatus.ACTIVE,
-          limit: 50,
+        const response = await searchService.searchGlobal({
+          search: query,
+          limit: 3,
         });
-        setProjects(
-          response.data.map((p) => ({
-            id: p.id,
-            name: p.name,
-            description: p.description || "",
-          })),
-        );
+
+        setResults({
+          projects: response.projects?.data || [],
+          users: response.users?.data || [],
+          tags: (response.tags?.data || []) as SearchTag[],
+          progress: (response.progress?.data || []) as SearchProgress[],
+        });
       } catch (error) {
-        console.error("Failed to fetch projects for search:", error);
-        setProjects([]);
+        console.error("Erreur lors de la recherche globale :", error);
+        setResults({ projects: [], users: [], tags: [], progress: [] });
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchProjects();
-  }, [query]);
+    // Debounce de 300ms
+    const timeoutId = setTimeout(() => {
+      fetchSearchResults();
+    }, 300);
 
-  const queryLower = query.toLowerCase();
-  const filteredProjects = projects
-    .filter(
-      (p) =>
-        p.name.toLowerCase().includes(queryLower) ||
-        p.description.toLowerCase().includes(queryLower),
-    )
-    .slice(0, 3);
+    return () => clearTimeout(timeoutId);
+  }, [query, isQueryEmpty]);
+
+  const isEmpty =
+    results.projects.length === 0 &&
+    results.users.length === 0 &&
+    results.tags.length === 0 &&
+    results.progress.length === 0;
 
   return {
-    filteredProjects,
-    filteredUsers: [] as Array<{
-      username: string;
-      id: string;
-      avatar: string;
-      displayName: string;
-    }>,
-    filteredTags: [] as SearchTag[],
-    filteredProgress: [] as SearchProgress[],
-    isEmpty: filteredProjects.length === 0,
+    filteredProjects: results.projects,
+    filteredUsers: results.users,
+    filteredTags: results.tags,
+    filteredProgress: results.progress,
+    isEmpty,
     isLoading,
   };
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { MessageSquare, UserPlus, PackageOpen } from "lucide-react";
 import { Header } from "@features/layout";
@@ -17,6 +17,9 @@ import { getTagColor } from "@shared/utils/tagColors";
 import type { UserProfileFormData } from "@shared/types/user";
 import { useAuth } from "@shared/contexts";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { userService } from "@/api/services";
+import { storageService } from "@/api/services/http/storage.service.http";
+import { StorageFolder } from "@plic-mti-highfive/shared-types";
 
 function StatItem({
   value,
@@ -50,15 +53,8 @@ export default function UserProfile() {
 
   const isOwnProfile = isAuthenticated && currentUser?.id === userId;
 
-  // For display name / username: prefer the email prefix when viewing own profile
-  const displayUsername =
-    isOwnProfile && currentUser?.email
-      ? currentUser.email.split("@")[0]
-      : (user?.username ?? userId ?? "");
-  const displayName =
-    isOwnProfile && currentUser?.email
-      ? currentUser.email.split("@")[0]
-      : (user?.displayName ?? userId ?? "");
+  const displayUsername = user?.username ?? userId ?? "";
+  const displayName = user?.displayName ?? displayUsername;
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [following, setFollowing] = useState(false);
@@ -66,8 +62,42 @@ export default function UserProfile() {
   const [followingDialogOpen, setFollowingDialogOpen] = useState(false);
   const [unfollowConfirmOpen, setUnfollowConfirmOpen] = useState(false);
 
-  const handleSaveProfile = (data: UserProfileFormData) => {
+  const [backendTags, setBackendTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    userService
+      .getSkillSuggestions()
+      .then((suggestions) => setBackendTags(suggestions))
+      .catch(console.error);
+  }, []);
+
+  const handleSaveProfile = async (
+    data: UserProfileFormData,
+    fileToUpload?: File,
+  ) => {
+    if (!userId) return;
     console.log("Saving profile:", data);
+
+    try {
+      let finalAvatarPath = data.avatar;
+
+      if (fileToUpload) {
+        finalAvatarPath = await storageService.upload(
+          fileToUpload,
+          StorageFolder.AVATARS,
+        );
+      }
+
+      await userService.updateUserProfile(userId, {
+        displayName: data.displayName,
+        bio: data.bio,
+        avatarPath: finalAvatarPath,
+        skills: data.tags,
+      });
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
   };
 
   const handleShare = () => {
@@ -313,6 +343,7 @@ export default function UserProfile() {
           onOpenChange={setEditModalOpen}
           user={user}
           onSave={handleSaveProfile}
+          availableTags={backendTags}
         />
       )}
 

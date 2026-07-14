@@ -31,7 +31,10 @@ export default function LabPage() {
     addColumn,
     deleteColumn,
     addCustomTag,
-  } = useKanban();
+    addChecklist,
+    toggleChecklist,
+    addComment,
+  } = useKanban(projectId);
   const [openTicket, setOpenTicket] = useState<{
     ticketId: string;
     columnId: KanbanColumnId;
@@ -189,6 +192,9 @@ export default function LabPage() {
           setOpenTicket(null);
         }}
         onAddTag={addCustomTag}
+        onAddChecklist={addChecklist}
+        onToggleChecklist={toggleChecklist}
+        onAddComment={addComment}
       />
     </>
   );

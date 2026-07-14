@@ -13,6 +13,7 @@ import { StepManualName } from "../components/StepManualName";
 import { StepManualDesc } from "../components/StepManualDesc";
 import { StepManualTags } from "../components/StepManualTags";
 import { StepDone } from "../components/StepDone";
+import { projectService } from "@/api/services";
 
 export default function CreateProject() {
   const { step, visible, goTo } = useStepTransition("choose");
@@ -21,6 +22,7 @@ export default function CreateProject() {
     description: "",
     tags: [],
   });
+  const [createdProjectId, setCreatedProjectId] = useState<string>("");
 
   function handleChooseAI() {
     goTo("ai-pitch");
@@ -44,9 +46,15 @@ export default function CreateProject() {
     goTo("manual-tags");
   }
 
-  function handleManualSubmit() {
+  async function handleManualSubmit() {
     console.log("Créer projet :", form);
-    goTo("done");
+    try {
+      const newProject = await projectService.createProject(form);
+      setCreatedProjectId(newProject.id);
+      goTo("done");
+    } catch (error) {
+      console.error("Erreur lors de la création du projet :", error);
+    }
   }
 
   const backs: Partial<Record<typeof step, typeof step>> = {
@@ -101,7 +109,9 @@ export default function CreateProject() {
                 onChange={(t) => setForm((f) => ({ ...f, tags: t }))}
               />
             )}
-            {step === "done" && <StepDone projectName={form.name} />}
+            {step === "done" && (
+              <StepDone projectName={form.name} projectId={createdProjectId} />
+            )}
           </StepWrapper>
         </div>
       </main>

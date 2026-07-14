@@ -13,6 +13,10 @@ import type {
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
+  TicketCommentDto,
+  CreateTicketCommentDto,
+  ChecklistItemDto,
+  CreateChecklistItemDto,
 } from "../../types";
 import { httpClient } from "../../http-client";
 
@@ -25,19 +29,32 @@ export class ProjectServiceHttp implements IProjectService {
   async getProjects(
     query?: ListProjectsQuery,
   ): Promise<PaginatedResponse<ProjectDto>> {
-    const { page, limit, ...rest } = query ?? {};
-    const resolvedLimit = limit ?? 20;
-    const offset = page !== undefined ? (page - 1) * resolvedLimit : 0;
+    const { limit, offset, tags, ...rest } = query ?? {};
+
+    const params: Record<string, string | number | boolean> = {
+      ...rest,
+      limit: limit ?? 20,
+      offset: offset ?? 0,
+    };
+
+    if (tags && tags.length > 0) {
+      params.tags = tags.join(",");
+    }
+
     return httpClient.get<PaginatedResponse<ProjectDto>>("/projects", {
-      params: { ...rest, offset, limit: resolvedLimit } as Record<
-        string,
-        string | number | boolean
-      >,
+      params,
     });
   }
 
   async getProjectById(id: string): Promise<ProjectDto> {
     return httpClient.get<ProjectDto>(`/projects/${id}`);
+  }
+
+  async getProjectsByIds(ids: string[]): Promise<ProjectDto[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    return httpClient.post<ProjectDto[]>("/projects/batch", { ids });
   }
 
   async updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto> {
@@ -87,7 +104,10 @@ export class ProjectServiceHttp implements IProjectService {
   }
 
   async getProjectTickets(projectId: string): Promise<TicketDto[]> {
-    return httpClient.get<TicketDto[]>(`/projects/${projectId}/tickets`);
+    const response = await httpClient.get<PaginatedResponse<TicketDto>>(
+      `/projects/${projectId}/tickets`,
+    );
+    return response.data;
   }
 
   async getTicketById(projectId: string, ticketId: string): Promise<TicketDto> {
@@ -103,6 +123,39 @@ export class ProjectServiceHttp implements IProjectService {
   ): Promise<TicketDto> {
     return httpClient.patch<TicketDto>(
       `/projects/${projectId}/tickets/${ticketId}`,
+      dto,
+    );
+  }
+
+  async addChecklistItem(
+    projectId: string,
+    ticketId: string,
+    dto: CreateChecklistItemDto,
+  ): Promise<ChecklistItemDto> {
+    return httpClient.post<ChecklistItemDto>(
+      `/projects/${projectId}/tickets/${ticketId}/checklists`,
+      dto,
+    );
+  }
+
+  async toggleChecklistItem(
+    projectId: string,
+    itemId: string,
+    isCompleted: boolean,
+  ): Promise<ChecklistItemDto> {
+    return httpClient.patch<ChecklistItemDto>(
+      `/projects/${projectId}/tickets/checklists/${itemId}`,
+      { isCompleted },
+    );
+  }
+
+  async addTicketComment(
+    projectId: string,
+    ticketId: string,
+    dto: CreateTicketCommentDto,
+  ): Promise<TicketCommentDto> {
+    return httpClient.post<TicketCommentDto>(
+      `/projects/${projectId}/tickets/${ticketId}/comments`,
       dto,
     );
   }
