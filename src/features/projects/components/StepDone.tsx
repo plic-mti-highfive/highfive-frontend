@@ -5,7 +5,7 @@ export function StepDone({
   projectId,
 }: {
   projectName: string;
-  projectId: string;
+  projectId?: string | null;
 }) {
   const navigate = useNavigate();
   return (
@@ -38,7 +38,7 @@ export function StepDone({
 
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <button
-          onClick={() => navigate(`/projects/${projectId}`)}
+          onClick={() => navigate(projectId ? `/projects/${projectId}` : "/")}
           className="w-full py-4 rounded-2xl bg-gray-900 text-white font-bold text-base hover:bg-gray-700 active:scale-[0.98] transition-all duration-200 shadow-sm"
         >
           Voir mon projet →

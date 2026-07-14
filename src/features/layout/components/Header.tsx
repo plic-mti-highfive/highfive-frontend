@@ -13,6 +13,8 @@ import { Logo } from "@features/layout";
 import { Button } from "@shared/components/ui/button";
 import { SearchBar } from "@features/search";
 import { useAuth } from "@shared/contexts";
+import { NotificationItem } from "@features/notifications";
+import { mockNotifications } from "@/api/services/mock/data/mockNotifications";
 
 const popupCls =
   "bg-background border border-border rounded-xl shadow-lg py-1.5 w-80 origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0";
@@ -23,13 +25,20 @@ const itemCls =
 const separatorCls = "border-t border-border my-1.5 mx-2";
 
 function NotificationsMenu() {
+  const navigate = useNavigate();
+  const recent = mockNotifications.slice(0, 4);
+  const unreadCount = mockNotifications.filter((n) => !n.read).length;
+
   return (
     <Menu.Root>
       <Menu.Trigger
-        className="flex items-center justify-center w-12 h-12 rounded-full text-foreground hover:bg-muted transition-all outline-none cursor-pointer"
+        className="relative flex items-center justify-center w-12 h-12 rounded-full text-foreground hover:bg-muted transition-all outline-none cursor-pointer"
         aria-label="Notifications"
       >
         <Bell size={24} />
+        {unreadCount > 0 && (
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary" />
+        )}
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
@@ -39,10 +48,45 @@ function NotificationsMenu() {
           className="z-[10000]"
         >
           <Menu.Popup className={popupCls}>
-            <div className="px-4 py-6 text-center">
-              <p className="text-body-md text-muted-foreground">
-                Aucune notification pour l'instant.
-              </p>
+            {/* Panel header */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
+              <span className="text-sm font-semibold text-foreground">
+                Notifications
+              </span>
+              {unreadCount > 0 && (
+                <span className="inline-flex items-center justify-center min-w-5 h-5 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+
+            {/* Recent notifications */}
+            {recent.length > 0 ? (
+              <div className="py-1">
+                {recent.map((notif) => (
+                  <NotificationItem
+                    key={notif.id}
+                    notification={notif}
+                    compact
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="px-4 py-6 text-center">
+                <p className="text-body-md text-muted-foreground">
+                  Aucune notification pour l'instant.
+                </p>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="border-t border-border px-3 py-2">
+              <Menu.Item
+                className="w-full text-center text-sm font-medium text-primary hover:text-primary/80 py-1.5 rounded-lg hover:bg-muted outline-none cursor-pointer transition-colors"
+                onClick={() => navigate("/notifications")}
+              >
+                Voir tout
+              </Menu.Item>
             </div>
           </Menu.Popup>
         </Menu.Positioner>

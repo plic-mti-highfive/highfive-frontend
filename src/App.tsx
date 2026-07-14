@@ -6,6 +6,8 @@ import { CreateProjectPage, ProjectDetailPage } from "@features/projects";
 import { UserProfilePage } from "@features/user";
 import { SearchPage } from "@features/search";
 import { MessagesPage } from "@features/messages";
+import { NotificationsPage } from "@features/notifications";
+import { AdminDashboardPage } from "@features/admin";
 
 import { LabPage, MoodboardPage } from "@features/lab";
 
@@ -41,6 +43,8 @@ export default function App() {
         />
 
         <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/admin" element={<AdminDashboardPage />} />
 
         <Route path="/debug" element={<Debug />} />
         <Route path="*" element={<NotFoundPage />} />

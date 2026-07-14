@@ -22,7 +22,7 @@ export default function CreateProject() {
     description: "",
     tags: [],
   });
-  const [createdProjectId, setCreatedProjectId] = useState<string>("");
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
 
   function handleChooseAI() {
     goTo("ai-pitch");
@@ -47,7 +47,6 @@ export default function CreateProject() {
   }
 
   async function handleManualSubmit() {
-    console.log("Créer projet :", form);
     try {
       const newProject = await projectService.createProject(form);
       setCreatedProjectId(newProject.id);

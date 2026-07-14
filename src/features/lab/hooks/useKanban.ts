@@ -22,6 +22,18 @@ const INITIAL_TAGS: CustomTag[] = [
   { id: "tag-4", label: "Créatif", color: "#FF6B1A" },
 ];
 
+function ticketStatusToColumnId(status: TicketStatus): KanbanColumnId {
+  switch (status) {
+    case TicketStatus.IN_PROGRESS:
+    case TicketStatus.IN_REVIEW:
+      return "in-progress";
+    case TicketStatus.DONE:
+      return "done";
+    default:
+      return "todo";
+  }
+}
+
 export function useKanban(projectId: string | undefined) {
   const [columns, setColumns] = useState<KanbanColumnDef[]>(INITIAL_COLUMNS);
   const [customTags, setCustomTags] = useState<CustomTag[]>(INITIAL_TAGS);
@@ -33,12 +45,17 @@ export function useKanban(projectId: string | undefined) {
     "in-progress": [],
     done: [],
   });
+  const [isLoading, setIsLoading] = useState(!!projectId);
 
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId) {
+      setIsLoading(false);
+      return;
+    }
 
     async function fetchTickets() {
       try {
+        setIsLoading(true);
         const data: TicketDto[] = await projectService.getProjectTickets(
           projectId!,
         );
@@ -50,12 +67,7 @@ export function useKanban(projectId: string | undefined) {
         };
 
         data.forEach((ticket: TicketDto) => {
-          const colId: KanbanColumnId =
-            ticket.status === TicketStatus.IN_PROGRESS
-              ? "in-progress"
-              : ticket.status === TicketStatus.DONE
-                ? "done"
-                : "todo";
+          const colId = ticketStatusToColumnId(ticket.status);
 
           // Adaptation TicketDto -> KanbanTicket
           groupedTickets[colId].push({
@@ -83,6 +95,8 @@ export function useKanban(projectId: string | undefined) {
         setTickets(groupedTickets);
       } catch (error) {
         console.error("Error fetching tickets", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -190,6 +204,11 @@ export function useKanban(projectId: string | undefined) {
         t.id === ticketId ? { ...t, ...updates } : t,
       ),
     }));
+    if (projectId && updates.title !== undefined) {
+      projectService
+        .updateTicket(projectId, ticketId, { title: updates.title })
+        .catch((err) => console.error("Error updating ticket:", err));
+    }
   }
 
   // ---------- Checklist Operations ----------
@@ -342,6 +361,7 @@ export function useKanban(projectId: string | undefined) {
     columns,
     customTags,
     tickets,
+    isLoading,
     addTicket,
     moveTicket,
     deleteTicket,

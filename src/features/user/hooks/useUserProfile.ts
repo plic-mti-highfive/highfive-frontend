@@ -63,9 +63,6 @@ export function useUserProfile(userId: string | undefined) {
           userService.getUserProjects(userId),
         ]);
 
-        console.log("Fetched user profile:", profile);
-        console.log("Fetched user projects:", projects);
-
         const combinedUser = buildUserFromData(profile, projects);
         setUser(combinedUser);
       } catch (err) {
