@@ -13,6 +13,8 @@ import type {
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
+  ProjectNewsDto,
+  CreateProjectNewsDto,
   ChecklistItemDto,
   CreateChecklistItemDto,
   CreateTicketCommentDto,
@@ -32,6 +34,7 @@ class MockProjectDb {
   private members: Map<string, ProjectMemberDto[]> = new Map();
   private tickets: Map<string, TicketDto[]> = new Map();
   private messages: Map<string, ProjectMessageDto[]> = new Map();
+  private news: Map<string, ProjectNewsDto[]> = new Map();
 
   constructor() {
     const allProjects = getAllProjects();
@@ -60,6 +63,66 @@ class MockProjectDb {
         },
       };
       this.members.set(project.id, [member]);
+
+      // Seed news for the first project only (demo)
+      if (index === 0) {
+        const author = {
+          userId: creatorUser.id,
+          username: creatorUser.email.split("@")[0],
+          displayName: creatorUser.email.split("@")[0],
+          avatar: creatorUser.avatar ?? "",
+        };
+        this.news.set(project.id, [
+          {
+            id: "news-1",
+            projectId: project.id,
+            authorId: creatorUser.id,
+            tenantId: "default-tenant",
+            title: "Lancement officiel du projet 🚀",
+            content:
+              "Nous sommes ravis de vous annoncer le lancement officiel de ce projet ! Après plusieurs semaines de préparation, nous ouvrons maintenant les contributions à tous les membres. Consultez les tickets disponibles et n'hésitez pas à nous contacter si vous avez des questions.",
+            createdAt: new Date(
+              Date.now() - 7 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            updatedAt: new Date(
+              Date.now() - 7 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            author,
+          },
+          {
+            id: "news-2",
+            projectId: project.id,
+            authorId: creatorUser.id,
+            tenantId: "default-tenant",
+            title: "Première milestone atteinte",
+            content:
+              "L'équipe a franchi une étape importante cette semaine : le module d'authentification est désormais complet et les tests passent à 100 %. Merci à tous les contributeurs pour leur implication. La prochaine étape sera l'intégration de l'API principale.",
+            createdAt: new Date(
+              Date.now() - 3 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            updatedAt: new Date(
+              Date.now() - 3 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            author,
+          },
+          {
+            id: "news-3",
+            projectId: project.id,
+            authorId: creatorUser.id,
+            tenantId: "default-tenant",
+            title: "Appel à contributeurs — design UI",
+            content:
+              'Nous recherchons des contributeurs avec des compétences en design pour nous aider à améliorer l\'interface utilisateur. Si vous êtes intéressé(e), rejoignez le projet et prenez un ticket labellisé "design". Toutes les contributions sont les bienvenues !',
+            createdAt: new Date(
+              Date.now() - 1 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            updatedAt: new Date(
+              Date.now() - 1 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            author,
+          },
+        ]);
+      }
     });
   }
 
@@ -166,6 +229,16 @@ class MockProjectDb {
     const messages = this.messages.get(projectId) || [];
     messages.push(message);
     this.messages.set(projectId, messages);
+  }
+
+  getNews(projectId: string): ProjectNewsDto[] {
+    return this.news.get(projectId) || [];
+  }
+
+  addNews(projectId: string, item: ProjectNewsDto): void {
+    const items = this.news.get(projectId) || [];
+    items.push(item);
+    this.news.set(projectId, items);
   }
 }
 
@@ -426,5 +499,35 @@ export class ProjectServiceMock implements IProjectService {
   async getProjectMessages(projectId: string): Promise<ProjectMessageDto[]> {
     await delay(200);
     return db.getMessages(projectId);
+  }
+
+  async createNews(
+    projectId: string,
+    dto: CreateProjectNewsDto,
+  ): Promise<ProjectNewsDto> {
+    await delay(400);
+    const item: ProjectNewsDto = {
+      id: generateId(),
+      projectId,
+      authorId: "current-user-id",
+      tenantId: "default-tenant",
+      title: dto.title,
+      content: dto.content,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        userId: "current-user-id",
+        username: "currentuser",
+        displayName: "Current User",
+        avatar: "",
+      },
+    };
+    db.addNews(projectId, item);
+    return item;
+  }
+
+  async getProjectNews(projectId: string): Promise<ProjectNewsDto[]> {
+    await delay(200);
+    return db.getNews(projectId);
   }
 }

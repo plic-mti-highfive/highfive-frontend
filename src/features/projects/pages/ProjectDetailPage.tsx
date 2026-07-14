@@ -7,15 +7,27 @@ import { ProjectTabs, type TabId } from "../components/ProjectTabs";
 import { ProjectSidebar } from "../components/ProjectSidebar";
 import { TicketList } from "../components/TicketList";
 import { DiscussionThread } from "../components/DiscussionThread";
+import { NewsFeedPreview } from "../components/NewsFeedPreview";
 import { SimilarProjects } from "../components/SimilarProjects";
 import { ProjectDetailSkeleton } from "../components/ProjectDetailSkeleton";
+import {
+  ConfirmJoinModal,
+  JoinSuccessModal,
+} from "../components/JoinProjectModal";
 import type { ProjectMessageDto } from "@/api/types";
+import { projectService } from "@/api/services";
+import { ProjectRole } from "@plic-mti-highfive/shared-types";
+import { useAuth } from "@shared/contexts";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [localMessages, setLocalMessages] = useState<ProjectMessageDto[]>([]);
+  const [showJoinConfirm, setShowJoinConfirm] = useState(false);
+  const [showJoinSuccess, setShowJoinSuccess] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
 
   const { project, members, tickets, messages, isLoading, error } =
     useProjectDetail(id || "");
@@ -72,7 +84,23 @@ export function ProjectDetailPage() {
   }
 
   const handleJoinProject = () => {
-    console.log("Rejoindre le projet:", project.id);
+    setShowJoinConfirm(true);
+  };
+
+  const handleConfirmJoin = async () => {
+    setShowJoinConfirm(false);
+    try {
+      if (user) {
+        await projectService.addProjectMember(project.id, {
+          userId: user.id,
+          role: ProjectRole.MEMBER,
+        });
+      }
+    } catch (err) {
+      console.error("Erreur lors de la tentative de rejoindre le projet:", err);
+    }
+    setHasJoined(true);
+    setShowJoinSuccess(true);
   };
 
   const handleHighfive = () => {
@@ -124,7 +152,7 @@ export function ProjectDetailPage() {
               : undefined
           }
           highfiveCount={highfiveCount}
-          onJoinClick={handleJoinProject}
+          onJoinClick={hasJoined ? undefined : handleJoinProject}
           onHighfiveClick={handleHighfive}
         />
 
@@ -152,6 +180,18 @@ export function ProjectDetailPage() {
                         </p>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {activeTab === "announcement" && (
+                  <div className="pl-4">
+                    <NewsFeedPreview
+                      projectId={project.id}
+                      isOwner={members.some(
+                        (m) =>
+                          m.userId === user?.id && m.role === ProjectRole.OWNER,
+                      )}
+                    />
                   </div>
                 )}
 
@@ -187,6 +227,21 @@ export function ProjectDetailPage() {
         <SimilarProjects projects={similarProjects} />
       </main>
       <Footer />
+
+      {showJoinConfirm && (
+        <ConfirmJoinModal
+          projectName={project.name}
+          onConfirm={handleConfirmJoin}
+          onCancel={() => setShowJoinConfirm(false)}
+        />
+      )}
+
+      {showJoinSuccess && (
+        <JoinSuccessModal
+          projectName={project.name}
+          onClose={() => setShowJoinSuccess(false)}
+        />
+      )}
     </>
   );
 }

@@ -2,7 +2,11 @@ import { Routes, Route } from "react-router-dom";
 
 import { HomePage } from "@features/home";
 import { LoginPage, RegisterPage } from "@features/auth";
-import { CreateProjectPage, ProjectDetailPage } from "@features/projects";
+import {
+  CreateProjectPage,
+  ProjectDetailPage,
+  ProjectNewsPage,
+} from "@features/projects";
 import { UserProfilePage } from "@features/user";
 import { SearchPage } from "@features/search";
 import { MessagesPage } from "@features/messages";
@@ -34,6 +38,7 @@ export default function App() {
 
         <Route path="/create-project" element={<CreateProjectPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
+        <Route path="/projects/:id/news" element={<ProjectNewsPage />} />
         <Route path="/user/:userId" element={<UserProfilePage />} />
 
         <Route path="/projects/:projectId/lab" element={<LabPage />} />

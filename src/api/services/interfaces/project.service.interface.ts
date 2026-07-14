@@ -12,6 +12,8 @@ import type {
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
+  ProjectNewsDto,
+  CreateProjectNewsDto,
   CreateChecklistItemDto,
   ChecklistItemDto,
   TicketCommentDto,
@@ -73,4 +75,11 @@ export interface IProjectService {
     dto: CreateProjectMessageDto,
   ): Promise<ProjectMessageDto>;
   getProjectMessages(projectId: string): Promise<ProjectMessageDto[]>;
+
+  // News
+  createNews(
+    projectId: string,
+    dto: CreateProjectNewsDto,
+  ): Promise<ProjectNewsDto>;
+  getProjectNews(projectId: string): Promise<ProjectNewsDto[]>;
 }

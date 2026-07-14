@@ -167,3 +167,22 @@ export interface CreateProjectMessageDto {
   attachmentPath?: string;
   replyToId?: string | null;
 }
+
+// ---------- News ----------
+
+export interface ProjectNewsDto {
+  id: string;
+  projectId: string;
+  authorId: string;
+  tenantId: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  author?: MinimalProfileDto;
+}
+
+export interface CreateProjectNewsDto {
+  title: string;
+  content: string;
+}

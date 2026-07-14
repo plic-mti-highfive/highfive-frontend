@@ -13,6 +13,8 @@ import type {
   PaginatedResponse,
   ProjectMessageDto,
   CreateProjectMessageDto,
+  ProjectNewsDto,
+  CreateProjectNewsDto,
   TicketCommentDto,
   CreateTicketCommentDto,
   ChecklistItemDto,
@@ -175,5 +177,20 @@ export class ProjectServiceHttp implements IProjectService {
     return httpClient.get<ProjectMessageDto[]>(
       `/projects/${projectId}/messages`,
     );
+  }
+
+  // News
+  async createNews(
+    projectId: string,
+    dto: CreateProjectNewsDto,
+  ): Promise<ProjectNewsDto> {
+    return httpClient.post<ProjectNewsDto>(`/projects/${projectId}/news`, dto);
+  }
+
+  async getProjectNews(projectId: string): Promise<ProjectNewsDto[]> {
+    const response = await httpClient.get<PaginatedResponse<ProjectNewsDto>>(
+      `/projects/${projectId}/news`,
+    );
+    return response.data;
   }
 }
