@@ -20,6 +20,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 import { ScrollToTop } from "@shared/components/ScrollToTop";
 import { ScrollToTopButton } from "@shared/components/ScrollToTopButton";
+import CanvasPage from "@features/canvas/pages/CanvasPage";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/projects/:id/news" element={<ProjectNewsPage />} />
         <Route path="/user/:userId" element={<UserProfilePage />} />
 
+        <Route path="/projects/:projectId/canvas" element={<CanvasPage />} />
         <Route path="/projects/:projectId/lab" element={<LabPage />} />
         <Route
           path="/projects/:projectId/moodboard"

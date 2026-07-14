@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Kanban } from "lucide-react";
+import { Kanban, PenLine } from "lucide-react";
 import type { TicketDto, ProjectMemberDto } from "@/api/types";
 import { TicketStatus } from "@plic-mti-highfive/shared-types";
 import { TicketCard } from "./TicketCard";
@@ -10,9 +10,31 @@ interface TicketListProps {
   projectId: string;
 }
 
-export function TicketList({ tickets, members, projectId }: TicketListProps) {
+/** Acces au lab (kanban) et au canvas de brainstorming, d'ou l'on genere les taches. */
+function ProjectActions({ projectId }: { projectId: string }) {
   const navigate = useNavigate();
 
+  return (
+    <div className="flex flex-wrap gap-3">
+      <button
+        onClick={() => navigate(`/projects/${projectId}/lab`)}
+        className="flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-semibold rounded-lg hover:opacity-90 transition-opacity"
+      >
+        <Kanban size={18} />
+        Accéder au lab
+      </button>
+      <button
+        onClick={() => navigate(`/projects/${projectId}/canvas`)}
+        className="flex items-center gap-2 px-4 py-2.5 border border-foreground text-foreground font-semibold rounded-lg hover:bg-foreground/5 transition-colors"
+      >
+        <PenLine size={18} />
+        Ouvrir le canvas
+      </button>
+    </div>
+  );
+}
+
+export function TicketList({ tickets, members, projectId }: TicketListProps) {
   const getAssigneeName = (assigneeId: string | null) => {
     if (!assigneeId) return undefined;
     const member = members.find((m) => m.userId === assigneeId);
@@ -41,16 +63,13 @@ export function TicketList({ tickets, members, projectId }: TicketListProps) {
     return (
       <>
         <div className="mb-6">
-          <button
-            onClick={() => navigate(`/projects/${projectId}/lab`)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-semibold rounded-lg hover:opacity-90 transition-opacity"
-          >
-            <Kanban size={18} />
-            Accéder au lab
-          </button>
+          <ProjectActions projectId={projectId} />
         </div>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Aucun ticket pour le moment.</p>
+          <p className="text-muted-foreground">
+            Aucun ticket pour le moment. Ouvrez le canvas pour brainstormer, puis
+            générez les tâches.
+          </p>
         </div>
       </>
     );
@@ -59,13 +78,7 @@ export function TicketList({ tickets, members, projectId }: TicketListProps) {
   return (
     <div className="space-y-6">
       <div className="mb-4">
-        <button
-          onClick={() => navigate(`/projects/${projectId}/lab`)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-semibold rounded-lg hover:opacity-90 transition-opacity"
-        >
-          <Kanban size={18} />
-          Accéder au lab
-        </button>
+        <ProjectActions projectId={projectId} />
       </div>
       {Object.entries(groupedTickets).map(([status, statusTickets]) => {
         if (statusTickets.length === 0) return null;
