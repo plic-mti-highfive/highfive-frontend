@@ -2,6 +2,7 @@ import type {
   AdminUser,
   AdminProject,
   AdminStats,
+  AdminTenant,
   DailyRegistration,
   RecentlyClosedProject,
 } from "@features/admin/types";

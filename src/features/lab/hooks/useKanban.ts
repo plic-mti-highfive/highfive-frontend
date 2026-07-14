@@ -48,10 +48,7 @@ export function useKanban(projectId: string | undefined) {
   const [isLoading, setIsLoading] = useState(!!projectId);
 
   useEffect(() => {
-    if (!projectId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!projectId) return;
 
     async function fetchTickets() {
       try {
