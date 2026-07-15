@@ -1,25 +1,5 @@
 import { useState } from "react";
-
-// Deterministic pseudo-random from a seed
-function seededRand(seed: number) {
-  let s = seed;
-  return () => {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    return (s >>> 0) / 0xffffffff;
-  };
-}
-
-// Palette sets: [bg, accent1, accent2, shape]
-const PALETTE_SETS = [
-  { bg: "#E8F4F0", a1: "#2D9E7A", a2: "#A8DDD0", shape: "#1A6B52" },
-  { bg: "#EEE8F8", a1: "#7C5CBF", a2: "#C9B8EC", shape: "#4A2D8C" },
-  { bg: "#FDF0E6", a1: "#D4783A", a2: "#F5C89A", shape: "#9B4E1A" },
-  { bg: "#E6EEF8", a1: "#3A6FD4", a2: "#9ABCF5", shape: "#1A3D8C" },
-  { bg: "#F8E6EE", a1: "#C43A7C", a2: "#F5A0C8", shape: "#8C1A52" },
-  { bg: "#F0F0E6", a1: "#8C8C3A", a2: "#D4D49A", shape: "#5A5A1A" },
-  { bg: "#E6F0F8", a1: "#3A8CC4", a2: "#9AC8F0", shape: "#1A5A8C" },
-  { bg: "#F8EEE6", a1: "#C47C3A", a2: "#F0C09A", shape: "#8C4A1A" },
-];
+import { PALETTE_SETS, seededRand, getSeed } from "@shared/utils/colorPalette";
 
 type PatternType =
   | "circles"
@@ -35,10 +15,7 @@ export function generateSVGPattern(
   width = 400,
   height = 280,
 ): string {
-  const seed =
-    typeof id === "string"
-      ? id.split("").reduce((a, c) => a + c.charCodeAt(0), 0)
-      : id;
+  const seed = getSeed(id);
   const rand = seededRand(seed * 137);
   const paletteIndex = Math.abs(seed) % PALETTE_SETS.length;
   const palette = PALETTE_SETS[paletteIndex];

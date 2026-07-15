@@ -101,7 +101,7 @@ src/
 │   │
 │   ├── projects/             # Gestion des projets
 │   │   ├── pages/            # CreateProjectPage, ProjectDetailPage
-│   │   ├── components/       # ProjectHero, TicketList, ProjectFiltersBar…
+│   │   ├── components/       # ProjectHeader, TicketList, ProjectFiltersBar…
 │   │   ├── hooks/            # useProjectDetail, useStepTransition
 │   │   └── index.ts
 │   │
@@ -121,7 +121,7 @@ src/
 ├── shared/                   # Modules transverses (accessibles par tous)
 │   ├── components/
 │   │   ├── ui/               # Primitives shadcn/ui (Button, Input, Skeleton…)
-│   │   ├── projects/         # Composants projets réutilisables (SmallCard, HeroCard, Section…)
+│   │   ├── projects/         # Composants projets réutilisables (ProjectFeedCard, HeroCard, Section…)
 │   │   ├── ErrorBoundary.tsx
 │   │   ├── ScrollToTop.tsx
 │   │   └── ScrollToTopButton.tsx
