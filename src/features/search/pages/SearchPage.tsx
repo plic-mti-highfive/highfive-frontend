@@ -197,7 +197,7 @@ export function SearchPage() {
             {/* VUE PROJETS */}
             {resultType === "projects" &&
               (projects.length > 0 ? (
-                <div className="flex flex-col gap-3.5 max-w-2xl mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {projects.map((project) => (
                     <ProjectFeedCard key={project.id} project={project} />
                   ))}
