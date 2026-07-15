@@ -22,7 +22,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@shared/components/ui/breadcrumb";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { projectService } from "@/api";
 
 const RECT_COLORS = [
   "#93C5FD",
@@ -55,8 +56,18 @@ export default function MoodboardPage() {
   const [activeTool, setActiveTool] = useState<ActiveTool>("select");
   const [activeRectColor, setActiveRectColor] = useState(RECT_COLORS[0]);
   const [rectExpanded, setRectExpanded] = useState(false);
+  const [projectName, setProjectName] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Le fil d'Ariane affichait « Projet #<id> » : le nom n'etait jamais charge.
+  useEffect(() => {
+    if (!projectId) return;
+    projectService
+      .getProjectById(projectId)
+      .then((project) => setProjectName(project.name))
+      .catch((err) => console.error("Error loading project:", err));
+  }, [projectId]);
 
   // Called by canvas when user clicks in placement mode
   function handlePlace(canvasX: number, canvasY: number) {
@@ -104,7 +115,7 @@ export default function MoodboardPage() {
                 <BreadcrumbLink
                   render={(props) => (
                     <Link {...props} to={`/projects/${projectId}`}>
-                      Projet #{projectId}
+                      {projectName ?? "Projet"}
                     </Link>
                   )}
                 />

@@ -38,12 +38,46 @@ export function AdminDashboardPage() {
     RecentlyClosedProject[]
   >([]);
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    adminService.getUsers().then(setUsers);
-    adminService.getProjects().then(setProjects);
-    adminService.getStats().then(setStats);
-    adminService.getDailyRegistrations().then(setDailyRegistrations);
-    adminService.getRecentlyClosedProjects().then(setRecentlyClosedProjects);
+    // Les cinq appels etaient lances sans aucun `.catch` : le moindre echec
+    // produisait un rejet non gere et laissait la page vide — sans erreur, sans
+    // indicateur de chargement, sans rien.
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const [
+          usersData,
+          projectsData,
+          statsData,
+          registrationsData,
+          closedData,
+        ] = await Promise.all([
+          adminService.getUsers(),
+          adminService.getProjects(),
+          adminService.getStats(),
+          adminService.getDailyRegistrations(),
+          adminService.getRecentlyClosedProjects(),
+        ]);
+        setUsers(usersData);
+        setProjects(projectsData);
+        setStats(statsData);
+        setDailyRegistrations(registrationsData);
+        setRecentlyClosedProjects(closedData);
+      } catch (err) {
+        console.error("Erreur lors du chargement du dashboard admin:", err);
+        setError(
+          "Impossible de charger les données du dashboard. Réessayez plus tard.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    load();
   }, []);
 
   const handleUserStatusChange = async (
@@ -108,28 +142,48 @@ export function AdminDashboardPage() {
           </div>
 
           {/* Tab content */}
-          {activeTab === "overview" && stats && (
-            <OverviewTab
-              stats={stats}
-              dailyRegistrations={dailyRegistrations}
-              recentlyClosedProjects={recentlyClosedProjects}
-            />
-          )}
+          {isLoading ? (
+            <p className="py-12 text-center text-sm text-muted-foreground">
+              Chargement des données…
+            </p>
+          ) : error ? (
+            <div
+              role="alert"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            >
+              {error}
+            </div>
+          ) : (
+            <>
+              {activeTab === "overview" &&
+                (stats ? (
+                  <OverviewTab
+                    stats={stats}
+                    dailyRegistrations={dailyRegistrations}
+                    recentlyClosedProjects={recentlyClosedProjects}
+                  />
+                ) : (
+                  <p className="py-12 text-center text-sm text-muted-foreground">
+                    Aucune statistique disponible.
+                  </p>
+                ))}
 
-          {activeTab === "users" && (
-            <UsersTable
-              users={users}
-              onStatusChange={handleUserStatusChange}
-              onDelete={handleUserDelete}
-            />
-          )}
+              {activeTab === "users" && (
+                <UsersTable
+                  users={users}
+                  onStatusChange={handleUserStatusChange}
+                  onDelete={handleUserDelete}
+                />
+              )}
 
-          {activeTab === "projects" && (
-            <ProjectsTable
-              projects={projects}
-              onArchive={handleProjectArchive}
-              onDelete={handleProjectDelete}
-            />
+              {activeTab === "projects" && (
+                <ProjectsTable
+                  projects={projects}
+                  onArchive={handleProjectArchive}
+                  onDelete={handleProjectDelete}
+                />
+              )}
+            </>
           )}
         </div>
       </main>

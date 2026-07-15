@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { projectService, iaMatchmakingService } from "@/api";
 import type { Project } from "@shared/types";
-import { adaptProjects } from "../adapters";
+import { adaptProjects } from "@shared/utils/projectAdapter";
 import { useCurrentUser } from "@/api/hooks/useCurrentUser";
 import type { RecommendationResultItem } from "@/api/types/ia-matchmaking.types";
 

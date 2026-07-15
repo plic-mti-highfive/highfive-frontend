@@ -28,10 +28,19 @@ export function ProjectDetailPage() {
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
   const [showJoinSuccess, setShowJoinSuccess] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
   const [highfiveCount, setHighfiveCount] = useState<number | null>(null);
+  const [hasHighfived, setHasHighfived] = useState(false);
 
-  const { project, members, tickets, messages, isLoading, error } =
-    useProjectDetail(id || "");
+  const {
+    project,
+    members,
+    tickets,
+    messages,
+    similarProjects,
+    isLoading,
+    error,
+  } = useProjectDetail(id || "");
 
   const handleMessageSent = (newMessage: ProjectMessageDto) => {
     setLocalMessages((prev) => [...prev, newMessage]);
@@ -88,53 +97,74 @@ export function ProjectDetailPage() {
     setShowJoinConfirm(true);
   };
 
+  // Le proprietaire, identifie par son role et non par sa position dans la
+  // liste. Repli sur le profil imbrique dans le projet si l'appel /members
+  // n'a rien renvoye.
+  const ownerMember = members.find((m) => m.role === ProjectRole.OWNER);
+  const creator = ownerMember?.user
+    ? {
+        email: ownerMember.user.email,
+        avatar: ownerMember.user.profile?.avatarPath ?? undefined,
+      }
+    : project.owner
+      ? {
+          email: project.owner.username,
+          avatar: project.owner.avatar ?? undefined,
+        }
+      : undefined;
+
   const handleConfirmJoin = async () => {
     setShowJoinConfirm(false);
+    setJoinError(null);
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    // La confirmation de succes etait hors du try/catch : elle s'affichait meme
+    // quand l'appel echouait, et meme quand aucun appel n'etait fait faute
+    // d'utilisateur connecte. On ne l'affiche plus que si l'ajout a reussi.
     try {
-      if (user) {
-        await projectService.addProjectMember(project.id, {
-          userId: user.id,
-          role: ProjectRole.MEMBER,
-        });
-      }
+      await projectService.addProjectMember(project.id, {
+        userId: user.id,
+        role: ProjectRole.MEMBER,
+      });
+      setHasJoined(true);
+      setShowJoinSuccess(true);
     } catch (err) {
       console.error("Erreur lors de la tentative de rejoindre le projet:", err);
+      setJoinError(
+        "Impossible de rejoindre ce projet pour le moment. Réessayez.",
+      );
     }
-    setHasJoined(true);
-    setShowJoinSuccess(true);
   };
 
-  const handleHighfive = () => {
-    setHighfiveCount((prev) => (prev ?? project.highfiveCount ?? 0) + 1);
-  };
+  const handleHighfive = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
 
-  // Simuler des projets similaires (à remplacer par une vraie requête API plus tard)
-  const similarProjects: (typeof project)[] = [
-    {
-      ...project,
-      id: "101",
-      name: "Projet Open Source similaire 1",
-      description: "Description du projet similaire 1",
-    },
-    {
-      ...project,
-      id: "102",
-      name: "Projet Open Source similaire 2",
-      description: "Description du projet similaire 2",
-    },
-    {
-      ...project,
-      id: "103",
-      name: "Projet Open Source similaire 3",
-      description: "Description du projet similaire 3",
-    },
-    {
-      ...project,
-      id: "104",
-      name: "Projet Open Source similaire 4",
-      description: "Description du projet similaire 4",
-    },
-  ];
+    const current = highfiveCount ?? project.highfiveCount ?? 0;
+    const next = hasHighfived ? current - 1 : current + 1;
+
+    // Mise a jour optimiste, puis persistance : le compteur n'etait
+    // qu'un etat local et retombait a sa valeur initiale au rechargement.
+    setHighfiveCount(next);
+    setHasHighfived(!hasHighfived);
+    try {
+      if (hasHighfived) {
+        await projectService.removeHighfive(project.id);
+      } else {
+        await projectService.addHighfive(project.id);
+      }
+    } catch (err) {
+      console.error("Erreur lors du highfive:", err);
+      setHighfiveCount(current);
+      setHasHighfived(hasHighfived);
+    }
+  };
 
   return (
     <>
@@ -142,14 +172,11 @@ export function ProjectDetailPage() {
       <main className="min-h-screen bg-background">
         <ProjectHeader
           project={project}
-          creator={
-            members[0]?.user
-              ? {
-                  email: members[0].user.email,
-                  avatar: members[0].user.profile?.avatarPath ?? undefined,
-                }
-              : undefined
-          }
+          // `members[0]` designait le premier membre renvoye par l'API, dont
+          // l'ordre n'est pas garanti : l'en-tete a affiche un simple VIEWER
+          // comme createur alors que le panneau equipe montrait le bon
+          // proprietaire juste a cote. On s'appuie sur le role.
+          creator={creator}
           onJoinClick={hasJoined ? undefined : handleJoinProject}
           onHighfiveClick={handleHighfive}
         />
@@ -229,6 +256,21 @@ export function ProjectDetailPage() {
         <SimilarProjects projects={similarProjects} />
       </main>
       <Footer />
+
+      {joinError && (
+        <div
+          role="alert"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive shadow-lg"
+        >
+          <span>{joinError}</span>
+          <button
+            onClick={() => setJoinError(null)}
+            className="font-medium underline underline-offset-2 hover:opacity-80"
+          >
+            Fermer
+          </button>
+        </div>
+      )}
 
       {showJoinConfirm && (
         <ConfirmJoinModal

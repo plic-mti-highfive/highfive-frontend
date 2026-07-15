@@ -6,10 +6,23 @@ import type {
   ISearchService,
   IUserService,
 } from "./interfaces";
+import type {
+  IMessagingService,
+  INotificationService,
+} from "./interfaces/messaging.service.interface";
+import {
+  MessagingServiceMock,
+  NotificationServiceMock,
+} from "./mock/messaging.service.mock";
 import type { IIAMatchmakingService } from "./interfaces/ia-matchmaking.service.interface";
 
 // Import des implémentations
-import { AuthServiceMock, ProjectServiceMock, UserServiceMock } from "./mock";
+import {
+  AdminServiceMock,
+  AuthServiceMock,
+  ProjectServiceMock,
+  UserServiceMock,
+} from "./mock";
 import {
   AdminServiceHttp,
   AuthServiceHttp,
@@ -29,10 +42,14 @@ class ServiceFactory {
   private _userService: IUserService | null = null;
   private _iaMatchmakingService: IIAMatchmakingService | null = null;
   private _searchService: ISearchService | null = null;
+  private _messagingService: IMessagingService | null = null;
+  private _notificationService: INotificationService | null = null;
 
   get adminService(): IAdminService {
     if (!this._adminService) {
-      this._adminService = new AdminServiceHttp();
+      this._adminService = isMockMode()
+        ? new AdminServiceMock()
+        : new AdminServiceHttp();
     }
     return this._adminService;
   }
@@ -82,6 +99,26 @@ class ServiceFactory {
     return this._searchService;
   }
 
+  /**
+   * Messagerie privee et notifications : mock dans les deux modes, faute de
+   * routes correspondantes cote backend (cf. messaging.service.interface.ts).
+   * Le choix est fait ici, une fois, plutot que dissemine dans des imports de
+   * donnees mock au fond des composants.
+   */
+  get messagingService(): IMessagingService {
+    if (!this._messagingService) {
+      this._messagingService = new MessagingServiceMock();
+    }
+    return this._messagingService;
+  }
+
+  get notificationService(): INotificationService {
+    if (!this._notificationService) {
+      this._notificationService = new NotificationServiceMock();
+    }
+    return this._notificationService;
+  }
+
   // Réinitialiser les services (utile si on change le mode à runtime)
   reset() {
     this._adminService = null;
@@ -90,6 +127,8 @@ class ServiceFactory {
     this._userService = null;
     this._iaMatchmakingService = null;
     this._searchService = null;
+    this._messagingService = null;
+    this._notificationService = null;
   }
 }
 
@@ -102,6 +141,8 @@ export const projectService = factory.projectService;
 export const userService = factory.userService;
 export const iaMatchmakingService = factory.iaMatchmakingService;
 export const searchService = factory.searchService;
+export const messagingService = factory.messagingService;
+export const notificationService = factory.notificationService;
 
 // Export de la factory pour pouvoir reset si besoin
 export { factory as serviceFactory };
@@ -114,4 +155,6 @@ export type {
   IUserService,
   IIAMatchmakingService,
   ISearchService,
+  IMessagingService,
+  INotificationService,
 };

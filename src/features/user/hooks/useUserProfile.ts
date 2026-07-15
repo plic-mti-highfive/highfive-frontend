@@ -1,21 +1,8 @@
 import { useState, useEffect } from "react";
-import { userService, type ProjectDto } from "@/api";
+import { userService } from "@/api";
 import type { User } from "@shared/types/user";
 import type { UserProfileDto, UserProjectsDto } from "@/api/types/user.types";
-import type { Project } from "@/shared/types/project";
-
-const adaptProject = (p: ProjectDto): Project => ({
-  id: p.id,
-  name: p.name,
-  description: p.description ?? "",
-  tags: p.tags ?? [],
-  author: p.owner?.username ?? "Unknown",
-  authorAvatar: p.owner?.avatar ?? undefined,
-  contributorsCount: 0, // TODO
-  highfiveCount: p.highfiveCount,
-  successRate: 0, // TODO
-  daysLeft: null, // TODO
-});
+import { adaptProjects } from "@shared/utils/projectAdapter";
 
 /**
  * Combine profile and projects data into a unified User object
@@ -38,9 +25,9 @@ const buildUserFromData = (
     following: profile.stats.following,
   },
   projects: {
-    created: projects.created.map(adaptProject),
-    collaborations: projects.collaborations.map(adaptProject),
-    liked: projects.liked.map(adaptProject),
+    created: adaptProjects(projects.created),
+    collaborations: adaptProjects(projects.collaborations),
+    liked: adaptProjects(projects.liked),
   },
   followers: profile.followers,
   following: profile.following,
