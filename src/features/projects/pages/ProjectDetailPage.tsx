@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header, Footer } from "@features/layout";
 import { useProjectDetail } from "../hooks/useProjectDetail";
-import { ProjectHero } from "../components/ProjectHero";
+import { ProjectHeader } from "../components/ProjectHeader";
 import { ProjectTabs, type TabId } from "../components/ProjectTabs";
 import { ProjectSidebar } from "../components/ProjectSidebar";
 import { TicketList } from "../components/TicketList";
@@ -28,6 +28,7 @@ export function ProjectDetailPage() {
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
   const [showJoinSuccess, setShowJoinSuccess] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
+  const [highfiveCount, setHighfiveCount] = useState<number | null>(null);
 
   const { project, members, tickets, messages, isLoading, error } =
     useProjectDetail(id || "");
@@ -104,10 +105,10 @@ export function ProjectDetailPage() {
   };
 
   const handleHighfive = () => {
-    console.log("Highfive le projet:", project.id);
+    setHighfiveCount((prev) => (prev ?? project.highfiveCount ?? 0) + 1);
   };
 
-  // Simuler des projets similaires et highfives (à remplacer par une vraie requête API plus tard)
+  // Simuler des projets similaires (à remplacer par une vraie requête API plus tard)
   const similarProjects: (typeof project)[] = [
     {
       ...project,
@@ -134,15 +135,13 @@ export function ProjectDetailPage() {
       description: "Description du projet similaire 4",
     },
   ];
-  const highfiveCount = 42;
 
   return (
     <>
       <Header />
       <main className="min-h-screen bg-background">
-        <ProjectHero
+        <ProjectHeader
           project={project}
-          memberCount={members.length}
           creator={
             members[0]?.user
               ? {
@@ -151,13 +150,12 @@ export function ProjectDetailPage() {
                 }
               : undefined
           }
-          highfiveCount={highfiveCount}
           onJoinClick={hasJoined ? undefined : handleJoinProject}
           onHighfiveClick={handleHighfive}
         />
 
         <div className="border-b border-border bg-background py-12">
-          <div className="max-w-8xl mx-auto px-6">
+          <div className="max-w-[1400px] mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 <ProjectTabs activeTab={activeTab} onChange={setActiveTab} />
@@ -205,7 +203,11 @@ export function ProjectDetailPage() {
               </div>
 
               <div className="lg:col-span-1">
-                <ProjectSidebar project={project} members={members} />
+                <ProjectSidebar
+                  project={project}
+                  members={members}
+                  highfiveCount={highfiveCount ?? project.highfiveCount ?? 0}
+                />
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { FolderOpen, Users, Tag } from "lucide-react";
 import { Header } from "@features/layout";
 import { Footer } from "@features/layout";
-import { SmallCard } from "@shared/components/projects";
+import { ProjectFeedCard } from "@shared/components/projects";
 import { ProjectFiltersBar } from "@features/projects";
 import { projectService } from "@/api";
 import type { Project } from "@shared/types";
@@ -197,9 +197,9 @@ export function SearchPage() {
             {/* VUE PROJETS */}
             {resultType === "projects" &&
               (projects.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-7 gap-y-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {projects.map((project) => (
-                    <SmallCard key={project.id} project={project} />
+                    <ProjectFeedCard key={project.id} project={project} />
                   ))}
                 </div>
               ) : (

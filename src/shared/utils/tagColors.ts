@@ -1,11 +1,35 @@
 // Couleurs accent disponibles pour les tags
 const TAG_COLORS = [
-  { bg: "bg-rose-light", text: "text-rose-dark", border: "border-rose" },
-  { bg: "bg-orange-light", text: "text-orange-dark", border: "border-orange" },
-  { bg: "bg-yellow-light", text: "text-yellow-dark", border: "border-yellow" },
-  { bg: "bg-apple-light", text: "text-apple-dark", border: "border-apple" },
-  { bg: "bg-sky-light", text: "text-sky-dark", border: "border-sky" },
-  { bg: "bg-purple-light", text: "text-purple-dark", border: "border-purple" },
+  {
+    bg: "bg-rose-light dark:bg-rose-deeper/40",
+    text: "text-rose-dark dark:text-rose-mid",
+    border: "border-rose",
+  },
+  {
+    bg: "bg-orange-light dark:bg-orange-deeper/40",
+    text: "text-orange-dark dark:text-orange-mid",
+    border: "border-orange",
+  },
+  {
+    bg: "bg-yellow-light dark:bg-yellow-deeper/40",
+    text: "text-yellow-dark dark:text-yellow-mid",
+    border: "border-yellow",
+  },
+  {
+    bg: "bg-apple-light dark:bg-apple-deeper/40",
+    text: "text-apple-dark dark:text-apple-mid",
+    border: "border-apple",
+  },
+  {
+    bg: "bg-sky-light dark:bg-sky-deeper/40",
+    text: "text-sky-dark dark:text-sky-mid",
+    border: "border-sky",
+  },
+  {
+    bg: "bg-purple-light dark:bg-purple-deeper/40",
+    text: "text-purple-dark dark:text-purple-mid",
+    border: "border-purple",
+  },
 ];
 
 // Hash simple pour assigner une couleur cohérente basée sur le nom du tag

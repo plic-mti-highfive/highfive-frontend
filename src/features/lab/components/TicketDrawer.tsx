@@ -66,7 +66,7 @@ function Section({
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <p className="text-label uppercase tracking-wider font-bold text-[var(--color-ink-muted)]">
+        <p className="text-label uppercase tracking-wider font-bold text-muted-foreground">
           {label}
         </p>
         {aside}
@@ -223,7 +223,7 @@ export function TicketDrawer({
 
       {/* Drawer panel */}
       <div
-        className={`fixed right-0 top-0 h-full z-[101] bg-white flex flex-col
+        className={`fixed right-0 top-0 h-full z-[101] bg-background flex flex-col
           shadow-[-8px_0_40px_rgba(0,0,0,0.12)]
           transition-[transform,opacity] duration-[320ms] ease-[cubic-bezier(0.32,0.72,0,1)]
           ${isOpen ? "translate-x-0 opacity-100" : "translate-x-[40px] opacity-0 pointer-events-none"}
@@ -231,7 +231,7 @@ export function TicketDrawer({
         style={{ width: "440px", maxWidth: "100vw" }}
       >
         {/* -- Header -- */}
-        <div className="flex-none px-6 pt-5 pb-5 border-b border-[var(--color-cream-mid)]">
+        <div className="flex-none px-6 pt-5 pb-5 border-b border-border">
           {/* Column badge + close */}
           <div className="flex items-center justify-between mb-4">
             <span
@@ -249,7 +249,7 @@ export function TicketDrawer({
             </span>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--color-cream)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-dark)] transition-colors cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
               aria-label="Fermer"
             >
               <X size={15} />
@@ -277,7 +277,7 @@ export function TicketDrawer({
             placeholder="Titre du ticket"
             spellCheck={false}
             rows={1}
-            className="w-full resize-none overflow-hidden text-heading-md font-semibold text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)] leading-snug hover:bg-[var(--color-cream)] focus:bg-[var(--color-cream)] rounded-lg px-2.5 py-1.5 -mx-2.5 transition-colors"
+            className="w-full resize-none overflow-hidden text-heading-md font-semibold text-foreground bg-transparent outline-none placeholder:text-muted-foreground leading-snug hover:bg-muted focus:bg-muted rounded-lg px-2.5 py-1.5 -mx-2.5 transition-colors"
           />
         </div>
 
@@ -334,10 +334,10 @@ export function TicketDrawer({
                       backgroundColor: isActive
                         ? cfg.color + "18"
                         : "transparent",
-                      color: isActive ? cfg.color : "var(--color-ink-muted)",
+                      color: isActive ? cfg.color : "var(--muted-foreground)",
                       borderColor: isActive
                         ? cfg.color + "60"
-                        : "var(--color-cream-mid)",
+                        : "var(--border)",
                     }}
                   >
                     {cfg.label}
@@ -414,7 +414,7 @@ export function TicketDrawer({
             </div>
             {/* Create new tag */}
             {showTagForm ? (
-              <div className="flex items-center gap-2 bg-[var(--color-cream)] rounded-xl px-3 py-2">
+              <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2">
                 <input
                   autoFocus
                   type="text"
@@ -427,7 +427,7 @@ export function TicketDrawer({
                     }
                   }}
                   placeholder="Nom de l'étiquette…"
-                  className="flex-1 text-body-sm text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
+                  className="flex-1 text-body-sm text-foreground bg-transparent outline-none placeholder:text-muted-foreground"
                 />
                 {/* Color picker */}
                 <div className="flex gap-1">
@@ -454,7 +454,7 @@ export function TicketDrawer({
                     setNewTagLabel("");
                     setShowTagForm(false);
                   }}
-                  className="text-ui-sm font-semibold px-2.5 py-1 rounded-lg border border-[var(--color-cream-mid)] text-[var(--color-ink)] bg-white cursor-pointer hover:bg-[var(--color-cream-dark)] disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="text-ui-sm font-semibold px-2.5 py-1 rounded-lg border border-border text-foreground bg-card cursor-pointer hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   Créer
                 </button>
@@ -462,7 +462,7 @@ export function TicketDrawer({
             ) : (
               <button
                 onClick={() => setShowTagForm(true)}
-                className="inline-flex items-center gap-1.5 text-body-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] cursor-pointer transition-colors"
+                className="inline-flex items-center gap-1.5 text-body-sm text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
               >
                 <Plus size={12} />
                 Nouvelle étiquette
@@ -471,7 +471,7 @@ export function TicketDrawer({
           </Section>
 
           {/* Divider */}
-          <div className="border-t border-[var(--color-cream-mid)]" />
+          <div className="border-t border-border" />
 
           {/* Checklist */}
           <Section
@@ -484,7 +484,7 @@ export function TicketDrawer({
                     color:
                       checklistDone === checklistTotal
                         ? "#2A8C1E"
-                        : "var(--color-ink-muted)",
+                        : "var(--muted-foreground)",
                   }}
                 >
                   {checklistPct}%
@@ -493,7 +493,7 @@ export function TicketDrawer({
             }
           >
             {checklistTotal > 0 && (
-              <div className="h-1.5 bg-[var(--color-cream-mid)] rounded-full overflow-hidden mb-3">
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-3">
                 <div
                   className="h-full rounded-full transition-all duration-300"
                   style={{
@@ -508,14 +508,14 @@ export function TicketDrawer({
               {visibleTicket?.checklistItems?.map((item) => (
                 <div
                   key={item.id}
-                  className="group flex items-center gap-2.5 py-1 px-1 rounded-lg hover:bg-[var(--color-cream)] transition-colors"
+                  className="group flex items-center gap-2.5 py-1 px-1 rounded-lg hover:bg-muted transition-colors"
                 >
                   <button
                     onClick={() => toggleChecklistItem(item.id)}
                     className={`shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer transition-all ${
                       item.done
                         ? "bg-[#5ED651] border-[#5ED651]"
-                        : "border-[var(--color-cream-mid)] hover:border-[var(--color-ink-muted)]"
+                        : "border-border hover:border-muted-foreground"
                     }`}
                   >
                     {item.done && (
@@ -523,13 +523,13 @@ export function TicketDrawer({
                     )}
                   </button>
                   <span
-                    className={`flex-1 text-body-sm ${item.done ? "line-through text-[var(--color-ink-muted)]" : "text-[var(--color-ink)]"}`}
+                    className={`flex-1 text-body-sm ${item.done ? "line-through text-muted-foreground" : "text-foreground"}`}
                   >
                     {item.text}
                   </span>
                   <button
                     onClick={() => deleteChecklistItem(item.id)}
-                    className="opacity-0 group-hover:opacity-100 text-[var(--color-ink-muted)] hover:text-red-500 cursor-pointer transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 cursor-pointer transition-opacity"
                     aria-label="Supprimer"
                   >
                     <X size={12} />
@@ -539,22 +539,19 @@ export function TicketDrawer({
 
               {/* Add item */}
               <form onSubmit={addChecklistItem} className="mt-1.5">
-                <div className="flex items-center gap-2 bg-[var(--color-cream)] rounded-xl px-3 py-2 border border-transparent focus-within:border-[var(--color-cream-mid)] transition-colors">
-                  <Plus
-                    size={13}
-                    className="shrink-0 text-[var(--color-ink-muted)]"
-                  />
+                <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2 border border-transparent focus-within:border-border transition-colors">
+                  <Plus size={13} className="shrink-0 text-muted-foreground" />
                   <input
                     type="text"
                     value={newChecklistText}
                     onChange={(e) => setNewChecklistText(e.target.value)}
                     placeholder="Nouvel élément…"
-                    className="flex-1 text-body-sm text-[var(--color-ink)] bg-transparent outline-none placeholder:text-[var(--color-ink-muted)]"
+                    className="flex-1 text-body-sm text-foreground bg-transparent outline-none placeholder:text-muted-foreground"
                   />
                   <button
                     type="submit"
                     disabled={!newChecklistText.trim()}
-                    className="shrink-0 text-ui-sm font-semibold px-3 py-1 rounded-lg border border-[var(--color-cream-mid)] text-[var(--color-ink)] bg-white cursor-pointer transition-all hover:bg-[var(--color-cream-dark)] hover:border-[var(--color-ink-muted)] disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="shrink-0 text-ui-sm font-semibold px-3 py-1 rounded-lg border border-border text-foreground bg-card cursor-pointer transition-all hover:bg-accent hover:border-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     Ajouter
                   </button>
@@ -564,7 +561,7 @@ export function TicketDrawer({
           </Section>
 
           {/* Divider */}
-          <div className="border-t border-[var(--color-cream-mid)]" />
+          <div className="border-t border-border" />
 
           {/* Comments */}
           <Section
@@ -584,13 +581,13 @@ export function TicketDrawer({
                           {assigneeInitials(comment.author)}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-ui-sm text-[var(--color-ink)]">
+                          <p className="text-ui-sm text-foreground">
                             {comment.author}
-                            <span className="text-[var(--color-ink-muted)] font-normal ml-2">
+                            <span className="text-muted-foreground font-normal ml-2">
                               {formatRelative(comment.createdAt)}
                             </span>
                           </p>
-                          <p className="text-body-sm text-[var(--color-ink)] mt-1 leading-relaxed">
+                          <p className="text-body-sm text-foreground mt-1 leading-relaxed">
                             {comment.text}
                           </p>
                         </div>
@@ -605,12 +602,12 @@ export function TicketDrawer({
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Écrire un commentaire…"
                 rows={2}
-                className="w-full resize-none text-body-sm text-[var(--color-ink)] bg-[var(--color-cream)] rounded-xl px-3.5 py-2.5 outline-none placeholder:text-[var(--color-ink-muted)] focus:bg-[var(--color-cream-dark)] transition-colors"
+                className="w-full resize-none text-body-sm text-foreground bg-muted rounded-xl px-3.5 py-2.5 outline-none placeholder:text-muted-foreground focus:bg-accent transition-colors"
               />
               {newComment.trim() && (
                 <button
                   type="submit"
-                  className="text-ui-sm font-bold px-4 py-1.5 rounded-lg bg-[var(--color-ink)] text-white cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all"
+                  className="text-ui-sm font-bold px-4 py-1.5 rounded-lg bg-primary text-primary-foreground cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all"
                 >
                   Envoyer
                 </button>
@@ -621,25 +618,25 @@ export function TicketDrawer({
 
         {/* -- Footer / Danger zone -- */}
         <div
-          className={`flex-none px-6 py-4 border-t transition-colors ${deleteConfirm ? "border-red-200 bg-red-50/60" : "border-[var(--color-cream-mid)]"}`}
+          className={`flex-none px-6 py-4 border-t transition-colors ${deleteConfirm ? "border-red-200 dark:border-red-900/40 bg-red-50/60 dark:bg-red-500/10" : "border-border"}`}
         >
           {!deleteConfirm ? (
             <button
               onClick={() => setDeleteConfirmFor(visibleTicket?.id ?? null)}
-              className="flex items-center gap-2 text-body-sm text-[var(--color-ink-muted)] hover:text-red-500 cursor-pointer transition-colors"
+              className="flex items-center gap-2 text-body-sm text-muted-foreground hover:text-red-500 cursor-pointer transition-colors"
             >
               <Trash2 size={14} />
               Supprimer le ticket
             </button>
           ) : (
             <div className="space-y-2.5">
-              <p className="text-body-sm font-semibold text-red-600">
+              <p className="text-body-sm font-semibold text-red-600 dark:text-red-400">
                 Supprimer définitivement ce ticket ?
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setDeleteConfirmFor(null)}
-                  className="flex-1 text-ui-sm font-semibold py-2 rounded-xl border border-[var(--color-cream-mid)] text-[var(--color-ink)] hover:bg-[var(--color-cream)] cursor-pointer transition-colors"
+                  className="flex-1 text-ui-sm font-semibold py-2 rounded-xl border border-border text-foreground hover:bg-muted cursor-pointer transition-colors"
                 >
                   Annuler
                 </button>

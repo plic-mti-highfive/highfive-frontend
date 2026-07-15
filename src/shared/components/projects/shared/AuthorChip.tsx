@@ -1,19 +1,42 @@
-export function AuthorChip({ author }: { author: string }) {
+import { Avatar } from "./Avatar";
+
+const SIZES = {
+  sm: { avatar: "xs", label: "text-xs" },
+  md: { avatar: "sm", label: "text-sm" },
+  lg: { avatar: "md", label: "text-sm" },
+} as const;
+
+export function AuthorChip({
+  author,
+  size = "sm",
+  avatarUrl,
+  onClick,
+}: {
+  author: string;
+  size?: keyof typeof SIZES;
+  avatarUrl?: string;
+  onClick?: () => void;
+}) {
   if (!author) return null;
-  const initials = author.slice(0, 2).toUpperCase();
-  const hue = (author.charCodeAt(0) * 37) % 360;
+  const { avatar, label } = SIZES[size];
+
   return (
-    <div className="flex items-center gap-1.5">
-      <div
-        className="w-5 h-5 rounded-full text-[9px] font-bold flex items-center justify-center shrink-0 ring-1 ring-black/10"
-        style={{
-          background: `hsl(${hue} 45% 80%)`,
-          color: `hsl(${hue} 45% 30%)`,
-        }}
+    <div
+      className={`flex items-center gap-1.5 w-fit ${onClick ? "cursor-pointer group/author" : ""}`}
+      onClick={
+        onClick &&
+        ((e) => {
+          e.stopPropagation();
+          onClick();
+        })
+      }
+    >
+      <Avatar name={author} avatarUrl={avatarUrl} size={avatar} />
+      <span
+        className={`${label} text-foreground font-medium ${onClick ? "group-hover/author:underline" : ""}`}
       >
-        {initials}
-      </div>
-      <span className="text-xs text-foreground font-medium">@{author}</span>
+        @{author}
+      </span>
     </div>
   );
 }

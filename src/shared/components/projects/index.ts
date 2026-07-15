@@ -1,8 +1,9 @@
-export { SmallCard, HeroCard, AnimatedCard } from "./cards";
+export { HeroCard, AnimatedCard, ProjectFeedCard } from "./cards";
 export {
   Thumbnail,
   generateSVGPattern,
   ProgressBar,
+  Avatar,
   AuthorChip,
   DaysLeftBadge,
   TagPill,

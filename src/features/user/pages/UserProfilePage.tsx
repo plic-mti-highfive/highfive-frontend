@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { MessageSquare, UserPlus, PackageOpen } from "lucide-react";
 import { Header } from "@features/layout";
 import { Footer } from "@features/layout";
-import { SmallCard } from "@shared/components/projects";
+import { ProjectFeedCard, TagPill } from "@shared/components/projects";
 import { UserNotFound } from "../components/UserNotFound";
 import { UserActionsMenu } from "../components/UserActionsMenu";
 import { EditProfileModal } from "../components/EditProfileModal";
@@ -13,7 +13,6 @@ import { createProjectsTabs } from "../utils/profileTabsUtils";
 import { ProjectFiltersBar } from "@features/projects";
 import { UsersListDialog } from "../components/UsersListDialog";
 import { UnfollowConfirmDialog } from "../components/UnfollowConfirmDialog";
-import { getTagColor } from "@shared/utils/tagColors";
 import type { UserProfileFormData } from "@shared/types/user";
 import { useAuth } from "@shared/contexts";
 import { useUserProfile } from "../hooks/useUserProfile";
@@ -204,20 +203,9 @@ export default function UserProfile() {
                 {/* Tags */}
                 {user.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {user.tags.map((tag) => {
-                      const colors = getTagColor(tag);
-                      return (
-                        <span
-                          key={tag}
-                          className={`
-                              px-3 py-1.5 rounded-full text-xs font-semibold
-                              border ${colors.bg} ${colors.text} ${colors.border}
-                            `}
-                        >
-                          {tag}
-                        </span>
-                      );
-                    })}
+                    {user.tags.map((tag) => (
+                      <TagPill key={tag} tag={tag} />
+                    ))}
                   </div>
                 )}
 
@@ -263,9 +251,12 @@ export default function UserProfile() {
                     user.projects.created.length > 0 ? (
                       <div>
                         <ProjectFiltersBar />
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
+                        <div className="flex flex-col gap-3.5 max-w-2xl mx-auto">
                           {user.projects.created.map((project) => (
-                            <SmallCard key={project.id} project={project} />
+                            <ProjectFeedCard
+                              key={project.id}
+                              project={project}
+                            />
                           ))}
                         </div>
                       </div>
@@ -286,9 +277,12 @@ export default function UserProfile() {
                     user.projects.collaborations.length > 0 ? (
                       <div>
                         <ProjectFiltersBar />
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
+                        <div className="flex flex-col gap-3.5 max-w-2xl mx-auto">
                           {user.projects.collaborations.map((project) => (
-                            <SmallCard key={project.id} project={project} />
+                            <ProjectFeedCard
+                              key={project.id}
+                              project={project}
+                            />
                           ))}
                         </div>
                       </div>
@@ -309,9 +303,12 @@ export default function UserProfile() {
                     user.projects.liked.length > 0 ? (
                       <div>
                         <ProjectFiltersBar />
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-7">
+                        <div className="flex flex-col gap-3.5 max-w-2xl mx-auto">
                           {user.projects.liked.map((project) => (
-                            <SmallCard key={project.id} project={project} />
+                            <ProjectFeedCard
+                              key={project.id}
+                              project={project}
+                            />
                           ))}
                         </div>
                       </div>

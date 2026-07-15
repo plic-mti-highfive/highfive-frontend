@@ -1,4 +1,4 @@
-import { Section } from "@shared/components/projects";
+import { ProjectFeedCard } from "@shared/components/projects";
 import type { ProjectDto } from "@/api/types";
 import type { Project } from "@shared/types";
 
@@ -21,16 +21,18 @@ export function SimilarProjects({ projects }: SimilarProjectsProps) {
     thumbnailUrl: undefined,
   });
 
-  const projectsForSection = projects.map(convertToProject);
+  const projectsForSection = projects.slice(0, 4).map(convertToProject);
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6">
-      <Section
-        title="Projets similaires"
-        projects={projectsForSection}
-        cols={4}
-        showViewAll={false}
-      />
+    <div className="max-w-[1400px] mx-auto px-6 py-14 border-t border-border">
+      <h2 className="text-lg font-bold text-foreground mb-5">
+        Projets similaires
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {projectsForSection.map((project) => (
+          <ProjectFeedCard key={project.id} project={project} />
+        ))}
+      </div>
     </div>
   );
 }

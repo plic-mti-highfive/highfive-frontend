@@ -4,6 +4,7 @@ export interface Project {
   description: string;
   tags?: string[];
   author: string;
+  authorId?: string;
   authorAvatar?: string;
   contributorsCount: number;
   highfiveCount?: number;

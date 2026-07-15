@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { Project } from "@shared/types";
-import { SmallCard } from "@shared/components/projects";
+import { ProjectFeedCard } from "@shared/components/projects";
 
 interface SectionProps {
   title: string;
@@ -19,10 +19,6 @@ export function Section({
   if (projects.length === 0) return null;
 
   const displayed = projects.slice(0, cols === 3 ? 6 : 8);
-  const gridClass =
-    cols === 3
-      ? "grid-cols-2 lg:grid-cols-3"
-      : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
 
   return (
     <section className="py-14 border-t border-border">
@@ -42,9 +38,9 @@ export function Section({
           </button>
         )}
       </div>
-      <div className={`grid ${gridClass} gap-x-7 gap-y-10`}>
+      <div className="flex flex-col gap-3.5 max-w-2xl mx-auto">
         {displayed.map((p) => (
-          <SmallCard key={p.id} project={p} />
+          <ProjectFeedCard key={p.id} project={p} />
         ))}
       </div>
     </section>

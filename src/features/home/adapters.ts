@@ -10,7 +10,9 @@ export const adaptProjectDto = (dto: ProjectDto): Project => ({
   name: dto.name,
   description: dto.description || "",
   tags: dto.tags || [],
-  author: "unknown", // TODO: récupérer l'auteur via les membres
+  author: dto.owner?.username || dto.owner?.displayName || "Membre",
+  authorId: dto.owner?.userId,
+  authorAvatar: dto.owner?.avatar || undefined,
   contributorsCount: 0, // TODO: calculer depuis les membres
   highfiveCount: dto.highfiveCount || 0,
   successRate: 100, // TODO: calculer selon la logique métier
