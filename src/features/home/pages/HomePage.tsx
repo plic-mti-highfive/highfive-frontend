@@ -10,8 +10,7 @@ import { TrendingUsersPanel } from "../components/TrendingUsersPanel";
 import { TrendingTagsPanel } from "../components/TrendingTagsPanel";
 import { TagNavBar } from "../components/TagNavBar";
 import { HomePageSkeleton } from "../components/HomePageSkeleton";
-import { useHomeTrendingAndRecommended } from "../hooks/useHomeTrendingAndRecommended";
-import { useHomeProjects } from "../hooks/useHomeProjects";
+import { useHomeFeed } from "../hooks/useHomeFeed";
 import { useAuth } from "@shared/contexts";
 
 const SIDEBAR_STICKY_TOP = "6.25rem";
@@ -19,32 +18,27 @@ const SIDEBAR_STICKY_TOP = "6.25rem";
 export default function HomePage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   // Fetch other project categories from client-side logic
+  // Une seule source pour tout le fil : sections deduplquees entre elles et
+  // erreur limitee au service projets. Une panne du service de recommandation,
+  // qui n'alimente que deux sections, faisait auparavant basculer la page
+  // entiere en ecran d'erreur alors que les projets etaient bien charges.
   const {
     featured,
-    endingSoon,
-    successful,
-    recent,
-    isLoading: homeProjectsLoading,
-    error: homeProjectsError,
-  } = useHomeProjects();
-
-  // Fetch trending and recommended from IA backend
-  const {
-    trending,
     recommended,
-    isLoading: iaLoading,
-    error: iaError,
-  } = useHomeTrendingAndRecommended();
-
-  const isLoading = homeProjectsLoading || iaLoading;
-  const error = homeProjectsError || iaError;
+    trending,
+    popular,
+    active,
+    recent,
+    isLoading,
+    error,
+  } = useHomeFeed();
 
   const allLoadedProjects = [
     ...(featured ? [featured] : []),
     ...recommended,
     ...trending,
-    ...endingSoon,
-    ...successful,
+    ...popular,
+    ...active,
     ...recent,
   ];
 
@@ -150,7 +144,7 @@ export default function HomePage() {
               <div className="flex-1 min-w-0 flex flex-col gap-11 xl:px-10 xl:border-x xl:border-border">
                 {featured && <FeaturedLayout hero={featured} />}
                 <ProjectFeedSection
-                  title="Recommandés"
+                  title="Recommandés pour vous"
                   projects={recommended}
                 />
                 <ProjectFeedSection
@@ -158,12 +152,12 @@ export default function HomePage() {
                   projects={trending}
                 />
                 <ProjectFeedSection
-                  title="Se terminent bientôt"
-                  projects={endingSoon}
+                  title="Les plus soutenus"
+                  projects={popular}
                 />
                 <ProjectFeedSection
-                  title="Projets qui ont réussi"
-                  projects={successful}
+                  title="Les plus grandes équipes"
+                  projects={active}
                 />
                 <ProjectFeedSection title="Projets récents" projects={recent} />
               </div>

@@ -1,27 +1,21 @@
 import { ProjectFeedCard } from "@shared/components/projects";
 import type { ProjectDto } from "@/api/types";
-import type { Project } from "@shared/types";
+import { adaptProjects } from "@shared/utils/projectAdapter";
 
 interface SimilarProjectsProps {
   projects: ProjectDto[];
 }
 
+/**
+ * La conversion locale forcait `author: "Équipe"` et `tags: ["Open Source"]` en
+ * ignorant les vraies valeurs, et faisait `Number(dto.id)` alors que les
+ * identifiants sont des UUID : branche sur de vraies donnees, cela produisait
+ * `NaN` et une navigation vers /projects/NaN. On passe par l'adaptateur commun.
+ */
 export function SimilarProjects({ projects }: SimilarProjectsProps) {
   if (projects.length === 0) return null;
 
-  const convertToProject = (dto: ProjectDto): Project => ({
-    id: Number(dto.id),
-    name: dto.name,
-    description: dto.description || "",
-    author: "Équipe",
-    successRate: 0,
-    contributorsCount: 0,
-    daysLeft: null,
-    tags: ["Open Source"],
-    thumbnailUrl: undefined,
-  });
-
-  const projectsForSection = projects.slice(0, 4).map(convertToProject);
+  const projectsForSection = adaptProjects(projects.slice(0, 4));
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-14 border-t border-border">

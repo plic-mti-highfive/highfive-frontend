@@ -1,11 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { projectService } from "@/api";
 import { ProjectStatus } from "@plic-mti-highfive/shared-types";
-import type { Project } from "@shared/types";
-import { adaptProjects } from "../adapters";
+import type { ProjectDto } from "@/api/types";
 
+/**
+ * Charge le catalogue des projets actifs et en tire des classements.
+ *
+ * Ce hook ne compose pas les sections affichees : c'est le role de
+ * `useHomeFeed`, seul endroit a connaitre toutes les listes de la page et donc
+ * capable de garantir qu'aucun projet n'y apparait deux fois.
+ */
 export function useHomeProjects() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -16,24 +22,18 @@ export function useHomeProjects() {
         setError(null);
         const response = await projectService.getProjects({
           status: ProjectStatus.ACTIVE,
-          limit: 50, // Charger plus de projets pour avoir assez pour toutes les catégories
+          limit: 50,
         });
-
-        const adaptedProjects = adaptProjects(response.data);
-        setProjects(adaptedProjects);
+        setProjects(response.data);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
-        const errorMessage =
+        const message =
           err instanceof Error
             ? err.message
             : "Erreur inconnue lors du chargement des projets";
-
-        // Ajouter plus de contexte à l'erreur
-        const enhancedError = new Error(errorMessage);
+        const enhancedError = new Error(message);
         enhancedError.stack = err instanceof Error ? err.stack : undefined;
         setError(enhancedError);
-
-        // En cas d'erreur, garder les projets vides plutôt que de crasher
         setProjects([]);
       } finally {
         setIsLoading(false);
@@ -43,23 +43,27 @@ export function useHomeProjects() {
     fetchProjects();
   }, []);
 
-  // Pour l'instant, on retourne tous les projets
-  // TODO: implémenter la logique de catégorisation quand le backend supportera les catégories
-  const featured = projects[0] || null;
-  const recommended = projects.slice(0, 4);
-  const trending = projects.slice(4, 8);
-  const endingSoon = projects.slice(8, 12);
-  const successful = projects.slice(12, 16);
-  const recent = projects.slice(16, 20);
+  /**
+   * Classements sur des criteres reellement disponibles. Les sections etaient
+   * auparavant de simples tranches du meme tableau — slice(8, 12) pour « Se
+   * terminent bientot », slice(12, 16) pour « Projets qui ont reussi » — sans
+   * rapport avec leur titre, et pour cause : le backend n'expose ni date de fin
+   * ni notion de reussite.
+   */
+  const rankings = useMemo(
+    () => ({
+      byHighfives: [...projects].sort(
+        (a, b) => (b.highfiveCount ?? 0) - (a.highfiveCount ?? 0),
+      ),
+      byTeamSize: [...projects].sort(
+        (a, b) => (b.membersCount ?? 0) - (a.membersCount ?? 0),
+      ),
+      byDate: [...projects].sort(
+        (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
+      ),
+    }),
+    [projects],
+  );
 
-  return {
-    featured,
-    recommended,
-    trending,
-    endingSoon,
-    successful,
-    recent,
-    isLoading,
-    error,
-  };
+  return { ...rankings, isLoading, error };
 }

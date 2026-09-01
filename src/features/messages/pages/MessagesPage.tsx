@@ -1,19 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Footer, Header } from "@features/layout";
 import { ConversationList } from "../components/ConversationList";
 import { ConversationDetail } from "../components/ConversationDetail";
 import { EmptyConversation } from "../components/EmptyConversation";
 import type { Conversation } from "../types";
-import { mockConversations } from "@/api/services/mock/data/mockConversations";
+import { messagingService } from "@/api/services";
 
 export function MessagesPage() {
-  const [conversations] = useState<Conversation[]>(mockConversations);
+  // Les conversations etaient importees en dur depuis les donnees mock, ce qui
+  // les affichait a l'identique en mode http. Elles passent par la couche API.
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | null
   >(null);
   const [isListCollapsed, setIsListCollapsed] = useState(false);
+
+  useEffect(() => {
+    messagingService
+      .getConversations()
+      .then(setConversations)
+      .catch((err) =>
+        console.error("Erreur lors du chargement des conversations:", err),
+      );
+  }, []);
 
   const selectedConversation = conversations.find(
     (c) => c.id === selectedConversationId,

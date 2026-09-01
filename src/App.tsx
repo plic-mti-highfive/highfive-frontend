@@ -20,6 +20,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 import { ScrollToTop } from "@shared/components/ScrollToTop";
 import { ScrollToTopButton } from "@shared/components/ScrollToTopButton";
+import { AdminRoute, ProtectedRoute } from "@shared/components/ProtectedRoute";
 import CanvasPage from "@features/canvas/pages/CanvasPage";
 
 export default function App() {
@@ -37,21 +38,69 @@ export default function App() {
         <Route path="/search/users" element={<SearchPage />} />
         <Route path="/search/tags" element={<SearchPage />} />
 
-        <Route path="/create-project" element={<CreateProjectPage />} />
+        <Route
+          path="/create-project"
+          element={
+            <ProtectedRoute>
+              <CreateProjectPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/projects/:id/news" element={<ProjectNewsPage />} />
         <Route path="/user/:userId" element={<UserProfilePage />} />
 
-        <Route path="/projects/:projectId/canvas" element={<CanvasPage />} />
-        <Route path="/projects/:projectId/lab" element={<LabPage />} />
+        {/* Espaces de travail : reserves aux membres du projet, que le backend
+            verifie de son cote (403 sur le canvas notamment). */}
+        <Route
+          path="/projects/:projectId/canvas"
+          element={
+            <ProtectedRoute>
+              <CanvasPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:projectId/lab"
+          element={
+            <ProtectedRoute>
+              <LabPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/projects/:projectId/moodboard"
-          element={<MoodboardPage />}
+          element={
+            <ProtectedRoute>
+              <MoodboardPage />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path="/messages" element={<MessagesPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <MessagesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
+          }
+        />
 
         <Route path="/debug" element={<Debug />} />
         <Route path="*" element={<NotFoundPage />} />

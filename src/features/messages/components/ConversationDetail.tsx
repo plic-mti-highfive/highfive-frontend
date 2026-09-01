@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronRight } from "lucide-react";
 import type { Conversation, Message } from "../types";
-import { mockMessages } from "@/api/services/mock/data/mockMessages";
+import { messagingService } from "@/api/services";
 import { MessageBubble } from "./MessageBubble";
 import { MessageDateSeparator } from "./MessageDateSeparator";
 import { NewMessagesSeparator } from "./NewMessagesSeparator";
@@ -46,29 +46,36 @@ export function ConversationDetail({
   conversation,
   onToggleListCollapse,
 }: ConversationDetailProps) {
-  const [messages, setMessages] = useState<Message[]>(() => {
-    return mockMessages.filter(
-      (m: Message) => m.conversationId === conversation.id,
-    );
-  });
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Les messages etaient lus directement dans les donnees mock : ils passent
+  // par la couche API, et se rechargent quand on change de conversation.
+  useEffect(() => {
+    messagingService
+      .getMessages(conversation.id)
+      .then(setMessages)
+      .catch((err) =>
+        console.error("Erreur lors du chargement des messages:", err),
+      );
+  }, [conversation.id]);
 
   // Scroll to bottom on mount and when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = (content: string) => {
-    const newMessage: Message = {
-      id: `msg-${Date.now()}`,
-      conversationId: conversation.id,
-      senderId: "user-1",
-      content,
-      timestamp: new Date(),
-      read: true,
-    };
-    setMessages([...messages, newMessage]);
+  const handleSendMessage = async (content: string) => {
+    try {
+      const newMessage = await messagingService.sendMessage(
+        conversation.id,
+        content,
+      );
+      setMessages((prev) => [...prev, newMessage]);
+    } catch (err) {
+      console.error("Erreur lors de l'envoi du message:", err);
+    }
   };
 
   // Find the unread separator position

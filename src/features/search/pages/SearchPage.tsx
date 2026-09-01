@@ -7,23 +7,10 @@ import { ProjectFeedCard } from "@shared/components/projects";
 import { ProjectFiltersBar } from "@features/projects";
 import { projectService } from "@/api";
 import type { Project } from "@shared/types";
-import type { MinimalProfileDto, ProjectDto } from "@/api/types";
+import type { MinimalProfileDto } from "@/api/types";
 import { userService } from "@/api/services";
+import { adaptProjects } from "@shared/utils/projectAdapter";
 import { SearchEntityType } from "@plic-mti-highfive/shared-types";
-
-function adaptProject(p: ProjectDto): Project {
-  return {
-    id: p.id,
-    name: p.name,
-    description: p.description ?? "",
-    tags: p.tags ?? [],
-    author: "",
-    contributorsCount: 0,
-    highfiveCount: p.highfiveCount,
-    successRate: 0,
-    daysLeft: null,
-  };
-}
 
 export function SearchPage() {
   const [searchParams] = useSearchParams();
@@ -59,7 +46,7 @@ export function SearchPage() {
             tags: tagFilter ? [tagFilter] : undefined,
             limit: 20,
           });
-          setProjects(response.data.map(adaptProject));
+          setProjects(adaptProjects(response.data));
           setTotalCount(response.total);
         } else if (resultType === SearchEntityType.USERS) {
           const response = await userService.searchProfiles({
@@ -67,10 +54,11 @@ export function SearchPage() {
             limit: 20,
           });
           setUsers(response.data);
-          setTotalCount(response.total);
-
           setProjects([]);
-          setTotalCount(0);
+          // Le total etait ecrase par un setTotalCount(0) juste apres avoir ete
+          // renseigne : la page annoncait « 0 utilisateur trouve » meme quand
+          // elle en affichait.
+          setTotalCount(response.total);
         } else if (resultType === "tags") {
           // TODO
           setProjects([]);

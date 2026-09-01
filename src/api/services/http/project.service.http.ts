@@ -67,6 +67,16 @@ export class ProjectServiceHttp implements IProjectService {
     return httpClient.delete(`/projects/${id}`);
   }
 
+  // Highfives
+
+  async addHighfive(projectId: string): Promise<void> {
+    await httpClient.post(`/projects/${projectId}/highfive`, {});
+  }
+
+  async removeHighfive(projectId: string): Promise<void> {
+    await httpClient.delete(`/projects/${projectId}/highfive`);
+  }
+
   // Members
   async getProjectMembers(projectId: string): Promise<ProjectMemberDto[]> {
     return httpClient.get<ProjectMemberDto[]>(`/projects/${projectId}/members`);

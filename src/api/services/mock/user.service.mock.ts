@@ -2,12 +2,18 @@ import type { IUserService } from "../interfaces";
 import type {
   ListUsersQuery,
   PaginatedUsersResponse,
+  ProjectDto,
   UpdateUserProfileDto,
   UserProfileDto,
   UserProjectsDto,
 } from "../../types";
 import { delay } from "./utils";
-import { getAllUsers } from "./data";
+import {
+  getAllUsers,
+  getProjectIdsJoinedBy,
+  getProjectIdsOwnedBy,
+  getProjectWithOwner,
+} from "./data";
 
 // Base de données mock pour les profils utilisateurs
 class MockUserDb {
@@ -16,7 +22,7 @@ class MockUserDb {
   constructor() {
     const allUsers = getAllUsers();
 
-    allUsers.forEach((user) => {
+    allUsers.forEach((user, index) => {
       const username = user.email.split("@")[0];
       const displayName = username
         .split(".")
@@ -33,9 +39,11 @@ class MockUserDb {
         bio: user.profile?.bio || null,
         createdAt: user.createdAt,
         skills: [],
+        // Derive de l'index plutot que tire au hasard : les compteurs
+        // changeaient a chaque rechargement de la page.
         stats: {
-          followers: Math.floor(Math.random() * 50),
-          following: Math.floor(Math.random() * 50),
+          followers: (index * 7) % 43,
+          following: (index * 5) % 29,
         },
         followers: [],
         following: [],
@@ -85,33 +93,24 @@ export class UserServiceMock implements IUserService {
 
   async getUserProfile(userId: string): Promise<UserProfileDto> {
     await delay(200);
-    const profile = db.getProfile(userId);
-    return {
-      userId,
-      username: userId.substring(0, 8),
-      displayName: userId.substring(0, 8),
-      avatar:
-        profile.avatar ||
-        `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
-      bio: profile.bio,
-      createdAt: new Date().toISOString(),
-      skills: [],
-      stats: {
-        followers: 0,
-        following: 0,
-      },
-      followers: [],
-      following: [],
-    };
+    // Le profil construit par MockUserDb etait recupere puis aussitot ecrase :
+    // le nom devenait un fragment d'identifiant (« user-1 »), les stats
+    // retombaient a zero et la date de creation a aujourd'hui. On le renvoie
+    // tel quel, comme le fait le backend.
+    return db.getProfile(userId);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getUserProjects(_userId: string): Promise<UserProjectsDto> {
+  async getUserProjects(userId: string): Promise<UserProjectsDto> {
     await delay(300);
-    // Mock projects data
+    // Renvoyait systematiquement des listes vides : tous les profils
+    // affichaient « aucun projet », y compris pour les proprietaires.
     return {
-      created: [],
-      collaborations: [],
+      created: getProjectIdsOwnedBy(userId)
+        .map(getProjectWithOwner)
+        .filter((p): p is ProjectDto => p !== undefined),
+      collaborations: getProjectIdsJoinedBy(userId)
+        .map(getProjectWithOwner)
+        .filter((p): p is ProjectDto => p !== undefined),
       liked: [],
     };
   }

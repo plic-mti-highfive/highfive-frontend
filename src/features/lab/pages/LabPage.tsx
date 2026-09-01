@@ -41,6 +41,7 @@ export default function LabPage() {
     columnId: KanbanColumnId;
   } | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [projectName, setProjectName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!projectId) return;
@@ -52,6 +53,13 @@ export default function LabPage() {
         );
       })
       .catch((err) => console.error("Error loading project members:", err));
+
+    // Le fil d'Ariane affichait « Projet #<id> », soit un UUID brut en mode
+    // http : le nom du projet n'etait jamais charge.
+    projectService
+      .getProjectById(projectId)
+      .then((project) => setProjectName(project.name))
+      .catch((err) => console.error("Error loading project:", err));
   }, [projectId]);
 
   const { total, done } = useMemo(() => {
@@ -89,7 +97,7 @@ export default function LabPage() {
                 <BreadcrumbLink
                   render={(props) => (
                     <Link {...props} to={`/projects/${projectId}`}>
-                      Projet #{projectId}
+                      {projectName ?? "Projet"}
                     </Link>
                   )}
                 />

@@ -31,6 +31,11 @@ export interface IProjectService {
   updateProject(id: string, dto: UpdateProjectDto): Promise<ProjectDto>;
   deleteProject(id: string): Promise<void>;
 
+  /** Soutenir un projet. Le bouton n'etait branche sur rien : le compteur
+   *  n'existait qu'en memoire et retombait au rechargement. */
+  addHighfive(projectId: string): Promise<void>;
+  removeHighfive(projectId: string): Promise<void>;
+
   // Members
   getProjectMembers(projectId: string): Promise<ProjectMemberDto[]>;
   addProjectMember(

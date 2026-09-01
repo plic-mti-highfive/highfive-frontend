@@ -27,7 +27,12 @@ import {
   TicketStatus,
 } from "@plic-mti-highfive/shared-types";
 import { delay, generateId } from "./utils";
-import { getAllProjects, getAllUsers } from "./data";
+import {
+  getAllProjects,
+  getAllUsers,
+  getProjectMemberships,
+  getProjectTicketsData,
+} from "./data";
 
 class MockProjectDb {
   private projects: Map<string, ProjectDto> = new Map();
@@ -42,22 +47,35 @@ class MockProjectDb {
 
     allProjects.forEach((project, index) => {
       this.projects.set(project.id, project);
-      const creatorUser = allUsers[index % allUsers.length];
-      const member: ProjectMemberDto = {
-        projectId: project.id,
-        userId: creatorUser.id,
-        tenantId: "default-tenant",
-        role: ProjectRole.OWNER,
-        createdAt: project.createdAt,
-        user: {
-          id: creatorUser.id,
-          email: creatorUser.email,
-          profile: {
-            avatarPath: creatorUser.profile?.avatarPath ?? null,
+
+      // Equipe complete issue du referentiel partage (cf. mockMemberships) :
+      // chaque projet n'avait qu'un seul membre, ce qui masquait le bug
+      // d'affichage du proprietaire et rendait le nombre de contributeurs faux.
+      const team = getProjectMemberships(project.id);
+      const members: ProjectMemberDto[] = team.flatMap((membership) => {
+        const user = allUsers.find((u) => u.id === membership.userId);
+        if (!user) return [];
+        return [
+          {
+            projectId: project.id,
+            userId: user.id,
+            tenantId: "default-tenant",
+            role: membership.role,
+            createdAt: project.createdAt,
+            user: {
+              id: user.id,
+              email: user.email,
+              profile: {
+                avatarPath: user.profile?.avatarPath ?? null,
+              },
+            },
           },
-        },
-      };
-      this.members.set(project.id, [member]);
+        ];
+      });
+      this.members.set(project.id, members);
+      this.tickets.set(project.id, getProjectTicketsData(project.id));
+
+      const creatorUser = allUsers[index % allUsers.length];
 
       // Seed news for the first project only (demo)
       if (index === 0) {
@@ -152,6 +170,13 @@ class MockProjectDb {
     return this.projects.delete(id);
   }
 
+  /** Fait varier le compteur de highfives, jamais sous zero. */
+  adjustHighfiveCount(projectId: string, delta: number): void {
+    const project = this.projects.get(projectId);
+    if (!project) throw new Error("Project not found");
+    project.highfiveCount = Math.max(0, (project.highfiveCount ?? 0) + delta);
+  }
+
   getMembers(projectId: string): ProjectMemberDto[] {
     return this.members.get(projectId) || [];
   }
@@ -169,8 +194,13 @@ class MockProjectDb {
     };
   }
 
+  /** Enrichit un projet comme le fait le backend : proprietaire + taille d'equipe. */
   withOwner(project: ProjectDto): ProjectDto {
-    return { ...project, owner: this.getOwner(project.id) };
+    return {
+      ...project,
+      owner: this.getOwner(project.id),
+      membersCount: this.getMembers(project.id).length,
+    };
   }
 
   addMember(projectId: string, member: ProjectMemberDto): void {
@@ -359,6 +389,26 @@ export class ProjectServiceMock implements IProjectService {
     if (query?.visibility) {
       projects = projects.filter((p) => p.visibility === query.visibility);
     }
+    // `search` et `tags` etaient ignores : une recherche renvoyait tous les
+    // projets tout en annoncant leur nombre total, alors que le backend filtre
+    // bien. On aligne le mock sur ce comportement (nom + description, insensible
+    // a la casse ; tags cumulatifs).
+    if (query?.search) {
+      const needle = query.search.toLowerCase();
+      projects = projects.filter(
+        (p) =>
+          p.name.toLowerCase().includes(needle) ||
+          (p.description ?? "").toLowerCase().includes(needle),
+      );
+    }
+    if (query?.tags?.length) {
+      const wanted = query.tags.map((t) => t.toLowerCase());
+      projects = projects.filter((p) =>
+        wanted.every((tag) =>
+          (p.tags ?? []).some((t) => t.toLowerCase() === tag),
+        ),
+      );
+    }
     const limit = query?.limit || 20;
     const offset = query?.offset || 0;
     const paginatedProjects = projects
@@ -403,6 +453,16 @@ export class ProjectServiceMock implements IProjectService {
     await delay(300);
     const success = db.deleteProject(id);
     if (!success) throw new Error("Project not found");
+  }
+
+  async addHighfive(projectId: string): Promise<void> {
+    await delay(200);
+    db.adjustHighfiveCount(projectId, 1);
+  }
+
+  async removeHighfive(projectId: string): Promise<void> {
+    await delay(200);
+    db.adjustHighfiveCount(projectId, -1);
   }
 
   async getProjectMembers(projectId: string): Promise<ProjectMemberDto[]> {

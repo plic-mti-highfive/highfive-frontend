@@ -1,18 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Header, Footer } from "@features/layout";
 import { Bell, CheckCheck } from "lucide-react";
-import { mockNotifications } from "@/api/services/mock/data/mockNotifications";
+import { notificationService } from "@/api/services";
 import { NotificationItem } from "../components/NotificationItem";
 import type { Notification } from "../types";
 
 export function NotificationsPage() {
-  const [notifications, setNotifications] =
-    useState<Notification[]>(mockNotifications);
+  // Les notifications etaient importees en dur depuis les donnees mock : elles
+  // passent par la couche API, comme le reste.
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    notificationService
+      .getNotifications()
+      .then(setNotifications)
+      .catch((err) =>
+        console.error("Erreur lors du chargement des notifications:", err),
+      );
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
+    // Mise a jour optimiste : « Tout marquer comme lu » ne changeait qu'un etat
+    // local et n'etait jamais persiste.
+    const previous = notifications;
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      await notificationService.markAllAsRead();
+    } catch (err) {
+      console.error("Erreur lors du marquage des notifications:", err);
+      setNotifications(previous);
+    }
   };
 
   const unread = notifications.filter((n) => !n.read);

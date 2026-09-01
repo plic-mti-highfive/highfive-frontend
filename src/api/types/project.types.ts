@@ -24,6 +24,8 @@ export interface ProjectDto {
   status: ProjectStatus;
   visibility: ProjectVisibility;
   highfiveCount?: number;
+  /** Taille de l'equipe, renvoyee par le backend pour eviter un appel par projet. */
+  membersCount?: number;
   tags?: string[];
   createdAt: string;
   updatedAt: string;

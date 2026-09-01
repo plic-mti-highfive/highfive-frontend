@@ -64,10 +64,18 @@ export interface ProfileBaseDto {
   emailNotifications: boolean;
 }
 
+/**
+ * Role plateforme. Defini ici et non dans shared-types, ou il n'existe pas :
+ * le backend le declare aussi localement (shared/auth/system-role.enum.ts).
+ */
+export type SystemRole = "USER" | "ADMIN";
+
 export interface UserDto {
   id: string;
   email: string;
   status: UserStatus;
+  /** Renvoye par /auth/me. Necessaire pour reserver le dashboard aux admins. */
+  systemRole?: SystemRole;
   tenantId: string;
   createdAt: string;
   updatedAt: string;

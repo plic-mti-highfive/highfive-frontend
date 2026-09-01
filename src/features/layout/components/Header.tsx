@@ -6,6 +6,7 @@ import {
   LogOut,
   Plus,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "@base-ui/react/menu";
 
@@ -14,7 +15,8 @@ import { Button } from "@shared/components/ui/button";
 import { SearchBar } from "@features/search";
 import { useAuth } from "@shared/contexts";
 import { NotificationItem } from "@features/notifications";
-import { mockNotifications } from "@/api/services/mock/data/mockNotifications";
+import type { Notification } from "@features/notifications";
+import { notificationService } from "@/api/services";
 
 const popupCls =
   "bg-background border border-border rounded-xl shadow-lg py-1.5 w-80 origin-[var(--transform-origin)] transition-[transform,opacity] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0";
@@ -26,8 +28,21 @@ const separatorCls = "border-t border-border my-1.5 mx-2";
 
 function NotificationsMenu() {
   const navigate = useNavigate();
-  const recent = mockNotifications.slice(0, 4);
-  const unreadCount = mockNotifications.filter((n) => !n.read).length;
+  // Le compteur de la cloche etait lu directement dans les donnees mock : il
+  // affichait donc le meme nombre en mode http, quel que soit l'utilisateur.
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    notificationService
+      .getNotifications()
+      .then(setNotifications)
+      .catch((err) =>
+        console.error("Erreur lors du chargement des notifications:", err),
+      );
+  }, []);
+
+  const recent = notifications.slice(0, 4);
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <Menu.Root>
@@ -196,7 +211,6 @@ function UserMenu({
 export default function Header() {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
-  console.log(user);
   const username = user?.email.split("@")[0] ?? "";
 
   return (
