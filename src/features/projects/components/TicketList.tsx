@@ -67,8 +67,8 @@ export function TicketList({ tickets, members, projectId }: TicketListProps) {
         </div>
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            Aucun ticket pour le moment. Ouvrez le canvas pour brainstormer, puis
-            générez les tâches.
+            Aucun ticket pour le moment. Ouvrez le canvas pour brainstormer,
+            puis générez les tâches.
           </p>
         </div>
       </>

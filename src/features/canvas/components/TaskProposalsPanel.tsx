@@ -16,7 +16,9 @@ export const TaskProposalsPanel = ({
   onConfirm,
   onClose,
 }: TaskProposalsPanelProps) => {
-  const [selected, setSelected] = useState<boolean[]>(() => tasks.map(() => true));
+  const [selected, setSelected] = useState<boolean[]>(() =>
+    tasks.map(() => true),
+  );
   const [edited, setEdited] = useState<ProposedTask[]>(tasks);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +36,9 @@ export const TaskProposalsPanel = ({
     );
 
   const confirm = async () => {
-    const kept = edited.filter((_, index) => selected[index] && edited[index].title.trim());
+    const kept = edited.filter(
+      (_, index) => selected[index] && edited[index].title.trim(),
+    );
     if (!kept.length) return;
 
     setSubmitting(true);
@@ -51,10 +55,12 @@ export const TaskProposalsPanel = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl">
         <header className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900">Taches proposees</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Taches proposees
+          </h2>
           <p className="mt-1 text-sm text-gray-500">
-            Deduites du canvas et de la description du projet. Decochez ce que vous
-            ne voulez pas : rien n'est cree avant validation.
+            Deduites du canvas et de la description du projet. Decochez ce que
+            vous ne voulez pas : rien n'est cree avant validation.
           </p>
         </header>
 
@@ -82,7 +88,9 @@ export const TaskProposalsPanel = ({
                     className="w-full rounded border border-transparent bg-transparent font-medium text-gray-900 hover:border-gray-300 focus:border-gray-900 focus:outline-none"
                   />
                   {task.description && (
-                    <p className="mt-1 text-sm text-gray-600">{task.description}</p>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {task.description}
+                    </p>
                   )}
                   {task.sourceHints.length > 0 && (
                     <p className="mt-2 text-xs text-gray-400">
@@ -121,7 +129,9 @@ export const TaskProposalsPanel = ({
               disabled={submitting || keptCount === 0}
               className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-40"
             >
-              {submitting ? "Creation..." : `Creer ${keptCount} ticket${keptCount > 1 ? "s" : ""}`}
+              {submitting
+                ? "Creation..."
+                : `Creer ${keptCount} ticket${keptCount > 1 ? "s" : ""}`}
             </button>
           </div>
         </footer>

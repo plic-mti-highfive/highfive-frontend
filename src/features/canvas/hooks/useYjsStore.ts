@@ -33,7 +33,14 @@ interface PresenceState {
   selectedShapeIds: string[];
 }
 
-const COLORS = ["#e11d48", "#2563eb", "#16a34a", "#d97706", "#7c3aed", "#0891b2"];
+const COLORS = [
+  "#e11d48",
+  "#2563eb",
+  "#16a34a",
+  "#d97706",
+  "#7c3aed",
+  "#0891b2",
+];
 
 /** Couleur stable par utilisateur : il garde la meme d'une session a l'autre. */
 export const colorFor = (userId: string): string => {
@@ -134,11 +141,15 @@ export const useYjsStore = (session: CanvasSession): UseYjsStoreResult => {
         const unlisten = store.listen(
           ({ changes }) => {
             hocuspocus.document.transact(() => {
-              Object.values(changes.added).forEach((r) => yRecords.set(r.id, r));
+              Object.values(changes.added).forEach((r) =>
+                yRecords.set(r.id, r),
+              );
               Object.values(changes.updated).forEach(([, r]) =>
                 yRecords.set(r.id, r),
               );
-              Object.values(changes.removed).forEach((r) => yRecords.delete(r.id));
+              Object.values(changes.removed).forEach((r) =>
+                yRecords.delete(r.id),
+              );
             });
           },
           // Source "user" uniquement : sinon ce qui arrive du reseau en
@@ -168,7 +179,12 @@ export const useYjsStore = (session: CanvasSession): UseYjsStoreResult => {
                 currentPageId: p.pageId as TLPageId,
                 selectedShapeIds: p.selectedShapeIds as TLShapeId[],
                 cursor: p.cursor
-                  ? { x: p.cursor.x, y: p.cursor.y, type: "default", rotation: 0 }
+                  ? {
+                      x: p.cursor.x,
+                      y: p.cursor.y,
+                      type: "default",
+                      rotation: 0,
+                    }
                   : null,
                 lastActivityTimestamp: Date.now(),
               }) as unknown as TLRecord,
@@ -223,7 +239,13 @@ export const useYjsStore = (session: CanvasSession): UseYjsStoreResult => {
       hocuspocus.destroy();
       setProvider(null);
     };
-  }, [store, session.canvasId, session.token, session.websocketUrl, session.role]);
+  }, [
+    store,
+    session.canvasId,
+    session.token,
+    session.websocketUrl,
+    session.role,
+  ]);
 
   return { storeWithStatus, provider };
 };

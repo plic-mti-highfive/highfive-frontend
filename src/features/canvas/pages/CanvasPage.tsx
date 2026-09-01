@@ -28,7 +28,9 @@ export const CanvasPage = () => {
     canvasService
       .openSession(projectId)
       .then(setSession)
-      .catch(() => setSessionError("Impossible d'ouvrir le canvas de ce projet."));
+      .catch(() =>
+        setSessionError("Impossible d'ouvrir le canvas de ce projet."),
+      );
   }, [projectId]);
 
   if (sessionError) {
@@ -111,7 +113,9 @@ const CanvasWorkspace = ({
     <div className="flex h-screen flex-col">
       <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
         <div>
-          <h1 className="text-base font-semibold text-gray-900">{session.name}</h1>
+          <h1 className="text-base font-semibold text-gray-900">
+            {session.name}
+          </h1>
           <p className="text-xs text-gray-500">
             {readOnly ? "Lecture seule" : "Edition collaborative"}
             {storeWithStatus.status === "synced-remote" &&
