@@ -1,50 +1,57 @@
 import type { KanbanPriority } from "../types";
+import {
+  ACCENT_NAMES,
+  getAccent,
+  resolveAccentColor,
+} from "@shared/lib/accent";
+
+// Couleurs dérivées de la roue d'accent (src/shared/lib/accent.ts) : plus
+// aucune valeur hex en dur ici, tout est résolu depuis les tokens CSS de
+// src/index.css. Les noms/formes exportés restent inchangés pour ne pas
+// casser les appelants (KanbanCard, TicketDrawer, useKanban, LabPage).
 
 export const PRIORITY_CONFIG: Record<
   KanbanPriority,
   { color: string; label: string }
 > = {
-  high: { color: "#E0305A", label: "Haute" },
-  medium: { color: "#B85A00", label: "Moyenne" },
-  low: { color: "#2A8C1E", label: "Basse" },
+  high: { color: resolveAccentColor("rose", "dark"), label: "Haute" },
+  medium: { color: resolveAccentColor("orange", "dark"), label: "Moyenne" },
+  low: { color: resolveAccentColor("apple", "dark"), label: "Basse" },
 };
 
-/** Default columns for a new project - 3 universal stages */
+/** Colonnes par défaut d'un nouveau projet - 3 étapes universelles. */
 export const DEFAULT_COLUMNS = [
-  { id: "todo", label: "À faire", accentColor: "#3EC6F5", bgColor: "#D4F1FF" },
+  {
+    id: "todo",
+    label: "À faire",
+    accentColor: resolveAccentColor("sky"),
+    bgColor: resolveAccentColor("sky", "light"),
+  },
   {
     id: "in-progress",
     label: "En cours",
-    accentColor: "#FF6B1A",
-    bgColor: "#FFE5D1",
+    accentColor: resolveAccentColor("orange"),
+    bgColor: resolveAccentColor("orange", "light"),
   },
-  { id: "done", label: "Terminé", accentColor: "#5ED651", bgColor: "#DFFBD4" },
+  {
+    id: "done",
+    label: "Terminé",
+    accentColor: resolveAccentColor("apple"),
+    bgColor: resolveAccentColor("apple", "light"),
+  },
 ];
 
-/** Palette for user-created tags (cycles through on creation) */
-export const TAG_COLOR_PALETTE = [
-  "#3EC6F5", // sky
-  "#FF6B1A", // orange
-  "#C24BFF", // purple
-  "#E0305A", // rose
-  "#5ED651", // green
-  "#F5C842", // yellow
-  "#1A8CFF", // blue
-  "#FF4FCB", // pink
-];
+/** Palette proposée pour les étiquettes créées à la main (cycle la roue d'accent). */
+export const TAG_COLOR_PALETTE = ACCENT_NAMES.map((accent) =>
+  resolveAccentColor(accent),
+);
 
-const ASSIGNEE_COLORS = [
-  { bg: "#FFE8F1", text: "#CC0055" },
-  { bg: "#FFF0E6", text: "#AA3A00" },
-  { bg: "#E5F8FF", text: "#0A6080" },
-  { bg: "#F5E8FF", text: "#7000B8" },
-  { bg: "#EDFCE8", text: "#1A7010" },
-];
-
-export function getAssigneeColor(name: string) {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + hash * 31;
-  return ASSIGNEE_COLORS[Math.abs(hash) % ASSIGNEE_COLORS.length];
+export function getAssigneeColor(name: string): { bg: string; text: string } {
+  const accent = getAccent(name);
+  return {
+    bg: resolveAccentColor(accent, "light"),
+    text: resolveAccentColor(accent, "dark"),
+  };
 }
 
 export function assigneeInitials(name: string) {
@@ -56,7 +63,7 @@ export function assigneeInitials(name: string) {
     .toUpperCase();
 }
 
-/** Returns a light bg tint for a solid hex color */
+/** Teinte de fond légère pour une couleur pleine donnée (résolue depuis un token). */
 export function tagBg(hex: string) {
   return hex + "22";
 }

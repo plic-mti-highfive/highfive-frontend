@@ -21,7 +21,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@shared/components/ui/breadcrumb";
+} from "@shared/ui/breadcrumb";
 import { useEffect, useRef, useState } from "react";
 import { projectService } from "@/api";
 

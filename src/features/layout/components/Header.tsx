@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Menu } from "@base-ui/react/menu";
 
 import { Logo } from "@features/layout";
-import { Button } from "@shared/components/ui/button";
+import { Button } from "@shared/ui/button";
 import { SearchBar } from "@features/search";
 import { useAuth } from "@shared/contexts";
 import { NotificationItem } from "@features/notifications";

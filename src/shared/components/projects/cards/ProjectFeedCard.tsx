@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Hand } from "lucide-react";
 import type { Project } from "@shared/types";
-import { getCardTint } from "@shared/utils/colorPalette";
+import { getCardTint } from "@shared/lib/accent";
 import { AuthorChip } from "../shared/AuthorChip";
 import { TagPill } from "../shared/TagPill";
 

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { UserX } from "lucide-react";
-import { Button } from "@shared/components/ui/button";
+import { Button } from "@shared/ui/button";
 
 export function UserNotFound() {
   const navigate = useNavigate();

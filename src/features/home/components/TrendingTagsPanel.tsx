@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Skeleton } from "@shared/components/ui/skeleton";
+import { Skeleton } from "@shared/ui/skeleton";
 import type { Project } from "@shared/types";
 import { TagPill } from "@shared/components/projects";
 import { computeTrendingTags } from "../utils/trendingTags";

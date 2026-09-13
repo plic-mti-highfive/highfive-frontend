@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Button } from "@shared/components/ui/button";
-import { Input } from "@shared/components/ui/input";
-import { Label } from "@shared/components/ui/label";
-import { Checkbox } from "@shared/components/ui/checkbox";
+import { Button } from "@shared/ui/button";
+import { Input } from "@shared/ui/input";
+import { Label } from "@shared/ui/label";
+import { Checkbox } from "@shared/ui/checkbox";
 import { AuthLayout } from "../components/AuthLayout";
-import { PasswordInput } from "@shared/components/ui/password-input";
+import { PasswordInput } from "@shared/ui/password-input";
 import { useAuth } from "@shared/contexts";
 
 export default function LoginPage() {

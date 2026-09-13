@@ -1,6 +1,6 @@
 import { Dialog } from "@base-ui/react/dialog";
 import { X } from "lucide-react";
-import { Button } from "@shared/components/ui/button";
+import { Button } from "@shared/ui/button";
 
 interface UnfollowConfirmDialogProps {
   open: boolean;

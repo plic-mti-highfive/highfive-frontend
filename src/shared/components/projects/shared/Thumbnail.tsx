@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { PALETTE_SETS, seededRand, getSeed } from "@shared/utils/colorPalette";
+import { getAccent, resolveAccentColor } from "@shared/lib/accent";
+import { seededRand, getSeed } from "@shared/lib/random";
 
 type PatternType =
   | "circles"
@@ -17,8 +18,13 @@ export function generateSVGPattern(
 ): string {
   const seed = getSeed(id);
   const rand = seededRand(seed * 137);
-  const paletteIndex = Math.abs(seed) % PALETTE_SETS.length;
-  const palette = PALETTE_SETS[paletteIndex];
+  const accent = getAccent(id);
+  const palette = {
+    bg: resolveAccentColor(accent, "light"),
+    a1: resolveAccentColor(accent),
+    a2: resolveAccentColor(accent, "mid"),
+    shape: resolveAccentColor(accent, "dark"),
+  };
   const patternTypes: PatternType[] = [
     "circles",
     "triangles",

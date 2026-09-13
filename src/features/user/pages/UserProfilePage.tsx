@@ -7,7 +7,7 @@ import { ProjectFeedCard, TagPill } from "@shared/components/projects";
 import { UserNotFound } from "../components/UserNotFound";
 import { UserActionsMenu } from "../components/UserActionsMenu";
 import { EditProfileModal } from "../components/EditProfileModal";
-import { Button } from "@shared/components/ui/button";
+import { Button } from "@shared/ui/button";
 import { ProfileTabs, EmptyState } from "../components/ProfileTabs";
 import { createProjectsTabs } from "../utils/profileTabsUtils";
 import { ProjectFiltersBar } from "@features/projects";
