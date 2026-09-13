@@ -1,6 +1,6 @@
-import type { Notification } from "@features/notifications/types";
+import type { LegacyNotification } from "../../interfaces/messaging.service.interface";
 
-export const mockNotifications: Notification[] = [
+export const mockNotifications: LegacyNotification[] = [
   {
     id: "notif-1",
     type: "like",

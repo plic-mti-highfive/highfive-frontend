@@ -1,8 +1,4 @@
-/** Formate une date ISO en format long français : "15 janvier 2024". */
-export function formatFrenchDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
+// Convergence vers src/shared/lib/dates.ts (R-X1) : l'implementation vit
+// desormais la-bas, ce fichier ne fait que re-exporter pour ne pas casser
+// ses appelants existants (ProjectHeader, ProjectSidebar).
+export { formatFrenchDate } from "@shared/lib/dates";

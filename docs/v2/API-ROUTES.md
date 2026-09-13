@@ -123,26 +123,26 @@ membre ; `admin` = role plateforme `admin`.
 
 ## Messagerie (`conversations.ts`)
 
-| Methode | Route                                     | Entree                    | Sortie                  | Auth/role            | Regles                                                               |
-| ------- | ----------------------------------------- | ------------------------- | ----------------------- | -------------------- | -------------------------------------------------------------------- |
-| GET     | `/conversations`                          | —                         | `ConversationSummary[]` | connecte             | R-MSG7 : `isMessageRequest` tant que le destinataire n'a pas repondu |
-| GET     | `/conversations/:conversationId`          | —                         | `Conversation`          | connecte/participant | —                                                                    |
-| GET     | `/conversations/:conversationId/messages` | query `cursor`            | `Paginated<Message>`    | connecte/participant | —                                                                    |
-| POST    | `/conversations`                          | `ConversationCreateInput` | `Conversation` (201)    | connecte             | R-MSG1/R-MSG2 (2 = direct, 3-50 = groupe)                            |
-| POST    | `/conversations/:conversationId/messages` | `MessageCreateInput`      | `Message` (201)         | connecte/participant | R-MSG4 (piece jointe)                                                |
-| PATCH   | `/messages/:messageId`                    | `{body}`                  | `Message`               | auteur               | R-MSG5 : fenetre 15 min                                              |
-| DELETE  | `/messages/:messageId`                    | —                         | 204                     | auteur               | R-MSG6 : laisse "Message supprime"                                   |
-| POST    | `/conversations/:conversationId/read`     | —                         | 204                     | connecte/participant | marque tout comme lu                                                 |
+| Methode | Route                                     | Entree                    | Sortie                         | Auth/role            | Regles                                                                                                        |
+| ------- | ----------------------------------------- | ------------------------- | ------------------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------- |
+| GET     | `/conversations`                          | —                         | `ConversationSummary[]`        | connecte             | R-MSG7 : `isMessageRequest` tant que le destinataire n'a pas repondu ; `participants` resolus (avatar/pseudo) |
+| GET     | `/conversations/:conversationId`          | —                         | `ConversationDetail`           | connecte/participant | `participants` resolus (avatar/pseudo)                                                                        |
+| GET     | `/conversations/:conversationId/messages` | query `cursor`            | `Paginated<MessageWithAuthor>` | connecte/participant | `author` resolu ; `attachmentPreview` resolu si piece jointe (R-MSG4)                                         |
+| POST    | `/conversations`                          | `ConversationCreateInput` | `Conversation` (201)           | connecte             | R-MSG1/R-MSG2 (2 = direct, 3-50 = groupe)                                                                     |
+| POST    | `/conversations/:conversationId/messages` | `MessageCreateInput`      | `MessageWithAuthor` (201)      | connecte/participant | R-MSG4 (piece jointe, `attachmentPreview` resolu)                                                             |
+| PATCH   | `/messages/:messageId`                    | `{body}`                  | `MessageWithAuthor`            | auteur               | R-MSG5 : fenetre 15 min                                                                                       |
+| DELETE  | `/messages/:messageId`                    | —                         | 204                            | auteur               | R-MSG6 : laisse "Message supprime"                                                                            |
+| POST    | `/conversations/:conversationId/read`     | —                         | 204                            | connecte/participant | marque tout comme lu                                                                                          |
 
 ## Notifications (`notifications.ts`)
 
-| Methode | Route                                 | Entree                               | Sortie                     | Auth/role | Regles                                  |
-| ------- | ------------------------------------- | ------------------------------------ | -------------------------- | --------- | --------------------------------------- |
-| GET     | `/notifications`                      | query `cursor`                       | `Paginated<Notification>`  | connecte  | R-N1/R-N2 : deja regroupees par acteurs |
-| POST    | `/notifications/:notificationId/read` | —                                    | 204                        | connecte  | —                                       |
-| POST    | `/notifications/read-all`             | —                                    | 204                        | connecte  | —                                       |
-| GET     | `/notifications/preferences`          | —                                    | `NotificationPreference[]` | connecte  | R-N4 : defauts app/e-mail               |
-| PATCH   | `/notifications/preferences`          | `NotificationPreferencesUpdateInput` | `NotificationPreference[]` | connecte  | —                                       |
+| Methode | Route                                 | Entree                               | Sortie                           | Auth/role | Regles                                                                                                                                                       |
+| ------- | ------------------------------------- | ------------------------------------ | -------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GET     | `/notifications`                      | query `cursor`                       | `Paginated<NotificationSummary>` | connecte  | R-N1/R-N2 : deja regroupees par acteurs, `actors` resolus ; R-N3 : `target` resolu (slug/titre projet, titre tache ou id conversation) pour un routage exact |
+| POST    | `/notifications/:notificationId/read` | —                                    | 204                              | connecte  | —                                                                                                                                                            |
+| POST    | `/notifications/read-all`             | —                                    | 204                              | connecte  | —                                                                                                                                                            |
+| GET     | `/notifications/preferences`          | —                                    | `NotificationPreference[]`       | connecte  | R-N4 : defauts app/e-mail                                                                                                                                    |
+| PATCH   | `/notifications/preferences`          | `NotificationPreferencesUpdateInput` | `NotificationPreference[]`       | connecte  | —                                                                                                                                                            |
 
 ## Recherche et fil (`search.ts`)
 
@@ -156,15 +156,29 @@ membre ; `admin` = role plateforme `admin`.
 
 | Methode | Route                              | Entree         | Sortie                      | Auth/role | Regles                                       |
 | ------- | ---------------------------------- | -------------- | --------------------------- | --------- | -------------------------------------------- |
-| GET     | `/admin/reports`                   | query `cursor` | `Paginated<Report>`         | admin     | R-S2 : cibles a 3+ signalements en tete      |
+| GET     | `/admin/reports`                   | query `cursor` | `Paginated<ReportSummary>`  | admin     | R-S2 : cibles a 3+ signalements en tete      |
 | POST    | `/admin/reports/:reportId/resolve` | `{reason?}`    | `Report`                    | admin     | R-S4 : journalise dans `adminActions`        |
 | POST    | `/admin/reports/:reportId/reject`  | `{reason?}`    | `Report`                    | admin     | idem                                         |
 | GET     | `/admin/stats`                     | —              | `AdminStats`                | admin     | compteurs calcules en direct depuis le store |
 | GET     | `/admin/users`                     | query `cursor` | `Paginated<CurrentUser>`    | admin     | mot de passe jamais renvoye                  |
 | POST    | `/admin/users/:userId/suspend`     | `{reason?}`    | 204                         | admin     | journalise                                   |
+| POST    | `/admin/users/:userId/reactivate`  | `{reason?}`    | 204                         | admin     | leve la suspension, journalise               |
 | GET     | `/admin/projects`                  | query `cursor` | `Paginated<ProjectSummary>` | admin     | —                                            |
-| DELETE  | `/admin/projects/:slug`            | —              | 204                         | admin     | R-PR7, journalise                            |
+| DELETE  | `/admin/projects/:slug`            | —              | 204                         | admin     | R-PR7, journalise ; voir note ci-dessous     |
 | GET     | `/admin/tags`                      | —              | `Tag[]`                     | admin     | —                                            |
+
+**Note UI (moderation, doc 15 E-35) :** l'ecran d'administration appelle
+aussi des routes deja existantes hors `admin.ts`, plutot que d'en dupliquer :
+`DELETE /projects/:slug` (`{confirmTitle}`, deja ouvert au role admin dans
+son handler, R-PR7) pour supprimer un projet avec confirmation nominative, et
+`POST /comments/:commentId/hide` / `DELETE /comments/:commentId` (admin,
+R-C3) pour masquer/supprimer un commentaire signale. `DELETE
+/admin/projects/:slug` reste dans le contrat (aucun export supprime) mais
+n'est plus appele par l'interface, faute de confirmation nominative cote
+handler. `GET /admin/reports` renvoie desormais `ReportSummary`
+(`reportSchema` etendu de `reporter`, `target` — apercu au mieux depuis les
+tables deja jointes cote mock — et `similarReportsCount`), pour que la file
+de moderation montre le contenu signale sans nouvelle route.
 
 ---
 

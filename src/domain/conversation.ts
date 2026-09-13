@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { idSchema, isoDateTimeSchema } from "./common";
+import { idSchema, isoDateTimeSchema, slugSchema } from "./common";
+import { userSummarySchema } from "./user";
 
 /**
  * Messagerie (doc 04 section 13). `direct` : exactement 2 participants
@@ -44,17 +45,32 @@ export type Conversation = z.infer<typeof conversationSchema>;
 
 /** Version pour la liste des conversations (`/api/conversations`). */
 export const conversationSummarySchema = conversationBase.extend({
+  /** Personnes de la conversation, resolues (avatar/pseudo) pour l'affichage. */
+  participants: z.array(userSummarySchema),
+  /** R-MSG3 : nom/slug du projet, resolus quand `type === "channel"`. */
+  projectSlug: slugSchema.optional(),
+  projectTitle: z.string().optional(),
   lastMessage: z
     .object({
       body: z.string(),
       authorId: idSchema,
       sentAt: isoDateTimeSchema,
+      /** R-MSG6 : le corps est vide quand le dernier message a ete supprime. */
+      deleted: z.boolean().default(false),
     })
     .optional(),
   unreadCount: z.number().int().nonnegative(),
   isMessageRequest: z.boolean().default(false),
 });
 export type ConversationSummary = z.infer<typeof conversationSummarySchema>;
+
+/** Version detaillee pour l'ouverture d'une conversation (`/api/conversations/:id`). */
+export const conversationDetailSchema = conversationBase.extend({
+  participants: z.array(userSummarySchema),
+  projectSlug: slugSchema.optional(),
+  projectTitle: z.string().optional(),
+});
+export type ConversationDetail = z.infer<typeof conversationDetailSchema>;
 
 /** R-MSG4 : un message peut embarquer un projet ou un fichier en piece jointe. */
 export const messageAttachmentSchema = z.discriminatedUnion("kind", [
@@ -75,6 +91,32 @@ export const messageSchema = z.object({
   deleted: z.boolean().default(false),
 });
 export type Message = z.infer<typeof messageSchema>;
+
+/** R-MSG4 : aperçu résolu d'une pièce jointe, pour l'affichage embarqué dans la bulle. */
+export const messageAttachmentPreviewSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("project"),
+    projectSlug: slugSchema,
+    projectTitle: z.string(),
+    projectTagline: z.string(),
+  }),
+  z.object({
+    kind: z.literal("file"),
+    fileId: idSchema,
+    fileName: z.string(),
+    fileSize: z.number().int().nonnegative(),
+  }),
+]);
+export type MessageAttachmentPreview = z.infer<
+  typeof messageAttachmentPreviewSchema
+>;
+
+/** Message enrichi de son auteur et de l'aperçu resolu de sa piece jointe. */
+export const messageWithAuthorSchema = messageSchema.extend({
+  author: userSummarySchema,
+  attachmentPreview: messageAttachmentPreviewSchema.optional(),
+});
+export type MessageWithAuthor = z.infer<typeof messageWithAuthorSchema>;
 
 export const messageCreateInputSchema = z.object({
   body: z.string().min(1).max(4000),

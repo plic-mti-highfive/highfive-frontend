@@ -10,13 +10,26 @@ export function useNotifications(cursor?: string) {
   });
 }
 
+/**
+ * Compteur pour le badge de la cloche (en-tete) : derive de la premiere page
+ * de `useNotifications`, meme cle TanStack Query donc rafraichi par les
+ * memes invalidations que "Tout marquer comme lu".
+ */
+export function useUnreadNotificationsCount(): number {
+  const { data } = useNotifications();
+  return data?.items.filter((notification) => !notification.read).length ?? 0;
+}
+
 export function useMarkNotificationRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (notificationId: string) =>
       notificationsApi.markNotificationRead(notificationId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      // Invalide toute la liste (et le compteur de l'en-tete, qui lit la meme cle).
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications.all(),
+      });
     },
   });
 }
@@ -26,7 +39,9 @@ export function useMarkAllNotificationsRead() {
   return useMutation({
     mutationFn: notificationsApi.markAllNotificationsRead,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications.all(),
+      });
     },
   });
 }

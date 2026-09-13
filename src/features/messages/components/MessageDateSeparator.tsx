@@ -1,28 +1,23 @@
-import { isToday, isYesterday, format } from "date-fns";
-import { frCA } from "date-fns/locale";
+import { isToday, isYesterday } from "date-fns";
+import { formatAbsoluteDate } from "@shared/lib/dates";
 
-interface MessageDateSeparatorProps {
-  date: Date;
+export interface MessageDateSeparatorProps {
+  iso: string;
 }
 
-function formatSeparatorDate(date: Date): string {
-  if (isToday(date)) {
-    return "Aujourd'hui";
-  }
-  if (isYesterday(date)) {
-    return "Hier";
-  }
-  return format(date, "d MMMM yyyy", { locale: frCA });
+function label(iso: string): string {
+  const date = new Date(iso);
+  if (isToday(date)) return "Aujourd'hui";
+  if (isYesterday(date)) return "Hier";
+  return formatAbsoluteDate(iso);
 }
 
-export function MessageDateSeparator({ date }: MessageDateSeparatorProps) {
+export function MessageDateSeparator({ iso }: MessageDateSeparatorProps) {
   return (
-    <div className="flex items-center gap-3 py-4 px-4">
-      <div className="flex-1 h-px bg-border" />
-      <span className="text-xs text-muted-foreground font-medium">
-        {formatSeparatorDate(date)}
+    <div className="flex items-center justify-center py-2">
+      <span className="rounded-pill bg-muted px-3 py-1 text-label uppercase text-muted-foreground">
+        {label(iso)}
       </span>
-      <div className="flex-1 h-px bg-border" />
     </div>
   );
 }

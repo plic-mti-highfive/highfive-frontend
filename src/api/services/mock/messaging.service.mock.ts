@@ -1,9 +1,9 @@
 import type {
   IMessagingService,
   INotificationService,
+  LegacyNotification,
 } from "../interfaces/messaging.service.interface";
 import type { ConversationDto, MessageDto } from "../../types";
-import type { Notification } from "@features/notifications/types";
 import { delay, generateId } from "./utils";
 import { mockConversations, mockMessages, mockNotifications } from "./data";
 
@@ -63,11 +63,11 @@ export class MessagingServiceMock implements IMessagingService {
 }
 
 export class NotificationServiceMock implements INotificationService {
-  private notifications: Notification[] = mockNotifications.map((n) => ({
+  private notifications: LegacyNotification[] = mockNotifications.map((n) => ({
     ...n,
   }));
 
-  async getNotifications(): Promise<Notification[]> {
+  async getNotifications(): Promise<LegacyNotification[]> {
     await delay(200);
     return this.notifications.map((n) => ({ ...n }));
   }

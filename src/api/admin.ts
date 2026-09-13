@@ -6,19 +6,23 @@ import {
   paginatedSchema,
   projectSummarySchema,
   reportSchema,
+  reportSummarySchema,
   tagSchema,
   type AdminStats,
   type CurrentUser,
   type Paginated,
   type ProjectSummary,
   type Report,
+  type ReportSummary,
   type Tag,
 } from "@/domain";
 
-export function listReports(cursor?: string): Promise<Paginated<Report>> {
+export function listReports(
+  cursor?: string,
+): Promise<Paginated<ReportSummary>> {
   return apiFetch("/admin/reports", {
     query: { cursor },
-    schema: paginatedSchema(reportSchema),
+    schema: paginatedSchema(reportSummarySchema),
   });
 }
 
@@ -59,6 +63,14 @@ export function listAdminUsers(
 
 export function suspendUser(userId: string, reason?: string): Promise<void> {
   return apiFetch(`/admin/users/${userId}/suspend`, {
+    method: "POST",
+    body: { reason },
+  });
+}
+
+/** Leve une suspension (doc 15 E-35 : "lever la suspension"). */
+export function reactivateUser(userId: string, reason?: string): Promise<void> {
+  return apiFetch(`/admin/users/${userId}/reactivate`, {
     method: "POST",
     body: { reason },
   });

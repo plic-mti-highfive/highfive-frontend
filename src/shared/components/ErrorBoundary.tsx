@@ -1,5 +1,6 @@
 import { Component } from "react";
 import type { ReactNode, ErrorInfo } from "react";
+import { Button, ErrorState } from "@shared/ui";
 
 interface Props {
   children: ReactNode;
@@ -10,6 +11,12 @@ interface State {
   error: Error | null;
 }
 
+/**
+ * Filet de secours applicatif (V2 item 4) : migre sur la primitive
+ * `ErrorState` (src/shared/ui/error-state.tsx) — plus aucune couleur en dur
+ * (V2-2), le rouge/blanc codes en dur laissent place aux tokens `danger-*`
+ * et `background`/`card`/`border` deja utilises partout ailleurs.
+ */
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -27,47 +34,36 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-cream flex items-center justify-center p-6">
-          <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8">
-            <div className="flex items-start gap-4">
-              <span className="text-4xl font-bold text-red-500">!</span>
-              <div className="flex-1">
-                <h1 className="text-2xl font-heading font-bold text-ink mb-2">
-                  Oups, quelque chose s'est mal passé
-                </h1>
-                <p className="text-ink-muted mb-4">
-                  Une erreur inattendue est survenue. L'équipe a été notifiée.
-                </p>
+        <div className="flex min-h-screen items-center justify-center bg-background p-6">
+          <div className="w-full max-w-2xl rounded-xl border border-border bg-card p-8 shadow-lift">
+            <ErrorState message="Une erreur inattendue est survenue." />
 
-                <details className="mb-6">
-                  <summary className="cursor-pointer text-sm text-ink-muted hover:text-ink mb-2">
-                    Détails techniques
-                  </summary>
-                  <div className="p-4 bg-cream rounded border border-cream-mid">
-                    <p className="font-mono text-sm text-red-600 mb-2">
-                      {this.state.error?.message}
-                    </p>
-                    <pre className="text-xs text-ink-muted overflow-auto max-h-60">
-                      {this.state.error?.stack}
-                    </pre>
-                  </div>
-                </details>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="px-4 py-2 bg-ink text-white rounded-lg hover:bg-ink-muted transition-colors"
-                  >
-                    Recharger la page
-                  </button>
-                  <button
-                    onClick={() => (window.location.href = "/")}
-                    className="px-4 py-2 border border-cream-mid rounded-lg hover:bg-cream transition-colors"
-                  >
-                    Retour à l'accueil
-                  </button>
+            {this.state.error && (
+              <details className="mt-2">
+                <summary className="cursor-pointer text-body-sm text-muted-foreground hover:text-foreground">
+                  Détails techniques
+                </summary>
+                <div className="mt-2 rounded-md border border-border bg-muted p-4">
+                  <p className="font-mono text-body-sm text-danger-fg">
+                    {this.state.error.message}
+                  </p>
+                  <pre className="mt-2 max-h-60 overflow-auto text-body-sm text-muted-foreground">
+                    {this.state.error.stack}
+                  </pre>
                 </div>
-              </div>
+              </details>
+            )}
+
+            <div className="mt-6 flex justify-center gap-3">
+              <Button onClick={() => window.location.reload()}>
+                Recharger la page
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => (window.location.href = "/")}
+              >
+                Retour à l'accueil
+              </Button>
             </div>
           </div>
         </div>

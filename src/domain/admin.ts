@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { idSchema, isoDateTimeSchema } from "./common";
+import { idSchema, isoDateTimeSchema, slugSchema } from "./common";
+import { userSummarySchema } from "./user";
 
 /**
  * Signalement et moderation (doc 04 section 15). R-S1 : motifs enumeres.
@@ -48,9 +49,36 @@ export const reportCreateInputSchema = z.object({
 });
 export type ReportCreateInput = z.infer<typeof reportCreateInputSchema>;
 
+/**
+ * Apercu de la cible d'un signalement, pour l'ecran de moderation (doc 15
+ * E-35 : "le contenu signale est montre en entier, avec son contexte"). Tous
+ * les champs sont optionnels : construit au mieux depuis ce que le store
+ * mock sait joindre (auteur, extrait, projet), jamais invente.
+ */
+export const reportTargetPreviewSchema = z.object({
+  author: userSummarySchema.optional(),
+  excerpt: z.string().max(1000).optional(),
+  projectTitle: z.string().optional(),
+  projectSlug: slugSchema.optional(),
+});
+export type ReportTargetPreview = z.infer<typeof reportTargetPreviewSchema>;
+
+/**
+ * Version pour la file de moderation (`GET /admin/reports`) : le
+ * signalement brut, augmente du profil du signaleur, d'un apercu de la
+ * cible et du nombre de signalements distincts sur la meme cible (R-S2).
+ */
+export const reportSummarySchema = reportSchema.extend({
+  reporter: userSummarySchema,
+  target: reportTargetPreviewSchema.optional(),
+  similarReportsCount: z.number().int().positive(),
+});
+export type ReportSummary = z.infer<typeof reportSummarySchema>;
+
 /** Journal d'action d'administration (R-S4), inalterable. */
 export const adminActionTypeSchema = z.enum([
   "suspend_account",
+  "reactivate_account",
   "delete_project",
   "hide_comment",
   "reject_report",

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as authApi from "../auth";
+import { tokenStorage } from "../http-client";
 import { queryKeys } from "./keys";
 import type { LoginInput, RegisterInput } from "@/domain";
 
@@ -18,6 +19,11 @@ export function useLogin() {
   return useMutation({
     mutationFn: (input: LoginInput) => authApi.login(input),
     onSuccess: (session) => {
+      // Le jeton doit etre persiste avant tout : apiFetch (src/api/client.ts)
+      // le relit depuis tokenStorage pour authentifier les requetes suivantes
+      // (ex. le prochain GET /me). Sans cet appel la connexion "reussissait"
+      // sans jamais authentifier la moindre requete apres.
+      tokenStorage.setAccessToken(session.token);
       queryClient.setQueryData(queryKeys.auth.me(), session.user);
     },
   });
@@ -28,6 +34,7 @@ export function useRegister() {
   return useMutation({
     mutationFn: (input: RegisterInput) => authApi.register(input),
     onSuccess: (session) => {
+      tokenStorage.setAccessToken(session.token);
       queryClient.setQueryData(queryKeys.auth.me(), session.user);
     },
   });
@@ -38,6 +45,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
+      tokenStorage.clearTokens();
       queryClient.setQueryData(queryKeys.auth.me(), null);
       queryClient.clear();
     },

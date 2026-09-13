@@ -82,7 +82,7 @@ export function ProjectSidebar({
                 key={tag}
                 tag={tag}
                 onClick={() =>
-                  navigate(`/search/projects?tag=${encodeURIComponent(tag)}`)
+                  navigate(`/recherche?tag=${encodeURIComponent(tag)}`)
                 }
               />
             ))}

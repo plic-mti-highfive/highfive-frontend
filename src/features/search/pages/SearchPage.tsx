@@ -1,8 +1,6 @@
-import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FolderOpen, Users, Tag } from "lucide-react";
-import { Header } from "@features/layout";
-import { Footer } from "@features/layout";
 import { ProjectFeedCard } from "@shared/components/projects";
 import { ProjectFiltersBar } from "@features/projects";
 import { projectService } from "@/api";
@@ -15,15 +13,19 @@ import { SearchEntityType } from "@plic-mti-highfive/shared-types";
 export function SearchPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const searchQuery = searchParams.get("q") || "";
   const tagFilter = searchParams.get("tag");
 
-  const resultType: SearchEntityType = location.pathname.includes("/users")
-    ? SearchEntityType.USERS
-    : location.pathname.includes("/tags")
-      ? SearchEntityType.TAGS
-      : SearchEntityType.PROJECTS;
+  // TODO(v2-L4) : route unique "/recherche" (doc 06, R-R4) — le type de
+  // resultat vient desormais du parametre "type" plutot que du chemin
+  // (anciennement /search/projects, /search/users, /search/tags).
+  const typeParam = searchParams.get("type");
+  const resultType: SearchEntityType =
+    typeParam === "users"
+      ? SearchEntityType.USERS
+      : typeParam === "tags"
+        ? SearchEntityType.TAGS
+        : SearchEntityType.PROJECTS;
 
   const [, setActiveSort] = useState<"name" | "date" | "popularity">("date");
   const [, setActiveFilters] = useState<string[]>([]);
@@ -89,20 +91,13 @@ export function SearchPage() {
         : "tag";
 
   const handleTypeChange = (type: string) => {
-    const currentParams = searchParams.toString();
-    const path =
-      type === "projects"
-        ? "/search/projects"
-        : type === "users"
-          ? "/search/users"
-          : "/search/tags";
-    navigate(currentParams ? `${path}?${currentParams}` : path);
+    const next = new URLSearchParams(searchParams);
+    next.set("type", type);
+    navigate(`/recherche?${next.toString()}`);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-black text-foreground tracking-tight">
@@ -211,7 +206,7 @@ export function SearchPage() {
                   {users.map((user) => (
                     <button
                       key={user.userId}
-                      onClick={() => navigate(`/user/${user.userId}`)}
+                      onClick={() => navigate(`/u/${user.username}`)}
                       className="flex items-center gap-4 p-4 text-left bg-background border border-border rounded-xl cursor-pointer hover:bg-muted transition-colors outline-none"
                     >
                       <img
@@ -250,8 +245,6 @@ export function SearchPage() {
           </>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }

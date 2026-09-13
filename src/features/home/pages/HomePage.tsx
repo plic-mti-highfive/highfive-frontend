@@ -1,8 +1,5 @@
 "use client";
 
-import { Link } from "react-router-dom";
-import { Header } from "@features/layout";
-import { Footer } from "@features/layout";
 import { FeaturedLayout } from "../components/FeaturedLayout";
 import { ProjectFeedSection } from "../components/ProjectFeedSection";
 import { ProfilePanel } from "../components/ProfilePanel";
@@ -16,7 +13,7 @@ import { useAuth } from "@shared/contexts";
 const SIDEBAR_STICKY_TOP = "6.25rem";
 
 export default function HomePage() {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { isLoading: isAuthLoading } = useAuth();
   // Fetch other project categories from client-side logic
   // Une seule source pour tout le fil : sections deduplquees entre elles et
   // erreur limitee au service projets. Une panne du service de recommandation,
@@ -43,50 +40,14 @@ export default function HomePage() {
   ];
 
   if (isAuthLoading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-background" />
-      </>
-    );
+    return <div className="min-h-screen bg-background" />;
   }
 
-  if (!isAuthenticated) {
-    return (
-      <>
-        <Header />
-        <main className="min-h-screen bg-background flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto px-6">
-            <h1 className="text-3xl font-bold text-primary mb-4">
-              Bienvenue sur HighFive!
-            </h1>
-            <p className="text-ink-muted mb-8">
-              Connectez-vous pour découvrir et rejoindre des projets.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link
-                to="/login"
-                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity"
-              >
-                Se connecter
-              </Link>
-              <Link
-                to="/register"
-                className="px-6 py-3 border border-primary text-primary rounded-lg font-semibold hover:bg-primary/10 transition-colors"
-              >
-                S'inscrire
-              </Link>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
+  // R-V1/doc 06 §5 : Decouvrir montre de vrais projets, connecte ou non — la
+  // page "Bienvenue sur HighFive!" (deux boutons, aucun contenu) est
+  // explicitement supprimee par la refonte v2 (doc 17 §4, textes interdits).
   return (
     <>
-      <Header />
       <TagNavBar />
       <div className="bg-background" style={{ height: "2.75rem" }} />
       <main className="relative z-0 min-h-screen bg-background">
@@ -176,7 +137,6 @@ export default function HomePage() {
           <div className="pb-20" />
         </div>
       </main>
-      <Footer />
     </>
   );
 }

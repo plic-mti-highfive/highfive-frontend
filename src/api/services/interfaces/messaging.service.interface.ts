@@ -1,5 +1,4 @@
 import type { ConversationDto, MessageDto } from "../../types";
-import type { Notification } from "@features/notifications/types";
 
 /**
  * Messagerie privee et notifications.
@@ -15,7 +14,26 @@ import type { Notification } from "@features/notifications/types";
  * renvoie le mock dans les deux modes, explicitement, en attendant que le
  * domaine existe cote serveur. Le contrat est pose ici pour que le jour venu
  * seule la factory change.
+ *
+ * `LegacyNotification` etait auparavant importe depuis
+ * `@features/notifications/types` : ce type a migre vers le domaine v2
+ * (`NotificationSummary` dans `src/domain/notification.ts`), consomme par
+ * `src/api/queries/notifications.ts`. Il reste defini ici, local a cette
+ * ancienne implementation mock, pour les appelants qui n'ont pas encore
+ * migre (ex. `@features/layout/components/Header.tsx`).
  */
+export type LegacyNotificationType = "like" | "comment" | "follow" | "mention";
+
+export interface LegacyNotification {
+  id: string;
+  type: LegacyNotificationType;
+  read: boolean;
+  timestamp: Date;
+  actor: { id: string; name: string; avatar?: string };
+  target?: { type: "project" | "comment"; id: string; label: string };
+  excerpt?: string;
+}
+
 export interface IMessagingService {
   getConversations(): Promise<ConversationDto[]>;
   getMessages(conversationId: string): Promise<MessageDto[]>;
@@ -23,7 +41,7 @@ export interface IMessagingService {
 }
 
 export interface INotificationService {
-  getNotifications(): Promise<Notification[]>;
+  getNotifications(): Promise<LegacyNotification[]>;
   markAsRead(notificationId: string): Promise<void>;
   markAllAsRead(): Promise<void>;
 }

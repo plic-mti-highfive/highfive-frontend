@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { MessageSquare, UserPlus, PackageOpen } from "lucide-react";
-import { Header } from "@features/layout";
-import { Footer } from "@features/layout";
 import { ProjectFeedCard, TagPill } from "@shared/components/projects";
 import { UserNotFound } from "../components/UserNotFound";
 import { UserActionsMenu } from "../components/UserActionsMenu";
@@ -46,7 +44,9 @@ function StatItem({
 }
 
 export default function UserProfile() {
-  const { userId } = useParams<{ userId: string }>();
+  // TODO(v2-L4) : route "/u/:pseudo" (param renomme userId -> pseudo) ; le
+  // hook/service ci-dessous attend encore un identifiant technique, a migrer.
+  const { pseudo: userId } = useParams<{ pseudo: string }>();
   const { user: currentUser, isAuthenticated } = useAuth();
   const { user, isLoading, error } = useUserProfile(userId);
 
@@ -113,30 +113,18 @@ export default function UserProfile() {
 
   if (isLoading) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen flex items-center justify-center">
-          <p className="text-muted-foreground">Chargement...</p>
-        </div>
-        <Footer />
-      </>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Chargement...</p>
+      </div>
     );
   }
 
   if (error || !user) {
-    return (
-      <>
-        <Header />
-        <UserNotFound />
-        <Footer />
-      </>
-    );
+    return <UserNotFound />;
   }
 
   return (
     <>
-      <Header />
-
       <main className="min-h-screen bg-background">
         <div className="flex flex-col lg:flex-row">
           {/* Pan gauche - Profil */}
@@ -331,8 +319,6 @@ export default function UserProfile() {
           </section>
         </div>
       </main>
-
-      <Footer />
 
       {isOwnProfile && (
         <EditProfileModal

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, Footer } from "@features/layout";
 import { useProjectDetail } from "../hooks/useProjectDetail";
 import { ProjectHeader } from "../components/ProjectHeader";
 import { ProjectTabs, type TabId } from "../components/ProjectTabs";
@@ -20,7 +19,9 @@ import { ProjectRole } from "@plic-mti-highfive/shared-types";
 import { useAuth } from "@shared/contexts";
 
 export function ProjectDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  // TODO(v2-L4) : route "/projets/:slug" (param renomme id -> slug) ; le hook
+  // ci-dessous attend encore un id technique, a migrer.
+  const { slug: id } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
@@ -57,19 +58,12 @@ export function ProjectDetailPage() {
   })();
 
   if (isLoading) {
-    return (
-      <>
-        <Header />
-        <ProjectDetailSkeleton />
-        <Footer />
-      </>
-    );
+    return <ProjectDetailSkeleton />;
   }
 
   if (error || !project) {
     return (
       <>
-        <Header />
         <main className="min-h-screen bg-background">
           <div className="max-w-7xl mx-auto px-6 py-12">
             <div className="text-center py-12">
@@ -88,7 +82,6 @@ export function ProjectDetailPage() {
             </div>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
@@ -118,7 +111,7 @@ export function ProjectDetailPage() {
     setJoinError(null);
 
     if (!user) {
-      navigate("/login");
+      navigate("/connexion");
       return;
     }
 
@@ -142,7 +135,7 @@ export function ProjectDetailPage() {
 
   const handleHighfive = async () => {
     if (!user) {
-      navigate("/login");
+      navigate("/connexion");
       return;
     }
 
@@ -168,7 +161,6 @@ export function ProjectDetailPage() {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-background">
         <ProjectHeader
           project={project}
@@ -255,7 +247,6 @@ export function ProjectDetailPage() {
 
         <SimilarProjects projects={similarProjects} />
       </main>
-      <Footer />
 
       {joinError && (
         <div

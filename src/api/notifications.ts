@@ -2,20 +2,21 @@ import { z } from "zod";
 import { apiFetch } from "./client";
 import {
   notificationPreferenceSchema,
-  notificationSchema,
+  notificationSummarySchema,
   paginatedSchema,
-  type Notification,
   type NotificationPreference,
   type NotificationPreferencesUpdateInput,
+  type NotificationSummary,
   type Paginated,
 } from "@/domain";
 
+/** R-N1/R-N2 : deja regroupees par acteurs, R-N3 : cible resolue pour le routage. */
 export function listNotifications(
   cursor?: string,
-): Promise<Paginated<Notification>> {
+): Promise<Paginated<NotificationSummary>> {
   return apiFetch("/notifications", {
     query: { cursor },
-    schema: paginatedSchema(notificationSchema),
+    schema: paginatedSchema(notificationSummarySchema),
   });
 }
 

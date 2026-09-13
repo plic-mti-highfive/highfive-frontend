@@ -45,6 +45,8 @@ export {
   BreadcrumbEllipsis,
 } from "./breadcrumb";
 
+export { ListItem, type ListItemProps } from "./list-item";
+
 export { Skeleton } from "./skeleton";
 export { Spinner, type SpinnerProps } from "./spinner";
 export { EmptyState, type EmptyStateProps } from "./empty-state";
@@ -52,3 +54,14 @@ export { ErrorState, type ErrorStateProps } from "./error-state";
 export { PageHeader, type PageHeaderProps } from "./page-header";
 export { Section, type SectionProps } from "./section";
 export { Stat, type StatProps } from "./stat";
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableHead,
+  TableCell,
+  type TableProps,
+} from "./table";

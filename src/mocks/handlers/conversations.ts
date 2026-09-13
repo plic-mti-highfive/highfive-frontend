@@ -2,15 +2,19 @@ import { http, HttpResponse } from "msw";
 import {
   conversationCreateInputSchema,
   messageCreateInputSchema,
+  type Message,
+  type MessageAttachmentPreview,
+  type MessageWithAuthor,
 } from "@/domain";
 import { nextId } from "../data/ids";
-import { getDb, type MockDatabase } from "../db";
+import { getDb, type DbUser, type MockDatabase } from "../db";
 import {
   apiUrl,
   errors,
   getAuthUser,
   paginate,
   simulateLatency,
+  toUserSummary,
 } from "./utils";
 
 function messagesOf(db: MockDatabase, conversationId: string) {
@@ -19,6 +23,58 @@ function messagesOf(db: MockDatabase, conversationId: string) {
     .sort(
       (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime(),
     );
+}
+
+function participantsOf(db: MockDatabase, participantIds: string[]) {
+  return participantIds
+    .map((id) => db.users.findOne((u) => u.id === id))
+    .filter((u): u is DbUser => Boolean(u))
+    .map(toUserSummary);
+}
+
+/** R-MSG3 : un canal miroite l'equipe d'un projet ; on resout son nom pour l'affichage. */
+function projectInfoOf(db: MockDatabase, projectId: string | undefined) {
+  if (!projectId) return {};
+  const project = db.projects.findOne((p) => p.id === projectId);
+  if (!project) return {};
+  return { projectSlug: project.slug, projectTitle: project.title };
+}
+
+/** R-MSG4 : resout la piece jointe (projet ou fichier) pour l'aperçu embarque. */
+function resolveAttachmentPreview(
+  db: MockDatabase,
+  attachment: Message["attachment"],
+): MessageAttachmentPreview | undefined {
+  if (!attachment) return undefined;
+  if (attachment.kind === "project") {
+    const project = db.projects.findOne((p) => p.id === attachment.projectId);
+    if (!project) return undefined;
+    return {
+      kind: "project",
+      projectSlug: project.slug,
+      projectTitle: project.title,
+      projectTagline: project.tagline,
+    };
+  }
+  const file = db.files.findOne((f) => f.id === attachment.fileId);
+  if (!file) return undefined;
+  return {
+    kind: "file",
+    fileId: file.id,
+    fileName: file.name,
+    fileSize: file.size,
+  };
+}
+
+function toMessageWithAuthor(
+  db: MockDatabase,
+  message: Message,
+): MessageWithAuthor {
+  return {
+    ...message,
+    author: toUserSummary(db.users.findOne((u) => u.id === message.authorId)!),
+    attachmentPreview: resolveAttachmentPreview(db, message.attachment),
+  };
 }
 
 /** R-MSG7 : une conversation directe reste une "demande" jusqu'a la premiere reponse du destinataire. */
@@ -45,8 +101,15 @@ function toSummary(
   ).length;
   return {
     ...conversation,
+    participants: participantsOf(db, conversation.participantIds),
+    ...projectInfoOf(db, conversation.projectId),
     lastMessage: last
-      ? { body: last.body, authorId: last.authorId, sentAt: last.sentAt }
+      ? {
+          body: last.body,
+          authorId: last.authorId,
+          sentAt: last.sentAt,
+          deleted: last.deleted,
+        }
       : undefined,
     unreadCount,
     isMessageRequest: isMessageRequest(db, conversation, viewerId),
@@ -83,7 +146,11 @@ export const conversationHandlers = [
       if (!conversation || !conversation.participantIds.includes(user.id)) {
         return errors.notFound("Conversation introuvable.");
       }
-      return HttpResponse.json(conversation);
+      return HttpResponse.json({
+        ...conversation,
+        participants: participantsOf(db, conversation.participantIds),
+        ...projectInfoOf(db, conversation.projectId),
+      });
     },
   ),
 
@@ -105,7 +172,10 @@ export const conversationHandlers = [
         messagesOf(db, conversation.id),
         url.searchParams.get("cursor"),
       );
-      return HttpResponse.json(page);
+      return HttpResponse.json({
+        ...page,
+        items: page.items.map((m) => toMessageWithAuthor(db, m)),
+      });
     },
   ),
 
@@ -180,7 +250,9 @@ export const conversationHandlers = [
         deleted: false,
       };
       db.messages.insert(message);
-      return HttpResponse.json(message, { status: 201 });
+      return HttpResponse.json(toMessageWithAuthor(db, message), {
+        status: 201,
+      });
     },
   ),
 
@@ -204,7 +276,7 @@ export const conversationHandlers = [
       body: body.body,
       editedAt: new Date().toISOString(),
     });
-    return HttpResponse.json(updated);
+    return HttpResponse.json(toMessageWithAuthor(db, updated!));
   }),
 
   http.delete(apiUrl("/messages/:messageId"), async ({ request, params }) => {

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@features/layout";
-import { Footer } from "@features/layout";
 import type { ProjectForm } from "../types";
 import { useStepTransition } from "../hooks/useStepTransition";
 import { StepWrapper } from "../components/StepWrapper";
@@ -69,7 +67,6 @@ export default function CreateProject() {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-background flex items-start justify-center px-6 py-16">
         <div className="w-full max-w-lg">
           <StepWrapper visible={visible}>
@@ -114,7 +111,6 @@ export default function CreateProject() {
           </StepWrapper>
         </div>
       </main>
-      <Footer />
 
       <style>{`
         @keyframes check-draw {

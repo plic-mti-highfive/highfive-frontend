@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { idSchema, isoDateTimeSchema } from "./common";
+import { idSchema, isoDateTimeSchema, slugSchema } from "./common";
+import { userSummarySchema } from "./user";
 
 /** R-N1 : types de notification enumeres par le doc 04 section 14. */
 export const notificationTypeSchema = z.enum([
@@ -46,6 +47,49 @@ export const notificationSchema = z.object({
   createdAt: isoDateTimeSchema,
 });
 export type Notification = z.infer<typeof notificationSchema>;
+
+/**
+ * Cible resolue d'une notification, pour un routage exact vers une route FR
+ * (R-N3) : `/projets/:slug` (project/comment), `/projets/:slug/lab/taches`
+ * (task) ou `/messages/:id` (message).
+ */
+export const notificationTargetSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("project"),
+    projectSlug: slugSchema,
+    projectTitle: z.string(),
+  }),
+  z.object({
+    type: z.literal("task"),
+    projectSlug: slugSchema,
+    projectTitle: z.string(),
+    taskTitle: z.string(),
+  }),
+  z.object({
+    type: z.literal("comment"),
+    projectSlug: slugSchema,
+    projectTitle: z.string(),
+  }),
+  z.object({
+    type: z.literal("message"),
+    conversationId: idSchema,
+    /** Nom affichable de la conversation (canal/groupe) quand il en a un. */
+    conversationTitle: z.string().optional(),
+  }),
+]);
+export type NotificationTarget = z.infer<typeof notificationTargetSchema>;
+
+/**
+ * Version enrichie pour la liste (`/api/notifications`). R-N2 : `actorIds`
+ * est deja regroupe cote serveur, `actors` en donne la projection affichable
+ * ("Sophie et 4 autres..."). R-N3 : `target` porte de quoi construire le lien
+ * exact sans requete supplementaire.
+ */
+export const notificationSummarySchema = notificationSchema.extend({
+  actors: z.array(userSummarySchema).min(1),
+  target: notificationTargetSchema,
+});
+export type NotificationSummary = z.infer<typeof notificationSummarySchema>;
 
 /** R-N4 : preferences par type et par canal, reglables dans /reglages/notifications. */
 export const notificationChannelSchema = z.enum(["app", "email"]);

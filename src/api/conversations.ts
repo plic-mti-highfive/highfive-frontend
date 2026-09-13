@@ -1,15 +1,17 @@
 import { z } from "zod";
 import { apiFetch } from "./client";
 import {
+  conversationDetailSchema,
   conversationSchema,
   conversationSummarySchema,
-  messageSchema,
+  messageWithAuthorSchema,
   paginatedSchema,
   type Conversation,
   type ConversationCreateInput,
+  type ConversationDetail,
   type ConversationSummary,
-  type Message,
   type MessageCreateInput,
+  type MessageWithAuthor,
   type Paginated,
 } from "@/domain";
 
@@ -20,19 +22,21 @@ export function listConversations(): Promise<ConversationSummary[]> {
   });
 }
 
-export function getConversation(conversationId: string): Promise<Conversation> {
+export function getConversation(
+  conversationId: string,
+): Promise<ConversationDetail> {
   return apiFetch(`/conversations/${conversationId}`, {
-    schema: conversationSchema,
+    schema: conversationDetailSchema,
   });
 }
 
 export function listMessages(
   conversationId: string,
   cursor?: string,
-): Promise<Paginated<Message>> {
+): Promise<Paginated<MessageWithAuthor>> {
   return apiFetch(`/conversations/${conversationId}/messages`, {
     query: { cursor },
-    schema: paginatedSchema(messageSchema),
+    schema: paginatedSchema(messageWithAuthorSchema),
   });
 }
 
@@ -49,20 +53,23 @@ export function createConversation(
 export function sendMessage(
   conversationId: string,
   input: MessageCreateInput,
-): Promise<Message> {
+): Promise<MessageWithAuthor> {
   return apiFetch(`/conversations/${conversationId}/messages`, {
     method: "POST",
     body: input,
-    schema: messageSchema,
+    schema: messageWithAuthorSchema,
   });
 }
 
 /** R-MSG5 : modification possible dans les 15 minutes (verifie cote handler). */
-export function editMessage(messageId: string, body: string): Promise<Message> {
+export function editMessage(
+  messageId: string,
+  body: string,
+): Promise<MessageWithAuthor> {
   return apiFetch(`/messages/${messageId}`, {
     method: "PATCH",
     body: { body },
-    schema: messageSchema,
+    schema: messageWithAuthorSchema,
   });
 }
 

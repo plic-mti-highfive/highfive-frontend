@@ -48,6 +48,8 @@ export const queryKeys = {
       ["conversations", id, "messages", cursor ?? null] as const,
   },
   notifications: {
+    /** Prefixe utilise pour invalider toutes les cles notifications (liste + compteur de l'en-tete). */
+    all: () => ["notifications"] as const,
     list: (cursor?: string) => ["notifications", cursor ?? null] as const,
     preferences: () => ["notifications", "preferences"] as const,
   },

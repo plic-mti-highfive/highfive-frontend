@@ -1,7 +1,4 @@
-import { Link, useParams } from "react-router-dom";
 import {
-  Kanban,
-  LayoutTemplate,
   ZoomIn,
   ZoomOut,
   RotateCcw,
@@ -10,20 +7,10 @@ import {
   MousePointer2,
   ChevronDown,
 } from "lucide-react";
-import { Header } from "@features/layout";
 import { useMoodboard, type MoodboardElementType } from "../hooks/useMoodboard";
 import type { ActiveTool } from "../hooks/useMoodboard";
 import { MoodboardCanvas } from "../components/MoodboardCanvas";
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@shared/ui/breadcrumb";
-import { useEffect, useRef, useState } from "react";
-import { projectService } from "@/api";
+import { useRef, useState } from "react";
 
 const RECT_COLORS = [
   "#93C5FD",
@@ -36,8 +23,16 @@ const RECT_COLORS = [
   "#F9A8D4",
 ];
 
+/**
+ * Le Mur, montee sous LabLayout. En attendant la vraie construction du Mur
+ * (tldraw, V2-10), cette page reutilise l'ancien moodboard comme contenu de
+ * l'onglet "Le Mur" — voir TODO(v2-L4) plus bas.
+ */
 export default function MoodboardPage() {
-  const { projectId } = useParams<{ projectId: string }>();
+  // TODO(v2-L4) : route "/projets/:slug/lab/mur" (param renomme projectId ->
+  // slug). Cette page reste un espace "moodboard" provisoire, sans lien avec
+  // le projet courant : le vrai Le Mur (V2-10, fusion Canvas+Moodboard sur
+  // tldraw) n'est pas dans ce lot.
   const {
     elements,
     viewport,
@@ -56,18 +51,8 @@ export default function MoodboardPage() {
   const [activeTool, setActiveTool] = useState<ActiveTool>("select");
   const [activeRectColor, setActiveRectColor] = useState(RECT_COLORS[0]);
   const [rectExpanded, setRectExpanded] = useState(false);
-  const [projectName, setProjectName] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
-
-  // Le fil d'Ariane affichait « Projet #<id> » : le nom n'etait jamais charge.
-  useEffect(() => {
-    if (!projectId) return;
-    projectService
-      .getProjectById(projectId)
-      .then((project) => setProjectName(project.name))
-      .catch((err) => console.error("Error loading project:", err));
-  }, [projectId]);
 
   // Called by canvas when user clicks in placement mode
   function handlePlace(canvasX: number, canvasY: number) {
@@ -101,48 +86,7 @@ export default function MoodboardPage() {
 
   return (
     <>
-      <Header />
-      <div className="bg-background" style={{ height: "2.75rem" }} />
-      <main
-        className="flex flex-col"
-        style={{ height: "calc(100vh - 2.75rem)" }}
-      >
-        <div className="flex-none px-6 pt-6 pb-4 bg-background border-b border-border">
-          {/* Breadcrumb */}
-          <Breadcrumb className="mb-4">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  render={(props) => (
-                    <Link {...props} to={`/projects/${projectId}`}>
-                      {projectName ?? "Projet"}
-                    </Link>
-                  )}
-                />
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Moodboard</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          {/* Tool switcher */}
-          <div className="flex items-center gap-2">
-            <Link
-              to={`/projects/${projectId}/lab`}
-              className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors select-none"
-            >
-              <Kanban size={16} className="shrink-0" />
-              <span className="text-ui-md font-bold">Kanban</span>
-            </Link>
-            <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-foreground text-background shadow-sm cursor-default select-none">
-              <LayoutTemplate size={16} className="shrink-0" />
-              <span className="text-ui-md font-bold">Moodboard</span>
-            </div>
-          </div>
-        </div>
-
+      <main className="flex h-full flex-col">
         {/* Canvas + toolbar row */}
         <div className="flex flex-1 min-h-0">
           {/* Canvas */}

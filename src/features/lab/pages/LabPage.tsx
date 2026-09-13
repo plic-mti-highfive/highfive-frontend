@@ -1,8 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { LayoutTemplate, Kanban } from "lucide-react";
-import { Header } from "@features/layout";
-import { Footer } from "@features/layout";
+import { useParams } from "react-router-dom";
 import { KanbanBoard } from "../components/KanbanBoard";
 import { TicketDrawer } from "../components/TicketDrawer";
 import { useKanban } from "../hooks/useKanban";
@@ -10,17 +7,16 @@ import type { Member } from "../data/members";
 import { getAssigneeColor, assigneeInitials } from "../utils/kanbanConfig";
 import type { KanbanColumnId } from "../types";
 import { projectService } from "@/api";
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@shared/ui/breadcrumb";
 
+/**
+ * Les Tâches, montee sous LabLayout (src/app/layouts/LabLayout.tsx, V2 item 3)
+ * qui porte desormais la barre de projet (titre, retour, onglets Le
+ * Mur/Les Tâches) : cette page ne garde que le contenu propre a l'onglet.
+ */
 export default function LabPage() {
-  const { projectId } = useParams<{ projectId: string }>();
+  // TODO(v2-L4) : route "/projets/:slug/lab/taches" (param renomme projectId
+  // -> slug) ; le service ci-dessous attend encore un id technique, a migrer.
+  const { slug: projectId } = useParams<{ slug: string }>();
   const {
     tickets,
     columns,
@@ -41,7 +37,6 @@ export default function LabPage() {
     columnId: KanbanColumnId;
   } | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
-  const [projectName, setProjectName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!projectId) return;
@@ -53,13 +48,6 @@ export default function LabPage() {
         );
       })
       .catch((err) => console.error("Error loading project members:", err));
-
-    // Le fil d'Ariane affichait « Projet #<id> », soit un UUID brut en mode
-    // http : le nom du projet n'etait jamais charge.
-    projectService
-      .getProjectById(projectId)
-      .then((project) => setProjectName(project.name))
-      .catch((err) => console.error("Error loading project:", err));
   }, [projectId]);
 
   const { total, done } = useMemo(() => {
@@ -86,36 +74,13 @@ export default function LabPage() {
 
   return (
     <>
-      <Header />
-      <div className="bg-background" style={{ height: "2.75rem" }} />
-      <main className="relative z-0 flex flex-col min-h-screen bg-background">
-        <div className="flex-1 max-w-7xl w-full mx-auto px-6 pb-12">
-          {/* Breadcrumb */}
-          <Breadcrumb className="mb-5">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  render={(props) => (
-                    <Link {...props} to={`/projects/${projectId}`}>
-                      {projectName ?? "Projet"}
-                    </Link>
-                  )}
-                />
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Tableau de bord</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          {/* Project context bar */}
+      <div className="h-full overflow-y-auto px-6 py-6">
+        <div className="mx-auto max-w-7xl">
+          {/* Barre de contexte de l'onglet */}
           <div className="flex items-center justify-between gap-6 mb-6 pb-6 border-b border-border">
-            <div>
-              <h1 className="text-heading-lg font-semibold text-foreground">
-                Tableau de bord
-              </h1>
-            </div>
+            <h1 className="text-heading-lg font-semibold text-foreground">
+              Les Tâches
+            </h1>
 
             <div className="flex items-center gap-5">
               {/* Members */}
@@ -155,33 +120,9 @@ export default function LabPage() {
                   {done}/{total}
                 </span>
               </div>
-
-              {/* Status */}
-              <span className="px-3 py-1 rounded-full text-ui-sm font-bold bg-[var(--color-orange-light)] text-[var(--color-orange-dark)] dark:bg-orange-500/20 dark:text-orange-400">
-                En cours
-              </span>
             </div>
           </div>
 
-          {/* Tool switcher */}
-          <div className="flex items-center gap-2 mb-8">
-            {/* Kanban - active */}
-            <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-foreground text-background shadow-sm cursor-default select-none">
-              <Kanban size={16} className="shrink-0" />
-              <span className="text-ui-md font-bold">Kanban</span>
-            </div>
-
-            {/* Moodboard - inactive */}
-            <Link
-              to={`/projects/${projectId}/moodboard`}
-              className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors select-none"
-            >
-              <LayoutTemplate size={16} className="shrink-0" />
-              <span className="text-ui-md font-bold">Moodboard</span>
-            </Link>
-          </div>
-
-          {/* Kanban board */}
           <KanbanBoard
             columns={columns}
             tickets={tickets}
@@ -196,8 +137,7 @@ export default function LabPage() {
             onDeleteColumn={deleteColumn}
           />
         </div>
-      </main>
-      <Footer />
+      </div>
 
       <TicketDrawer
         ticket={activeTicket}

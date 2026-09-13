@@ -1,192 +1,190 @@
 import { useState } from "react";
-import { Dialog } from "@base-ui/react/dialog";
-import { X, Search } from "lucide-react";
+import { X } from "lucide-react";
+import type { UserSummary } from "@/domain";
+import { useSearch } from "@/api/queries/search";
+import { useCreateConversation } from "@/api/queries/conversations";
+import {
+  Avatar,
+  Button,
+  Dialog,
+  DialogDescription,
+  DialogPopup,
+  DialogTitle,
+  Field,
+  Input,
+  Textarea,
+} from "@shared/ui";
 
-interface CreateConversationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onCreateConversation: () => void;
+export interface CreateConversationModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  currentUserId: string;
+  /** Appele avec l'id de la conversation creee, pour y naviguer. */
+  onCreated: (conversationId: string) => void;
 }
 
-interface AvailableUser {
-  id: string;
-  username: string;
-  displayName: string;
-}
-
-const availableUsers: AvailableUser[] = [
-  { id: "user-2", username: "sophie_martin", displayName: "Sophie Martin" },
-  { id: "user-3", username: "thomas_dupont", displayName: "Thomas Dupont" },
-  { id: "user-4", username: "marie_laurent", displayName: "Marie Laurent" },
-  { id: "user-5", username: "jean_claude", displayName: "Jean Claude" },
-  { id: "user-6", username: "lisa_moreau", displayName: "Lisa Moreau" },
-];
-
+/**
+ * Nouvelle conversation : recherche de personnes (R-MSG1/R-MSG2, 1 = direct,
+ * 2-49 = groupe une fois soi-meme ajoute), message d'ouverture obligatoire.
+ */
 export function CreateConversationModal({
-  isOpen,
-  onClose,
-  onCreateConversation,
+  open,
+  onOpenChange,
+  currentUserId,
+  onCreated,
 }: CreateConversationModalProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [isGroup, setIsGroup] = useState(false);
-  const [groupName, setGroupName] = useState("");
+  const [query, setQuery] = useState("");
+  const [recipients, setRecipients] = useState<UserSummary[]>([]);
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
 
-  const filteredUsers = availableUsers.filter(
+  const search = useSearch({ q: query, types: ["users"] });
+  const results = (search.data?.users?.items ?? []).filter(
     (user) =>
-      user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchQuery.toLowerCase()),
+      user.id !== currentUserId && !recipients.some((r) => r.id === user.id),
   );
 
-  const handleToggleUser = (userId: string) => {
-    setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId],
+  const createConversation = useCreateConversation();
+
+  function reset() {
+    setQuery("");
+    setRecipients([]);
+    setTitle("");
+    setMessage("");
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (recipients.length === 0 || !message.trim()) return;
+    createConversation.mutate(
+      {
+        participantIds: recipients.map((r) => r.id),
+        title: recipients.length > 1 && title.trim() ? title.trim() : undefined,
+        message: message.trim(),
+      },
+      {
+        onSuccess: (conversation) => {
+          reset();
+          onOpenChange(false);
+          onCreated(conversation.id);
+        },
+      },
     );
-  };
-
-  const handleCreate = () => {
-    if (selectedUsers.length === 0) return;
-
-    if (isGroup && !groupName.trim()) return;
-
-    // Mock: just close the modal for now
-    setSearchQuery("");
-    setSelectedUsers([]);
-    setIsGroup(false);
-    setGroupName("");
-    onCreateConversation();
-    onClose();
-  };
-
-  const isValid = selectedUsers.length > 0 && (!isGroup || groupName.trim());
+  }
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onClose}>
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) reset();
+        onOpenChange(next);
+      }}
+    >
+      <DialogPopup>
+        <DialogTitle>Nouvelle conversation</DialogTitle>
+        <DialogDescription>
+          Choisis une ou plusieurs personnes, puis écris ton premier message.
+        </DialogDescription>
 
-        <Dialog.Popup className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
-          <div className="bg-popover border border-border rounded-2xl shadow-2xl flex flex-col h-full">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <Dialog.Title className="text-xl font-bold text-popover-foreground">
-                Nouvelle conversation
-              </Dialog.Title>
-              <Dialog.Close className="p-2 hover:bg-muted rounded-lg transition-colors text-popover-foreground">
-                <X className="w-5 h-5" />
-              </Dialog.Close>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4">
-              {/* Search Bar */}
-              <div className="mb-4">
-                <div className="flex items-center gap-2 px-3 py-2 bg-background border border-input rounded-lg">
-                  <Search className="w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Rechercher des utilisateurs..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-1 bg-transparent border-0 outline-none text-foreground placeholder-muted-foreground"
-                  />
-                </div>
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
+          <Field label="À">
+            {recipients.length > 0 && (
+              <div className="mb-1.5 flex flex-wrap gap-1.5">
+                {recipients.map((recipient) => (
+                  <span
+                    key={recipient.id}
+                    className="inline-flex items-center gap-1.5 rounded-pill bg-muted px-2 py-1 text-body-sm text-foreground"
+                  >
+                    {recipient.displayName ?? `@${recipient.username}`}
+                    <button
+                      type="button"
+                      aria-label={`Retirer ${recipient.displayName ?? recipient.username}`}
+                      onClick={() =>
+                        setRecipients((prev) =>
+                          prev.filter((r) => r.id !== recipient.id),
+                        )
+                      }
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
               </div>
-
-              {/* Users List */}
-              <div className="space-y-1 mb-2">
-                {filteredUsers.map((user) => (
+            )}
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Chercher un pseudo…"
+              aria-label="Chercher une personne"
+            />
+            {query.trim() && results.length > 0 && (
+              <div className="mt-1.5 flex flex-col gap-0.5 rounded-md border border-border bg-card p-1 shadow-rest">
+                {results.slice(0, 6).map((user) => (
                   <button
                     key={user.id}
-                    onClick={() => handleToggleUser(user.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
-                      selectedUsers.includes(user.id)
-                        ? "bg-primary/10 border border-primary"
-                        : "hover:bg-muted border border-transparent"
-                    }`}
+                    type="button"
+                    onClick={() => {
+                      setRecipients((prev) => [...prev, user]);
+                      setQuery("");
+                    }}
+                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-muted"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                      <span className="text-xs font-bold text-muted-foreground">
-                        {user.displayName.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-popover-foreground truncate">
-                        {user.displayName}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        @{user.username}
-                      </p>
-                    </div>
-                    <div
-                      className={`flex-shrink-0 w-5 h-5 rounded border transition-colors ${
-                        selectedUsers.includes(user.id)
-                          ? "bg-primary border-primary"
-                          : "border-border"
-                      } flex items-center justify-center`}
-                    >
-                      {selectedUsers.includes(user.id) && (
-                        <span className="text-white text-sm">✓</span>
-                      )}
-                    </div>
+                    <Avatar
+                      name={user.displayName ?? user.username}
+                      src={user.avatar}
+                      size="sm"
+                    />
+                    <span className="text-body-md text-foreground">
+                      {user.displayName ?? `@${user.username}`}
+                    </span>
                   </button>
                 ))}
-
-                {filteredUsers.length === 0 && (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">
-                      Aucun utilisateur trouvé
-                    </p>
-                  </div>
-                )}
               </div>
+            )}
+          </Field>
 
-              {/* Group Toggle */}
-              {selectedUsers.length > 1 && (
-                <div className="pt-4 border-t border-border space-y-4">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={isGroup}
-                      onChange={(e) => setIsGroup(e.target.checked)}
-                      className="w-4 h-4 rounded border border-input cursor-pointer"
-                    />
-                    <span className="text-sm font-medium text-popover-foreground">
-                      Créer un groupe
-                    </span>
-                  </label>
+          {recipients.length > 1 && (
+            <Field label="Nom du groupe" description="Facultatif.">
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Ex. Chorale du mardi"
+              />
+            </Field>
+          )}
 
-                  {isGroup && (
-                    <input
-                      type="text"
-                      placeholder="Nom du groupe"
-                      value={groupName}
-                      onChange={(e) => setGroupName(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-input rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder-muted-foreground"
-                    />
-                  )}
-                </div>
-              )}
-            </div>
+          <Field label="Message">
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Écris ton premier message…"
+              rows={3}
+              required
+            />
+          </Field>
 
-            {/* Footer */}
-            <div className="flex gap-3 p-4 border-t border-border bg-muted/30">
-              <Dialog.Close className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground font-medium">
-                Annuler
-              </Dialog.Close>
-              <button
-                onClick={handleCreate}
-                disabled={!isValid}
-                className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isGroup ? "Créer le groupe" : "Créer"}
-              </button>
-            </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="submit"
+              disabled={
+                recipients.length === 0 ||
+                !message.trim() ||
+                createConversation.isPending
+              }
+            >
+              {createConversation.isPending ? "Envoi…" : "Envoyer"}
+            </Button>
           </div>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </form>
+      </DialogPopup>
+    </Dialog>
   );
 }

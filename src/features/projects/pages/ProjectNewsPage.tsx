@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { Header, Footer } from "@features/layout";
 import type { ProjectNewsDto } from "@/api/types";
 import { projectService } from "@/api/services";
 import { NewsCard } from "../components/NewsCard";
 
 export function ProjectNewsPage() {
-  const { id } = useParams<{ id: string }>();
+  // TODO(v2-L4) : route "/projets/:slug/annonces" (param renomme id -> slug) ;
+  // le service appele ci-dessous attend encore un id technique, a migrer.
+  const { slug: id } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [news, setNews] = useState<ProjectNewsDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,11 +32,10 @@ export function ProjectNewsPage() {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-background">
         <div className="max-w-3xl mx-auto px-6 py-12">
           <button
-            onClick={() => navigate(`/projects/${id}`)}
+            onClick={() => navigate(`/projets/${id}`)}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft size={16} />
@@ -82,7 +82,6 @@ export function ProjectNewsPage() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { adminStatsSchema, currentUserSchema } from "@/domain";
+import { adminStatsSchema, currentUserSchema, type Report } from "@/domain";
 import { nextId } from "../data/ids";
 import { SIGNUPS_LAST_30_DAYS } from "../data";
 import { getDb, type DbUser } from "../db";
@@ -10,6 +10,7 @@ import {
   getAuthUser,
   paginate,
   simulateLatency,
+  toUserSummary,
 } from "./utils";
 
 function requireAdmin(request: Request) {
@@ -23,6 +24,52 @@ function stripPassword(user: DbUser) {
   const { passwordHash, ...rest } = user;
   void passwordHash;
   return rest;
+}
+
+/**
+ * Apercu de la cible d'un signalement (doc 15 E-35), construit depuis les
+ * tables du store mock deja disponibles cote handler — jamais une nouvelle
+ * route, juste une jointure en lecture pour l'ecran de moderation.
+ */
+function buildTargetPreview(db: ReturnType<typeof getDb>, report: Report) {
+  switch (report.targetType) {
+    case "comment": {
+      const comment = db.comments.findOne((c) => c.id === report.targetId);
+      if (!comment) return undefined;
+      const author = db.users.findOne((u) => u.id === comment.authorId);
+      const project = db.projects.findOne((p) => p.id === comment.projectId);
+      return {
+        author: author ? toUserSummary(author) : undefined,
+        excerpt: comment.body,
+        projectTitle: project?.title,
+        projectSlug: project?.slug,
+      };
+    }
+    case "message": {
+      const message = db.messages.findOne((m) => m.id === report.targetId);
+      if (!message) return undefined;
+      const author = db.users.findOne((u) => u.id === message.authorId);
+      return {
+        author: author ? toUserSummary(author) : undefined,
+        excerpt: message.body,
+      };
+    }
+    case "user": {
+      const target = db.users.findOne((u) => u.id === report.targetId);
+      return target ? { author: toUserSummary(target) } : undefined;
+    }
+    case "project": {
+      const project = db.projects.findOne((p) => p.id === report.targetId);
+      if (!project) return undefined;
+      return {
+        excerpt: project.tagline,
+        projectTitle: project.title,
+        projectSlug: project.slug,
+      };
+    }
+    default:
+      return undefined;
+  }
 }
 
 export const adminHandlers = [
@@ -39,7 +86,25 @@ export const adminHandlers = [
       if (countA !== countB) return countB - countA;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-    return HttpResponse.json(paginate(reports, url.searchParams.get("cursor")));
+    const page = paginate(reports, url.searchParams.get("cursor"));
+    return HttpResponse.json({
+      ...page,
+      items: page.items.map((report) => {
+        const reporter = db.users.findOne((u) => u.id === report.reporterId);
+        if (!reporter)
+          throw new Error(
+            `Signaleur introuvable pour le signalement ${report.id}`,
+          );
+        return {
+          ...report,
+          reporter: toUserSummary(reporter),
+          target: buildTargetPreview(db, report),
+          similarReportsCount: db.reports.find(
+            (r) => r.targetId === report.targetId,
+          ).length,
+        };
+      }),
+    });
   }),
 
   http.post(
@@ -154,6 +219,34 @@ export const adminHandlers = [
         id: nextId(),
         adminId: auth.user!.id,
         type: "suspend_account",
+        targetType: "user",
+        targetId: target.id,
+        reason: body.reason,
+        createdAt: new Date().toISOString(),
+      });
+      return new HttpResponse(null, { status: 204 });
+    },
+  ),
+
+  http.post(
+    apiUrl("/admin/users/:userId/reactivate"),
+    async ({ request, params }) => {
+      await simulateLatency();
+      const auth = requireAdmin(request);
+      if (auth.error) return auth.error;
+      const db = getDb();
+      const target = db.users.findOne((u) => u.id === params.userId);
+      if (!target) return errors.notFound("Personne introuvable.");
+      const body = (await request.json().catch(() => ({}))) as {
+        reason?: string;
+      };
+      db.users.update((u) => u.id === target.id, {
+        accountStatus: "active",
+      });
+      db.adminActions.insert({
+        id: nextId(),
+        adminId: auth.user!.id,
+        type: "reactivate_account",
         targetType: "user",
         targetId: target.id,
         reason: body.reason,

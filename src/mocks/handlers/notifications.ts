@@ -2,16 +2,93 @@ import { http, HttpResponse } from "msw";
 import {
   notificationPreferencesUpdateInputSchema,
   notificationTypeSchema,
+  type Notification,
   type NotificationPreference,
+  type NotificationSummary,
+  type NotificationTarget,
 } from "@/domain";
-import { getDb } from "../db";
+import { getDb, type MockDatabase } from "../db";
 import {
   apiUrl,
   errors,
   getAuthUser,
   paginate,
   simulateLatency,
+  toUserSummary,
 } from "./utils";
+
+/** R-N3 : resout la cible vers ce qu'il faut pour construire la route FR exacte. */
+function resolveTarget(
+  db: MockDatabase,
+  notification: Notification,
+): NotificationTarget {
+  switch (notification.targetType) {
+    case "project": {
+      const project = db.projects.findOne(
+        (p) => p.id === notification.targetId,
+      )!;
+      return {
+        type: "project",
+        projectSlug: project.slug,
+        projectTitle: project.title,
+      };
+    }
+    case "task": {
+      const task = db.tasks.findOne((t) => t.id === notification.targetId)!;
+      const column = db.columns.findOne((c) => c.id === task.columnId)!;
+      const project = db.projects.findOne((p) => p.id === column.projectId)!;
+      return {
+        type: "task",
+        projectSlug: project.slug,
+        projectTitle: project.title,
+        taskTitle: task.title,
+      };
+    }
+    case "comment": {
+      const comment = db.comments.findOne(
+        (c) => c.id === notification.targetId,
+      )!;
+      const project = db.projects.findOne((p) => p.id === comment.projectId)!;
+      return {
+        type: "comment",
+        projectSlug: project.slug,
+        projectTitle: project.title,
+      };
+    }
+    case "message": {
+      const conversation = db.conversations.findOne(
+        (c) => c.id === notification.targetId,
+      );
+      let conversationTitle: string | undefined = conversation?.title;
+      if (!conversationTitle && conversation?.projectId) {
+        const project = db.projects.findOne(
+          (p) => p.id === conversation.projectId,
+        );
+        if (project) conversationTitle = `Canal de ${project.title}`;
+      }
+      return {
+        type: "message",
+        conversationId: notification.targetId,
+        conversationTitle,
+      };
+    }
+  }
+}
+
+/** R-N2 : `actorIds` deja regroupe cote serveur ; on n'ajoute que la projection affichable. */
+function toNotificationSummary(
+  db: MockDatabase,
+  notification: Notification,
+): NotificationSummary {
+  return {
+    ...notification,
+    actors: notification.actorIds
+      .map((id) => db.users.findOne((u) => u.id === id))
+      .filter((u): u is NonNullable<typeof u> => Boolean(u))
+      .map(toUserSummary),
+    target: resolveTarget(db, notification),
+  };
+}
 
 /** R-N4 : par defaut tout dans l'application, e-mail en plus pour ces trois types. */
 const EMAIL_BY_DEFAULT = new Set([
@@ -39,7 +116,8 @@ export const notificationHandlers = [
       .sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      )
+      .map((n) => toNotificationSummary(db, n));
     return HttpResponse.json(
       paginate(notifications, url.searchParams.get("cursor")),
     );
