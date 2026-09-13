@@ -1,4 +1,3 @@
-import { Header, Footer } from "@features/layout";
 import { PageHeader, Tabs, TabsList, TabsPanel, TabsTab } from "@shared/ui";
 import { AccountsSection } from "../components/AccountsSection";
 import { ModerationSection } from "../components/ModerationSection";
@@ -13,8 +12,7 @@ import { StatisticsSection } from "../components/StatisticsSection";
 export function AdminDashboardPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background">
+      <main className="bg-background">
         <div className="mx-auto max-w-6xl px-8 py-8">
           <PageHeader title="Administration" />
           <Tabs defaultValue="moderation" className="mt-6">
@@ -39,7 +37,6 @@ export function AdminDashboardPage() {
           </Tabs>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

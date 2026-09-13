@@ -138,6 +138,32 @@ export function AppRouter() {
           path="/projets/:slug/equipe"
           element={withSuspense(<ProjectDetailPage />)}
         />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>{withSuspense(<MessagesPage />)}</ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages/:id"
+          element={
+            <ProtectedRoute>{withSuspense(<MessagesPage />)}</ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              {withSuspense(<NotificationsPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>{withSuspense(<AdminDashboardPage />)}</AdminRoute>
+          }
+        />
       </Route>
 
       {/* Coquille atelier — Le Lab (doc 06 §4) */}
@@ -148,35 +174,6 @@ export function AppRouter() {
         <Route path="mur" element={withSuspense(<LabWallPage />)} />
         <Route path="taches" element={withSuspense(<LabTasksPage />)} />
       </Route>
-
-      {/* Messages, notifications, administration : features migrees en
-          parallele par d'autres agents (src/features/messages,
-          notifications, admin). Leurs pages gardent leur propre Header/
-          Footer — montees hors SiteLayout pour ne pas les doubler. */}
-      <Route
-        path="/messages"
-        element={
-          <ProtectedRoute>{withSuspense(<MessagesPage />)}</ProtectedRoute>
-        }
-      />
-      <Route
-        path="/messages/:id"
-        element={
-          <ProtectedRoute>{withSuspense(<MessagesPage />)}</ProtectedRoute>
-        }
-      />
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>{withSuspense(<NotificationsPage />)}</ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin"
-        element={
-          <AdminRoute>{withSuspense(<AdminDashboardPage />)}</AdminRoute>
-        }
-      />
 
       {/* Redirections des anciennes routes (id -> slug/pseudo impossible sans
           donnee supplementaire : direction l'accueil plutot qu'une 404). */}

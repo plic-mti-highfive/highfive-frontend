@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Footer, Header } from "@features/layout";
 import { useAuth } from "@shared/contexts";
 import { useConversations } from "@/api/queries/conversations";
 import { ErrorState, Skeleton } from "@shared/ui";
@@ -27,9 +26,8 @@ export function MessagesPage() {
 
   return (
     <>
-      <Header />
       <main className="bg-background">
-        <div className="flex h-[calc(100vh-3.5rem)]">
+        <div className="flex h-[calc(100dvh-3.5rem)]">
           <aside
             className={cn(
               "w-full border-r border-border lg:flex lg:w-96 lg:shrink-0",
@@ -79,7 +77,6 @@ export function MessagesPage() {
           </section>
         </div>
       </main>
-      <Footer />
 
       <CreateConversationModal
         open={createOpen}

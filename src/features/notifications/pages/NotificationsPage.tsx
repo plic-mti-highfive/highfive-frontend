@@ -1,5 +1,4 @@
 import { Bell, CheckCheck } from "lucide-react";
-import { Footer, Header } from "@features/layout";
 import { ApiError } from "@/api/client";
 import {
   useMarkAllNotificationsRead,
@@ -27,8 +26,7 @@ export function NotificationsPage() {
 
   return (
     <>
-      <Header />
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background">
+      <main className="bg-background">
         <div className="mx-auto max-w-2xl px-6 py-8">
           <PageHeader
             title="Notifications"
@@ -104,7 +102,6 @@ export function NotificationsPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }
