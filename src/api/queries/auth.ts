@@ -1,14 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as authApi from "../auth";
+import { ApiError } from "../client";
 import { tokenStorage } from "../token-storage";
 import { queryKeys } from "./keys";
 import type { LoginInput, RegisterInput } from "@/domain";
 
-/** Session courante. `enabled: hasToken` evite un appel systematique si l'AuthContext gere deja ce cas. */
+/**
+ * Session courante. Un 401 n'est pas une erreur mais "personne n'est connecte" :
+ * le jeton perime est efface et la session vaut `null`. Sans cela, chaque
+ * nouvel observateur relancait /me sur une requete en erreur, repassait la
+ * session en chargement et faisait remonter les pages en boucle.
+ */
 export function useSession(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: queryKeys.auth.me(),
-    queryFn: authApi.getCurrentUser,
+    queryFn: async () => {
+      try {
+        return await authApi.getCurrentUser();
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          tokenStorage.clearTokens();
+          return null;
+        }
+        throw error;
+      }
+    },
     enabled: options.enabled ?? true,
     retry: false,
   });
