@@ -1,9 +1,33 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { cn } from "@shared/lib/cn";
 import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
 import { useTrendingTags } from "@/api/queries/search";
 import { getTagById, type Tag } from "@/domain";
+
+function useScrollDirection() {
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY;
+      if (y < 10) {
+        setHidden(false);
+      } else if (y > lastY.current + 4) {
+        setHidden(true);
+      } else if (y < lastY.current - 4) {
+        setHidden(false);
+      }
+      lastY.current = y;
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return hidden;
+}
 
 const pillBase =
   "shrink-0 whitespace-nowrap rounded-pill px-3 py-1.5 text-ui-md font-semibold transition-colors duration-fast outline-none focus-visible:ring-2 focus-visible:ring-ring/50";
@@ -23,6 +47,7 @@ const MOBILE_LIMIT = 4;
  * detection JS de la largeur d'ecran.
  */
 export function TagFilterBar() {
+  const hidden = useScrollDirection();
   const { user } = useCurrentUser();
   const trendingQuery = useTrendingTags();
 
@@ -42,9 +67,13 @@ export function TagFilterBar() {
   return (
     <nav
       aria-label="Parcourir les thèmes"
-      className="sticky top-14 z-sticky border-b border-sidebar-border bg-sidebar"
+      className={cn(
+        "sticky top-14 z-sticky border-b border-sidebar-border bg-sidebar",
+        "transition-transform duration-300 ease-in-out",
+        hidden && "-translate-y-full",
+      )}
     >
-      <div className="mx-auto flex max-w-content flex-wrap items-center gap-1.5 px-6 py-2">
+      <div className="justify-center mx-auto flex max-w-content flex-wrap items-center gap-1.5 px-6 py-2">
         {tags.map((tag, index) => (
           <Link
             key={tag.id}

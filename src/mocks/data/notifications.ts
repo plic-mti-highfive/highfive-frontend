@@ -12,7 +12,7 @@ const repairCafe = PROJECT_BY_SLUG.get("repair-cafe-du-mois")!;
 
 const thomasComment = COMMENTS.find((c) => c.authorId === u.thomasDupont.id)!;
 const repeindreMurNord = TASKS.find(
-  (t) => t.title === "Repeindre le mur nord",
+  (t) => t.title === "Repeindre Tableau blanc nord",
 )!;
 
 function notification(input: Omit<Notification, "id" | "read">): Notification {
@@ -60,7 +60,7 @@ export const NOTIFICATIONS: Notification[] = [
     targetId: thomasComment.id,
     createdAt: hoursAgo(3),
   }),
-  // "Camille t'a confié « Repeindre le mur nord »"
+  // "Camille t'a confié « Repeindre Tableau blanc nord »"
   notification({
     recipientId: u.alexRivera.id,
     type: "task_assigned",

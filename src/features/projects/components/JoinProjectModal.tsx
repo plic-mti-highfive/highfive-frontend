@@ -4,7 +4,6 @@ import {
   Button,
   Dialog,
   DialogClose,
-  DialogDescription,
   DialogPopup,
   DialogTitle,
   Field,
@@ -20,7 +19,6 @@ import {
 export function JoinProjectModal({
   open,
   onOpenChange,
-  projectTitle,
   onSubmit,
   isSubmitting,
 }: {
@@ -37,10 +35,6 @@ export function JoinProjectModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPopup>
         <DialogTitle>Demander à rejoindre</DialogTitle>
-        <DialogDescription>
-          « {projectTitle} » accepte les demandes au cas par cas. Un mot
-          d'explication aide le porteur à décider.
-        </DialogDescription>
 
         <Field
           label="Message"

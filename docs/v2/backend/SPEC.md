@@ -161,7 +161,7 @@ contraintes listees sont celles qui portent une regle metier (R-xx).
 | `announcements`             | `id` uuid PK, `project_id` FK, `author_id` FK, `title`, `body`, `pinned` bool default false, `published_at`                                                                                                                                                                           | R-A2 : index unique partiel `project_id WHERE pinned = true` — epingler doit alors dans la meme transaction depingler l'ancienne (`UPDATE ... SET pinned = false WHERE project_id = $1` puis l'insertion/mise a jour), pas une contrainte seule.                                                                                                                                                                   |
 | `comments`                  | `id` uuid PK, `project_id` FK, `author_id` FK, `body`, `parent_id` nullable FK comments, `published_at`, `hidden` bool default false                                                                                                                                                  | R-C4 : check applicatif — refuser un `parentId` dont le commentaire cible a lui-meme un `parent_id` non nul (un seul niveau).                                                                                                                                                                                                                                                                                      |
 | `columns`                   | `id` uuid PK, `project_id` FK, `label`, `order` int, `color` enum nullable                                                                                                                                                                                                            | R-K1 : 3 colonnes creees avec le projet (A faire/En cours/Fait). R-K2 : 1 a 6 par projet (applicatif, verifie a l'insertion).                                                                                                                                                                                                                                                                                      |
-| `tasks`                     | `id` uuid PK, `column_id` FK columns, `title`, `details` nullable, `due_date` date nullable, `order` int, `created_by` FK users, `created_at`, `wall_origin_id` nullable                                                                                                              | `wall_origin_id` : identifiant opaque cote document tldraw (pas une FK, le Mur n'est pas relationnel).                                                                                                                                                                                                                                                                                                             |
+| `tasks`                     | `id` uuid PK, `column_id` FK columns, `title`, `details` nullable, `due_date` date nullable, `order` int, `created_by` FK users, `created_at`, `wall_origin_id` nullable                                                                                                              | `wall_origin_id` : identifiant opaque cote document tldraw (pas une FK, Tableau blanc n'est pas relationnel).                                                                                                                                                                                                                                                                                                      |
 | `task_assignees`            | `task_id` FK, `user_id` FK, PK composite                                                                                                                                                                                                                                              | R-K5 : plusieurs assignes possibles -> table de jointure plutot qu'un tableau.                                                                                                                                                                                                                                                                                                                                     |
 | `walls`                     | `project_id` PK/FK, `snapshot_url` nullable, `updated_at`                                                                                                                                                                                                                             | Le document collaboratif (tldraw/Yjs) ne vit pas ici : voir section 6. Une ligne par projet, creee avec lui.                                                                                                                                                                                                                                                                                                       |
 | `project_files`             | `id` uuid PK, `project_id` FK, `uploaded_by` FK users, `name`, `size` bigint, `mime_type`, `storage_key`, `uploaded_at`                                                                                                                                                               | R-F1 : verifier la taille avant/au moment de l'ecriture objet (20 Mo/fichier), et la somme des tailles du projet (200 Mo) dans la meme transaction que l'insertion. `storage_key` : cle vers le stockage objet (S3-like), pas le contenu en base.                                                                                                                                                                  |
@@ -337,7 +337,7 @@ R-K4 (titre seul obligatoire). R-K5 (plusieurs assignes,
 contrainte serveur). R-K7 (assigner quelqu'un notifie — seul evenement des
 Taches qui notifie ; rien d'autre dans ce domaine ne le fait).
 
-### Le Mur (2 routes)
+### Tableau blanc (2 routes)
 
 R-W1 (edition reservee aux membres ; lecture seule pour les observateurs
 selon le reglage du porteur, doc 05 §3.3 note 1 — **reglage absent du
@@ -459,7 +459,7 @@ Hors perimetre v2 actuelle : **aucun ecran front n'en depend aujourd'hui**.
 Deux endroits en beneficieraient plus tard, a ne pas anticiper au-dela de ce
 que `docs/v2/API-ROUTES.md`/`src/domain/wall.ts` decrivent deja :
 
-- **Le Mur** : document collaboratif tldraw/Yjs. Le contrat REST
+- **Tableau blanc** : document collaboratif tldraw/Yjs. Le contrat REST
   (`GET /projects/{slug}/wall`) n'expose que des metadonnees —
   `snapshotUrl` (image d'apercu, regeneree au plus toutes les 10 minutes,
   doc 04 §10) et `updatedAt`. Le document lui-meme vivrait derriere un
@@ -477,7 +477,7 @@ que `docs/v2/API-ROUTES.md`/`src/domain/wall.ts` decrivent deja :
   temps reel tant qu'aucune route front ne l'attend.
 
 En resume : le backend n'a besoin d'aucune infrastructure temps reel pour
-livrer le contrat de `openapi.yaml`. Le jour ou Le Mur devient
+livrer le contrat de `openapi.yaml`. Le jour ou Tableau blanc devient
 multi-utilisateur en direct, un document dedie precisera le protocole
 Yjs/Hocuspocus ; ce n'est pas ce document.
 
@@ -591,7 +591,7 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
 7. **Limite de membres par projet** (R-M5) : voir §3 "Projets" — champ
    absent de `ProjectUpdateInput`.
 8. **Reglage Mur/Taches ouverts aux observateurs** (doc 05 §3.3 note 1) :
-   voir §3 "Le Mur" — champ absent de `Project`.
+   voir §3 "Tableau blanc" — champ absent de `Project`.
 9. **Accord explicite au transfert de propriete** (R-M2) : voir §3
    "Projets" — le mock transfere immediatement sans etape d'acceptation.
 10. **Archivage automatique a 180 jours** (R-PR6) et **notification 24h

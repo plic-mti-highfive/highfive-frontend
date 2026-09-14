@@ -24,9 +24,9 @@ export const wallHandlers = [
     const project = db.projects.findOne((p) => p.slug === params.slug);
     if (!project) return errors.notFound("Ce projet n'existe pas.");
     const user = getAuthUser(request);
-    // R-W1/R-V6 (doc 05 §3.3, §4) : Le Mur n'est jamais public, meme sur un
+    // R-W1/R-V6 (doc 05 §3.3, §4) : Tableau blanc n'est jamais public, meme sur un
     // projet public — seuls les membres et observateurs du projet y lisent
-    // (defaut porteur : Le Mur ouvert aux observateurs). Un visiteur sans
+    // (defaut porteur : Tableau blanc ouvert aux observateurs). Un visiteur sans
     // appartenance (role indefini) est refuse, jamais suppose observateur.
     const role = roleOf(project.id, user?.id);
     if (!role || !hasAtLeastRole(role, "observer")) return errors.forbidden();

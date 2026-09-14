@@ -53,7 +53,7 @@ export function ProjectTeamPage() {
 
   return (
     <div className="flex max-w-2xl flex-col gap-10">
-      <Section title={`Membres ${members.length}`}>
+      <Section title={`Membres`}>
         <ul className="flex flex-col gap-1">
           {grouped.map((group) => (
             <li key={group.role} className="flex flex-col gap-1">

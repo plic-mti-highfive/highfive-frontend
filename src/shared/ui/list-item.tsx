@@ -34,7 +34,7 @@ function ListItem({
       data-slot="list-item"
       aria-current={active ? "true" : undefined}
       className={cn(
-        "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors duration-fast outline-none cursor-pointer hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50",
+        "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors duration-fast outline-none cursor-pointer hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50",
         active && "bg-muted",
         unread && !active && "bg-primary/5",
         className,

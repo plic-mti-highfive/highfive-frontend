@@ -30,7 +30,7 @@ const alexReply = commentSchema.parse({
   id: nextId(),
   projectId: fresque.id,
   authorId: u.alexRivera.id,
-  body: "Parfait, viens à 9 h, on te montrera le mur.",
+  body: "Parfait, viens à 9 h, on te montrera Tableau blanc.",
   parentId: sophieComment.id,
   publishedAt: daysAgo(2),
   hidden: false,

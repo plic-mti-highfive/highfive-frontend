@@ -1,6 +1,7 @@
+import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import { Avatar, AvatarGroup, Badge, Card, TagPill } from "@shared/ui";
+import { Avatar, AvatarGroup, Badge, Card, Divider, TagPill } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import { getAccent } from "@shared/lib/accent";
 import { getTagById, type ProjectSummary } from "@/domain";
@@ -68,20 +69,21 @@ export function ProjectCard({
         className="absolute inset-0 z-10 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       />
 
-      <div className="flex items-center gap-2">
-        <Badge tone="neutral">{participationLabel(project)}</Badge>
+      <div className="flex items-start justify-between gap-2">
+        <h3
+          className={cn(
+            "font-bold text-foreground",
+            featured
+              ? "text-heading-lg leading-tight"
+              : "text-heading-md leading-snug line-clamp-1",
+          )}
+        >
+          {project.title}
+        </h3>
+        <Badge tone="neutral" className="shrink-0">
+          {participationLabel(project)}
+        </Badge>
       </div>
-
-      <h3
-        className={cn(
-          "font-bold text-foreground",
-          featured
-            ? "text-heading-lg leading-tight"
-            : "text-heading-md leading-snug line-clamp-1",
-        )}
-      >
-        {project.title}
-      </h3>
 
       <p
         className={cn(
@@ -105,16 +107,6 @@ export function ProjectCard({
           );
         })}
       </div>
-
-      {unmetNeeds.length > 0 && (
-        <p className="text-body-sm text-muted-foreground">
-          <span className="font-semibold text-foreground">Cherche : </span>
-          {unmetNeeds
-            .slice(0, 3)
-            .map((need) => need.label)
-            .join(" · ")}
-        </p>
-      )}
 
       <div className="mt-auto flex items-center justify-between gap-3 pt-1">
         <div className="flex items-center gap-2">
@@ -143,6 +135,25 @@ export function ProjectCard({
           />
         </div>
       </div>
+
+      {unmetNeeds.length > 0 && (
+        <>
+          <Divider />
+          <div className="flex flex-col gap-2">
+            <span className="flex items-center gap-1 text-label font-semibold uppercase tracking-wider text-muted-foreground">
+              <Search className="size-3" />
+              {unmetNeeds.length > 1
+                ? "Profils recherchés"
+                : "Profil recherché"}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {unmetNeeds.slice(0, 3).map((need) => (
+                <TagPill key={need.label} label={need.label} size="xs" />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </Card>
   );
 }

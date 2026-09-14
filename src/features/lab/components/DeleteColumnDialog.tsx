@@ -35,10 +35,10 @@ export function DeleteColumnDialog({
       <DialogPopup>
         <DialogTitle>Supprimer « {column?.label} »</DialogTitle>
         <DialogDescription>
-          Choisis la colonne qui accueillera les tâches de cette colonne.
+          Choisis la colonne qui accueillera Étapes de cette colonne.
         </DialogDescription>
 
-        <Field label="Déplacer les tâches vers" className="mt-4">
+        <Field label="Déplacer Étapes vers" className="mt-4">
           <select
             value={moveTo}
             onChange={(e) => setMoveTo(e.target.value)}

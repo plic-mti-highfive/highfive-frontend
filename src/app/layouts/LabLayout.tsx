@@ -37,7 +37,7 @@ const STATE_TONE: Record<ProjectState, NonNullable<BadgeProps["tone"]>> = {
  * Coquille atelier (doc 06 §4, V2 item 3) : hauteur d'écran fixe, aucun
  * défilement de page — seul l'espace de travail (Outlet) défile selon ses
  * propres règles. Barre de projet 52px avec retour nommé vers la fiche
- * (R-NAV2), état + nombre de membres, onglets routés Le Mur / Les Tâches et
+ * (R-NAV2), état + nombre de membres, onglets routés Tableau blanc / Étapes et
  * bouton Inviter (porteur/co-porteur).
  *
  * Accès : sans appartenance -> état permission (l'atelier est un espace
@@ -108,8 +108,8 @@ export function LabLayout() {
 
         {isMember && (
           <nav className="flex h-full items-center gap-1" aria-label="Le Lab">
-            <TabLink to="mur">Le Mur</TabLink>
-            <TabLink to="taches">Les Tâches</TabLink>
+            <TabLink to="mur">Tableau blanc</TabLink>
+            <TabLink to="taches">Étapes</TabLink>
           </nav>
         )}
 
@@ -146,7 +146,7 @@ export function LabLayout() {
             <EmptyState
               icon={Lock}
               title="L'atelier est réservé à l'équipe"
-              description="Le Mur et Les Tâches ne sont visibles que par les membres de ce projet. Rejoins l'équipe depuis la fiche du projet pour y accéder."
+              description="Tableau blanc et Étapes ne sont visibles que par les membres de ce projet. Rejoins l'équipe depuis la fiche du projet pour y accéder."
               action={
                 <Button render={<Link to={`/projets/${slug}`} />}>
                   Voir la fiche du projet

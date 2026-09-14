@@ -22,12 +22,9 @@ export function NavigationProgress() {
   const visible = navigationPending || initialFetchPending;
 
   return (
-    <div
-      aria-hidden
-      className="sticky top-14 z-sticky h-0.5 w-full overflow-hidden"
-    >
+    <div aria-hidden className="sticky top-14 z-sticky h-0 w-full">
       {visible && (
-        <div className="nav-progress-bar h-full w-1/3 rounded-full bg-rose" />
+        <div className="nav-progress-bar h-0.5 w-1/3 rounded-full bg-rose" />
       )}
     </div>
   );

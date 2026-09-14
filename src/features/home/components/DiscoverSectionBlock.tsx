@@ -11,10 +11,10 @@ import { discoverSeeAllHref } from "../lib/searchHref";
  */
 const SECTION_LABELS: Record<DiscoverSectionId, string> = {
   for_you: "Pour toi",
-  starting: "Ça démarre",
-  trending_highfives: "Beaucoup de highfives cette semaine",
-  needs_help: "Ils cherchent du monde",
-  near_your_projects: "Près de tes projets",
+  starting: "Nouveaux projets",
+  trending_highfives: "Projets aimés de la semaine",
+  needs_help: "Ils cherchent des profils",
+  near_your_projects: "Projets similaires aux tiens",
 };
 
 /**

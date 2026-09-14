@@ -45,8 +45,8 @@ export function ConvertSelectionDialog({
       <DialogPopup>
         <DialogTitle>Convertir la sélection en tâches</DialogTitle>
         <DialogDescription>
-          Chaque élément coché devient une tâche dans la première colonne de Les
-          Tâches. Décoche ce que tu ne veux pas convertir.
+          Chaque élément coché devient une tâche dans la première colonne des
+          étapes du projet.
         </DialogDescription>
 
         <SelectionChecklist

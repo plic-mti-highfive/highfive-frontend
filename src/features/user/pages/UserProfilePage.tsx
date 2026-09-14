@@ -144,7 +144,7 @@ export default function UserProfilePage() {
           <div className="min-w-0 flex-1">
             <Tabs defaultValue="created">
               <TabsList>
-                <TabsTab value="created">Projets portés</TabsTab>
+                <TabsTab value="created">Projets créés</TabsTab>
                 <TabsTab value="joined">Projets rejoints</TabsTab>
               </TabsList>
 
@@ -167,7 +167,7 @@ export default function UserProfilePage() {
                     }
                   />
                 ) : (
-                  <div className="grid gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 pt-4 grid-cols-2">
                     {created.map((project) => (
                       <ProjectCard key={project.id} project={project} />
                     ))}
@@ -194,7 +194,7 @@ export default function UserProfilePage() {
                     }
                   />
                 ) : (
-                  <div className="grid gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 pt-4 grid-cols-2">
                     {joined.map((project) => (
                       <ProjectCard key={project.id} project={project} />
                     ))}

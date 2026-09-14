@@ -31,7 +31,7 @@ export const ANNOUNCEMENTS: Announcement[] = [
     slug: "fresque-murale-collaborative",
     authorId: u.alexRivera.id,
     title: "On a l'accord de la mairie",
-    body: "Le service technique nous laisse le mur jusqu'en septembre. On commence samedi 14, rendez-vous à 9 h devant le gymnase. Apportez de vieux vêtements.",
+    body: "Le service technique nous laisse Tableau blanc jusqu'en septembre. On commence samedi 14, rendez-vous à 9 h devant le gymnase. Apportez de vieux vêtements.",
     pinned: true,
     publishedDaysAgo: 3,
   }),

@@ -110,7 +110,7 @@ export const MESSAGES: Message[] = [
   message({
     conversationId: directSophie.id,
     authorId: u.sophieMartin.id,
-    body: "On se voit samedi pour le mur ?",
+    body: "On se voit samedi pour Tableau blanc ?",
     sentAt: hoursAgo(6),
   }),
   message({

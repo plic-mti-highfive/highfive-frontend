@@ -82,8 +82,7 @@ export function HighfiveButton({
     });
   }
 
-  const countLabel =
-    count === 0 ? "Aucun highfive" : `${count} highfive${count > 1 ? "s" : ""}`;
+  const countLabel = count === 0 ? "Aucun highfive" : `${count}`;
 
   return (
     <Button
@@ -104,7 +103,7 @@ export function HighfiveButton({
     >
       <Hand
         size={size === "sm" ? 14 : 16}
-        className={cn(given && "fill-current")}
+        className={cn(given && "fill-current stroke-0")}
       />
       {size === "md" && <span>{given ? "Highfive donné" : "Highfive"}</span>}
       <span className="tabular-nums">{countLabel}</span>

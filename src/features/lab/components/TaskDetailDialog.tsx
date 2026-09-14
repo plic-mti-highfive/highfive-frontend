@@ -195,10 +195,7 @@ function TaskDetailForm({
           )}
         </Field>
 
-        <Field
-          label="Échéance"
-          description="Facultative — aucune alerte même passée."
-        >
+        <Field label="Échéance" description="Facultatif">
           <Input
             type="date"
             value={dueDate}

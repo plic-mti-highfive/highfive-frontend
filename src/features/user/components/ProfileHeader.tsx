@@ -69,7 +69,7 @@ export function ProfileHeader({
       )}
 
       <div className="flex items-center gap-6 border-y border-border py-4">
-        <Stat value={createdCount} label="Projets portés" />
+        <Stat value={createdCount} label="Projets créés" />
         <Stat value={joinedCount} label="Projets rejoints" />
       </div>
 

@@ -25,7 +25,7 @@ export function TrendingTagsPanel() {
   if (!data || data.length === 0) return null;
 
   return (
-    <Section title="Ce qui bouge en ce moment">
+    <Section title="Tags tendance">
       <div className="flex flex-col gap-1">
         {data.map(({ tag, projectsCount }) => (
           <Link

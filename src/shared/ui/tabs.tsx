@@ -34,7 +34,7 @@ function TabsList({
 }
 
 const tabTriggerClass =
-  "text-ui-sm font-semibold rounded-md px-3 py-1.5 text-muted-foreground transition-colors duration-fast outline-none cursor-pointer hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50";
+  "text-sm px-3 py-2.5 text-muted-foreground transition-colors duration-fast outline-none cursor-pointer hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 -mb-px border-b-2 border-transparent";
 
 function TabsTab({
   className,
@@ -45,7 +45,7 @@ function TabsTab({
       data-slot="tabs-tab"
       className={cn(
         tabTriggerClass,
-        "aria-selected:bg-card aria-selected:text-foreground aria-selected:shadow-rest",
+        "aria-selected:border-foreground aria-selected:text-foreground aria-selected:font-semibold",
         className,
       )}
       {...props}
@@ -77,7 +77,7 @@ function TabLink({ className, ...props }: NavLinkProps) {
       className={(state) =>
         cn(
           tabTriggerClass,
-          state.isActive && "bg-card text-foreground shadow-rest",
+          state.isActive && "border-foreground text-foreground font-semibold",
           typeof className === "function" ? className(state) : className,
         )
       }

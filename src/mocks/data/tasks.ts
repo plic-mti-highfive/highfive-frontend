@@ -70,12 +70,12 @@ function task(input: {
 
 const fresqueSlug = "fresque-murale-collaborative";
 
-/** Doc 23 §4 : taches du projet 1, y compris l'echeance depassee et le lien vers Le Mur. */
+/** Doc 23 §4 : taches du projet 1, y compris l'echeance depassee et le lien vers Tableau blanc. */
 export const TASKS: Task[] = [
   task({
     slug: fresqueSlug,
     column: "À faire",
-    title: "Repeindre le mur nord",
+    title: "Repeindre Tableau blanc nord",
     order: 0,
     createdBy: u.alexRivera.id,
     createdDaysAgo: 12,

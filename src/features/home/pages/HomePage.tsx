@@ -1,6 +1,14 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Button, EmptyState, ErrorState, Section, Spinner } from "@shared/ui";
+import {
+  Button,
+  Divider,
+  EmptyState,
+  ErrorState,
+  Section,
+  Spinner,
+} from "@shared/ui";
 import { ProjectCard } from "@shared/components/projects";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
 import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
@@ -64,19 +72,30 @@ export default function HomePage() {
           <div className="flex items-start gap-8">
             <div className="flex min-w-0 flex-1 flex-col gap-9">
               {feed.data?.moment && (
-                <Section title="Le projet du moment">
-                  <ProjectCard project={feed.data.moment} variant="featured" />
-                </Section>
+                <>
+                  <Section title="Le projet du moment">
+                    <ProjectCard
+                      project={feed.data.moment}
+                      variant="featured"
+                    />
+                  </Section>
+                  {(feed.data.sections.length ?? 0) > 0 && <Divider />}
+                </>
               )}
 
-              {feed.data?.sections.map((section) => (
-                <DiscoverSectionBlock key={section.id} section={section} />
+              {feed.data?.sections.map((section, i) => (
+                <React.Fragment key={section.id}>
+                  <DiscoverSectionBlock section={section} />
+                  {i < (feed.data?.sections.length ?? 0) - 1 && <Divider />}
+                </React.Fragment>
               ))}
             </div>
 
-            <aside className="sticky top-shell-sticky hidden w-72 shrink-0 flex-col gap-9 self-start lg:flex">
-              <SuggestedPeoplePanel />
-              <TrendingTagsPanel />
+            <aside className="sticky top-shell-sticky hidden w-72 shrink-0 flex-col gap-6 self-start lg:flex">
+              <div className="flex flex-col gap-6 rounded-[--radius-xl] border border-[--border] bg-card p-6 shadow-[--shadow-rest]">
+                <SuggestedPeoplePanel />
+                <TrendingTagsPanel />
+              </div>
             </aside>
           </div>
         )}

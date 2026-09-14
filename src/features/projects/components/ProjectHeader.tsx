@@ -48,74 +48,82 @@ export function ProjectHeader({
   }
 
   return (
-    <header className="flex flex-col gap-4">
-      {owner && (
-        <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
-          <Avatar
-            name={owner.displayName ?? owner.username}
-            src={owner.avatar}
-            size="xs"
-          />
-          <Link
-            to={`/u/${owner.username}`}
-            className="font-medium text-foreground hover:underline"
-          >
-            @{owner.username}
-          </Link>
+    <header className="flex items-stretch gap-4">
+      <div className="flex flex-1 flex-col gap-4">
+        {owner && (
+          <div className="flex items-center gap-1 text-body-sm text-muted-foreground">
+            <p>Créé par</p>
+            <Avatar
+              name={owner.displayName ?? owner.username}
+              src={owner.avatar}
+              size="xs"
+            />
+            <Link
+              to={`/u/${owner.username}`}
+              className="font-medium text-foreground hover:underline"
+            >
+              @{owner.username}
+            </Link>
+          </div>
+        )}
+
+        <h1 className="text-heading-lg font-bold text-foreground">
+          {project.title}
+        </h1>
+
+        <p className="text-body-lg text-foreground">{project.tagline}</p>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {project.tags.map((tag) => (
+            <TagPill key={tag} label={tag} />
+          ))}
+          <Badge tone={STATE_TONE[project.state]}>
+            {STATE_LABEL[project.state]}
+          </Badge>
+          <Badge tone="neutral">
+            {PARTICIPATION_LABEL[project.participation]}
+          </Badge>
         </div>
-      )}
-
-      <h1 className="text-heading-lg font-bold text-foreground">
-        {project.title}
-      </h1>
-
-      <p className="text-body-lg text-foreground">{project.tagline}</p>
-
-      <div className="flex flex-wrap items-center gap-2">
-        {project.tags.map((tag) => (
-          <TagPill key={tag} label={tag} />
-        ))}
-        <Badge tone={STATE_TONE[project.state]}>
-          {STATE_LABEL[project.state]}
-        </Badge>
-        <Badge tone="neutral">
-          {PARTICIPATION_LABEL[project.participation]}
-        </Badge>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <JoinAction
-          slug={project.slug}
-          projectTitle={project.title}
-          participation={project.participation}
-          isAuthenticated={isAuthenticated}
-          isMember={isMember}
-        />
-        {canEdit && (
-          <Button
-            variant="outline"
-            onClick={() => navigate(`/projets/${project.slug}?modifier=1`)}
+      <div className="flex shrink-0 flex-col items-end justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <JoinAction
+            slug={project.slug}
+            projectTitle={project.title}
+            participation={project.participation}
+            isAuthenticated={isAuthenticated}
+            isMember={isMember}
+          />
+          {canEdit && (
+            <Button
+              variant="outline"
+              onClick={() => navigate(`/projets/${project.slug}?modifier=1`)}
+            >
+              Modifier
+            </Button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <HighfiveButton
+            slug={project.slug}
+            ownerId={project.ownerId}
+            given={highfiveGiven}
+            count={project.highfiveCount}
+          />
+          <IconButton
+            aria-label={copied ? "Lien copié" : "Partager"}
+            onClick={handleShare}
           >
-            Modifier
-          </Button>
-        )}
-        <HighfiveButton
-          slug={project.slug}
-          ownerId={project.ownerId}
-          given={highfiveGiven}
-          count={project.highfiveCount}
-        />
-        <IconButton
-          aria-label={copied ? "Lien copié" : "Partager"}
-          onClick={handleShare}
-        >
-          <Share2 size={16} />
-        </IconButton>
-        {copied && (
-          <span role="status" className="text-body-sm text-muted-foreground">
-            Lien copié
-          </span>
-        )}
+            <Share2 size={16} />
+          </IconButton>
+          {copied && (
+            <span role="status" className="text-body-sm text-muted-foreground">
+              Lien copié
+            </span>
+          )}
+        </div>
       </div>
     </header>
   );

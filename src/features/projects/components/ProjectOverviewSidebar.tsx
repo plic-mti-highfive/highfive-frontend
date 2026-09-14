@@ -21,7 +21,7 @@ function NeedsList({ needs }: { needs: Need[] }) {
   );
 
   return (
-    <Section title="On cherche">
+    <Section title="Profils recherchés">
       <ul className="flex flex-col gap-2">
         {sorted.map((need) => (
           <li
@@ -52,63 +52,65 @@ export function ProjectOverviewSidebar({
 
   return (
     <aside className="flex flex-col gap-8">
-      <Section title={`Équipe ${members.length}`}>
-        {members.length === 0 ? (
+      <div className="flex flex-col gap-8 rounded-[--radius-xl] border border-[--border] bg-card p-6 shadow-[--shadow-rest]">
+        <Section title={`Équipe ${members.length}`}>
+          {members.length === 0 ? (
+            <p className="text-body-sm text-muted-foreground">
+              Aucun membre pour l'instant
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {members.slice(0, 3).map((member) => (
+                <li key={member.userId} className="flex items-center gap-2">
+                  <Avatar
+                    name={member.user.displayName ?? member.user.username}
+                    src={member.user.avatar}
+                    size="sm"
+                  />
+                  <Link
+                    to={`/u/${member.user.username}`}
+                    className="flex-1 truncate text-body-sm font-medium text-foreground hover:underline"
+                  >
+                    @{member.user.username}
+                  </Link>
+                  <span className="text-body-sm text-muted-foreground">
+                    {ROLE_LABEL[member.role]}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {members.length > 3 && (
+            <Link
+              to={`/projets/${project.slug}/equipe`}
+              className="text-body-sm font-medium text-foreground hover:underline"
+            >
+              Voir l'équipe
+            </Link>
+          )}
+        </Section>
+
+        <NeedsList needs={project.needs} />
+
+        <Section title="Chiffres">
+          <div className="grid grid-cols-2 gap-4">
+            <Stat value={project.highfiveCount} label="highfives" />
+            <Stat
+              value={members.length}
+              label={members.length === 1 ? "membre" : "membres"}
+            />
+          </div>
           <p className="text-body-sm text-muted-foreground">
-            Aucun membre pour l'instant
+            {isActiveThisWeek && <>Actif cette semaine · </>}
+            <time
+              dateTime={project.createdAt}
+              title={formatExactDateTime(project.createdAt)}
+            >
+              créé le {formatAbsoluteDate(project.createdAt)}
+            </time>
           </p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {members.slice(0, 3).map((member) => (
-              <li key={member.userId} className="flex items-center gap-2">
-                <Avatar
-                  name={member.user.displayName ?? member.user.username}
-                  src={member.user.avatar}
-                  size="sm"
-                />
-                <Link
-                  to={`/u/${member.user.username}`}
-                  className="flex-1 truncate text-body-sm font-medium text-foreground hover:underline"
-                >
-                  @{member.user.username}
-                </Link>
-                <span className="text-body-sm text-muted-foreground">
-                  {ROLE_LABEL[member.role]}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {members.length > 3 && (
-          <Link
-            to={`/projets/${project.slug}/equipe`}
-            className="text-body-sm font-medium text-foreground hover:underline"
-          >
-            Voir l'équipe
-          </Link>
-        )}
-      </Section>
-
-      <NeedsList needs={project.needs} />
-
-      <Section title="Chiffres">
-        <div className="grid grid-cols-2 gap-4">
-          <Stat value={project.highfiveCount} label="highfives" />
-          <Stat
-            value={members.length}
-            label={members.length === 1 ? "membre" : "membres"}
-          />
-        </div>
-        <p className="text-body-sm text-muted-foreground">
-          {isActiveThisWeek && <>Actif cette semaine · </>}
-          <time
-            dateTime={project.createdAt}
-            title={formatExactDateTime(project.createdAt)}
-          >
-            créé le {formatAbsoluteDate(project.createdAt)}
-          </time>
-        </p>
-      </Section>
+        </Section>
+      </div>
 
       <NearbyProjects project={project} />
     </aside>

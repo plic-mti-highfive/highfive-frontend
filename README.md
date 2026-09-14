@@ -98,17 +98,17 @@ src/
 
 ## Stack technique
 
-| Catégorie           | Outil                                |
-| ------------------- | ------------------------------------ |
-| UI                  | React 19, TypeScript 6               |
-| Build               | Vite 8                               |
-| Routing             | React Router 7                       |
-| Styling             | Tailwind CSS 4, tw-animate-css       |
-| Composants headless | base-ui                              |
-| Contrat de données  | zod                                  |
-| Requêtes serveur    | TanStack Query                       |
-| Mock API            | MSW                                  |
-| Le Mur (canvas)     | tldraw                               |
-| Icônes              | lucide-react                         |
-| Tests               | Vitest + @vitest/coverage-v8         |
-| Qualité             | ESLint, Prettier, Husky, lint-staged |
+| Catégorie              | Outil                                |
+| ---------------------- | ------------------------------------ |
+| UI                     | React 19, TypeScript 6               |
+| Build                  | Vite 8                               |
+| Routing                | React Router 7                       |
+| Styling                | Tailwind CSS 4, tw-animate-css       |
+| Composants headless    | base-ui                              |
+| Contrat de données     | zod                                  |
+| Requêtes serveur       | TanStack Query                       |
+| Mock API               | MSW                                  |
+| Tableau blanc (canvas) | tldraw                               |
+| Icônes                 | lucide-react                         |
+| Tests                  | Vitest + @vitest/coverage-v8         |
+| Qualité                | ESLint, Prettier, Husky, lint-staged |

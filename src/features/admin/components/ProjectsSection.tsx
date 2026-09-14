@@ -171,7 +171,7 @@ export function ProjectsSection() {
         open={projectToDelete !== null}
         onOpenChange={(open) => !open && closeDialog()}
         title={`Supprimer ${projectToDelete?.title} ?`}
-        description="Le projet, Le Mur, Les Tâches et les fichiers seront supprimés. Écris le titre du projet pour confirmer."
+        description="Le projet, Tableau blanc, Étapes et les fichiers seront supprimés. Écris le titre du projet pour confirmer."
         confirmLabel="Supprimer le projet"
         destructive
         pending={deleteProject.isPending}

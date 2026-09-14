@@ -21,7 +21,7 @@ import { DeleteColumnDialog } from "../components/DeleteColumnDialog";
 const MAX_COLUMNS = 6;
 
 /**
- * Les Tâches (`/projets/:slug/lab/taches`, doc 04 §11) : colonnes de 1 à 6
+ * Étapes (`/projets/:slug/lab/taches`, doc 04 §11) : colonnes de 1 à 6
  * (R-K2), suppression avec choix de destination (R-K3), glisser-déposer
  * entre colonnes + alternative clavier "Déplacer vers…" (voir TaskCard).
  * Vocabulaire du doc 03 uniquement (tâche, colonne, Fait) — pas de
@@ -30,7 +30,7 @@ const MAX_COLUMNS = 6;
  */
 export default function TasksPage() {
   const { slug, project, myRole, readOnly, members } = useLabContext();
-  useDocumentTitle(`Les Tâches · ${project.title}`);
+  useDocumentTitle(`Étapes · ${project.title}`);
 
   const columnsQuery = useColumns(slug);
   const tasksQuery = useTasks(slug);
@@ -62,7 +62,7 @@ export default function TasksPage() {
     return (
       <div className="flex h-full items-center justify-center">
         <ErrorState
-          message="Impossible de charger Les Tâches pour le moment."
+          message="Impossible de charger Étapes pour le moment."
           onRetry={() => {
             columnsQuery.refetch();
             tasksQuery.refetch();
@@ -98,7 +98,7 @@ export default function TasksPage() {
     <div className="flex h-full flex-col overflow-hidden">
       <div className="shrink-0 px-6 pt-6">
         <PageHeader
-          title="Les Tâches"
+          title="Étapes"
           description={`${tasks.length} tâche${tasks.length > 1 ? "s" : ""} sur ${columns.length} colonne${columns.length > 1 ? "s" : ""}`}
         />
       </div>

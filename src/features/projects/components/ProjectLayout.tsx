@@ -145,7 +145,12 @@ export function ProjectLayout() {
           </TabLink>
           <TabLink to={`/projets/${slug}/annonces`}>Annonces</TabLink>
           <TabLink to={`/projets/${slug}/equipe`}>
-            Équipe {members.length}
+            <span className="flex items-center gap-2">
+              Équipe
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
+                {members.length}
+              </span>
+            </span>
           </TabLink>
         </div>
       </nav>

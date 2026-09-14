@@ -111,7 +111,7 @@ membre ; `admin` = role plateforme `admin`.
 | POST    | `/tasks/:taskId/move`     | `TaskMoveInput`     | `Task`         | membre+   | glisser-deposer entre colonnes                       |
 | DELETE  | `/tasks/:taskId`          | —                   | 204            | membre+   | —                                                    |
 
-## Le Mur (`wall.ts`)
+## Tableau blanc (`wall.ts`)
 
 | Methode | Route                           | Entree             | Sortie         | Auth/role           | Regles                          |
 | ------- | ------------------------------- | ------------------ | -------------- | ------------------- | ------------------------------- |

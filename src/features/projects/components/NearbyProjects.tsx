@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
-
 import { Section } from "@shared/ui";
+import { ProjectCard } from "@shared/components/projects/ProjectCard";
 import { useProjects } from "@/api/queries/projects";
 import type { Project } from "@/domain";
 
@@ -20,18 +19,11 @@ export function NearbyProjects({ project }: { project: Project }) {
 
   return (
     <Section title="Projets proches">
-      <ul className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {nearby.map((item) => (
-          <li key={item.id}>
-            <Link
-              to={`/projets/${item.slug}`}
-              className="text-body-sm text-foreground hover:underline"
-            >
-              {item.title}
-            </Link>
-          </li>
+          <ProjectCard key={item.id} project={item} />
         ))}
-      </ul>
+      </div>
     </Section>
   );
 }

@@ -22,7 +22,7 @@ export interface TaskCardProps {
  * Carte d'une tâche (doc 04 §11) : le domaine ne modélise aucun niveau
  * d'urgence, et le vocabulaire reste celui du doc 03 (V2-8). L'échéance
  * (R-K6) est affichée neutre, sans alerte même dépassée — le doc ne prévoit
- * aucune relance automatique sur Les Tâches.
+ * aucune relance automatique sur Étapes.
  */
 export function TaskCard({
   task,

@@ -68,7 +68,7 @@ export function NotificationsPage() {
                 description="Les highfives, commentaires et invitations que tu reçois apparaîtront ici."
               />
             ) : (
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-2">
                 {unread.length > 0 && (
                   <>
                     <p className="px-2 py-1.5 text-label uppercase text-muted-foreground">
@@ -85,7 +85,7 @@ export function NotificationsPage() {
                 )}
                 {previous.length > 0 && (
                   <>
-                    <p className="px-2 py-1.5 text-label uppercase text-muted-foreground">
+                    <p className="px-2 pt-3 text-label uppercase text-muted-foreground">
                       Précédentes
                     </p>
                     {previous.map((notification) => (

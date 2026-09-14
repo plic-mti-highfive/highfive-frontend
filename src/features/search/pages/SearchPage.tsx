@@ -1,19 +1,25 @@
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { FolderOpen, Tag as TagIcon, Users, X } from "lucide-react";
-
 import {
-  Avatar,
-  Button,
-  EmptyState,
-  IconButton,
-  Section,
-  TagPill,
-} from "@shared/ui";
+  ChevronDown,
+  FolderOpen,
+  Plus,
+  Tag as TagIcon,
+  Users,
+  X,
+} from "lucide-react";
+
+import { Avatar, Button, EmptyState, Section, TagPill } from "@shared/ui";
 import { ProjectCard } from "@shared/components/projects";
 import { cn } from "@shared/lib/cn";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
 import { useSearch, useTrendingTags } from "@/api/queries/search";
-import { getTagById, type SearchEntityType, type SearchSort } from "@/domain";
+import {
+  getTagById,
+  TAGS,
+  type SearchEntityType,
+  type SearchSort,
+} from "@/domain";
 import { SearchResultsSkeleton } from "../components/SearchResultsSkeleton";
 
 /**
@@ -62,6 +68,7 @@ function toggleCls(active: boolean) {
 export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [tagPickerOpen, setTagPickerOpen] = useState(false);
 
   const q = searchParams.get("q") ?? "";
   const typeParam = searchParams.get("type");
@@ -99,14 +106,30 @@ export function SearchPage() {
     setSearchParams(next, { replace: true });
   }
 
+  function setTags(next: string[], extra: Record<string, string | null> = {}) {
+    updateParams({
+      tags: next.length ? next.join(",") : null,
+      ...extra,
+    });
+  }
+
+  function addTag(tagId: string, extra: Record<string, string | null> = {}) {
+    if (activeTags.includes(tagId)) {
+      if (Object.keys(extra).length) updateParams(extra);
+      return;
+    }
+    setTags([...activeTags, tagId], extra);
+  }
+
   function removeTag(tagId: string) {
-    const next = activeTags.filter((id) => id !== tagId);
-    updateParams({ tags: next.length ? next.join(",") : null });
+    setTags(activeTags.filter((id) => id !== tagId));
   }
 
   function clearFilters() {
     updateParams({ tags: null });
   }
+
+  const availableTags = TAGS.filter((tag) => !activeTags.includes(tag.id));
 
   const projectItems = results.data?.projects?.items ?? [];
   const userItems = results.data?.users?.items ?? [];
@@ -138,72 +161,109 @@ export function SearchPage() {
         )}
       </div>
 
-      {hasQuery && (
-        <div className="mb-6 flex flex-col gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            {TABS.map(({ value, label, icon: Icon }) => (
-              <button
-                key={value}
-                type="button"
-                aria-pressed={activeType === value}
-                onClick={() => updateParams({ type: value })}
-                className={cn(
-                  toggleCls(activeType === value),
-                  "flex items-center gap-1.5",
-                )}
-              >
-                <Icon size={16} />
-                {label}
-              </button>
-            ))}
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          {TABS.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={activeType === value}
+              onClick={() => updateParams({ type: value })}
+              className={cn(
+                toggleCls(activeType === value),
+                "flex items-center gap-1.5",
+              )}
+            >
+              <Icon size={16} />
+              {label}
+            </button>
+          ))}
 
-            {activeType === "projets" && (
-              <div className="ml-auto flex flex-wrap items-center gap-1.5">
-                {SORTS.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-pressed={activeSort === value}
-                    onClick={() =>
-                      updateParams({ tri: value === "recents" ? null : value })
-                    }
-                    className={toggleCls(activeSort === value)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {activeTags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {activeTags.map((tagId) => {
-                const tag = getTagById(tagId);
-                return (
-                  <div key={tagId} className="flex items-center gap-1">
-                    <TagPill
-                      label={tag?.label ?? tagId}
-                      accent={tag?.accent}
-                      size="sm"
-                    />
-                    <IconButton
-                      aria-label={`Retirer le thème ${tag?.label ?? tagId}`}
-                      size="xs"
-                      onClick={() => removeTag(tagId)}
-                    >
-                      <X size={12} />
-                    </IconButton>
-                  </div>
-                );
-              })}
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Effacer
-              </Button>
+          {activeType === "projets" && (
+            <div className="ml-auto flex flex-wrap items-center gap-1.5">
+              {SORTS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={activeSort === value}
+                  onClick={() =>
+                    updateParams({ tri: value === "recents" ? null : value })
+                  }
+                  className={toggleCls(activeSort === value)}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           )}
         </div>
-      )}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-body-sm text-muted-foreground">Thèmes :</span>
+          {activeTags.map((tagId) => {
+            const tag = getTagById(tagId);
+            const label = tag?.label ?? tagId;
+            return (
+              <button
+                key={tagId}
+                type="button"
+                aria-label={`Retirer le thème ${label}`}
+                onClick={() => removeTag(tagId)}
+                data-accent={tag?.accent}
+                className="group inline-flex items-center gap-1 rounded-pill bg-[var(--accent-light)] py-0.5 pl-2 pr-1.5 text-body-sm font-medium text-[var(--accent-dark)] transition-opacity duration-fast hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              >
+                {label}
+                <span
+                  aria-hidden
+                  className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--accent-dark)]/10 text-[var(--accent-dark)] transition-colors group-hover:bg-[var(--accent-dark)]/20"
+                >
+                  <X size={10} />
+                </span>
+              </button>
+            );
+          })}
+          {availableTags.length > 0 && (
+            <button
+              type="button"
+              aria-expanded={tagPickerOpen}
+              onClick={() => setTagPickerOpen((v) => !v)}
+              className="inline-flex items-center gap-1 rounded-pill border border-dashed border-border px-2.5 py-0.5 text-body-sm text-muted-foreground transition-colors duration-fast hover:border-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            >
+              <Plus size={12} />
+              Ajouter un thème
+              <ChevronDown
+                size={12}
+                className={cn(
+                  "transition-transform duration-fast",
+                  tagPickerOpen && "rotate-180",
+                )}
+              />
+            </button>
+          )}
+          {activeTags.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Effacer
+            </Button>
+          )}
+        </div>
+
+        {tagPickerOpen && availableTags.length > 0 && (
+          <div className="rounded-xl border border-border bg-muted/40 p-3">
+            <div className="flex flex-wrap gap-1.5">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  onClick={() => addTag(tag.id)}
+                  className="transition-transform duration-fast hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 rounded-pill"
+                >
+                  <TagPill label={tag.label} accent={tag.accent} size="sm" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {!hasQuery ? (
         <Section title="Thèmes les plus actifs">
@@ -215,9 +275,7 @@ export function SearchPage() {
                 <button
                   key={tag.id}
                   type="button"
-                  onClick={() =>
-                    updateParams({ tags: tag.id, type: "projets" })
-                  }
+                  onClick={() => addTag(tag.id, { type: "projets" })}
                   className="flex items-center gap-1.5 rounded-pill bg-muted px-3 py-1.5 text-ui-md text-foreground transition-colors duration-fast hover:bg-muted/70"
                 >
                   <TagPill label={tag.label} accent={tag.accent} size="sm" />
@@ -314,9 +372,7 @@ export function SearchPage() {
                   <button
                     key={tag.id}
                     type="button"
-                    onClick={() =>
-                      updateParams({ tags: tag.id, type: "projets" })
-                    }
+                    onClick={() => addTag(tag.id, { type: "projets" })}
                   >
                     <TagPill label={tag.label} accent={tag.accent} size="sm" />
                   </button>

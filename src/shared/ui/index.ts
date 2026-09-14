@@ -55,6 +55,7 @@ export { ErrorState, type ErrorStateProps } from "./error-state";
 export { PageHeader, type PageHeaderProps } from "./page-header";
 export { Section, type SectionProps } from "./section";
 export { Stat, type StatProps } from "./stat";
+export { Divider, type DividerProps } from "./divider";
 
 export {
   Table,

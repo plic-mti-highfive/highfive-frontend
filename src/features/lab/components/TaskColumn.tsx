@@ -24,7 +24,7 @@ export interface TaskColumnProps {
  * doc 03 (colonne, tâche), jamais un emprunt aux outils de suivi logiciel.
  * Le glisser-déposer ne cible que la colonne (pas une
  * position précise) — le contrat `TaskMoveInput` (R-K5) ne modélise que la
- * colonne + un ordre, sans réindexer les tâches voisines côté handler ; une
+ * colonne + un ordre, sans réindexer Étapes voisines côté handler ; une
  * dépose place donc la tâche en fin de colonne cible, et l'alternative
  * clavier (`TaskCard`, "Déplacer vers…") fait exactement la même chose.
  */

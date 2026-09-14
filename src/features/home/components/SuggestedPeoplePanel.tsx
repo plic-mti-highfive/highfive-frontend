@@ -9,7 +9,7 @@ export function SuggestedPeoplePanel() {
 
   if (isLoading) {
     return (
-      <Section title="Des gens à rencontrer">
+      <Section title="Profils recommandés">
         <div className="flex flex-col gap-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2.5">
@@ -26,7 +26,7 @@ export function SuggestedPeoplePanel() {
   if (people.length === 0) return null;
 
   return (
-    <Section title="Des gens à rencontrer">
+    <Section title="Profils recommandés">
       <div className="flex flex-col gap-1">
         {people.map((person) => (
           <Link
@@ -39,7 +39,7 @@ export function SuggestedPeoplePanel() {
               src={person.avatar}
               size="sm"
             />
-            <span className="min-w-0 truncate text-body-sm font-medium text-foreground">
+            <span className="min-w-0 truncate text-body-md font-medium text-foreground">
               {person.displayName ?? person.username}
             </span>
           </Link>

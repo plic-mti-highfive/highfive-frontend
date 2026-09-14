@@ -10,7 +10,7 @@ import {
   Shield,
   Sun,
 } from "lucide-react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu } from "@base-ui/react/menu";
 
 import { cn } from "@shared/lib/cn";
@@ -24,7 +24,6 @@ import { useUnreadNotificationsCount } from "@/api/queries/notifications";
 import { useConversations } from "@/api/queries/conversations";
 import {
   preloadCreateProject,
-  preloadHome,
   preloadMessages,
   preloadNotifications,
   preloadUserProfile,
@@ -61,11 +60,11 @@ function NotificationsBell() {
       onFocus={() => void preloadNotifications()}
     >
       <span className="relative inline-flex items-center justify-center">
-        <Bell size={22} />
+        <Bell size={24} />
         {unreadCount > 0 && (
           <span
             aria-hidden
-            className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-rose ring-2 ring-sidebar"
+            className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-rose ring-2 ring-sidebar"
           />
         )}
       </span>
@@ -272,39 +271,20 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-sticky flex h-14 w-full items-center gap-8 border-b border-sidebar-border bg-sidebar px-6">
-      <div className="flex h-full shrink-0 items-center gap-6">
+    <header className="sticky top-0 z-[21] grid h-14 w-full grid-cols-[1fr_auto_1fr] items-center border-b border-sidebar-border bg-sidebar px-6">
+      {/* Colonne 1 : Gauche */}
+      <div className="flex items-center justify-start gap-6">
         <Logo className="text-2xl" />
-        {isAuthenticated && (
-          <nav className="hidden h-full items-center gap-6 md:flex">
-            <NavLink
-              to="/"
-              end
-              onMouseEnter={() => void preloadHome()}
-              onFocus={() => void preloadHome()}
-              className={({ isActive }) =>
-                cn(
-                  "relative flex h-full items-center text-ui-md font-semibold transition-colors",
-                  isActive
-                    ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )
-              }
-            >
-              Découvrir
-            </NavLink>
-          </nav>
-        )}
       </div>
 
-      <div className="hidden flex-1 justify-center md:flex">
+      {/* Colonne 2 : Centre (parfaitement au milieu) */}
+      <div className="hidden md:flex md:justify-center">
         <SearchBar navigate={navigate} />
       </div>
 
-      <div className="ml-auto flex shrink-0 items-center gap-3">
-        {/* Tablette/mobile (doc 06 §3.2) : le champ de recherche devient un
-            bouton — le panneau de recherche plein ecran n'est pas dans ce
-            lot, on ouvre directement /recherche. */}
+      {/* Colonne 3 : Droite */}
+      <div className="flex items-center justify-end gap-3">
+        {/* Tablette/mobile */}
         <IconButton
           aria-label="Rechercher"
           size="lg"
@@ -313,6 +293,7 @@ export function SiteHeader() {
         >
           <Search size={22} />
         </IconButton>
+
         {isLoading ? null : isAuthenticated && user ? (
           <>
             <Button
