@@ -33,10 +33,11 @@ export const queryKeys = {
     files: (slug: string) => ["projects", slug, "files"] as const,
   },
   feed: {
-    discover: (cursor?: string) =>
-      ["feed", "discover", cursor ?? null] as const,
+    discover: (cursor?: string, tags?: string[]) =>
+      ["feed", "discover", cursor ?? null, tags?.join(",") ?? null] as const,
     byTag: (tagId: string, cursor?: string) =>
       ["feed", "tag", tagId, cursor ?? null] as const,
+    trendingTags: () => ["feed", "trending-tags"] as const,
   },
   search: {
     results: (params: unknown) => ["search", params] as const,

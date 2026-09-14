@@ -34,6 +34,11 @@ const UserProfilePage = lazy(
 const CreateProjectPage = lazy(
   () => import("@features/projects/pages/CreateProjectPage"),
 );
+const ProjectLayout = lazy(() =>
+  import("@features/projects/components/ProjectLayout").then((m) => ({
+    default: m.ProjectLayout,
+  })),
+);
 const ProjectDetailPage = lazy(() =>
   import("@features/projects/pages/ProjectDetailPage").then((m) => ({
     default: m.ProjectDetailPage,
@@ -44,8 +49,13 @@ const ProjectNewsPage = lazy(() =>
     default: m.ProjectNewsPage,
   })),
 );
-const LabTasksPage = lazy(() => import("@features/lab/pages/LabPage"));
-const LabWallPage = lazy(() => import("@features/lab/pages/MoodboardPage"));
+const ProjectTeamPage = lazy(() =>
+  import("@features/projects/pages/ProjectTeamPage").then((m) => ({
+    default: m.ProjectTeamPage,
+  })),
+);
+const LabTasksPage = lazy(() => import("@features/lab/pages/TasksPage"));
+const LabWallPage = lazy(() => import("@features/lab/pages/WallPage"));
 
 // Features en cours en parallele (consignes de mission) : on importe leurs
 // pages telles quelles, sans toucher a leurs fichiers ni a leurs exports.
@@ -93,11 +103,19 @@ function LegacySearchTypeRedirect({ type }: { type: string }) {
   return <Navigate to={`/recherche?${params.toString()}`} replace />;
 }
 
-/** /tags/:tag (doc 06) : SearchPage ne route pas encore par tag dedie (filtre en query). */
+/**
+ * /tags/:tag (doc 06) : SearchPage ne route pas encore par tag dedie (filtre
+ * en query). Parametre `tags` (pluriel) pour matcher R-R4 et le contrat de
+ * `SearchPage`/`useSearch` (`SearchParams.tags: string[]`), pas `tag`
+ * (singulier) qu'aucune page ne lit.
+ */
 function TagRedirect() {
   const { tag } = useParams<{ tag: string }>();
   return (
-    <Navigate to={`/recherche?tag=${encodeURIComponent(tag ?? "")}`} replace />
+    <Navigate
+      to={`/recherche?type=projets&tags=${encodeURIComponent(tag ?? "")}`}
+      replace
+    />
   );
 }
 
@@ -123,21 +141,14 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/projets/:slug"
-          element={withSuspense(<ProjectDetailPage />)}
-        />
-        <Route
-          path="/projets/:slug/annonces"
-          element={withSuspense(<ProjectNewsPage />)}
-        />
-        {/* TODO(v2-L4) : pas de page Equipe dediee dans ce lot — la fiche
-            projet affiche deja l'equipe dans sa colonne d'appui
-            (ProjectSidebar). A separer quand l'onglet Equipe sera construit. */}
-        <Route
-          path="/projets/:slug/equipe"
-          element={withSuspense(<ProjectDetailPage />)}
-        />
+        {/* Fiche projet (doc 13 E-10/E-11/E-12) : coquille commune
+            (en-tete + onglets, `ProjectLayout`) partagee par les trois
+            onglets-routes, chacun rendu dans son `<Outlet/>`. */}
+        <Route path="/projets/:slug" element={withSuspense(<ProjectLayout />)}>
+          <Route index element={withSuspense(<ProjectDetailPage />)} />
+          <Route path="annonces" element={withSuspense(<ProjectNewsPage />)} />
+          <Route path="equipe" element={withSuspense(<ProjectTeamPage />)} />
+        </Route>
         <Route
           path="/messages"
           element={
@@ -168,9 +179,9 @@ export function AppRouter() {
 
       {/* Coquille atelier — Le Lab (doc 06 §4) */}
       <Route path="/projets/:slug/lab" element={<LabLayout />}>
-        {/* Le Mur n'est pas encore construit (V2-10) : on atterrit sur Les
-            Tâches tant qu'il n'existe pas. */}
-        <Route index element={<Navigate to="taches" replace />} />
+        {/* Le Mur (V2-10, fusion des deux anciens espaces de travail sur
+            tldraw) est l'entrée par défaut de l'atelier. */}
+        <Route index element={<Navigate to="mur" replace />} />
         <Route path="mur" element={withSuspense(<LabWallPage />)} />
         <Route path="taches" element={withSuspense(<LabTasksPage />)} />
       </Route>

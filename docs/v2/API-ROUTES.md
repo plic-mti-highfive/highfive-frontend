@@ -146,11 +146,12 @@ membre ; `admin` = role plateforme `admin`.
 
 ## Recherche et fil (`search.ts`)
 
-| Methode | Route                   | Entree                                        | Sortie                                       | Auth/role       | Regles                             |
-| ------- | ----------------------- | --------------------------------------------- | -------------------------------------------- | --------------- | ---------------------------------- |
-| GET     | `/search`               | query `q,types,tags,sort,cursor,limit` (R-R4) | `SearchResults`                              | public          | filtre `projects`/`users`/`tags`   |
-| GET     | `/feed/discover`        | query `cursor`                                | `{moment, items: Paginated<ProjectSummary>}` | public/connecte | "projet du moment" hors pagination |
-| GET     | `/tags/:tagId/projects` | query `cursor`                                | `Paginated<ProjectSummary>`                  | public          | page d'un theme                    |
+| Methode | Route                   | Entree                                        | Sortie                                       | Auth/role       | Regles                                                                                                           |
+| ------- | ----------------------- | --------------------------------------------- | -------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| GET     | `/search`               | query `q,types,tags,sort,cursor,limit` (R-R4) | `SearchResults`                              | public          | filtre `projects`/`users`/`tags`, `sort` trie les projets (`recent`/`popular`/`relevant`/`active`)               |
+| GET     | `/feed/discover`        | query `cursor,tags`                           | `{moment, items: Paginated<ProjectSummary>}` | public/connecte | "projet du moment" hors pagination ; `tags` (additif) filtre le fil, jamais le moment                            |
+| GET     | `/tags/:tagId/projects` | query `cursor`                                | `Paginated<ProjectSummary>`                  | public          | page d'un theme                                                                                                  |
+| GET     | `/feed/tags-trending`   | —                                             | `TrendingTag[]`                              | public          | colonne d'appui "Ce qui bouge en ce moment" (doc 12 E-01), 5 maximum, tags actifs sur les projets publics/actifs |
 
 ## Administration (`admin.ts`)
 
@@ -184,6 +185,22 @@ de moderation montre le contenu signale sans nouvelle route.
 
 ## Ecarts vs le modele de domaine (doc 04) et pourquoi
 
+- **`ProjectSummary.needs`/`ProjectSummary.teamPreview`** (`src/domain/project.ts`,
+  lot Decouvrir/Recherche/`ProjectCard`) : ajouts additifs (aucun champ existant
+  renomme/retire). `ProjectCard` doit permettre de trancher en 10 s (doc 01 §5,
+  doc 11 C1) — besoins non pourvus et visages de l'equipe — sans requete
+  supplementaire par carte affichee dans un fil de 12+ projets. `teamPreview`
+  reprend le porteur puis jusqu'a 5 membres (`toProjectSummary`,
+  `src/mocks/handlers/projectHelpers.ts`).
+- **`SearchSort` = `"active"`** (`src/domain/search.ts`) ajoute au triplet
+  existant `recent/popular/relevant` : le doc 12 (E-02) liste trois tris pour
+  `/recherche` — "Les plus récents", "Les plus highfivés", "Les plus actifs" —
+  et aucune valeur existante ne portait "le plus d'activite recente"
+  (`relevant` reste la pertinence texte). Trie par `lastActivityAt` cote
+  handler `/search`.
+- **`GET /feed/tags-trending`** : route ajoutee (aucune supprimee/renommee) pour
+  la colonne d'appui "Ce qui bouge en ce moment" (doc 12 E-01) — comptage des
+  tags sur les projets publics/actifs, absent du contrat initial.
 - **`ProjectFile` (`src/domain/file.ts`)** n'etait pas dans la liste de fichiers L2
   demandee explicitement ; ajoute car `src/api/files.ts` a besoin d'un contrat de
   sortie et Les Fichiers sont un objet de domaine a part entiere (doc 04 §12).

@@ -237,6 +237,13 @@
   --spacing-gap-lg: 24px;
   --spacing-gap-xl: 40px;
 
+  /* -- Largeur de contenu --
+     Namespace Tailwind v4 `--container-*` -> utilitaire `max-w-content`.
+     Doc 06 §3.1 : "largeur de contenu maximale 1240 px" (coquille site,
+     Decouvrir/recherche/fiche/profil) ; remplace `max-w-[1240px]` en dur
+     (V2-2, additif : ne modifie aucun token existant). */
+  --container-content: 1240px;
+
   /* -- Border radius -- */
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -339,6 +346,12 @@
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 320ms;
+
+  /* -- Decalage de collage sous la coquille --
+     56px (en-tete) + 44px (barre de themes/onglets) = 6.25rem. Reutilise par
+     toute colonne d'appui sticky (doc 06 §3.1) ; remplace un
+     `style={{ top: "6.25rem" }}` en dur (V2-2). */
+  --offset-shell-sticky: 6.25rem;
 }
 
 @utility z-base {
@@ -366,6 +379,10 @@
 @utility duration-base {
   transition-duration: var(--duration-base);
 }
+@utility top-shell-sticky {
+  top: var(--offset-shell-sticky);
+}
+
 @utility duration-slow {
   transition-duration: var(--duration-slow);
 }

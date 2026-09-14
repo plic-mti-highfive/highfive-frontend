@@ -33,6 +33,7 @@ export { Textarea } from "./textarea";
 export { Label } from "./label";
 export { Field, type FieldProps } from "./field";
 export { Checkbox } from "./checkbox";
+export { Radio, RadioGroup } from "./radio";
 export { PasswordInput } from "./password-input";
 
 export {

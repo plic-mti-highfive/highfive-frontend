@@ -12,7 +12,17 @@ import { userSummarySchema } from "./user";
 export const searchEntityTypeSchema = z.enum(["projects", "users", "tags"]);
 export type SearchEntityType = z.infer<typeof searchEntityTypeSchema>;
 
-export const searchSortSchema = z.enum(["recent", "popular", "relevant"]);
+/**
+ * `active` ajoute (additif) pour porter le tri "Les plus actifs" du doc 12
+ * (E-02) : distinct de `relevant` (pertinence texte) et de `recent`
+ * (creation), il trie par `lastActivityAt`.
+ */
+export const searchSortSchema = z.enum([
+  "recent",
+  "popular",
+  "relevant",
+  "active",
+]);
 export type SearchSort = z.infer<typeof searchSortSchema>;
 
 export const searchParamsSchema = z.object({
@@ -31,3 +41,10 @@ export const searchResultsSchema = z.object({
   tags: paginatedSchema(tagSchema).optional(),
 });
 export type SearchResults = z.infer<typeof searchResultsSchema>;
+
+/** Colonne d'appui "Ce qui bouge en ce moment" (doc 12 E-01). */
+export const trendingTagSchema = z.object({
+  tag: tagSchema,
+  projectsCount: z.number().int().nonnegative(),
+});
+export type TrendingTag = z.infer<typeof trendingTagSchema>;

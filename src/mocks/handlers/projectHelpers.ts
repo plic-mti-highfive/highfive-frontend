@@ -8,20 +8,30 @@ export function toProjectSummary(project: Project) {
   const owner = db.users.findOne((u) => u.id === project.ownerId);
   if (!owner)
     throw new Error(`Porteur introuvable pour le projet ${project.slug}`);
-  const membersCount = db.memberships.find(
-    (m) => m.projectId === project.id,
-  ).length;
+  const memberships = db.memberships.find((m) => m.projectId === project.id);
+  const membersCount = memberships.length;
+  // Porteur en tete (doc 11 C5), puis quelques membres pour l'AvatarGroup de
+  // la carte (ProjectSummary.teamPreview, additif V2-4).
+  const teamPreview = memberships
+    .slice()
+    .sort((a, b) => (a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0))
+    .slice(0, 6)
+    .map((m) => db.users.findOne((u) => u.id === m.userId))
+    .filter((u): u is NonNullable<typeof u> => Boolean(u))
+    .map(toUserSummary);
   return {
     id: project.id,
     slug: project.slug,
     title: project.title,
     tagline: project.tagline,
     tags: project.tags,
+    needs: project.needs,
     visibility: project.visibility,
     participation: project.participation,
     state: project.state,
     highfiveCount: project.highfiveCount,
     membersCount,
+    teamPreview,
     owner: toUserSummary(owner),
   };
 }

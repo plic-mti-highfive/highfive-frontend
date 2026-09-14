@@ -80,3 +80,10 @@ export const TAGS: Tag[] = TAG_SEED.map((seed, index) =>
     accent: ACCENT_CYCLE[index % ACCENT_CYCLE.length],
   }),
 );
+
+const TAG_BY_ID = new Map(TAGS.map((tag) => [tag.id, tag]));
+
+/** Resout un id de tag vers sa fiche complete (label, accent fixe, famille). */
+export function getTagById(id: string): Tag | undefined {
+  return TAG_BY_ID.get(id);
+}

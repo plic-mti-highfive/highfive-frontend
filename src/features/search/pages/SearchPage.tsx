@@ -1,250 +1,332 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { FolderOpen, Users, Tag } from "lucide-react";
-import { ProjectFeedCard } from "@shared/components/projects";
-import { ProjectFiltersBar } from "@features/projects";
-import { projectService } from "@/api";
-import type { Project } from "@shared/types";
-import type { MinimalProfileDto } from "@/api/types";
-import { userService } from "@/api/services";
-import { adaptProjects } from "@shared/utils/projectAdapter";
-import { SearchEntityType } from "@plic-mti-highfive/shared-types";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { FolderOpen, Tag as TagIcon, Users, X } from "lucide-react";
+
+import {
+  Avatar,
+  Button,
+  EmptyState,
+  IconButton,
+  Section,
+  TagPill,
+} from "@shared/ui";
+import { ProjectCard } from "@shared/components/projects";
+import { cn } from "@shared/lib/cn";
+import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
+import { useSearch, useTrendingTags } from "@/api/queries/search";
+import { getTagById, type SearchEntityType, type SearchSort } from "@/domain";
+import { SearchResultsSkeleton } from "../components/SearchResultsSkeleton";
+
+/**
+ * `/recherche` (doc 12 E-02, R-R4) : filtres dans la query string —
+ * `q`, `type` (projets/personnes/tags, francais cote URL par mission), `tags`
+ * (liste, comme le reste de R-R4), `tri`. Traduits ici vers les enums anglais
+ * du domaine (`SearchEntityType`, `SearchSort`) au moment de l'appel API.
+ */
+
+type UrlType = "projets" | "personnes" | "tags";
+type UrlSort = "recents" | "populaires" | "actifs";
+
+const TYPE_TO_DOMAIN: Record<UrlType, SearchEntityType> = {
+  projets: "projects",
+  personnes: "users",
+  tags: "tags",
+};
+
+const SORT_TO_DOMAIN: Record<UrlSort, SearchSort> = {
+  recents: "recent",
+  populaires: "popular",
+  actifs: "active",
+};
+
+const TABS: { value: UrlType; label: string; icon: typeof FolderOpen }[] = [
+  { value: "projets", label: "Projets", icon: FolderOpen },
+  { value: "personnes", label: "Personnes", icon: Users },
+  { value: "tags", label: "Thèmes", icon: TagIcon },
+];
+
+const SORTS: { value: UrlSort; label: string }[] = [
+  { value: "recents", label: "Les plus récents" },
+  { value: "populaires", label: "Les plus highfivés" },
+  { value: "actifs", label: "Les plus actifs" },
+];
+
+function toggleCls(active: boolean) {
+  return cn(
+    "shrink-0 whitespace-nowrap rounded-pill px-3 py-1.5 text-ui-md font-semibold transition-colors duration-fast outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-ring/50",
+    active
+      ? "bg-foreground text-background"
+      : "bg-muted text-muted-foreground hover:text-foreground",
+  );
+}
 
 export function SearchPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const searchQuery = searchParams.get("q") || "";
-  const tagFilter = searchParams.get("tag");
 
-  // TODO(v2-L4) : route unique "/recherche" (doc 06, R-R4) — le type de
-  // resultat vient desormais du parametre "type" plutot que du chemin
-  // (anciennement /search/projects, /search/users, /search/tags).
+  const q = searchParams.get("q") ?? "";
   const typeParam = searchParams.get("type");
-  const resultType: SearchEntityType =
-    typeParam === "users"
-      ? SearchEntityType.USERS
-      : typeParam === "tags"
-        ? SearchEntityType.TAGS
-        : SearchEntityType.PROJECTS;
+  const activeType: UrlType =
+    typeParam === "personnes" || typeParam === "tags" ? typeParam : "projets";
+  const activeTags = (searchParams.get("tags") ?? "")
+    .split(",")
+    .filter(Boolean);
+  const sortParam = searchParams.get("tri");
+  const activeSort: UrlSort =
+    sortParam === "populaires" || sortParam === "actifs"
+      ? sortParam
+      : "recents";
 
-  const [, setActiveSort] = useState<"name" | "date" | "popularity">("date");
-  const [, setActiveFilters] = useState<string[]>([]);
+  const hasQuery = Boolean(q.trim()) || activeTags.length > 0;
 
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [users, setUsers] = useState<MinimalProfileDto[]>([]);
-  const [, setTags] = useState<unknown[]>([]); // TODO
+  useDocumentTitle(q ? `Résultats pour « ${q} »` : "Recherche");
 
-  const [totalCount, setTotalCount] = useState(0);
+  const results = useSearch({
+    q: q || undefined,
+    types: [TYPE_TO_DOMAIN[activeType]],
+    tags: activeTags.length ? activeTags : undefined,
+    sort: SORT_TO_DOMAIN[activeSort],
+  });
 
-  const [isLoading, setIsLoading] = useState(false);
+  // R-R2 : recherche vide -> les themes les plus actifs plutot qu'un ecran blanc.
+  const trendingTags = useTrendingTags();
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      setIsLoading(true);
-      try {
-        if (resultType === SearchEntityType.PROJECTS) {
-          const response = await projectService.getProjects({
-            search: searchQuery || undefined,
-            tags: tagFilter ? [tagFilter] : undefined,
-            limit: 20,
-          });
-          setProjects(adaptProjects(response.data));
-          setTotalCount(response.total);
-        } else if (resultType === SearchEntityType.USERS) {
-          const response = await userService.searchProfiles({
-            search: searchQuery || undefined,
-            limit: 20,
-          });
-          setUsers(response.data);
-          setProjects([]);
-          // Le total etait ecrase par un setTotalCount(0) juste apres avoir ete
-          // renseigne : la page annoncait « 0 utilisateur trouve » meme quand
-          // elle en affichait.
-          setTotalCount(response.total);
-        } else if (resultType === "tags") {
-          // TODO
-          setProjects([]);
-          setUsers([]);
-          setTotalCount(0);
-        }
-      } catch (e) {
-        console.error("Failed to fetch results:", e);
-        setProjects([]);
-        setUsers([]);
-        setTags([]);
-        setTotalCount(0);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [searchQuery, tagFilter, resultType]);
-
-  const resultsCount = totalCount;
-
-  const resultsLabel =
-    resultType === "projects"
-      ? "projet"
-      : resultType === "users"
-        ? "utilisateur"
-        : "tag";
-
-  const handleTypeChange = (type: string) => {
+  function updateParams(patch: Record<string, string | null>) {
     const next = new URLSearchParams(searchParams);
-    next.set("type", type);
-    navigate(`/recherche?${next.toString()}`);
-  };
+    for (const [key, value] of Object.entries(patch)) {
+      if (value === null || value === "") next.delete(key);
+      else next.set(key, value);
+    }
+    setSearchParams(next, { replace: true });
+  }
+
+  function removeTag(tagId: string) {
+    const next = activeTags.filter((id) => id !== tagId);
+    updateParams({ tags: next.length ? next.join(",") : null });
+  }
+
+  function clearFilters() {
+    updateParams({ tags: null });
+  }
+
+  const projectItems = results.data?.projects?.items ?? [];
+  const userItems = results.data?.users?.items ?? [];
+  const tagItems = results.data?.tags?.items ?? [];
+  const resultsCount =
+    activeType === "projets"
+      ? (results.data?.projects?.total ?? 0)
+      : activeType === "personnes"
+        ? (results.data?.users?.total ?? 0)
+        : (results.data?.tags?.total ?? 0);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black text-foreground tracking-tight">
-            Résultats pour :{" "}
-            <span className="text-muted-foreground">
-              {tagFilter || searchQuery}
-            </span>
-          </h1>
-          <p className="mt-3 text-body-lg text-muted-foreground">
-            {resultsCount} {resultsLabel}
-            {resultsCount > 1 ? "s" : ""} trouvé{resultsCount > 1 ? "s" : ""}
+    <div className="mx-auto max-w-content px-6 py-8">
+      <div className="mb-6 flex flex-col gap-2">
+        <h1 className="text-heading-lg font-semibold text-foreground">
+          {q ? (
+            <>
+              Résultats pour{" "}
+              <span className="text-muted-foreground">« {q} »</span>
+            </>
+          ) : (
+            "Recherche"
+          )}
+        </h1>
+        {hasQuery && (
+          <p aria-live="polite" className="text-body-md text-muted-foreground">
+            {resultsCount} résultat{resultsCount > 1 ? "s" : ""}
           </p>
-        </div>
+        )}
+      </div>
 
-        <div className="flex items-start justify-between gap-4 mb-8">
-          <div className="flex gap-3">
-            <button
-              onClick={() => handleTypeChange("projects")}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-lg text-body-md font-semibold
-                transition-all outline-none
-                ${
-                  resultType === "projects"
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                }
-              `}
-            >
-              <FolderOpen size={18} />
-              Projets
-            </button>
-            <button
-              onClick={() => handleTypeChange("users")}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-lg text-body-md font-semibold
-                transition-all outline-none
-                ${
-                  resultType === "users"
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                }
-              `}
-            >
-              <Users size={18} />
-              Utilisateurs
-            </button>
-            <button
-              onClick={() => handleTypeChange("tags")}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-lg text-body-md font-semibold
-                transition-all outline-none
-                ${
-                  resultType === "tags"
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                }
-              `}
-            >
-              <Tag size={18} />
-              Tags
-            </button>
-          </div>
+      {hasQuery && (
+        <div className="mb-6 flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            {TABS.map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={activeType === value}
+                onClick={() => updateParams({ type: value })}
+                className={cn(
+                  toggleCls(activeType === value),
+                  "flex items-center gap-1.5",
+                )}
+              >
+                <Icon size={16} />
+                {label}
+              </button>
+            ))}
 
-          <div className="flex-shrink-0 h-[42px]">
-            {resultType === "projects" && (
-              <ProjectFiltersBar
-                onSortChange={(sort) => setActiveSort(sort)}
-                onFilterChange={(filters) => setActiveFilters(filters)}
-              />
-            )}
-          </div>
-        </div>
-
-        {isLoading ? (
-          <div className="text-center py-20">
-            <p className="text-xl text-muted-foreground">Chargement...</p>
-          </div>
-        ) : (
-          <>
-            {/* VUE PROJETS */}
-            {resultType === "projects" &&
-              (projects.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {projects.map((project) => (
-                    <ProjectFeedCard key={project.id} project={project} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-20">
-                  <p className="text-xl text-muted-foreground">
-                    Aucun projet trouvé{" "}
-                    {tagFilter || searchQuery
-                      ? `pour "${tagFilter || searchQuery}"`
-                      : ""}
-                  </p>
-                  <p className="mt-2 text-body-md text-muted-foreground">
-                    Essayez avec d'autres mots-clés
-                  </p>
-                </div>
-              ))}
-
-            {/* VUE UTILISATEURS */}
-            {resultType === "users" &&
-              (users.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {users.map((user) => (
-                    <button
-                      key={user.userId}
-                      onClick={() => navigate(`/u/${user.username}`)}
-                      className="flex items-center gap-4 p-4 text-left bg-background border border-border rounded-xl cursor-pointer hover:bg-muted transition-colors outline-none"
-                    >
-                      <img
-                        src={user.avatar}
-                        alt={user.displayName}
-                        className="w-12 h-12 rounded-full shrink-0 object-cover"
-                      />
-                      <div className="min-w-0">
-                        <p className="text-body-lg font-bold text-foreground truncate">
-                          {user.displayName}
-                        </p>
-                        <p className="text-body-md text-muted-foreground truncate">
-                          @{user.username}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-20">
-                  <p className="text-xl text-muted-foreground">
-                    Aucun utilisateur trouvé{" "}
-                    {searchQuery ? `pour "${searchQuery}"` : ""}
-                  </p>
-                </div>
-              ))}
-
-            {/* VUE TAGS (TODO) */}
-            {resultType === "tags" && (
-              <div className="text-center py-20">
-                <p className="text-xl text-muted-foreground">
-                  La recherche par tags n'est pas encore disponible.
-                </p>
+            {activeType === "projets" && (
+              <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                {SORTS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={activeSort === value}
+                    onClick={() =>
+                      updateParams({ tri: value === "recents" ? null : value })
+                    }
+                    className={toggleCls(activeSort === value)}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             )}
-          </>
-        )}
-      </main>
+          </div>
+
+          {activeTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {activeTags.map((tagId) => {
+                const tag = getTagById(tagId);
+                return (
+                  <div key={tagId} className="flex items-center gap-1">
+                    <TagPill
+                      label={tag?.label ?? tagId}
+                      accent={tag?.accent}
+                      size="sm"
+                    />
+                    <IconButton
+                      aria-label={`Retirer le thème ${tag?.label ?? tagId}`}
+                      size="xs"
+                      onClick={() => removeTag(tagId)}
+                    >
+                      <X size={12} />
+                    </IconButton>
+                  </div>
+                );
+              })}
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                Effacer
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!hasQuery ? (
+        <Section title="Thèmes les plus actifs">
+          {trendingTags.isLoading ? (
+            <SearchResultsSkeleton />
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {(trendingTags.data ?? []).map(({ tag, projectsCount }) => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  onClick={() =>
+                    updateParams({ tags: tag.id, type: "projets" })
+                  }
+                  className="flex items-center gap-1.5 rounded-pill bg-muted px-3 py-1.5 text-ui-md text-foreground transition-colors duration-fast hover:bg-muted/70"
+                >
+                  <TagPill label={tag.label} accent={tag.accent} size="sm" />
+                  <span className="text-body-sm text-muted-foreground">
+                    {projectsCount} projet{projectsCount > 1 ? "s" : ""}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </Section>
+      ) : results.isLoading ? (
+        <SearchResultsSkeleton />
+      ) : results.isError ? (
+        <EmptyState
+          title="Impossible de charger les résultats"
+          description="Vérifie ta connexion et réessaie."
+          action={
+            <Button variant="outline" onClick={() => results.refetch()}>
+              Réessayer
+            </Button>
+          }
+        />
+      ) : (
+        <>
+          {activeType === "projets" &&
+            (projectItems.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {projectItems.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    variant="feed"
+                  />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="Aucun projet trouvé"
+                description={
+                  q
+                    ? `Rien ne correspond à « ${q} » pour l'instant.`
+                    : undefined
+                }
+                action={
+                  <div className="flex gap-2">
+                    {activeTags.length > 0 && (
+                      <Button variant="outline" onClick={clearFilters}>
+                        Élargir la recherche
+                      </Button>
+                    )}
+                    <Button onClick={() => navigate("/projets/nouveau")}>
+                      Créer un projet sur ce sujet
+                    </Button>
+                  </div>
+                }
+              />
+            ))}
+
+          {activeType === "personnes" &&
+            (userItems.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {userItems.map((user) => (
+                  <button
+                    key={user.id}
+                    type="button"
+                    onClick={() => navigate(`/u/${user.username}`)}
+                    className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-left transition-colors duration-fast hover:bg-muted"
+                  >
+                    <Avatar
+                      name={user.displayName ?? user.username}
+                      src={user.avatar}
+                      size="lg"
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate text-body-lg font-semibold text-foreground">
+                        {user.displayName ?? user.username}
+                      </p>
+                      <p className="truncate text-body-md text-muted-foreground">
+                        @{user.username}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <EmptyState title="Aucune personne trouvée" />
+            ))}
+
+          {activeType === "tags" &&
+            (tagItems.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {tagItems.map((tag) => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() =>
+                      updateParams({ tags: tag.id, type: "projets" })
+                    }
+                  >
+                    <TagPill label={tag.label} accent={tag.accent} size="sm" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <EmptyState title="Aucun thème trouvé" />
+            ))}
+        </>
+      )}
     </div>
   );
 }

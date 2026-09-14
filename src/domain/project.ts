@@ -79,18 +79,27 @@ export const projectSchema = z
   );
 export type Project = z.infer<typeof projectSchema>;
 
-/** Version condensee pour les cartes (fil, recherche, profil). */
+/**
+ * Version condensee pour les cartes (fil, recherche, profil). `needs` et
+ * `teamPreview` ajoutes (additif, V2-4 respecte : aucun champ existant
+ * renomme/retire) pour que `ProjectCard` puisse trancher en 10 s (doc 01
+ * §5/doc 11 C1) sans requete supplementaire : besoins non pourvus et visages
+ * de l'equipe. Voir docs/v2/API-ROUTES.md "Ecarts vs le modele de domaine".
+ */
 export const projectSummarySchema = z.object({
   id: idSchema,
   slug: slugSchema,
   title: z.string().min(3).max(70),
   tagline: z.string().min(1).max(140),
   tags: z.array(z.string()).min(1).max(5),
+  needs: z.array(needSchema).max(6).default([]),
   visibility: visibilitySchema,
   participation: participationSchema,
   state: projectStateSchema,
   highfiveCount: z.number().int().nonnegative(),
   membersCount: z.number().int().nonnegative(),
+  /** Porteur + quelques membres, pour l'AvatarGroup de la carte (max 6). */
+  teamPreview: z.array(userSummarySchema).max(6).default([]),
   owner: userSummarySchema,
 });
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;

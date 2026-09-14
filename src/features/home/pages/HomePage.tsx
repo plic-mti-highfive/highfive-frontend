@@ -1,141 +1,171 @@
-"use client";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { FeaturedLayout } from "../components/FeaturedLayout";
-import { ProjectFeedSection } from "../components/ProjectFeedSection";
-import { ProfilePanel } from "../components/ProfilePanel";
-import { TrendingUsersPanel } from "../components/TrendingUsersPanel";
+import { Button, EmptyState, ErrorState, Section, Spinner } from "@shared/ui";
+import { ProjectCard } from "@shared/components/projects";
+import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
+import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
+import { useDiscoverFeed } from "@/api/queries/search";
+import type { ProjectSummary } from "@/domain";
+import { TagFilterBar } from "../components/TagFilterBar";
+import { SuggestedPeoplePanel } from "../components/SuggestedPeoplePanel";
 import { TrendingTagsPanel } from "../components/TrendingTagsPanel";
-import { TagNavBar } from "../components/TagNavBar";
-import { HomePageSkeleton } from "../components/HomePageSkeleton";
-import { useHomeFeed } from "../hooks/useHomeFeed";
-import { useAuth } from "@shared/contexts";
+import { AboutBlock } from "../components/AboutBlock";
+import { FeedSkeleton } from "../components/FeedSkeleton";
 
-const SIDEBAR_STICKY_TOP = "6.25rem";
-
+/**
+ * Découvrir (doc 12 E-01, V2 item 2) : public ET connecté, contenu
+ * différent (P1 — pas de page "Bienvenue"). Barre de thèmes filtrante,
+ * "Le projet du moment" hors filtre, fil paginé par tranches de 12,
+ * colonne d'appui optionnelle (doc 06 §3.1) absente en dessous de 1024 px.
+ */
 export default function HomePage() {
-  const { isLoading: isAuthLoading } = useAuth();
-  // Fetch other project categories from client-side logic
-  // Une seule source pour tout le fil : sections deduplquees entre elles et
-  // erreur limitee au service projets. Une panne du service de recommandation,
-  // qui n'alimente que deux sections, faisait auparavant basculer la page
-  // entiere en ecran d'erreur alors que les projets etaient bien charges.
-  const {
-    featured,
-    recommended,
-    trending,
-    popular,
-    active,
-    recent,
-    isLoading,
-    error,
-  } = useHomeFeed();
+  useDocumentTitle("Découvrir");
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading: authLoading } = useCurrentUser();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTags = (searchParams.get("tags") ?? "")
+    .split(",")
+    .filter(Boolean);
+  const tagsKey = activeTags.join(",");
 
-  const allLoadedProjects = [
-    ...(featured ? [featured] : []),
-    ...recommended,
-    ...trending,
-    ...popular,
-    ...active,
-    ...recent,
-  ];
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const [items, setItems] = useState<ProjectSummary[]>([]);
+  const [liveMessage, setLiveMessage] = useState("");
 
-  if (isAuthLoading) {
-    return <div className="min-h-screen bg-background" />;
+  // Ajustements d'etat "pendant le rendu" plutot que via useEffect
+  // (react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes) :
+  // evite le rendu en cascade que `react-hooks/set-state-in-effect` signale
+  // sur un simple useEffect([tagsKey])/useEffect([feed.data]).
+  const [prevTagsKey, setPrevTagsKey] = useState(tagsKey);
+  if (tagsKey !== prevTagsKey) {
+    // Le filtre change : on reinterroge depuis le debut plutot que
+    // d'empiler les pages d'un autre jeu de resultats.
+    setPrevTagsKey(tagsKey);
+    setCursor(undefined);
   }
 
-  // R-V1/doc 06 §5 : Decouvrir montre de vrais projets, connecte ou non — la
-  // page "Bienvenue sur HighFive!" (deux boutons, aucun contenu) est
-  // explicitement supprimee par la refonte v2 (doc 17 §4, textes interdits).
+  const feed = useDiscoverFeed(
+    cursor,
+    activeTags.length ? activeTags : undefined,
+  );
+
+  const [prevFeedData, setPrevFeedData] = useState(feed.data);
+  if (feed.data !== prevFeedData) {
+    setPrevFeedData(feed.data);
+    if (feed.data) {
+      const page = feed.data.items.items;
+      setItems((prev) => (cursor ? [...prev, ...page] : page));
+      if (cursor && page.length > 0) {
+        setLiveMessage(`${page.length} projets supplémentaires`);
+      }
+    }
+  }
+
+  function clearFilters() {
+    const params = new URLSearchParams(searchParams);
+    params.delete("tags");
+    setSearchParams(params, { replace: true });
+  }
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  const isFirstLoad = feed.isLoading && !cursor;
+  const showEmpty =
+    !isFirstLoad && !feed.isError && !feed.data?.moment && items.length === 0;
+  const sectionTitle = isAuthenticated
+    ? "Pour toi"
+    : "Ce qui se passe en ce moment";
+
   return (
     <>
-      <TagNavBar />
-      <div className="bg-background" style={{ height: "2.75rem" }} />
-      <main className="relative z-0 min-h-screen bg-background">
-        <div className="max-w-[100rem] mx-auto px-8 2xl:px-12">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-start gap-3">
-                <span className="text-red-500 text-xl font-bold">!</span>
-                <div className="flex-1">
-                  <h3 className="text-red-800 font-semibold mb-1">
-                    Impossible de charger les projets
-                  </h3>
-                  <p className="text-red-700 text-sm mb-2">{error.message}</p>
-                  <details className="text-xs text-red-600">
-                    <summary className="cursor-pointer hover:underline">
-                      Informations de debug
-                    </summary>
-                    <div className="mt-2 p-2 bg-red-100 rounded font-mono">
-                      <p>Mode API: {import.meta.env.VITE_API_MODE || "mock"}</p>
-                      <p>URL API: {import.meta.env.VITE_API_URL || "N/A"}</p>
-                      <p>Erreur: {error.stack || error.message}</p>
-                    </div>
-                  </details>
+      <TagFilterBar />
+      <main className="mx-auto max-w-content px-6 py-8">
+        {isFirstLoad ? (
+          <FeedSkeleton />
+        ) : feed.isError ? (
+          <ErrorState
+            message="Impossible de charger le fil pour l'instant."
+            onRetry={() => feed.refetch()}
+          />
+        ) : showEmpty ? (
+          activeTags.length > 0 ? (
+            <EmptyState
+              title="Aucun projet avec ces thèmes pour l'instant."
+              action={
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={clearFilters}>
+                    Retirer les filtres
+                  </Button>
+                  <Button onClick={() => navigate("/projets/nouveau")}>
+                    Créer un projet sur ce thème
+                  </Button>
                 </div>
-              </div>
-            </div>
-          )}
-
-          {isLoading ? (
-            <HomePageSkeleton />
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-ink-muted">
-                En mode dégradé. Vérifiez que le backend est lancé ou passez en
-                mode mock.
-              </p>
-              <p className="text-sm text-ink-muted mt-2">
-                Pour mode mock:{" "}
-                <code className="bg-cream-dark px-2 py-1 rounded">
-                  VITE_API_MODE=mock
-                </code>
-              </p>
-            </div>
+              }
+            />
           ) : (
-            <div className="flex items-start gap-10 py-10">
-              {/* LEFT: profil */}
-              <aside
-                className="hidden xl:block w-[260px] shrink-0 sticky self-start"
-                style={{ top: SIDEBAR_STICKY_TOP }}
-              >
-                <ProfilePanel />
-              </aside>
+            <EmptyState
+              title="Il n'y a encore rien ici. Tu peux être le premier."
+              action={
+                <Button onClick={() => navigate("/projets/nouveau")}>
+                  Créer un projet
+                </Button>
+              }
+            />
+          )
+        ) : (
+          <div className="flex items-start gap-8">
+            <div className="flex min-w-0 flex-1 flex-col gap-9">
+              {feed.data?.moment && (
+                <Section title="Le projet du moment">
+                  <ProjectCard project={feed.data.moment} variant="featured" />
+                </Section>
+              )}
 
-              {/* CENTER: fil */}
-              <div className="flex-1 min-w-0 flex flex-col gap-11 xl:px-10 xl:border-x xl:border-border">
-                {featured && <FeaturedLayout hero={featured} />}
-                <ProjectFeedSection
-                  title="Recommandés pour vous"
-                  projects={recommended}
-                />
-                <ProjectFeedSection
-                  title="Projets tendance"
-                  projects={trending}
-                />
-                <ProjectFeedSection
-                  title="Les plus soutenus"
-                  projects={popular}
-                />
-                <ProjectFeedSection
-                  title="Les plus grandes équipes"
-                  projects={active}
-                />
-                <ProjectFeedSection title="Projets récents" projects={recent} />
-              </div>
+              <Section title={sectionTitle}>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {items.map((project) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      variant="feed"
+                    />
+                  ))}
+                </div>
 
-              {/* RIGHT: tendances */}
-              <aside
-                className="hidden xl:flex w-[280px] shrink-0 flex-col gap-9 sticky self-start"
-                style={{ top: SIDEBAR_STICKY_TOP }}
-              >
-                <TrendingUsersPanel />
-                <TrendingTagsPanel projects={allLoadedProjects} />
-              </aside>
+                <div aria-live="polite" className="sr-only">
+                  {liveMessage}
+                </div>
+
+                {feed.data?.items.nextCursor && (
+                  <div className="flex justify-center pt-2">
+                    <Button
+                      variant="outline"
+                      disabled={feed.isFetching}
+                      onClick={() =>
+                        setCursor(feed.data?.items.nextCursor ?? undefined)
+                      }
+                    >
+                      {feed.isFetching ? "Chargement…" : "Charger la suite"}
+                    </Button>
+                  </div>
+                )}
+              </Section>
             </div>
-          )}
 
-          <div className="pb-20" />
-        </div>
+            <aside className="sticky top-shell-sticky hidden w-72 shrink-0 flex-col gap-9 self-start lg:flex">
+              {!isAuthenticated && <AboutBlock />}
+              <SuggestedPeoplePanel />
+              <TrendingTagsPanel />
+            </aside>
+          </div>
+        )}
       </main>
     </>
   );

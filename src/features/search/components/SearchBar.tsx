@@ -1,64 +1,86 @@
+import { useRef, useState } from "react";
 import { Search, X } from "lucide-react";
-import { useState } from "react";
+
+import { Input } from "@shared/ui";
 import { SearchResultsDropdown } from "./SearchResultsDropdown";
 
-type SearchBarProps = {
+interface SearchBarProps {
   navigate: (to: string) => void;
-};
+}
 
+/**
+ * Recherche de l'en-tete (doc 06 §3.1). Conserve la meme signature
+ * `{ navigate }` : appelee directement par `SiteHeader` (hors perimetre).
+ */
 export function SearchBar({ navigate }: SearchBarProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const blurTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-    }
-  };
+  function goToResults() {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    navigate(`/recherche?q=${encodeURIComponent(trimmed)}`);
+    setQuery("");
+    setOpen(false);
+  }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    } else if (e.key === "Escape") {
-      setSearchQuery("");
-    }
-  };
+  function goTo(to: string) {
+    navigate(to);
+    setQuery("");
+    setOpen(false);
+  }
 
   return (
-    <div className="w-96">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none z-10" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Rechercher des projets, utilisateurs..."
-          className="
-            w-full rounded-lg border border-border bg-background pl-10 pr-10 py-2.5
-            text-body-md text-foreground placeholder-muted-foreground
-            focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
-            transition-all shadow-sm
-          "
-        />
-
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hover:text-foreground transition-colors z-10"
-            aria-label="Effacer la recherche"
-          >
-            <X size={20} />
-          </button>
-        )}
-
-        {/* Dropdown results */}
-        {searchQuery.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
-            <SearchResultsDropdown query={searchQuery} navigate={navigate} />
-          </div>
-        )}
-      </div>
+    <div className="relative w-96">
+      <Search
+        size={16}
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+      />
+      <Input
+        value={query}
+        onChange={(event) => {
+          setQuery(event.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(Boolean(query.trim()))}
+        onBlur={() => {
+          // Laisse le temps a un clic sur un resultat d'aboutir avant de fermer.
+          blurTimeout.current = setTimeout(() => setOpen(false), 150);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") goToResults();
+          if (event.key === "Escape") {
+            setQuery("");
+            setOpen(false);
+          }
+        }}
+        placeholder="Rechercher des projets, des personnes…"
+        className="pl-9 pr-8"
+        aria-label="Rechercher"
+      />
+      {query && (
+        <button
+          type="button"
+          aria-label="Effacer la recherche"
+          onMouseDown={(event) => {
+            // `onMouseDown` plutot que `onClick` : passe avant le `blur` du champ.
+            event.preventDefault();
+            if (blurTimeout.current) clearTimeout(blurTimeout.current);
+            setQuery("");
+          }}
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X size={16} />
+        </button>
+      )}
+      {open && query.trim() && (
+        <div className="absolute left-0 right-0 top-full z-dropdown mt-2 max-h-96 overflow-y-auto rounded-xl border border-border bg-background shadow-overlay">
+          <SearchResultsDropdown query={query.trim()} navigate={goTo} />
+        </div>
+      )}
     </div>
   );
 }

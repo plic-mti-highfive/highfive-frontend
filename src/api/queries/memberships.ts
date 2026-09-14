@@ -83,6 +83,12 @@ export function useCreateJoinRequest(slug: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.projects.joinRequests(slug),
       });
+      // Participation "open" : la demande est auto-acceptee cote handler,
+      // ce qui cree directement une appartenance — l'equipe doit refleter
+      // le nouveau membre sans attendre un rechargement complet.
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.members(slug),
+      });
     },
   });
 }

@@ -4,10 +4,12 @@ import {
   paginatedSchema,
   projectSummarySchema,
   searchResultsSchema,
+  trendingTagSchema,
   type Paginated,
   type ProjectSummary,
   type SearchParams,
   type SearchResults,
+  type TrendingTag,
 } from "@/domain";
 
 export function search(params: SearchParams): Promise<SearchResults> {
@@ -30,10 +32,17 @@ const discoverFeedSchema = z.object({
 });
 export type DiscoverFeed = z.infer<typeof discoverFeedSchema>;
 
-/** Page Decouvrir (doc 06) : "le projet du moment" + fil recommande. */
-export function getDiscoverFeed(cursor?: string): Promise<DiscoverFeed> {
+/**
+ * Page Decouvrir (doc 06) : "le projet du moment" + fil recommande. `tags`
+ * (additif) filtre le fil par la barre de themes (doc 12 E-01) ; le projet du
+ * moment reste hors filtre (un seul, independant de la selection).
+ */
+export function getDiscoverFeed(
+  cursor?: string,
+  tags?: string[],
+): Promise<DiscoverFeed> {
   return apiFetch("/feed/discover", {
-    query: { cursor },
+    query: { cursor, tags },
     schema: discoverFeedSchema,
   });
 }
@@ -46,5 +55,12 @@ export function getProjectsByTag(
   return apiFetch(`/tags/${tagId}/projects`, {
     query: { cursor },
     schema: paginatedSchema(projectSummarySchema),
+  });
+}
+
+/** Colonne d'appui "Ce qui bouge en ce moment" (doc 12 E-01) : 5 maximum. */
+export function getTrendingTags(): Promise<TrendingTag[]> {
+  return apiFetch("/feed/tags-trending", {
+    schema: z.array(trendingTagSchema),
   });
 }
