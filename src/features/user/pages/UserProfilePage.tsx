@@ -21,7 +21,7 @@ import { ProfileHeader } from "../components/ProfileHeader";
 
 function ProfileSkeleton() {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
+    <div className="mx-auto max-w-content px-6 py-10">
       <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
         <div className="flex w-full flex-col gap-5 lg:w-80 lg:shrink-0">
           <div className="flex items-center gap-4">
@@ -40,7 +40,8 @@ function ProfileSkeleton() {
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           <Skeleton className="h-9 w-64 rounded-lg" />
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Skeleton className="h-32 w-full rounded-xl" />
             <Skeleton className="h-32 w-full rounded-xl" />
             <Skeleton className="h-32 w-full rounded-xl" />
           </div>
@@ -52,7 +53,8 @@ function ProfileSkeleton() {
 
 function ProjectListSkeleton() {
   return (
-    <div className="grid gap-4 pt-4 sm:grid-cols-2">
+    <div className="grid gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Skeleton className="h-32 w-full rounded-xl" />
       <Skeleton className="h-32 w-full rounded-xl" />
       <Skeleton className="h-32 w-full rounded-xl" />
     </div>
@@ -93,7 +95,7 @@ export default function UserProfilePage() {
 
     if (notFound) {
       return (
-        <main className="mx-auto max-w-5xl px-6 py-16">
+        <main className="mx-auto max-w-content px-6 py-16">
           <EmptyState
             icon={UserX}
             title="Profil introuvable"
@@ -107,7 +109,7 @@ export default function UserProfilePage() {
     }
 
     return (
-      <main className="mx-auto max-w-5xl px-6 py-16">
+      <main className="mx-auto max-w-content px-6 py-16">
         <ErrorState
           message="Ce profil n'a pas pu être chargé."
           onRetry={() => profile.refetch()}
@@ -123,7 +125,7 @@ export default function UserProfilePage() {
 
   return (
     <main className="bg-background">
-      <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mx-auto max-w-content px-6 py-10">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
           <div className="w-full lg:sticky lg:top-24 lg:w-80 lg:shrink-0">
             <ProfileHeader
@@ -165,7 +167,7 @@ export default function UserProfilePage() {
                     }
                   />
                 ) : (
-                  <div className="grid gap-4 pt-4 sm:grid-cols-2">
+                  <div className="grid gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
                     {created.map((project) => (
                       <ProjectCard key={project.id} project={project} />
                     ))}
@@ -192,7 +194,7 @@ export default function UserProfilePage() {
                     }
                   />
                 ) : (
-                  <div className="grid gap-4 pt-4 sm:grid-cols-2">
+                  <div className="grid gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
                     {joined.map((project) => (
                       <ProjectCard key={project.id} project={project} />
                     ))}

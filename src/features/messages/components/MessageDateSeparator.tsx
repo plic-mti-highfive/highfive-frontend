@@ -15,7 +15,7 @@ function label(iso: string): string {
 export function MessageDateSeparator({ iso }: MessageDateSeparatorProps) {
   return (
     <div className="flex items-center justify-center py-2">
-      <span className="rounded-pill bg-muted px-3 py-1 text-label uppercase text-muted-foreground">
+      <span className="rounded-pill bg-muted px-3 py-1 text-ui-sm font-semibold text-muted-foreground">
         {label(iso)}
       </span>
     </div>

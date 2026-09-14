@@ -40,7 +40,7 @@ export function ConversationList({
   const discussions = filtered.filter((c) => !c.isMessageRequest);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-w-0 flex-1 flex-col">
       <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
         <h1 className="text-heading-md font-semibold text-foreground">
           Messages
@@ -66,7 +66,7 @@ export function ConversationList({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="min-w-0 flex-1 overflow-y-auto">
         {conversations.length === 0 ? (
           <EmptyState
             icon={Search}

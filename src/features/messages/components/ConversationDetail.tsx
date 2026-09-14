@@ -94,8 +94,8 @@ export function ConversationDetail({
   const canWrite = currentUser.accountStatus === "active";
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
+    <div className="flex h-full min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 items-center gap-2 border-b border-border px-3 py-2.5">
         <IconButton
           aria-label="Retour aux conversations"
           className="lg:hidden"
@@ -142,7 +142,7 @@ export function ConversationDetail({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-2">
+      <div className="min-w-0 flex-1 overflow-y-auto py-2">
         {messages.isLoading ? (
           <div className="space-y-3 p-4">
             <Skeleton className="h-10 w-2/3" />

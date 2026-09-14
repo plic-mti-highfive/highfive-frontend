@@ -27,15 +27,15 @@ export function MessagesPage() {
   return (
     <>
       <main className="bg-background">
-        <div className="flex h-below-header">
+        <div className="flex h-below-header w-full min-w-0">
           <aside
             className={cn(
-              "w-full border-r border-border lg:flex lg:w-96 lg:shrink-0",
+              "w-full min-w-0 flex-col overflow-hidden border-r border-border lg:w-96 lg:shrink-0",
               conversationId ? "hidden lg:flex" : "flex",
             )}
           >
             {conversations.isLoading ? (
-              <div className="flex w-full flex-col gap-3 p-4">
+              <div className="flex w-full min-w-0 flex-col gap-3 p-4">
                 <Skeleton className="h-8 w-full" />
                 <Skeleton className="h-16 w-full" />
                 <Skeleton className="h-16 w-full" />
@@ -62,7 +62,10 @@ export function MessagesPage() {
           </aside>
 
           <section
-            className={cn("flex-1", conversationId ? "flex" : "hidden lg:flex")}
+            className={cn(
+              "min-w-0 flex-1",
+              conversationId ? "flex" : "hidden lg:flex",
+            )}
           >
             {conversationId ? (
               <ConversationDetail

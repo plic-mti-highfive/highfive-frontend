@@ -1,4 +1,4 @@
-import { Compass, FolderKanban, MessageSquare, Plus, User } from "lucide-react";
+import { Bell, Compass, MessageSquare, Plus, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@shared/lib/cn";
 import { useAuth } from "@shared/contexts";
@@ -13,6 +13,11 @@ const itemClass = ({ isActive }: { isActive: boolean }) =>
  * Barre basse mobile (doc 06 §3.3), 5 entrées icône + libellé. `Créer` est
  * une action directe vers `/projets/nouveau`, pas un onglet. Visible
  * uniquement sous 640px (breakpoint `sm`).
+ *
+ * V2, retour util. 4 : l'ancienne entrée "Mes projets" menait au meme
+ * endroit que "Profil" (`/u/:pseudo`), doublon retire au profit de
+ * Notifications — pas encore accessible sur mobile (pas de cloche dans
+ * l'en-tete en dessous de `md`, voir `SiteHeader`).
  */
 export function SiteMobileTabBar() {
   const { isAuthenticated, user } = useAuth();
@@ -28,9 +33,9 @@ export function SiteMobileTabBar() {
         <Compass size={20} />
         Découvrir
       </NavLink>
-      <NavLink to={profilePath} className={itemClass}>
-        <FolderKanban size={20} />
-        Mes projets
+      <NavLink to="/notifications" className={itemClass}>
+        <Bell size={20} />
+        Notifications
       </NavLink>
       <NavLink to="/projets/nouveau" className={itemClass}>
         <Plus size={20} />

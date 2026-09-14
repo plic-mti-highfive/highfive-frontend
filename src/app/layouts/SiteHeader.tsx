@@ -1,15 +1,16 @@
+import { useState } from "react";
 import {
   Bell,
   LogOut,
+  MessageSquare,
   Monitor,
   Moon,
   Plus,
   Search,
   Shield,
   Sun,
-  User,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu } from "@base-ui/react/menu";
 
 import { cn } from "@shared/lib/cn";
@@ -20,6 +21,14 @@ import { Avatar, Button, IconButton } from "@shared/ui";
 // (avertissement rollup INEFFECTIVE_DYNAMIC_IMPORT).
 import { SearchBar } from "@features/search/components/SearchBar";
 import { useUnreadNotificationsCount } from "@/api/queries/notifications";
+import { useConversations } from "@/api/queries/conversations";
+import {
+  preloadCreateProject,
+  preloadHome,
+  preloadMessages,
+  preloadNotifications,
+  preloadUserProfile,
+} from "../preload";
 import { Logo } from "./Logo";
 
 const popupCls =
@@ -28,24 +37,15 @@ const itemCls =
   "flex w-full cursor-pointer select-none items-center gap-3 rounded-lg px-3 py-2 text-body-md text-foreground outline-none transition-colors hover:bg-muted";
 const separatorCls = "my-1.5 mx-2 border-t border-border";
 
-/** Nav principale (Decouvrir / Mes projets), signalee autrement que par la seule couleur (R-NAV1). */
-function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
-  return (
-    <NavLink
-      to={to}
-      end
-      className={({ isActive }) =>
-        cn(
-          "relative flex h-full items-center text-ui-md font-semibold transition-colors",
-          isActive
-            ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground"
-            : "text-muted-foreground hover:text-foreground",
-        )
-      }
-    >
-      {children}
-    </NavLink>
-  );
+/**
+ * Compteur de messages non lus pour le menu du compte : derive de
+ * `useConversations` (deja utilise par la messagerie, `unreadCount` par
+ * conversation), pas d'un hook dedie qui n'existe pas encore — reste dans
+ * le perimetre "en-tete" plutot que de toucher `src/api/queries/**`.
+ */
+function useUnreadMessagesCount(): number {
+  const { data } = useConversations();
+  return (data ?? []).reduce((sum, c) => sum + c.unreadCount, 0);
 }
 
 function NotificationsBell() {
@@ -55,16 +55,20 @@ function NotificationsBell() {
   return (
     <IconButton
       aria-label="Notifications"
+      size="lg"
       onClick={() => navigate("/notifications")}
-      className="relative"
+      onMouseEnter={() => void preloadNotifications()}
+      onFocus={() => void preloadNotifications()}
     >
-      <Bell size={20} />
-      {unreadCount > 0 && (
-        <span
-          aria-hidden
-          className="absolute right-2.5 top-2.5 size-2 rounded-full bg-rose"
-        />
-      )}
+      <span className="relative inline-flex items-center justify-center">
+        <Bell size={22} />
+        {unreadCount > 0 && (
+          <span
+            aria-hidden
+            className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-rose ring-2 ring-sidebar"
+          />
+        )}
+      </span>
     </IconButton>
   );
 }
@@ -97,22 +101,31 @@ function ThemeOption({
   );
 }
 
-/** Menu du compte : ordre doc 06 §3.4 (pseudo, Mon profil, Mes projets, theme, Administration, Se deconnecter). */
+/**
+ * Menu du compte (doc 06 §3.4) : en-tete nom + @pseudo (lien profil, evite
+ * la redondance "Mon profil"/"Mes projets" qui menaient toutes deux a
+ * `/u/:pseudo`), Messages (nouveau, avec compteur non lu), theme, puis
+ * Administration si admin. Pas d'entree "Notifications" (deja visible via
+ * la cloche de l'en-tete) ni "Reglages" (aucune page correspondante).
+ */
 function AccountMenu({
   username,
   displayName,
   avatar,
   isAdmin,
+  isLoggingOut,
   onLogout,
 }: {
   username: string;
   displayName?: string;
   avatar: string;
   isAdmin: boolean;
+  isLoggingOut: boolean;
   onLogout: () => void;
 }) {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const unreadMessages = useUnreadMessagesCount();
 
   return (
     <Menu.Root>
@@ -130,7 +143,12 @@ function AccountMenu({
           className="z-dropdown"
         >
           <Menu.Popup className={popupCls}>
-            <div className="flex items-center gap-3 px-3 py-2.5">
+            <Menu.Item
+              render={<Link to={`/u/${username}`} />}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 outline-none transition-colors hover:bg-muted"
+              onMouseEnter={() => void preloadUserProfile()}
+              onFocus={() => void preloadUserProfile()}
+            >
               <Avatar name={displayName ?? username} src={avatar} size="lg" />
               <div className="min-w-0">
                 <p className="truncate text-body-md font-semibold text-foreground">
@@ -140,23 +158,29 @@ function AccountMenu({
                   @{username}
                 </p>
               </div>
-            </div>
+            </Menu.Item>
 
             <div className={separatorCls} />
 
             <Menu.Item
+              render={<Link to="/messages" />}
               className={itemCls}
-              onClick={() => navigate(`/u/${username}`)}
+              onMouseEnter={() => void preloadMessages()}
+              onFocus={() => void preloadMessages()}
             >
-              <User size={18} className="shrink-0 text-muted-foreground" />
-              Mon profil
-            </Menu.Item>
-            <Menu.Item
-              className={itemCls}
-              onClick={() => navigate(`/u/${username}`)}
-            >
-              <User size={18} className="shrink-0 text-muted-foreground" />
-              Mes projets
+              <MessageSquare
+                size={18}
+                className="shrink-0 text-muted-foreground"
+              />
+              <span className="flex-1">Messages</span>
+              {unreadMessages > 0 && (
+                <span
+                  className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose px-1 text-label text-white tabular-nums"
+                  aria-label={`${unreadMessages} message${unreadMessages > 1 ? "s" : ""} non lu${unreadMessages > 1 ? "s" : ""}`}
+                >
+                  {unreadMessages}
+                </span>
+              )}
             </Menu.Item>
 
             <div className={separatorCls} />
@@ -201,15 +225,27 @@ function AccountMenu({
             <div className={separatorCls} />
 
             <Menu.Item
-              className={cn(
-                itemCls,
-                "text-rose hover:bg-rose-light hover:text-rose-dark",
-              )}
+              closeOnClick={false}
               onClick={onLogout}
-            >
-              <LogOut size={18} className="shrink-0" />
-              Se déconnecter
-            </Menu.Item>
+              render={
+                <Button
+                  // Menu.Item gere deja son propre role="menuitem" et son
+                  // clavier (Entree/Espace, navigation flechee) : un <button>
+                  // natif imbrique double ce comportement (avertissement
+                  // base-ui). `render={<span/>}` fait rendre un hote non
+                  // natif par la primitive (nativeButton se deduit a `false`
+                  // des que `render` est fourni, voir button.tsx), sur lequel
+                  // Menu.Item fusionne ses propres attributs/gestionnaires.
+                  render={<span />}
+                  variant="ghost"
+                  loading={isLoggingOut}
+                  className="w-full justify-start gap-3 rounded-lg px-3 py-2 text-body-md font-normal text-rose hover:bg-rose-light hover:text-rose-dark"
+                >
+                  <LogOut size={18} className="shrink-0" />
+                  Se déconnecter
+                </Button>
+              }
+            />
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>
@@ -219,10 +255,21 @@ function AccountMenu({
 
 /**
  * En-tete de la coquille site (doc 06 §3) : 56px, collant, fond opaque.
+ * Nav principale reduite a "Decouvrir" (V2, retour util. 4) : "Mes projets"
+ * menait au meme endroit que le profil (`/u/:pseudo`), retire de la barre
+ * et du menu du compte plutot que duplique.
  */
 export function SiteHeader() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  function handleLogout() {
+    setIsLoggingOut(true);
+    logout()
+      .then(() => navigate("/"))
+      .finally(() => setIsLoggingOut(false));
+  }
 
   return (
     <header className="sticky top-0 z-sticky flex h-14 w-full items-center gap-8 border-b border-sidebar-border bg-sidebar px-6">
@@ -230,8 +277,22 @@ export function SiteHeader() {
         <Logo className="text-2xl" />
         {isAuthenticated && (
           <nav className="hidden h-full items-center gap-6 md:flex">
-            <NavItem to="/">Découvrir</NavItem>
-            <NavItem to={`/u/${user?.username ?? ""}`}>Mes projets</NavItem>
+            <NavLink
+              to="/"
+              end
+              onMouseEnter={() => void preloadHome()}
+              onFocus={() => void preloadHome()}
+              className={({ isActive }) =>
+                cn(
+                  "relative flex h-full items-center text-ui-md font-semibold transition-colors",
+                  isActive
+                    ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )
+              }
+            >
+              Découvrir
+            </NavLink>
           </nav>
         )}
       </div>
@@ -246,15 +307,18 @@ export function SiteHeader() {
             lot, on ouvre directement /recherche. */}
         <IconButton
           aria-label="Rechercher"
+          size="lg"
           className="md:hidden"
           onClick={() => navigate("/recherche")}
         >
-          <Search size={20} />
+          <Search size={22} />
         </IconButton>
         {isLoading ? null : isAuthenticated && user ? (
           <>
             <Button
               onClick={() => navigate("/projets/nouveau")}
+              onMouseEnter={() => void preloadCreateProject()}
+              onFocus={() => void preloadCreateProject()}
               size="sm"
               variant="ghost"
               className="hidden items-center gap-1.5 sm:flex"
@@ -268,9 +332,8 @@ export function SiteHeader() {
               displayName={user.displayName}
               avatar={user.avatar}
               isAdmin={user.platformRole === "admin"}
-              onLogout={() => {
-                logout().then(() => navigate("/"));
-              }}
+              isLoggingOut={isLoggingOut}
+              onLogout={handleLogout}
             />
           </>
         ) : (

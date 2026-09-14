@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { Avatar, AvatarGroup, Section, Stat } from "@shared/ui";
+import { Avatar, Section, Stat } from "@shared/ui";
 import type { Need, Project } from "@/domain";
 import type { TeamMember } from "@/api/memberships";
 import { formatAbsoluteDate, formatExactDateTime } from "@shared/lib/dates";
@@ -53,41 +53,40 @@ export function ProjectOverviewSidebar({
   return (
     <aside className="flex flex-col gap-8">
       <Section title={`Équipe ${members.length}`}>
-        <AvatarGroup max={6}>
-          {members.map((member) => (
-            <Avatar
-              key={member.userId}
-              name={member.user.displayName ?? member.user.username}
-              src={member.user.avatar}
-            />
-          ))}
-        </AvatarGroup>
-        <ul className="flex flex-col gap-2">
-          {members.slice(0, 3).map((member) => (
-            <li key={member.userId} className="flex items-center gap-2">
-              <Avatar
-                name={member.user.displayName ?? member.user.username}
-                src={member.user.avatar}
-                size="sm"
-              />
-              <Link
-                to={`/u/${member.user.username}`}
-                className="flex-1 truncate text-body-sm font-medium text-foreground hover:underline"
-              >
-                @{member.user.username}
-              </Link>
-              <span className="text-body-sm text-muted-foreground">
-                {ROLE_LABEL[member.role]}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <Link
-          to={`/projets/${project.slug}/equipe`}
-          className="text-body-sm font-medium text-foreground hover:underline"
-        >
-          Voir l'équipe
-        </Link>
+        {members.length === 0 ? (
+          <p className="text-body-sm text-muted-foreground">
+            Aucun membre pour l'instant
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {members.slice(0, 3).map((member) => (
+              <li key={member.userId} className="flex items-center gap-2">
+                <Avatar
+                  name={member.user.displayName ?? member.user.username}
+                  src={member.user.avatar}
+                  size="sm"
+                />
+                <Link
+                  to={`/u/${member.user.username}`}
+                  className="flex-1 truncate text-body-sm font-medium text-foreground hover:underline"
+                >
+                  @{member.user.username}
+                </Link>
+                <span className="text-body-sm text-muted-foreground">
+                  {ROLE_LABEL[member.role]}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {members.length > 3 && (
+          <Link
+            to={`/projets/${project.slug}/equipe`}
+            className="text-body-sm font-medium text-foreground hover:underline"
+          >
+            Voir l'équipe
+          </Link>
+        )}
       </Section>
 
       <NeedsList needs={project.needs} />
@@ -95,7 +94,10 @@ export function ProjectOverviewSidebar({
       <Section title="Chiffres">
         <div className="grid grid-cols-2 gap-4">
           <Stat value={project.highfiveCount} label="highfives" />
-          <Stat value={members.length} label="membres" />
+          <Stat
+            value={members.length}
+            label={members.length === 1 ? "membre" : "membres"}
+          />
         </div>
         <p className="text-body-sm text-muted-foreground">
           {isActiveThisWeek && <>Actif cette semaine · </>}

@@ -1,9 +1,15 @@
 import { http, HttpResponse } from "msw";
-import type { Project, Tag } from "@/domain";
-import { getDb } from "../db";
+import type { DiscoverSection, Project, Tag } from "@/domain";
+import { getDb, type DbUser } from "../db";
 import { PROJECT_OF_THE_MOMENT } from "../data";
 import { isDiscoverable, toProjectSummary } from "./projectHelpers";
-import { apiUrl, paginate, simulateLatency, toUserSummary } from "./utils";
+import {
+  apiUrl,
+  getAuthUser,
+  paginate,
+  simulateLatency,
+  toUserSummary,
+} from "./utils";
 
 /** Tris disponibles sur `/search` (doc 12 E-02) : trois, pas plus. */
 function sortProjects(projects: Project[], sort: string | null): Project[] {
@@ -20,6 +26,123 @@ function sortProjects(projects: Project[], sort: string | null): Project[] {
   return sorted.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
+}
+
+const DISCOVER_SECTION_LIMIT = 6;
+
+function byLastActivityDesc(projects: Project[]): Project[] {
+  return [...projects].sort(
+    (a, b) =>
+      new Date(b.lastActivityAt).getTime() -
+      new Date(a.lastActivityAt).getTime(),
+  );
+}
+
+function byCreatedAtDesc(projects: Project[]): Project[] {
+  return [...projects].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
+function byHighfivesDesc(projects: Project[]): Project[] {
+  return [...projects].sort((a, b) => b.highfiveCount - a.highfiveCount);
+}
+
+function hasUnmetNeed(project: Project): boolean {
+  return project.needs.some((n) => !n.fulfilled);
+}
+
+/**
+ * Sections du fil Decouvrir (doc 12 E-01, retour utilisateur "Decouvrir
+ * connecte trop pauvre") : chacune porte sa regle de selection et son lien
+ * "Voir plus". `for_you` (themes suivis, R-IA-1) et `near_your_projects`
+ * (themes des projets portes/rejoints) sont personnalisees et absentes du
+ * tableau plutot que rendues vides (pas de section pour un compte sans
+ * interet ni projet, ni pour un visiteur). Le "projet du moment" est deja
+ * exclu du bassin par l'appelant (`isDiscoverable` + filtre par id).
+ */
+export function buildDiscoverSections(
+  authUser: DbUser | undefined,
+): DiscoverSection[] {
+  const db = getDb();
+  const pool = db.projects
+    .find(isDiscoverable)
+    .filter((p) => p.id !== PROJECT_OF_THE_MOMENT.id);
+  const sections: DiscoverSection[] = [];
+
+  if (authUser && authUser.interests.length > 0) {
+    const items = byLastActivityDesc(
+      pool.filter((p) => p.tags.some((t) => authUser.interests.includes(t))),
+    ).slice(0, DISCOVER_SECTION_LIMIT);
+    if (items.length > 0) {
+      sections.push({
+        id: "for_you",
+        items: items.map(toProjectSummary),
+        seeAll: {
+          types: ["projects"],
+          tags: authUser.interests,
+          sort: "active",
+        },
+      });
+    }
+  }
+
+  sections.push({
+    id: "starting",
+    items: byCreatedAtDesc(pool)
+      .slice(0, DISCOVER_SECTION_LIMIT)
+      .map(toProjectSummary),
+    seeAll: { types: ["projects"], sort: "recent" },
+  });
+
+  sections.push({
+    id: "trending_highfives",
+    items: byHighfivesDesc(pool)
+      .slice(0, DISCOVER_SECTION_LIMIT)
+      .map(toProjectSummary),
+    seeAll: { types: ["projects"], sort: "popular" },
+  });
+
+  const seekingHelp = pool.filter(hasUnmetNeed);
+  if (seekingHelp.length > 0) {
+    sections.push({
+      id: "needs_help",
+      items: byLastActivityDesc(seekingHelp)
+        .slice(0, DISCOVER_SECTION_LIMIT)
+        .map(toProjectSummary),
+      seeAll: { types: ["projects"] },
+    });
+  }
+
+  if (authUser) {
+    const myProjectIds = new Set(
+      db.memberships
+        .find((m) => m.userId === authUser.id)
+        .map((m) => m.projectId),
+    );
+    const myTags = [
+      ...new Set(
+        db.projects.find((p) => myProjectIds.has(p.id)).flatMap((p) => p.tags),
+      ),
+    ];
+    if (myTags.length > 0) {
+      const items = byHighfivesDesc(
+        pool.filter(
+          (p) =>
+            !myProjectIds.has(p.id) && p.tags.some((t) => myTags.includes(t)),
+        ),
+      ).slice(0, DISCOVER_SECTION_LIMIT);
+      if (items.length > 0) {
+        sections.push({
+          id: "near_your_projects",
+          items: items.map(toProjectSummary),
+          seeAll: { types: ["projects"], tags: myTags, sort: "active" },
+        });
+      }
+    }
+  }
+
+  return sections;
 }
 
 export const searchHandlers = [
@@ -77,25 +200,10 @@ export const searchHandlers = [
 
   http.get(apiUrl("/feed/discover"), async ({ request }) => {
     await simulateLatency();
-    const db = getDb();
-    const url = new URL(request.url);
-    const cursor = url.searchParams.get("cursor");
-    const tags = url.searchParams.get("tags")?.split(",").filter(Boolean);
-    let projects = db.projects
-      .find(isDiscoverable)
-      .filter((p) => p.id !== PROJECT_OF_THE_MOMENT.id);
-    // Barre de themes (doc 12 E-01) : filtre le fil, jamais le projet du moment.
-    if (tags?.length)
-      projects = projects.filter((p) => tags.some((t) => p.tags.includes(t)));
-    projects = projects.sort(
-      (a, b) =>
-        new Date(b.lastActivityAt).getTime() -
-        new Date(a.lastActivityAt).getTime(),
-    );
-    const page = paginate(projects, cursor);
+    const authUser = getAuthUser(request);
     return HttpResponse.json({
-      moment: cursor ? null : toProjectSummary(PROJECT_OF_THE_MOMENT),
-      items: { ...page, items: page.items.map(toProjectSummary) },
+      moment: toProjectSummary(PROJECT_OF_THE_MOMENT),
+      sections: buildDiscoverSections(authUser),
     });
   }),
 

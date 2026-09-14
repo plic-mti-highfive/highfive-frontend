@@ -4,7 +4,13 @@ import { Avatar, AvatarGroup, Badge, Card, TagPill } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import { getAccent } from "@shared/lib/accent";
 import { getTagById, type ProjectSummary } from "@/domain";
+import { preloadProjectDetail, preloadProjectFiche } from "@/app/preload";
 import { HighfiveButton } from "./HighfiveButton";
+
+function preloadFiche() {
+  void preloadProjectFiche();
+  void preloadProjectDetail();
+}
 
 const PARTICIPATION_LABEL: Record<ProjectSummary["participation"], string> = {
   open: "Ouvert à tous",
@@ -57,6 +63,8 @@ export function ProjectCard({
       <Link
         to={href}
         aria-label={project.title}
+        onMouseEnter={preloadFiche}
+        onFocus={preloadFiche}
         className="absolute inset-0 z-10 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       />
 

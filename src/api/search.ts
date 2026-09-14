@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { apiFetch } from "./client";
 import {
+  discoverFeedSchema,
   paginatedSchema,
   projectSummarySchema,
   searchResultsSchema,
@@ -26,23 +27,16 @@ export function search(params: SearchParams): Promise<SearchResults> {
   });
 }
 
-const discoverFeedSchema = z.object({
-  moment: projectSummarySchema.nullable(),
-  items: paginatedSchema(projectSummarySchema),
-});
-export type DiscoverFeed = z.infer<typeof discoverFeedSchema>;
-
 /**
- * Page Decouvrir (doc 06) : "le projet du moment" + fil recommande. `tags`
- * (additif) filtre le fil par la barre de themes (doc 12 E-01) ; le projet du
- * moment reste hors filtre (un seul, independant de la selection).
+ * Page Decouvrir (doc 06, doc 12 E-01) : "le projet du moment" hors section,
+ * puis des sections thematiques courtes (3-6 projets chacune, pas de
+ * pagination) avec leur lien "Voir plus" vers `/recherche`. Plus de
+ * parametre `tags` : la barre de themes navigue desormais directement vers
+ * `/recherche?type=projets&tags=...` (V2, retour utilisateur "clic sur un
+ * tag") au lieu de filtrer ce fil sur place.
  */
-export function getDiscoverFeed(
-  cursor?: string,
-  tags?: string[],
-): Promise<DiscoverFeed> {
+export function getDiscoverFeed() {
   return apiFetch("/feed/discover", {
-    query: { cursor, tags },
     schema: discoverFeedSchema,
   });
 }

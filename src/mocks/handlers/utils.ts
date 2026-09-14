@@ -13,10 +13,25 @@ export function apiUrl(path: string): string {
   return `${apiConfig.baseUrl}/api${path}`;
 }
 
-/** Latence simulee centralisee (~200-400ms), desactivable via VITE_MOCK_DELAY=off. */
+/**
+ * Latence simulee centralisee (V2, retour util. 5 : "chargement lent, pas de
+ * retour visuel"). Par defaut ~60-150ms (assez pour que les etats de
+ * chargement/squelettes restent visibles a l'oeil sans ralentir chaque
+ * interaction de dev). Reglable via `VITE_MOCK_DELAY` :
+ * - "off" ou "0" : aucune latence.
+ * - un nombre (ms) : latence fixe (ex. VITE_MOCK_DELAY=500 pour tester les
+ *   etats de chargement/squelettes/la barre de progression de nav).
+ * - non defini : plage aleatoire par defaut 60-150ms.
+ */
 export async function simulateLatency(): Promise<void> {
-  if (import.meta.env.VITE_MOCK_DELAY === "off") return;
-  const ms = 200 + Math.floor(Math.random() * 200);
+  const raw = import.meta.env.VITE_MOCK_DELAY;
+  if (raw === "off" || raw === "0") return;
+  const fixed = raw !== undefined ? Number(raw) : NaN;
+  const ms =
+    Number.isFinite(fixed) && fixed >= 0
+      ? fixed
+      : 60 + Math.floor(Math.random() * 90);
+  if (ms <= 0) return;
   await mswDelay(ms);
 }
 

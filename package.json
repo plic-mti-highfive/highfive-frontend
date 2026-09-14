@@ -13,6 +13,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "check:tokens": "node scripts/check-tokens.mjs",
+    "export:schemas": "node scripts/export-schemas.mjs",
     "check": "tsc -b && eslint . && node scripts/check-tokens.mjs && vitest run",
     "prepare": "husky"
   },

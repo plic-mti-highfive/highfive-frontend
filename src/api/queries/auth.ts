@@ -41,6 +41,9 @@ export function useLogin() {
       // sans jamais authentifier la moindre requete apres.
       tokenStorage.setAccessToken(session.token);
       queryClient.setQueryData(queryKeys.auth.me(), session.user);
+      // Le fil, les droits et les compteurs dependent de la personne : ce qui
+      // a ete mis en cache en visiteur ne vaut plus.
+      void queryClient.invalidateQueries();
     },
   });
 }
@@ -52,6 +55,7 @@ export function useRegister() {
     onSuccess: (session) => {
       tokenStorage.setAccessToken(session.token);
       queryClient.setQueryData(queryKeys.auth.me(), session.user);
+      void queryClient.invalidateQueries();
     },
   });
 }

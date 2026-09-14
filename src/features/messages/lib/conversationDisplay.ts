@@ -42,10 +42,15 @@ export function getConversationDisplay(
   }
 
   if (conversation.type === "channel") {
+    if (conversation.projectTitle) {
+      return {
+        title: conversation.projectTitle,
+        subtitle: "Canal du projet",
+        avatarPeople: others,
+      };
+    }
     return {
-      title: conversation.projectTitle
-        ? `Canal — ${conversation.projectTitle}`
-        : (conversation.title ?? "Canal de l'équipe"),
+      title: conversation.title ?? "Canal de l'équipe",
       subtitle: `${conversation.participants.length} membres`,
       avatarPeople: others,
     };

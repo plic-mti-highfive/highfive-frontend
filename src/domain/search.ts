@@ -48,3 +48,36 @@ export const trendingTagSchema = z.object({
   projectsCount: z.number().int().nonnegative(),
 });
 export type TrendingTag = z.infer<typeof trendingTagSchema>;
+
+/**
+ * Sections du fil Decouvrir (doc 12 E-01, retour utilisateur "Decouvrir
+ * connecte trop pauvre" — v2). Chaque section porte sa propre regle de
+ * selection cote serveur (handler MSW) et son lien "Voir plus" vers
+ * `/recherche`. Le libelle affiche vit cote front (`Record<DiscoverSectionId,
+ * string>`), jamais renvoye par l'API — cf. Section de `shared/ui`.
+ * `for_you`/`near_your_projects` sont personnalisees et absentes du tableau
+ * quand elles seraient vides (visiteur, ou compte sans intéret/projet).
+ */
+export const discoverSectionIdSchema = z.enum([
+  "for_you",
+  "starting",
+  "trending_highfives",
+  "needs_help",
+  "near_your_projects",
+]);
+export type DiscoverSectionId = z.infer<typeof discoverSectionIdSchema>;
+
+export const discoverSectionSchema = z.object({
+  id: discoverSectionIdSchema,
+  items: z.array(projectSummarySchema),
+  /** Parametres a reappliquer sur `/recherche` pour le lien "Voir plus". */
+  seeAll: searchParamsSchema,
+});
+export type DiscoverSection = z.infer<typeof discoverSectionSchema>;
+
+/** Fil Decouvrir (`/feed/discover`) : "projet du moment" hors section, puis sections non vides. */
+export const discoverFeedSchema = z.object({
+  moment: projectSummarySchema.nullable(),
+  sections: z.array(discoverSectionSchema),
+});
+export type DiscoverFeed = z.infer<typeof discoverFeedSchema>;
