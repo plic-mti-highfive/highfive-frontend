@@ -1,5 +1,11 @@
 # API-ROUTES — contrat v2
 
+> Spec backend (V2-6) : [`backend/SPEC.md`](./backend/SPEC.md) (conventions,
+> modele de persistance, regles metier par domaine, IA, ecarts connus) et
+> [`backend/openapi.yaml`](./backend/openapi.yaml) (OpenAPI 3.1, toutes les
+> routes ci-dessous avec schemas `$ref` vers `backend/schemas/*.json`, generes
+> depuis `src/domain/` par `pnpm export:schemas`).
+
 Tableau de reference des routes servies par `src/mocks/handlers/*.ts` et appelees par
 `src/api/*.ts`. Prefixe commun `/api` (voir `src/api/client.ts`). Base pour la future
 spec backend (V2-6) : chaque handler MSW valide entree/sortie avec les schemas de
@@ -146,12 +152,12 @@ membre ; `admin` = role plateforme `admin`.
 
 ## Recherche et fil (`search.ts`)
 
-| Methode | Route                   | Entree                                        | Sortie                                       | Auth/role       | Regles                                                                                                           |
-| ------- | ----------------------- | --------------------------------------------- | -------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- |
-| GET     | `/search`               | query `q,types,tags,sort,cursor,limit` (R-R4) | `SearchResults`                              | public          | filtre `projects`/`users`/`tags`, `sort` trie les projets (`recent`/`popular`/`relevant`/`active`)               |
-| GET     | `/feed/discover`        | query `cursor,tags`                           | `{moment, items: Paginated<ProjectSummary>}` | public/connecte | "projet du moment" hors pagination ; `tags` (additif) filtre le fil, jamais le moment                            |
-| GET     | `/tags/:tagId/projects` | query `cursor`                                | `Paginated<ProjectSummary>`                  | public          | page d'un theme                                                                                                  |
-| GET     | `/feed/tags-trending`   | —                                             | `TrendingTag[]`                              | public          | colonne d'appui "Ce qui bouge en ce moment" (doc 12 E-01), 5 maximum, tags actifs sur les projets publics/actifs |
+| Methode | Route                   | Entree                                        | Sortie                                  | Auth/role       | Regles                                                                                                                         |
+| ------- | ----------------------- | --------------------------------------------- | --------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| GET     | `/search`               | query `q,types,tags,sort,cursor,limit` (R-R4) | `SearchResults`                         | public          | filtre `projects`/`users`/`tags`, `sort` trie les projets (`recent`/`popular`/`relevant`/`active`)                             |
+| GET     | `/feed/discover`        | —                                             | `{moment, sections: DiscoverSection[]}` | public/connecte | "projet du moment" hors section ; `sections` = liste courte (6 max, pas de pagination) par regle de selection, voir ci-dessous |
+| GET     | `/tags/:tagId/projects` | query `cursor`                                | `Paginated<ProjectSummary>`             | public          | page d'un theme                                                                                                                |
+| GET     | `/feed/tags-trending`   | —                                             | `TrendingTag[]`                         | public          | colonne d'appui "Ce qui bouge en ce moment" (doc 12 E-01), 5 maximum, tags actifs sur les projets publics/actifs               |
 
 ## Administration (`admin.ts`)
 
@@ -167,6 +173,36 @@ membre ; `admin` = role plateforme `admin`.
 | GET     | `/admin/projects`                  | query `cursor` | `Paginated<ProjectSummary>` | admin     | —                                            |
 | DELETE  | `/admin/projects/:slug`            | —              | 204                         | admin     | R-PR7, journalise ; voir note ci-dessous     |
 | GET     | `/admin/tags`                      | —              | `Tag[]`                     | admin     | —                                            |
+
+**`/feed/discover` — sections (V2, retour utilisateur "Decouvrir connecte
+trop pauvre") :** `DiscoverSection` (`src/domain/search.ts`) = `{ id,
+items: ProjectSummary[], seeAll: SearchParams }` ; `id` est une liste fermee
+(`discoverSectionIdSchema`) — le libelle affiche vit cote front
+(`SECTION_LABELS` dans `src/features/home/components/DiscoverSectionBlock.tsx`),
+jamais renvoye par l'API. `seeAll` porte les parametres a reappliquer sur
+`/recherche` pour le lien "Voir plus" de la section. Regles de selection
+(handler `src/mocks/handlers/search.ts`, fonction `buildDiscoverSections`,
+bassin = `isDiscoverable` moins le projet du moment) :
+
+| id                   | Regle                                                                                                                     | Visiteur                                               | Connecte                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------- |
+| `for_you`            | partage au moins un theme avec `interests`, tri par derniere activite                                                     | absente                                                | absente si `interests` vide ou 0 resultat |
+| `starting`           | tri par `createdAt` decroissant (les plus recents)                                                                        | presente                                               | presente                                  |
+| `trending_highfives` | tri par `highfiveCount` decroissant                                                                                       | presente                                               | presente                                  |
+| `needs_help`         | au moins un besoin non pourvu, tri par derniere activite                                                                  | presente (absente si aucun projet ne cherche du monde) | idem                                      |
+| `near_your_projects` | partage un theme avec les projets dont la personne est membre (porteur inclus), hors ces projets, tri par `highfiveCount` | absente                                                | absente si aucun projet possede/rejoint   |
+
+Chaque section est plafonnee a 6 projets, pas de pagination (remplace
+l'ancien fil paginé par tranches de 12). La barre de themes ne filtre plus
+ce fil : `tags` a ete retire des parametres de `/feed/discover` (voir
+"Sous-barre de tags" ci-dessous).
+
+**Sous-barre de tags (`TagFilterBar`, V2) :** ne filtre plus Decouvrir. Un
+clic sur un theme navigue vers `/recherche?type=projets&tags=<id>` ; une
+entree finale "Tous les themes" mene a `/recherche?type=tags`. Les themes
+affiches viennent de `GET /feed/tags-trending` (5 maximum, deja existant)
+completes par les `interests` de la personne connectee, aucune route
+supplementaire.
 
 **Note UI (moderation, doc 15 E-35) :** l'ecran d'administration appelle
 aussi des routes deja existantes hors `admin.ts`, plutot que d'en dupliquer :
