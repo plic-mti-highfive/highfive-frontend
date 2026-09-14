@@ -13,7 +13,7 @@ import {
 import type { BadgeProps } from "@shared/ui";
 import { useProject } from "@/api/queries/projects";
 import { useMembers } from "@/api/queries/memberships";
-import { useSession } from "@/api/queries/auth";
+import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
 import type { ProjectState } from "@/domain";
 import { InviteMemberDialog } from "../../features/lab/components/InviteMemberDialog";
 import { hasAtLeastRole } from "../../features/lab/lib/roles";
@@ -66,7 +66,7 @@ export function LabLayout() {
     isError: isMembersError,
     refetch: refetchMembers,
   } = useMembers(slug);
-  const { data: currentUser } = useSession();
+  const { user: currentUser } = useCurrentUser();
   const [inviteOpen, setInviteOpen] = useState(false);
 
   const isLoading = isProjectLoading || isMembersLoading;
