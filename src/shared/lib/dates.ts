@@ -1,9 +1,7 @@
 // Utilitaire de dates unique (R-X1, doc 15/16) : relatif tant que < 7 jours
 // ("il y a 3 h"), date absolue au-dela ("15 janvier 2024"), et toujours une
 // date+heure exacte disponible pour l'info-bulle (attribut `title`). Utilise
-// par les listes de conversations, le fil de messages et les notifications ;
-// `src/shared/utils/formatDate.ts` (ancien) re-exporte `formatFrenchDate`
-// depuis ce fichier pour ne pas casser ses appelants existants.
+// par les listes de conversations, le fil de messages et les notifications.
 
 import { formatDistanceToNowStrict } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -53,9 +51,4 @@ export function formatTime(iso: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-/** @deprecated Alias de compatibilite pour `src/shared/utils/formatDate.ts` ; preferer `formatAbsoluteDate`. */
-export function formatFrenchDate(dateString: string): string {
-  return formatAbsoluteDate(dateString);
 }

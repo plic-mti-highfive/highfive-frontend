@@ -6,10 +6,9 @@ interface LogoProps {
 }
 
 /**
- * Marque HighFive! (deplacee depuis src/features/layout/components/Logo.tsx,
- * V2 item 3). Fraunces italique reserve exclusivement au logotype (regle du
- * serif reserve au mot-marque, DESIGN.md) : `font-display` porte la police,
- * jamais de style={{}} pour la simuler.
+ * Marque HighFive!. Fraunces italique reserve exclusivement au logotype
+ * (regle du serif reserve au mot-marque, DESIGN.md) : `font-display` porte
+ * la police, jamais de style={{}} pour la simuler.
  */
 export function Logo({ className }: LogoProps) {
   return (

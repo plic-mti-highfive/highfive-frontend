@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PackageOpen, UserX } from "lucide-react";
 import { ApiError } from "@/api/client";
-import { useTags } from "@/api/queries/tags";
 import { useUser, useUserProjects } from "@/api/queries/users";
 import { useAuth } from "@shared/contexts";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
@@ -16,9 +15,9 @@ import {
   TabsPanel,
   TabsTab,
 } from "@shared/ui";
+import { ProjectCard } from "@shared/components/projects";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { ProfileHeader } from "../components/ProfileHeader";
-import { ProjectSummaryCard } from "../components/ProjectSummaryCard";
 
 function ProfileSkeleton() {
   return (
@@ -75,8 +74,6 @@ export default function UserProfilePage() {
 
   const profile = useUser(pseudo ?? "");
   const projects = useUserProjects(pseudo ?? "");
-  const tags = useTags();
-  const tagsById = new Map((tags.data ?? []).map((tag) => [tag.id, tag]));
 
   const displayName =
     profile.data?.displayName ?? profile.data?.username ?? pseudo ?? "";
@@ -170,12 +167,7 @@ export default function UserProfilePage() {
                 ) : (
                   <div className="grid gap-4 pt-4 sm:grid-cols-2">
                     {created.map((project) => (
-                      <ProjectSummaryCard
-                        key={project.id}
-                        project={project}
-                        tagsById={tagsById}
-                        showOwner={false}
-                      />
+                      <ProjectCard key={project.id} project={project} />
                     ))}
                   </div>
                 )}
@@ -202,11 +194,7 @@ export default function UserProfilePage() {
                 ) : (
                   <div className="grid gap-4 pt-4 sm:grid-cols-2">
                     {joined.map((project) => (
-                      <ProjectSummaryCard
-                        key={project.id}
-                        project={project}
-                        tagsById={tagsById}
-                      />
+                      <ProjectCard key={project.id} project={project} />
                     ))}
                   </div>
                 )}

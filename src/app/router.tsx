@@ -57,8 +57,6 @@ const ProjectTeamPage = lazy(() =>
 const LabTasksPage = lazy(() => import("@features/lab/pages/TasksPage"));
 const LabWallPage = lazy(() => import("@features/lab/pages/WallPage"));
 
-// Features en cours en parallele (consignes de mission) : on importe leurs
-// pages telles quelles, sans toucher a leurs fichiers ni a leurs exports.
 const MessagesPage = lazy(() =>
   import("@features/messages/pages/MessagesPage").then((m) => ({
     default: m.MessagesPage,
@@ -197,7 +195,7 @@ export function AppRouter() {
       />
       <Route
         path="/search/users"
-        element={<LegacySearchTypeRedirect type="users" />}
+        element={<LegacySearchTypeRedirect type="personnes" />}
       />
       <Route
         path="/search/tags"

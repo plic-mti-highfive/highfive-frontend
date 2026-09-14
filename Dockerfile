@@ -9,11 +9,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN --mount=type=secret,id=github_token \
-    echo "@plic-mti-highfive:registry=https://npm.pkg.github.com/" > .npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=$(cat /run/secrets/github_token)" >> .npmrc && \
-    pnpm install --frozen-lockfile && \
-    rm .npmrc
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 

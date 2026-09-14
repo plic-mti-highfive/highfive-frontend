@@ -39,7 +39,19 @@ src/
 - Pas de régression hors périmètre du lot.
 - Rapport : fichiers touchés, commandes + résultat, incertitudes.
 
-## Greps de contrôle (doivent tendre vers 0, = 0 en fin de chantier)
+## Garde-fou automatique (V2-2)
+
+`scripts/check-tokens.mjs` (Node pur, sans dépendance, `pnpm check:tokens`)
+remplace les greps manuels ci-dessous : il échoue (exit 1) si `src/**/*.{ts,tsx}`
+contient un hex, une classe de palette Tailwind brute, une valeur arbitraire
+de couleur/dimension (`[#…]`/`[rgb…]`/`[hsl…]`/`[<nombre>px|rem]`) ou un
+`style={{}}` visuel (hors ligne avec une variable CSS `--`). Les commentaires
+sont ignorés ; exceptions de fichier explicites en tête du script (ex.
+`src/features/lab/wall/tldrawTheme.ts`, palette interne du package `tldraw`).
+Branché dans `pnpm check` et dans `lint-staged`.
+
+Les greps ci-dessous restent utiles pour une recherche ponctuelle (ex.
+`rg` sur un seul fichier pendant l'écriture) :
 
 ```bash
 rg -n "#[0-9a-fA-F]{3,8}\b" src --glob "*.{ts,tsx}"

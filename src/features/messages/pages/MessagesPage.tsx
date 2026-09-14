@@ -27,7 +27,7 @@ export function MessagesPage() {
   return (
     <>
       <main className="bg-background">
-        <div className="flex h-[calc(100dvh-3.5rem)]">
+        <div className="flex h-below-header">
           <aside
             className={cn(
               "w-full border-r border-border lg:flex lg:w-96 lg:shrink-0",

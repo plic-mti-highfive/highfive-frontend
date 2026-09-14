@@ -12,8 +12,7 @@ const LINKS = [
 ];
 
 /**
- * Pied de la coquille site (doc 06 §3.1). Deplace/reecrit depuis
- * src/features/layout/components/Footer.tsx (V2 item 3).
+ * Pied de la coquille site (doc 06 §3.1).
  */
 export function SiteFooter() {
   return (

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as authApi from "../auth";
-import { tokenStorage } from "../http-client";
+import { tokenStorage } from "../token-storage";
 import { queryKeys } from "./keys";
 import type { LoginInput, RegisterInput } from "@/domain";
 

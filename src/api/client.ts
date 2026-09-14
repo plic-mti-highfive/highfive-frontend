@@ -1,6 +1,6 @@
 import type { z } from "zod";
 import { apiConfig } from "./config";
-import { tokenStorage } from "./http-client";
+import { tokenStorage } from "./token-storage";
 import { type ApiErrorBody } from "@/domain";
 
 /**

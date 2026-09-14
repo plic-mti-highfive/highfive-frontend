@@ -6,9 +6,7 @@ import { SiteMobileTabBar } from "./SiteMobileTabBar";
 /**
  * Coquille site (doc 06 §3, V2 item 3) : en-tete collant 56px opaque, footer
  * À propos · Confidentialité · Conditions, barre basse mobile a 5 entrees.
- * Remplace le rendu de `<Header/>`/`<Footer/>` que chaque page appelait
- * elle-meme (src/features/layout, supprime) : les pages montees ici ne
- * rendent plus que leur propre contenu.
+ * Les pages montees ici ne rendent plus que leur propre contenu.
  *
  * Pas de conteneur de largeur ici : les pages existantes gerent deja leur
  * propre `max-w-*` interne (feed 100rem, fiche projet 1400px...) — en

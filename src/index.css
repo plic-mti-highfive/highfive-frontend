@@ -352,6 +352,12 @@
      toute colonne d'appui sticky (doc 06 §3.1) ; remplace un
      `style={{ top: "6.25rem" }}` en dur (V2-2). */
   --offset-shell-sticky: 6.25rem;
+
+  /* -- Hauteur du seul en-tete de la coquille site --
+     56px (SiteHeader, `h-14`), sans la barre de themes/onglets propre a
+     Decouvrir. Utilise par les pages plein ecran sous l'en-tete seul
+     (messagerie) ; remplace un `h-[calc(100dvh-3.5rem)]` en dur (V2-2). */
+  --offset-shell-header: 3.5rem;
 }
 
 @utility z-base {
@@ -381,6 +387,9 @@
 }
 @utility top-shell-sticky {
   top: var(--offset-shell-sticky);
+}
+@utility h-below-header {
+  height: calc(100dvh - var(--offset-shell-header));
 }
 
 @utility duration-slow {

@@ -16,12 +16,6 @@ importers:
       "@fontsource-variable/geist":
         specifier: ^5.2.8
         version: 5.2.8
-      "@hocuspocus/provider":
-        specifier: ^3.4.4
-        version: 3.4.4(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31)
-      "@plic-mti-highfive/shared-types":
-        specifier: ^1.2.0
-        version: 1.2.0
       "@tailwindcss/vite":
         specifier: ^4.3.0
         version: 4.3.0(vite@8.0.12(@types/node@25.7.0)(jiti@2.6.1)(yaml@2.9.0))
@@ -31,12 +25,6 @@ importers:
       "@tldraw/editor":
         specifier: 5.0.0
         version: 5.0.0(@floating-ui/dom@1.7.6)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      "@tldraw/store":
-        specifier: 5.0.0
-        version: 5.0.0(react@19.2.6)
-      "@tldraw/tlschema":
-        specifier: 5.0.0
-        version: 5.0.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -79,12 +67,6 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
-      y-protocols:
-        specifier: ^1.0.7
-        version: 1.0.7(yjs@13.6.31)
-      yjs:
-        specifier: ^13.6.31
-        version: 13.6.31
       zod:
         specifier: ^4.6.4
         version: 4.6.4
@@ -538,21 +520,6 @@ packages:
         integrity: sha512-cJ6m9e+8MQ5dCYJsLylfZrgBh6KkG4bOLckB35Tr9J/EqdkEM6QllH5PxqP1dhTvFup+HtMRPuz9xOjxXJggxw==,
       }
 
-  "@hocuspocus/common@3.4.4":
-    resolution:
-      {
-        integrity: sha512-RykIJ0tsHHMP4Xk+4UCbc7SO5LgGxGUSTdbh6anJEsaALAyqinf1Nn5HYuMjLPolAmsar1v++m9zufR09NLpXA==,
-      }
-
-  "@hocuspocus/provider@3.4.4":
-    resolution:
-      {
-        integrity: sha512-KbsMAfdYcIJD8eMU/5QnpXcSOvIWAcCNI33FSRSaKCIpYBFtAwkYIwWnZJmPZ8a1BMAtqQc+uvy9+UQf7GHnGQ==,
-      }
-    peerDependencies:
-      y-protocols: ^1.0.6
-      yjs: ^13.6.8
-
   "@hono/node-server@1.19.11":
     resolution:
       {
@@ -671,12 +638,6 @@ packages:
         integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==,
       }
 
-  "@lifeomic/attempt@3.1.0":
-    resolution:
-      {
-        integrity: sha512-QZqem4QuAnAyzfz+Gj5/+SLxqwCAw2qmt7732ZXodr6VDWGeYLG6w1i/vYLa55JQM9wRuBKLmXmiZ2P0LtE5rw==,
-      }
-
   "@modelcontextprotocol/sdk@1.27.1":
     resolution:
       {
@@ -776,13 +737,6 @@ packages:
     resolution:
       {
         integrity: sha512-3oz8m3FGdr2nDXVqmFUw7jolKliC4MoyXYIG2c7gpjBnzUWQpUGIYcXYKxTdTi+N2jusvt610ckTMkxdwHkYEg==,
-      }
-
-  "@plic-mti-highfive/shared-types@1.2.0":
-    resolution:
-      {
-        integrity: sha512-SFu9BEFRI4Hd8qwaMXLsVF0LZ9PBdg5Mlr4chUZvv3S08cPTxiElV6v5V5R9HoUAlbV4nDlVbKnndBD8YhDpDw==,
-        tarball: https://npm.pkg.github.com/download/@plic-mti-highfive/shared-types/1.2.0/0f30e5d21aab4853da120452e8edd347f07723c6,
       }
 
   "@radix-ui/number@1.1.1":
@@ -4096,12 +4050,6 @@ packages:
       }
     engines: { node: ">=18" }
 
-  isomorphic.js@0.2.5:
-    resolution:
-      {
-        integrity: sha512-PIeMbHqMt4DnUP3MA/Flc0HElYjMXArsw1qwJZcm9sqR8mq3l8NYizFMty0pWwE/tzIGH3EKK5+jes5mAr85yw==,
-      }
-
   istanbul-lib-coverage@3.2.2:
     resolution:
       {
@@ -4246,14 +4194,6 @@ packages:
         integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==,
       }
     engines: { node: ">= 0.8.0" }
-
-  lib0@0.2.117:
-    resolution:
-      {
-        integrity: sha512-DeXj9X5xDCjgKLU/7RR+/HQEVzuuEUiwldwOGsHK/sfAfELGWEyTcf0x+uOvCvK3O2zPmZePXWL85vtia6GyZw==,
-      }
-    engines: { node: ">=16" }
-    hasBin: true
 
   lightningcss-android-arm64@1.32.0:
     resolution:
@@ -6071,36 +6011,12 @@ packages:
         integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==,
       }
 
-  ws@8.21.0:
-    resolution:
-      {
-        integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==,
-      }
-    engines: { node: ">=10.0.0" }
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ">=5.0.2"
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   wsl-utils@0.3.1:
     resolution:
       {
         integrity: sha512-g/eziiSUNBSsdDJtCLB8bdYEUMj4jR7AGeUo96p/3dTafgjHhpF4RiCFPiRILwjQoDXx5MqkBr4fwWtR3Ky4Wg==,
       }
     engines: { node: ">=20" }
-
-  y-protocols@1.0.7:
-    resolution:
-      {
-        integrity: sha512-YSVsLoXxO67J6eE/nV4AtFtT3QEotZf5sK5BHxFBXso7VDUT3Tx07IfA6hsu5Q5OmBdMkQVmFZ9QOA7fikWvnw==,
-      }
-    engines: { node: ">=16.0.0", npm: ">=8.0.0" }
-    peerDependencies:
-      yjs: ^13.0.0
 
   y18n@5.0.8:
     resolution:
@@ -6136,13 +6052,6 @@ packages:
         integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==,
       }
     engines: { node: ">=12" }
-
-  yjs@13.6.31:
-    resolution:
-      {
-        integrity: sha512-Eq+5BRfbeGyqGVrTJL3bEcr8gKkxPuyuoHmAwpk52fDb8kOVMrfVSTRPd6yiGgX5Fskb96qCRjzjbRjrL4YEnw==,
-      }
-    engines: { node: ">=16.0.0", npm: ">=8.0.0" }
 
   yocto-queue@0.1.0:
     resolution:
@@ -6489,22 +6398,6 @@ snapshots:
 
   "@fontsource-variable/geist@5.2.8": {}
 
-  "@hocuspocus/common@3.4.4":
-    dependencies:
-      lib0: 0.2.117
-
-  "@hocuspocus/provider@3.4.4(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31)":
-    dependencies:
-      "@hocuspocus/common": 3.4.4
-      "@lifeomic/attempt": 3.1.0
-      lib0: 0.2.117
-      ws: 8.21.0
-      y-protocols: 1.0.7(yjs@13.6.31)
-      yjs: 13.6.31
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   "@hono/node-server@1.19.11(hono@4.12.8)":
     dependencies:
       hono: 4.12.8
@@ -6565,8 +6458,6 @@ snapshots:
     dependencies:
       "@jridgewell/resolve-uri": 3.1.2
       "@jridgewell/sourcemap-codec": 1.5.5
-
-  "@lifeomic/attempt@3.1.0": {}
 
   "@modelcontextprotocol/sdk@1.27.1(zod@3.25.76)":
     dependencies:
@@ -6638,8 +6529,6 @@ snapshots:
   "@open-draft/until@2.1.0": {}
 
   "@oxc-project/types@0.129.0": {}
-
-  "@plic-mti-highfive/shared-types@1.2.0": {}
 
   "@radix-ui/number@1.1.1": {}
 
@@ -8777,8 +8666,6 @@ snapshots:
 
   isexe@3.1.5: {}
 
-  isomorphic.js@0.2.5: {}
-
   istanbul-lib-coverage@3.2.2: {}
 
   istanbul-lib-report@3.0.1:
@@ -8842,10 +8729,6 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
-
-  lib0@0.2.117:
-    dependencies:
-      isomorphic.js: 0.2.5
 
   lightningcss-android-arm64@1.32.0:
     optional: true
@@ -10007,17 +9890,10 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@8.21.0: {}
-
   wsl-utils@0.3.1:
     dependencies:
       is-wsl: 3.1.1
       powershell-utils: 0.1.0
-
-  y-protocols@1.0.7(yjs@13.6.31):
-    dependencies:
-      lib0: 0.2.117
-      yjs: 13.6.31
 
   y18n@5.0.8: {}
 
@@ -10037,10 +9913,6 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
-
-  yjs@13.6.31:
-    dependencies:
-      lib0: 0.2.117
 
   yocto-queue@0.1.0: {}
 

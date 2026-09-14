@@ -207,7 +207,21 @@ In dark mode the same roles shift to a deep violet-black base (`oklch(0.15 0.02 
 
 ## Layout
 
-The primary experience is a three-column feed: a sticky left profile rail (`260px`), a fluid center column bordered on both sides (`xl:border-x`) once the viewport is wide enough for the rail, and a sticky right rail of trending users/tags (`280px`), all inside a `max-w-[100rem]` page container. Vertical rhythm between feed sections is generous (`gap-11`, `py-10`), and sidebars stick just below the header (`top: 6.25rem`).
+Page content across the site shell (Découvrir, search, a project's fiche, a
+profile…) is capped at a single content width, the `--container-content`
+token (`1240px`, Tailwind utility `max-w-content`) — one width for the whole
+site shell rather than a per-page arbitrary value.
+
+The home feed adds a sticky left profile rail (`260px`) and a sticky right
+rail of trending users/tags (`280px`) around that same fluid center column,
+bordered on both sides (`xl:border-x`) once the viewport is wide enough for
+the rails. Vertical rhythm between feed sections is generous (`gap-11`,
+`py-10`), and sidebars stick just below the header/category-bar stack at the
+`--offset-shell-sticky` token (`6.25rem` = `56px` header + `44px` category
+bar, Tailwind utility `top-shell-sticky`). A page that sits under the header
+alone (no category bar), such as the messaging screen, instead fills the
+remaining viewport height via `--offset-shell-header` (`3.5rem`, utility
+`h-below-header`).
 
 Navigation is two stacked sticky bars: a `56px` header (logo, centered search, actions) directly above a `44px` pill-style category nav bar that auto-hides on scroll-down and reappears on scroll-up, keeping category browsing available without permanently taxing vertical space.
 

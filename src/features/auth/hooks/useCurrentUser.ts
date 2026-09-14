@@ -1,5 +1,5 @@
 import { useSession } from "@/api/queries/auth";
-import { tokenStorage } from "@/api/http-client";
+import { tokenStorage } from "@/api/token-storage";
 
 /**
  * Session courante (V2, item 2), gardee par la presence d'un jeton stocke :

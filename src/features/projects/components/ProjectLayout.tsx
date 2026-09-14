@@ -57,7 +57,7 @@ export function ProjectLayout() {
 
   if (projectQuery.isLoading || membersQuery.isLoading) {
     return (
-      <div className="mx-auto max-w-[87.5rem] px-6 py-10">
+      <div className="mx-auto max-w-content px-6 py-10">
         <ProjectDetailSkeleton />
       </div>
     );
@@ -66,7 +66,7 @@ export function ProjectLayout() {
   const error = projectQuery.error;
   if (error instanceof ApiError && error.status === 403) {
     return (
-      <div className="mx-auto max-w-[87.5rem] px-6 py-20">
+      <div className="mx-auto max-w-content px-6 py-20">
         <ErrorState message="Ce projet est privé. Il faut une invitation pour le voir." />
         <div className="mt-2 flex justify-center">
           <Button variant="outline" onClick={() => navigate("/")}>
@@ -81,7 +81,7 @@ export function ProjectLayout() {
     !projectQuery.data
   ) {
     return (
-      <div className="mx-auto max-w-[87.5rem] px-6 py-20">
+      <div className="mx-auto max-w-content px-6 py-20">
         <ErrorState message="Cette page n'existe pas. Le lien est peut-être ancien, ou le projet a été supprimé." />
         <div className="mt-2 flex justify-center gap-2">
           <Button variant="outline" onClick={() => navigate("/")}>
@@ -96,7 +96,7 @@ export function ProjectLayout() {
   }
   if (error) {
     return (
-      <div className="mx-auto max-w-[87.5rem] px-6 py-20">
+      <div className="mx-auto max-w-content px-6 py-20">
         <ErrorState
           message="Le projet n'a pas pu être chargé."
           onRetry={() => projectQuery.refetch()}
@@ -115,7 +115,7 @@ export function ProjectLayout() {
   );
 
   return (
-    <div className="mx-auto flex max-w-[87.5rem] flex-col gap-6 px-6 py-10">
+    <div className="mx-auto flex max-w-content flex-col gap-6 px-6 py-10">
       {project.state === "done" && (
         <div className="rounded-lg bg-info-bg px-4 py-3 text-body-sm text-info-fg">
           Ce projet est terminé. Le Lab est en lecture seule, les commentaires

@@ -219,7 +219,6 @@ function AccountMenu({
 
 /**
  * En-tete de la coquille site (doc 06 §3) : 56px, collant, fond opaque.
- * Deplace/reecrit depuis src/features/layout/components/Header.tsx (V2 item 3).
  */
 export function SiteHeader() {
   const navigate = useNavigate();
