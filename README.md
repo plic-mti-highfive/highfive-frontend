@@ -5,153 +5,74 @@
 - Node >= 24
 - pnpm (`npm install -g pnpm`)
 
-## Démarrage rapide (après un clone)
+## Démarrage rapide
 
 ```bash
-# 1. Copier les variables d'environnement
 cp .env.example .env
-
-# 2. Installer les dépendances
 pnpm install
-
-# 3. Lancer en mode mock (aucun backend requis)
 pnpm dev
 ```
 
-L'application est accessible sur `http://localhost:5173`.
+L'application est accessible sur `http://localhost:5173`, en mode mock par
+défaut (MSW intercepte toutes les routes `/api/*`, aucun backend requis).
 
-### Variables d'environnement
+Compte de démonstration : `alex.rivera@example.com` / `demo1234`.
 
-| Variable         | Valeur par défaut       | Description                             |
-| ---------------- | ----------------------- | --------------------------------------- |
-| `VITE_API_MODE`  | `mock`                  | Mode API : `mock` ou `http`             |
-| `VITE_API_URL`   | `http://localhost:3000` | URL du backend (mode `http` uniquement) |
-| `VITE_TENANT_ID` | `default-tenant`        | Tenant ID pour le multi-tenancy         |
+### Variables d'environnement (`.env`, voir `.env.example`)
+
+| Variable          | Valeur par défaut       | Description                                               |
+| ----------------- | ----------------------- | --------------------------------------------------------- |
+| `VITE_API_MODE`   | `mock`                  | `mock` (MSW, aucun backend) ou `http` (backend réel)      |
+| `VITE_API_URL`    | `http://localhost:3000` | URL du backend (mode `http` uniquement)                   |
+| `VITE_MOCK_DELAY` | _(latence simulée)_     | `off` pour désactiver la latence simulée des handlers MSW |
+
+```bash
+# Utiliser un backend réel
+VITE_API_MODE=http VITE_API_URL=http://localhost:3000 pnpm dev
+```
+
+## Scripts
+
+| Commande             | Description                                         |
+| -------------------- | --------------------------------------------------- |
+| `pnpm dev`           | Serveur de développement (Vite HMR)                 |
+| `pnpm build`         | Vérification TypeScript + build production          |
+| `pnpm preview`       | Prévisualiser le build de production                |
+| `pnpm lint`          | ESLint sur tout le projet                           |
+| `pnpm format`        | Prettier sur tout le projet                         |
+| `pnpm test`          | Tests unitaires (Vitest)                            |
+| `pnpm test:ui`       | Interface Vitest dans le navigateur                 |
+| `pnpm test:coverage` | Rapport de couverture                               |
+| `pnpm check:tokens`  | Garde-fou tokens (`scripts/check-tokens.mjs`, V2-2) |
+| `pnpm check`         | `tsc -b && eslint . && check:tokens && vitest run`  |
+
+Un hook pre-commit (Husky + lint-staged) lance `prettier --write .` et
+`check:tokens` sur les fichiers `.ts`/`.tsx` modifiés avant chaque commit.
 
 ## Docker
 
-### Avec Docker Compose (recommandé)
-
 ```bash
-GITHUB_TOKEN=ton_super_token docker compose up --build
+docker compose up --build
 ```
 
-GITHUB_TOKEN=ton_super_token dans le .env sinon.
 L'application est servie par nginx sur `http://localhost:8080`.
-
-### Image seule
-
-```bash
-# Build
-docker build --secret id=github_token,env=GITHUB_TOKEN -t highfive-frontend .
-
-# Run
-docker run -p 8080:8080 highfive-frontend
-```
-
-## Commandes disponibles
-
-| Commande             | Description                                |
-| -------------------- | ------------------------------------------ |
-| `pnpm dev`           | Serveur de développement (Vite HMR)        |
-| `pnpm build`         | Vérification TypeScript + build production |
-| `pnpm preview`       | Prévisualiser le build de production       |
-| `pnpm lint`          | ESLint sur tout le projet                  |
-| `pnpm format`        | Prettier sur tout le projet                |
-| `pnpm test`          | Tests unitaires (Vitest)                   |
-| `pnpm test:ui`       | Interface Vitest dans le navigateur        |
-| `pnpm test:coverage` | Rapport de couverture                      |
-
-Un hook pre-commit (Husky + lint-staged) lance `prettier --write .` automatiquement avant chaque commit.
 
 ## Architecture
 
-L'application suit une architecture feature-based hermétique : chaque feature est autonome et communique uniquement via son `index.ts`. Les imports cross-features sont interdits - seul `@shared` est accessible depuis n'importe où.
-
 ```
 src/
-├── features/                 # Domaines fonctionnels
-│   ├── auth/                 # Authentification & inscription
-│   │   ├── pages/            # LoginPage, RegisterPage
-│   │   ├── components/       # AuthLayout
-│   │   └── index.ts
-│   │
-│   ├── home/                 # Page d'accueil
-│   │   ├── pages/            # HomePage
-│   │   ├── components/       # FeaturedLayout, ProjectCarouselSection, TagNavBar…
-│   │   ├── hooks/            # useCarousel
-│   │   └── index.ts
-│   │
-│   ├── lab/                  # Outils créatifs (Kanban, Moodboard)
-│   │   ├── pages/            # LabPage, MoodboardPage
-│   │   ├── components/       # KanbanBoard, MoodboardCanvas…
-│   │   ├── hooks/            # useKanban, useMoodboard
-│   │   ├── types/
-│   │   └── index.ts
-│   │
-│   ├── layout/               # Éléments de mise en page globaux
-│   │   ├── components/       # Header, Footer, Logo
-│   │   └── index.ts
-│   │
-│   ├── messages/             # Messagerie
-│   │   ├── pages/            # MessagesPage
-│   │   ├── components/       # ConversationList, ConversationDetail…
-│   │   ├── types/
-│   │   └── index.ts
-│   │
-│   ├── projects/             # Gestion des projets
-│   │   ├── pages/            # CreateProjectPage, ProjectDetailPage
-│   │   ├── components/       # ProjectHeader, TicketList, ProjectFiltersBar…
-│   │   ├── hooks/            # useProjectDetail, useStepTransition
-│   │   └── index.ts
-│   │
-│   ├── search/               # Recherche globale
-│   │   ├── pages/            # SearchPage
-│   │   ├── components/       # SearchBar
-│   │   ├── hooks/            # useSearch
-│   │   └── index.ts
-│   │
-│   └── user/                 # Profils utilisateur
-│       ├── pages/            # UserProfilePage
-│       ├── components/       # EditProfileModal, ProfileTabs…
-│       ├── hooks/            # useUserProfile
-│       ├── utils/
-│       └── index.ts
-│
-├── shared/                   # Modules transverses (accessibles par tous)
-│   ├── components/
-│   │   ├── ui/               # Primitives shadcn/ui (Button, Input, Skeleton…)
-│   │   ├── projects/         # Composants projets réutilisables (ProjectFeedCard, HeroCard, Section…)
-│   │   ├── ErrorBoundary.tsx
-│   │   ├── ScrollToTop.tsx
-│   │   └── ScrollToTopButton.tsx
-│   ├── contexts/             # AuthContext, ThemeContext
-│   ├── utils/                # cn, tagColors
-│   └── types/                # Types TypeScript partagés (Project, User…)
-│
-├── api/                      # Couche d'accès aux données
-│   ├── services/
-│   │   ├── http/             # Implémentations HTTP réelles
-│   │   ├── mock/             # Implémentations mock (données statiques)
-│   │   └── interfaces/       # Contrats de service (IAuthService…)
-│   ├── types/                # DTOs (AuthResponse, ProjectDto, ConversationDto…)
-│   ├── config.ts             # Mode HTTP / Mock (`VITE_API_MODE`)
-│   ├── http-client.ts        # Client HTTP avec gestion des tokens
-│   └── index.ts
-│
-├── pages/                    # Pages hors-feature (NotFoundPage, Debug)
-├── App.tsx                   # Routeur principal (React Router v7)
-└── main.tsx
+├── app/            App.tsx, router.tsx (routes FR), providers.tsx, layouts (coquille site, coquille atelier)
+├── domain/         Schémas zod par entité (source unique des types, z.infer)
+├── api/            client.ts (fetch + ApiError), <domaine>.ts, queries/<domaine>.ts (hooks TanStack Query)
+├── mocks/          browser.ts, handlers/<domaine>.ts (= spec backend), data/, db.ts
+├── shared/
+│   ├── ui/         Primitives maison (base-ui/Radix + cva + tokens) : Button, Card, Badge, Dialog…
+│   ├── lib/        cn, dates, couleurs déterministes (accent), hooks génériques
+│   └── components/ Composants transverses composés à partir des primitives (ex. ProjectCard)
+└── features/<feature>/  components/, pages/, hooks/ — un domaine d'écrans par feature
 ```
 
-### Règles d'import
-
-- `@features/<feature>` - toujours via le barrel `index.ts`, jamais dans les sous-dossiers
-- `@shared/*` - accessible depuis n'importe quelle feature
-- `@/api` - couche de données, ne dépend pas des features
-- Pas d'import croisé entre features
-
-### Aliases de chemin (Vite + TypeScript)
+### Alias de chemin (Vite + TypeScript)
 
 | Alias         | Résolution       |
 | ------------- | ---------------- |
@@ -159,17 +80,21 @@ src/
 | `@shared/*`   | `src/shared/*`   |
 | `@features/*` | `src/features/*` |
 
-## Couche API
+## Règles clés
 
-Les services suivent une interface commune (`IAuthService`, `IProjectService`, `IUserService`). Le mode est contrôlé par la variable d'environnement `VITE_API_MODE` :
-
-- `mock` (défaut) - données statiques locales, aucun backend requis
-- `http` - appels réels vers le backend
-
-```bash
-# Utiliser le backend réel
-VITE_API_MODE=http pnpm dev
-```
+- **Tokens uniquement** : aucune valeur visuelle en dur (`src/**/*.{ts,tsx}`)
+  — hex, palette Tailwind brute, `text-[13px]`, `style={{}}` visuel. Tout
+  passe par les tokens de `src/index.css`, vérifié par `pnpm check:tokens`.
+  Détails : `docs/v2/CONVENTIONS.md`.
+- **Primitives** : les pages composent `src/shared/ui/`, elles ne re-stylent
+  pas de composants headless directement.
+- **Contrat de données unique** : schémas zod dans `src/domain/` ; aucune
+  `interface Project/User/...` ailleurs.
+- **Hooks de requête** : tout accès réseau passe par `src/api/queries/<domaine>.ts`
+  (TanStack Query), jamais de `useState`+`useEffect` de fetch fait main.
+- **MSW = spec backend** : chaque handler de `src/mocks/handlers/` valide
+  entrée/sortie avec les schémas de `src/domain/` et sert de référence au
+  contrat de routes — voir `docs/v2/API-ROUTES.md`.
 
 ## Stack technique
 
@@ -180,9 +105,10 @@ VITE_API_MODE=http pnpm dev
 | Routing                | React Router 7                       |
 | Styling                | Tailwind CSS 4, tw-animate-css       |
 | Composants headless    | base-ui                              |
-| Composants shadcn      | shadcn/ui (Button, Input, Skeleton…) |
-| Canvas / Whiteboard    | tldraw 5                             |
+| Contrat de données     | zod                                  |
+| Requêtes serveur       | TanStack Query                       |
+| Mock API               | MSW                                  |
+| Tableau blanc (canvas) | tldraw                               |
 | Icônes                 | lucide-react                         |
 | Tests                  | Vitest + @vitest/coverage-v8         |
 | Qualité                | ESLint, Prettier, Husky, lint-staged |
-| Types partagés backend | `@plic-mti-highfive/shared-types`    |

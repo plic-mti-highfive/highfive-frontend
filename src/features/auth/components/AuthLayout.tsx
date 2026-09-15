@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Logo } from "@features/layout";
+import { Logo } from "@/app/layouts/Logo";
 
 interface AuthLayoutProps {
   title: string;
@@ -35,7 +35,7 @@ export function AuthLayout({
       <div className="w-full md:w-1/2 flex flex-col items-center px-4">
         {/* Logo */}
         <div className="flex pt-4 w-full max-w-md justify-center">
-          <Logo className="text-3xl" textColor="text-foreground" />
+          <Logo className="text-3xl" />
         </div>
 
         {/* Formulaire centré verticalement */}

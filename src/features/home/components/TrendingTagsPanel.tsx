@@ -1,58 +1,45 @@
-import { useNavigate } from "react-router-dom";
-import { Skeleton } from "@shared/components/ui/skeleton";
-import type { Project } from "@shared/types";
-import { TagPill } from "@shared/components/projects";
-import { computeTrendingTags } from "../utils/trendingTags";
+import { Link } from "react-router-dom";
 
-interface TrendingTagsPanelProps {
-  projects: Project[];
-  isLoading?: boolean;
-}
+import { Section, Skeleton, TagPill } from "@shared/ui";
+import { useTrendingTags } from "@/api/queries/search";
 
-export function TrendingTagsPanel({
-  projects,
-  isLoading,
-}: TrendingTagsPanelProps) {
-  const navigate = useNavigate();
+/** Colonne d'appui "Ce qui bouge en ce moment" (doc 12 E-01), 5 maximum. */
+export function TrendingTagsPanel() {
+  const { data, isLoading } = useTrendingTags();
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-4 w-24" />
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center justify-between">
-            <Skeleton className="h-6 w-20 rounded-full" />
-            <Skeleton className="h-3 w-12" />
-          </div>
-        ))}
-      </div>
+      <Section title="Ce qui bouge en ce moment">
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <Skeleton className="h-6 w-20 rounded-pill" />
+              <Skeleton className="h-3 w-14" />
+            </div>
+          ))}
+        </div>
+      </Section>
     );
   }
 
-  const trendingTags = computeTrendingTags(projects, 5);
-  if (trendingTags.length === 0) return null;
+  if (!data || data.length === 0) return null;
 
   return (
-    <div>
-      <div className="text-base font-bold text-foreground mb-4">
-        Tags tendance
-      </div>
-      <div className="flex flex-col gap-3.5">
-        {trendingTags.map(({ tag, count }) => (
-          <div key={tag} className="flex items-center justify-between">
-            <TagPill
-              tag={tag}
-              size="sm"
-              onClick={() =>
-                navigate(`/search/projects?tag=${encodeURIComponent(tag)}`)
-              }
-            />
-            <span className="text-muted-foreground text-xs">
-              {count} projet{count > 1 ? "s" : ""}
+    <Section title="Tags tendance">
+      <div className="flex flex-col gap-1">
+        {data.map(({ tag, projectsCount }) => (
+          <Link
+            key={tag.id}
+            to={`/recherche?tags=${encodeURIComponent(tag.id)}`}
+            className="-mx-2 flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 outline-none transition-colors duration-fast hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
+            <TagPill label={tag.label} accent={tag.accent} size="sm" />
+            <span className="text-body-sm text-muted-foreground">
+              {projectsCount} projet{projectsCount > 1 ? "s" : ""}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
-    </div>
+    </Section>
   );
 }

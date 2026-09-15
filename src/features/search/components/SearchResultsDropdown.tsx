@@ -1,144 +1,113 @@
-import { useSearch } from "../hooks/useSearch";
+import { useEffect, useState } from "react";
+
+import { Avatar, Spinner } from "@shared/ui";
+import { useSearch } from "@/api/queries/search";
 
 const sectionTitleCls =
-  "px-3 py-2 text-body-md font-semibold text-muted-foreground uppercase tracking-wider";
-const separatorCls = "border-t border-border my-1.5 mx-2";
+  "px-3 py-1.5 text-label uppercase tracking-wide text-muted-foreground";
 const resultItemCls =
-  "flex items-center gap-3 w-full px-3 py-2 text-body-lg text-foreground cursor-pointer hover:bg-muted outline-none select-none transition-colors text-left";
+  "flex w-full items-center gap-3 px-3 py-2 text-left outline-none transition-colors duration-fast hover:bg-muted";
 
-type SearchResultsDropdownProps = {
+interface SearchResultsDropdownProps {
   query: string;
   navigate: (to: string) => void;
-};
+}
 
+/** Apercu rapide (en-tete, doc 06 §3.1) : quelques projets et personnes, "Voir tout" renvoie vers `/recherche`. */
 export function SearchResultsDropdown({
   query,
   navigate,
 }: SearchResultsDropdownProps) {
-  const {
-    filteredProjects,
-    filteredUsers,
-    filteredTags,
-    filteredProgress,
-    isEmpty,
-  } = useSearch(query);
+  const [debounced, setDebounced] = useState(query);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(query), 300);
+    return () => clearTimeout(id);
+  }, [query]);
+
+  const { data, isLoading } = useSearch({
+    q: debounced,
+    types: ["projects", "users"],
+    limit: 4,
+  });
+
+  const projects = data?.projects?.items ?? [];
+  const users = data?.users?.items ?? [];
+  const isEmpty = !isLoading && projects.length === 0 && users.length === 0;
 
   return (
     <div className="py-1.5">
-      {/* Projets Section */}
-      {filteredProjects.length > 0 && (
+      {isLoading && (
+        <div className="flex items-center justify-center py-6">
+          <Spinner size="sm" />
+        </div>
+      )}
+
+      {!isLoading && projects.length > 0 && (
         <>
-          <div className={sectionTitleCls}>Projets</div>
-          {filteredProjects.map((project) => (
+          <p className={sectionTitleCls}>Projets</p>
+          {projects.map((project) => (
             <button
               key={project.id}
-              className={resultItemCls}
-              onClick={() => navigate(`/projects/${project.id}`)}
               type="button"
+              className={resultItemCls}
+              onClick={() => navigate(`/projets/${project.slug}`)}
             >
               <div className="min-w-0 flex-1">
-                <p className="text-body-lg text-foreground truncate font-medium">
-                  {project.name}
+                <p className="truncate text-body-md font-medium text-foreground">
+                  {project.title}
                 </p>
-                <p className="text-body-md text-muted-foreground truncate">
-                  {project.description}
+                <p className="truncate text-body-sm text-muted-foreground">
+                  {project.tagline}
                 </p>
               </div>
             </button>
           ))}
-          <div className={separatorCls} />
         </>
       )}
 
-      {/* Utilisateurs Section */}
-      {filteredUsers.length > 0 && (
+      {!isLoading && users.length > 0 && (
         <>
-          <div className={sectionTitleCls}>Utilisateurs</div>
-          {filteredUsers.map((user) => (
+          <p className={sectionTitleCls}>Personnes</p>
+          {users.map((user) => (
             <button
-              key={user.userId}
-              className={resultItemCls}
-              onClick={() => navigate(`/user/${user.userId}`)}
+              key={user.id}
               type="button"
+              className={resultItemCls}
+              onClick={() => navigate(`/u/${user.username}`)}
             >
-              <img
+              <Avatar
+                name={user.displayName ?? user.username}
                 src={user.avatar}
-                alt={user.displayName}
-                className="w-8 h-8 rounded-full shrink-0"
+                size="sm"
               />
               <div className="min-w-0">
-                <p className="text-body-lg text-foreground truncate font-medium">
-                  {user.displayName}
+                <p className="truncate text-body-md font-medium text-foreground">
+                  {user.displayName ?? user.username}
                 </p>
-                <p className="text-body-md text-muted-foreground truncate">
+                <p className="truncate text-body-sm text-muted-foreground">
                   @{user.username}
                 </p>
               </div>
             </button>
           ))}
-          <div className={separatorCls} />
         </>
       )}
 
-      {/* Tags Section */}
-      {filteredTags.length > 0 && (
-        <>
-          <div className={sectionTitleCls}>Tags</div>
-          {filteredTags.map((tag) => (
-            <button
-              key={tag.name}
-              className={resultItemCls}
-              onClick={() =>
-                navigate(`/search/projects?tag=${encodeURIComponent(tag.name)}`)
-              }
-              type="button"
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-body-lg text-foreground truncate font-medium">
-                  {tag.name}
-                </p>
-              </div>
-              <span className="text-body-md text-muted-foreground shrink-0">
-                ({tag.count})
-              </span>
-            </button>
-          ))}
-          <div className={separatorCls} />
-        </>
-      )}
-
-      {/* Progrès Section */}
-      {filteredProgress.length > 0 && (
-        <>
-          <div className={sectionTitleCls}>Progrès</div>
-          {filteredProgress.map((progress) => (
-            <button
-              key={progress.id}
-              className="flex flex-col gap-1 w-full px-3 py-2.5 text-foreground cursor-pointer hover:bg-muted outline-none select-none transition-colors"
-              onClick={() => console.log(`Navigate to progress ${progress.id}`)}
-              type="button"
-            >
-              <p className="text-body-lg font-medium text-foreground text-left">
-                {progress.title}
-              </p>
-              <p className="text-body-md text-muted-foreground text-left">
-                {progress.projectName}
-              </p>
-              <p className="text-body-md text-muted-foreground text-left line-clamp-2">
-                {progress.description}
-              </p>
-            </button>
-          ))}
-          <div className={separatorCls} />
-        </>
+      {!isLoading && (projects.length > 0 || users.length > 0) && (
+        <button
+          type="button"
+          className={`${resultItemCls} justify-center text-body-sm font-semibold text-foreground`}
+          onClick={() => navigate(`/recherche?q=${encodeURIComponent(query)}`)}
+        >
+          Voir tous les résultats
+        </button>
       )}
 
       {isEmpty && (
-        <div className="px-4 py-8 text-center">
-          <p className="text-body-lg text-muted-foreground">
-            Aucun résultat trouvé pour "{query}"
-          </p>
-        </div>
+        <p className="px-4 py-6 text-center text-body-sm text-muted-foreground">
+          Aucun résultat pour « {query} »
+        </p>
       )}
     </div>
   );

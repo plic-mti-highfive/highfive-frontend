@@ -1,59 +1,60 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useState } from "react";
 import { Send } from "lucide-react";
+import { IconButton, Textarea } from "@shared/ui";
 
-interface MessageInputProps {
-  onSendMessage: (content: string) => void;
+export interface MessageInputProps {
+  onSend: (body: string) => void;
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
-export function MessageInput({ onSendMessage }: MessageInputProps) {
-  const [message, setMessage] = useState("");
+/** R-P1 : un compte suspendu perd toute capacite d'ecriture (`disabled`). */
+export function MessageInput({
+  onSend,
+  disabled,
+  disabledReason,
+}: MessageInputProps) {
+  const [body, setBody] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-expand textarea as user types
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
-    }
-  }, [message]);
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      onSendMessage(message);
-      setMessage("");
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  function submit() {
+    const trimmed = body.trim();
+    if (!trimmed || disabled) return;
+    onSend(trimmed);
+    setBody("");
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
+  }
 
   return (
-    <div className="border-t border-border bg-card p-4">
-      <div className="flex items-end gap-3">
-        <textarea
+    <div className="border-t border-border p-3">
+      {disabled && disabledReason && (
+        <p className="mb-2 text-body-sm text-muted-foreground">
+          {disabledReason}
+        </p>
+      )}
+      <div className="flex items-end gap-2">
+        <Textarea
           ref={textareaRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Tapez votre message..."
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              submit();
+            }
+          }}
+          placeholder="Écris ton message…"
           rows={1}
-          className="flex-1 p-3 bg-background border border-input rounded-lg resize-none outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder-muted-foreground max-h-30"
+          disabled={disabled}
+          className="max-h-30 flex-1 resize-none"
         />
-        <button
-          onClick={handleSendMessage}
-          disabled={!message.trim()}
-          className="flex-shrink-0 p-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Envoyer"
+        <IconButton
+          aria-label="Envoyer"
+          onClick={submit}
+          disabled={disabled || !body.trim()}
         >
-          <Send className="w-5 h-5" />
-        </button>
+          <Send size={18} />
+        </IconButton>
       </div>
     </div>
   );

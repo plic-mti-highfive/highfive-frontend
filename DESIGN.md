@@ -2,30 +2,54 @@
 name: HighFive!
 description: A community corkboard for real-world projects — warm neutral paper, a hashed six-hue tag wheel, and a serif brand mark that never leaks into the UI around it.
 colors:
-  highfive-pink: "#ff4d8c"
-  highfive-pink-light: "#ffe8f1"
-  highfive-pink-dark: "#cc0055"
-  tag-orange: "#ff6b1a"
-  tag-orange-light: "#fff0e6"
-  tag-orange-dark: "#aa3a00"
-  tag-yellow: "#ffd600"
-  tag-yellow-light: "#fffbe0"
-  tag-yellow-dark: "#6a4e00"
-  tag-apple: "#5ed651"
-  tag-apple-light: "#edfce8"
-  tag-apple-dark: "#1a7010"
-  tag-sky: "#3ec6f5"
-  tag-sky-light: "#e5f8ff"
-  tag-sky-dark: "#0a6080"
-  tag-purple: "#c24bff"
-  tag-purple-light: "#f5e8ff"
-  tag-purple-dark: "#7000b8"
-  neutral-bg: "oklch(0.98 0.008 85)"
-  neutral-fg: "oklch(0.2 0.015 30)"
-  neutral-card: "oklch(1 0.005 85)"
-  neutral-border: "oklch(0.88 0.01 85)"
-  neutral-muted: "oklch(0.94 0.012 85)"
-  neutral-muted-fg: "oklch(0.5 0.015 30)"
+  # Roue d'accent (--color-rose/orange/yellow/apple/sky/purple[-light/-mid/-dark/-deeper] dans src/index.css)
+  rose: "#ff4d8c"
+  rose-light: "#ffe8f1"
+  rose-mid: "#ffd0e2"
+  rose-dark: "#cc0055"
+  rose-deeper: "#99003d"
+  orange: "#ff6b1a"
+  orange-light: "#fff0e6"
+  orange-mid: "#ffd8bc"
+  orange-dark: "#aa3a00"
+  orange-deeper: "#7a2800"
+  yellow: "#ffd600"
+  yellow-light: "#fffbe0"
+  yellow-mid: "#ffe680"
+  yellow-dark: "#6a4e00"
+  yellow-deeper: "#4a3600"
+  apple: "#5ed651"
+  apple-light: "#edfce8"
+  apple-mid: "#c0f0ba"
+  apple-dark: "#1a7010"
+  apple-deeper: "#0e400a"
+  sky: "#3ec6f5"
+  sky-light: "#e5f8ff"
+  sky-mid: "#b0e8fa"
+  sky-dark: "#0a6080"
+  sky-deeper: "#054060"
+  purple: "#c24bff"
+  purple-light: "#f5e8ff"
+  purple-mid: "#e8c8ff"
+  purple-dark: "#7000b8"
+  purple-deeper: "#4a0080"
+  # Neutres (--cream/-dark/-mid, --ink/-soft/-muted ; --background/--foreground/--card/--border/--muted[-foreground])
+  cream: "#fcfcfc"
+  ink: "#0a0a0a"
+  background: "oklch(0.98 0.008 85)"
+  foreground: "oklch(0.2 0.015 30)"
+  card: "oklch(1 0.005 85)"
+  border: "oklch(0.88 0.01 85)"
+  muted: "oklch(0.94 0.012 85)"
+  muted-foreground: "oklch(0.5 0.015 30)"
+  # Statuts (--color-success/warning/info/danger-bg/-fg/-border), mappés sur la roue, jamais de teinte nouvelle
+  success-bg: "{colors.apple-light}"
+  success-fg: "{colors.apple-dark}"
+  warning-bg: "{colors.orange-light}"
+  warning-fg: "{colors.orange-dark}"
+  info-bg: "{colors.sky-light}"
+  info-fg: "{colors.sky-dark}"
+  danger-fg: "oklch(0.577 0.245 27.325)" # --destructive
 typography:
   display:
     fontFamily: "'Fraunces Variable', serif"
@@ -126,35 +150,39 @@ The palette is a warm neutral base (paper cream light mode / deep violet-black d
 
 ### Primary
 
-- **Highfive Pink** (`#ff4d8c`): the one true brand accent. Appears in the logo's exclamation mark, the default user-avatar fallback, the logout affordance (styled as brand rose rather than alarm red, keeping account exit calm rather than alarming), and as one of six possible hashed tag/category colors. It is **not** used as the default button or CTA fill — see the Accent-Not-Action rule below.
+- **`--color-rose`** (`#ff4d8c`): the one true brand accent. Appears in the logo's exclamation mark, the default user-avatar fallback, the logout affordance (styled as brand rose rather than alarm red, keeping account exit calm rather than alarming), and as one of six possible hashed tag/category colors (`data-accent="rose"`). It is **not** used as the default button or CTA fill — see the Accent-Not-Action rule below.
 
-### Secondary — the tag wheel
+### Secondary — the accent wheel
 
-Five more hues complete the deterministic tag/category wheel alongside Highfive Pink, each carrying the same light/base/dark step pattern (light background + dark text for pills, full saturation for borders/rings):
+Five more hues complete the deterministic accent wheel alongside `--color-rose`, each carrying the same `-light`/base/`-dark`/`-deeper` step pattern (light background + dark text for pills, full saturation for borders/rings):
 
-- **Ember Orange** (`#ff6b1a`)
-- **Signal Yellow** (`#ffd600`)
-- **Fresh Apple** (`#5ed651`)
-- **Open Sky** (`#3ec6f5`)
-- **Electric Purple** (`#c24bff`)
+- **`--color-orange`** (`#ff6b1a`)
+- **`--color-yellow`** (`#ffd600`)
+- **`--color-apple`** (`#5ed651`)
+- **`--color-sky`** (`#3ec6f5`)
+- **`--color-purple`** (`#c24bff`)
 
-A tag or project's color is computed by hashing its name and indexing into this six-color wheel (`getTagColor`, `getPaletteForId`) — the same tag string always resolves to the same hue everywhere it appears, and no hue is ever chosen by hand.
+A tag, project, or assignee's color is computed by hashing its id/name and indexing into this six-color wheel — `getAccent()` in `src/shared/lib/accent.ts` returns one of `AccentName` (`"rose" | "orange" | "yellow" | "apple" | "sky" | "purple"`). A container carries that result as `data-accent="<name>"`, which defines `--accent-base`/`--accent-light`/`--accent-dark`/`--card-accent` in CSS (see `[data-accent]` in `src/index.css`) — components (`Card`, `Avatar`, `TagPill`, `Badge` tone `accent`) then style themselves purely from those variables, never from a hex value in JS. The same string always resolves to the same hue everywhere it appears, and no hue is ever chosen by hand.
 
 ### Neutral
 
-- **Paper background** (`oklch(0.98 0.008 85)`): the base app background — warm cream, not pure white.
-- **Ink foreground** (`oklch(0.2 0.015 30)`): body text and the default (near-black) button fill.
-- **Card surface** (`oklch(1 0.005 85)`): elevated surfaces sit one step lighter/whiter than the page.
-- **Hairline border** (`oklch(0.88 0.01 85)`): dividers, input strokes, card borders.
-- **Muted fill / muted text** (`oklch(0.94 0.012 85)` / `oklch(0.5 0.015 30)`): hover fills and secondary text.
+- **`--background`** (`oklch(0.98 0.008 85)`): the base app background — warm cream, not pure white.
+- **`--foreground`** (`oklch(0.2 0.015 30)`): body text and the default (near-black) button fill.
+- **`--card`** (`oklch(1 0.005 85)`): elevated surfaces sit one step lighter/whiter than the page.
+- **`--border`** (`oklch(0.88 0.01 85)`): dividers, input strokes, card borders.
+- **`--muted` / `--muted-foreground`** (`oklch(0.94 0.012 85)` / `oklch(0.5 0.015 30)`): hover fills and secondary text.
 
-In dark mode the same roles shift to a deep violet-black base (`oklch(0.15 0.02 280)`) rather than pure black, keeping the same warm-not-cold character; the six-hue tag wheel and Highfive Pink stay chromatically consistent across both themes via `deeper`/`mid` steps rather than a straight brightness invert.
+In dark mode the same roles shift to a deep violet-black base (`oklch(0.15 0.02 280)`) rather than pure black, keeping the same warm-not-cold character; the six-hue accent wheel stays chromatically consistent across both themes via the `-mid`/`-deeper` steps (see `.dark [data-accent="…"]`) rather than a straight brightness invert.
+
+### Status colors
+
+`--color-success-bg/-fg/-border`, `--color-warning-bg/-fg/-border`, `--color-info-bg/-fg/-border` and `--color-danger-bg/-fg/-border` (Tailwind utilities `bg-success-bg`, `text-success-fg`, `border-success-border`, etc.) map status meaning onto the _same_ wheel rather than introducing new hues: success → apple, warning → orange, info → sky, danger → the existing `--destructive` token. Used by `Badge` tones and anywhere else a status needs to read unambiguously (never for plain identity/category, which stays on the accent wheel above).
 
 ### Named Rules
 
-**The Accent-Not-Action Rule.** Highfive Pink is a signal color (identity, social action, hashed category), never the default action color. Primary buttons and links use the near-black/near-white neutral pair, not rose — this keeps the one brand accent rare and meaningful instead of diluted across every CTA.
+**The Accent-Not-Action Rule.** `--color-rose` is a signal color (identity, social action, hashed category), never the default action color. Primary buttons and links use the near-black/near-white neutral pair, not rose — this keeps the one brand accent rare and meaningful instead of diluted across every CTA.
 
-**The Deterministic Tint Rule.** Any color assigned to a tag, project, or assignee is derived by hashing its name, never picked manually. The same project or tag always renders in the same hue everywhere in the product; don't hardcode a specific hue to a specific entity.
+**The Deterministic Tint Rule.** Any color assigned to a tag, project, or assignee is derived by hashing its id/name through `getAccent()`, never picked manually. The same project or tag always renders in the same hue everywhere in the product; don't hardcode a specific hue to a specific entity.
 
 ## Typography
 
@@ -179,7 +207,21 @@ In dark mode the same roles shift to a deep violet-black base (`oklch(0.15 0.02 
 
 ## Layout
 
-The primary experience is a three-column feed: a sticky left profile rail (`260px`), a fluid center column bordered on both sides (`xl:border-x`) once the viewport is wide enough for the rail, and a sticky right rail of trending users/tags (`280px`), all inside a `max-w-[100rem]` page container. Vertical rhythm between feed sections is generous (`gap-11`, `py-10`), and sidebars stick just below the header (`top: 6.25rem`).
+Page content across the site shell (Découvrir, search, a project's fiche, a
+profile…) is capped at a single content width, the `--container-content`
+token (`1240px`, Tailwind utility `max-w-content`) — one width for the whole
+site shell rather than a per-page arbitrary value.
+
+The home feed adds a sticky left profile rail (`260px`) and a sticky right
+rail of trending users/tags (`280px`) around that same fluid center column,
+bordered on both sides (`xl:border-x`) once the viewport is wide enough for
+the rails. Vertical rhythm between feed sections is generous (`gap-11`,
+`py-10`), and sidebars stick just below the header/category-bar stack at the
+`--offset-shell-sticky` token (`6.25rem` = `56px` header + `44px` category
+bar, Tailwind utility `top-shell-sticky`). A page that sits under the header
+alone (no category bar), such as the messaging screen, instead fills the
+remaining viewport height via `--offset-shell-header` (`3.5rem`, utility
+`h-below-header`).
 
 Navigation is two stacked sticky bars: a `56px` header (logo, centered search, actions) directly above a `44px` pill-style category nav bar that auto-hides on scroll-down and reappears on scroll-up, keeping category browsing available without permanently taxing vertical space.
 
@@ -187,23 +229,29 @@ Simpler task-oriented surfaces (auth) drop the three-column feed entirely for a 
 
 ## Elevation & Depth
 
-Flat at rest, everywhere. Cards, kanban tickets, inputs, and popovers carry at most a barely-visible `shadow-sm`. Depth is not ambient — it is a direct response to interaction, and when it appears it is never a neutral gray shadow alone.
+Flat at rest, everywhere. Cards, tickets, inputs, and popovers carry at most `shadow-rest` — barely visible. Depth is not ambient — it is a direct response to interaction, and when it appears it is never a neutral gray shadow alone. Four tokens (`--shadow-rest`/`--shadow-lift`/`--shadow-lift-lg`/`--shadow-overlay` in `src/index.css`, exposed as the Tailwind utilities `shadow-rest`/`shadow-lift`/`shadow-lift-lg`/`shadow-overlay`) cover the whole vocabulary; each has a bolder `.dark` variant so elevation stays legible on the deep violet-black base.
 
 ### Shadow Vocabulary
 
-- **Resting** (`shadow-sm`): the default state for every card, ticket, and popover surface.
-- **Feed card hover** (`0 2px 10px -2px rgb(0 0 0 / 0.15), 0 0 0 2px var(--card-accent)`): soft lift plus a 2px ring tinted in that card's own deterministic accent color.
-- **Hero card hover** (`0 4px 16px -4px rgb(0 0 0 / 0.15), 0 0 0 2px var(--card-accent)`): the same tinted-ring mechanic, scaled up for the larger hero card.
-- **Kanban ticket hover** (`0 6px 20px rgba(0,0,0,0.09)` light / `0 6px 20px rgba(0,0,0,0.3)` dark, plus `-translate-y-0.5`): shadow, lift, and a border-color shift together.
-- **Popover/menu** (`shadow-lg`): the one place a plain, untinted shadow is used — transient overlay surfaces (menus, search dropdown) rather than persistent content cards.
+- **`shadow-rest`**: the default state for every card, ticket, and popover surface at rest — `Card` variant `flat`.
+- **`shadow-lift`**: soft lift plus a 2px ring tinted via `var(--card-accent, transparent)` — the feed-card-hover mechanic, and the default hover shadow for `Card` variant `interactive` when a `data-accent` is set on the same element.
+- **`shadow-lift-lg`**: the same tinted-ring mechanic, scaled up for larger surfaces (hero card equivalent).
+- **`shadow-overlay`**: the one place a plain, untinted shadow is used — transient overlay surfaces (`DialogPopup`, menus, search dropdown) rather than persistent content cards.
 
 ### Named Rules
 
-**The Tinted Lift Rule.** A card's hover elevation is never generic. It pairs a soft shadow with a 2px ring in that specific card's own deterministic accent color (`--card-accent`, from the same hash used for its background tint) — depth and identity color appear together, or not at all.
+**The Tinted Lift Rule.** A card's hover elevation is never generic. `--shadow-lift`/`--shadow-lift-lg` pair a soft shadow with a 2px ring in `var(--card-accent)` — set for free by `data-accent="<accent>"` on the same container (see the Deterministic Tint Rule) — so depth and identity color appear together, or not at all.
+
+## Motion & Layering
+
+- **Durations** — `duration-fast` (120ms), `duration-base` (200ms), `duration-slow` (320ms) (`--duration-*`, exposed via `@utility` since Tailwind has no theme namespace for `transition-duration`).
+- **Easing** — `ease-standard` and `ease-emphasized` (`--ease-standard`/`--ease-emphasized`, real Tailwind theme tokens).
+- All of the above are neutralized under `prefers-reduced-motion: reduce` globally, so no per-component opt-out is needed.
+- **Z-index** — `z-base`/`z-sticky`/`z-dropdown`/`z-overlay`/`z-modal`/`z-toast` (`--z-base` … `--z-toast`, exposed via `@utility`) replace ad hoc `z-[999]`/`z-[9998]` values with a single ordered scale.
 
 ## Shapes
 
-Corners scale with a surface's importance: small interactive controls (buttons, inputs) use the tightest radius (8px), cards step up through 12–20px, and anything meant to read as a badge or avatar (tag pills, assignee initials, the user-menu trigger) is fully round. There are no sharp (0px) corners anywhere in the system, and no visible borders on colored surfaces — card and pill boundaries are made of color/shadow, not stroke, except for the deliberately flat kanban ticket and input controls, which do carry a hairline border.
+Corners scale with a surface's importance via the `--radius-sm/md/lg/xl/pill` tokens (Tailwind `rounded-sm/md/lg/xl/pill`): small interactive controls (buttons, inputs) use the tightest radius (`rounded-sm`, 8px), cards step up through `rounded-md`/`rounded-lg`/`rounded-xl` (12–20px), and anything meant to read as a badge or avatar (`TagPill`, `Avatar`, the user-menu trigger) uses `rounded-pill` (fully round). There are no sharp (0px) corners anywhere in the system, and no visible borders on colored surfaces — card and pill boundaries are made of color/shadow, not stroke, except for the deliberately flat ticket and input controls, which do carry a hairline `border-border`.
 
 ## Components
 
@@ -244,7 +292,7 @@ Buttons, inputs, and cards read as **soft and inviting**: generous radii, light 
 
 ### Avatar (signature component)
 
-Circular; renders the real photo when available, and otherwise deterministic initials-on-tint (`hsl(hue, 45%, 80%)` background / `hsl(hue, 45%, 30%)` text, hue derived from the person's name) with a subtle `ring-1 ring-black/10`. The same fallback mechanic and hue-from-name logic used for card tints and tag colors is reused here for people, keeping the "everything gets its own deterministic color" idea consistent across projects, tags, and users alike.
+Circular; renders the real photo when available, and otherwise deterministic initials on `var(--accent-light)` background / `var(--accent-dark)` text (same `data-accent`/`getAccent()` mechanic as tags and card tints) with a subtle `ring-1 ring-black/10`. The same fallback mechanic and accent-from-name logic used for card tints and tag colors is reused here for people, keeping the "everything gets its own deterministic color" idea consistent across projects, tags, and users alike.
 
 ## Do's and Don'ts
 
@@ -252,7 +300,7 @@ Circular; renders the real photo when available, and otherwise deterministic ini
 
 - **Do** derive any per-entity color (tag, project, assignee, avatar fallback) from a deterministic hash of its name — never hardcode a hue to a specific entity.
 - **Do** pair a hover shadow with a tinted ring in that item's own accent color on cards and tickets (The Tinted Lift Rule), rather than a plain gray shadow.
-- **Do** keep the primary CTA fill neutral (near-black), reserving Highfive Pink for identity and social-action moments.
+- **Do** keep the primary CTA fill neutral (near-black), reserving `--color-rose` for identity and social-action moments.
 - **Do** keep card and pill boundaries made of color/tint and shadow rather than visible borders.
 
 ### Don't:

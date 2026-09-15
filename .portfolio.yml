@@ -1,0 +1,36 @@
+title: HighFive — frontend
+type: project
+course: PLIC — Projet Long d'Innovation Collaborative
+school: EPITA
+year: MTI
+dates: 2025-2026
+description: Frontend React de la plateforme HighFive — dashboard admin, gestion de projets/tickets et canvas collaboratif temps réel (tldraw + Yjs) branché sur le backend canvas.
+repo: github.com/plic-mti-highfive/highfive-frontend
+authorship: author
+contribution: projet d'équipe — développeur au même titre — dépôt GitHub d'un tiers (organisation plic-mti-highfive), 3 commits sur 173 (contribution personnelle ciblée sur le canvas et le dashboard admin, à distinguer du reste du frontend porté par l'équipe)
+languages: [TypeScript]
+tools:
+  [
+    React 19,
+    Vite,
+    React Router,
+    Tailwind CSS,
+    shadcn/ui,
+    tldraw,
+    Yjs,
+    Hocuspocus Provider,
+    Recharts,
+    Vitest,
+    Docker,
+    Docker Compose,
+    pnpm,
+    Husky,
+  ]
+skills:
+  - Intégration d'un éditeur collaboratif temps réel (tldraw branché sur un document Yjs via Hocuspocus, curseurs et présence des autres utilisateurs)
+  - Consommation d'une API REST via une couche de services HTTP typée (contrats de données définis en zod dans `src/domain/`, exportés vers le backend)
+  - Tableau de bord d'administration (gestion des utilisateurs et de leurs rôles)
+  - Interface React 19 stylée avec Tailwind CSS et composants shadcn/ui
+team_size: 5
+role: Développeur
+highlight: false

@@ -1,25 +1,12 @@
-// Configuration API
-
-export type ApiMode = "mock" | "http";
-
+// Configuration du client fetch unique (V2-5). Seule la base URL du backend
+// est necessaire ici : le mode mock/http se lit directement via
+// `VITE_API_MODE` (src/main.tsx demarre MSW en mode mock avant le premier
+// rendu) et n'a pas besoin d'etre reflete dans un objet de configuration
+// partage.
 export interface ApiConfig {
-  mode: ApiMode;
   baseUrl: string;
-  tenantId: string;
-  iaApiUrl: string;
 }
 
-// Configuration par défaut (peut être overridé par .env)
 export const apiConfig: ApiConfig = {
-  mode: (import.meta.env.VITE_API_MODE as ApiMode) || "mock",
   baseUrl: import.meta.env.VITE_API_URL || "http://localhost:3000",
-  tenantId: import.meta.env.VITE_TENANT_ID || "default-tenant",
-  iaApiUrl: import.meta.env.VITE_IA_API_URL || "http://localhost:8000/api/v1",
 };
-
-export const setApiMode = (mode: ApiMode) => {
-  apiConfig.mode = mode;
-};
-
-export const isHttpMode = () => apiConfig.mode === "http";
-export const isMockMode = () => apiConfig.mode === "mock";
