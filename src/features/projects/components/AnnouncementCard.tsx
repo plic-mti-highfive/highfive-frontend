@@ -1,5 +1,14 @@
-import { Avatar, Badge, Button, Card, CardBody } from "@shared/ui";
+import { Avatar, Badge, Card, CardBody, IconButton } from "@shared/ui";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuPositioner,
+  DropdownMenuPopup,
+  DropdownMenuItem,
+} from "@shared/ui";
 import { formatExactDateTime, formatRelativeDate } from "@shared/lib/dates";
+import { MoreVertical } from "lucide-react";
 import type { AnnouncementWithAuthor } from "@/api/announcements";
 
 /** Une annonce (doc 13 E-11) : titre, corps, auteur, date, actions du porteur+. */
@@ -18,6 +27,8 @@ export function AnnouncementCard({
   isPinning?: boolean;
   isDeleting?: boolean;
 }) {
+  const hasActions = canManage && (onPin || onDelete);
+
   return (
     <Card>
       <CardBody>
@@ -28,29 +39,40 @@ export function AnnouncementCard({
               {announcement.title}
             </h3>
           </div>
-          {canManage && (
-            <div className="flex shrink-0 gap-2">
-              {!announcement.pinned && onPin && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={isPinning}
-                  onClick={onPin}
-                >
-                  Épingler
-                </Button>
-              )}
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={isDeleting}
-                  onClick={onDelete}
-                >
-                  Supprimer
-                </Button>
-              )}
-            </div>
+          {hasActions && (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <IconButton
+                    aria-label="Actions"
+                    size="sm"
+                    className="shrink-0"
+                  />
+                }
+              >
+                <MoreVertical size={16} />
+              </DropdownMenuTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuPositioner>
+                  <DropdownMenuPopup>
+                    {!announcement.pinned && onPin && (
+                      <DropdownMenuItem disabled={isPinning} onClick={onPin}>
+                        Épingler
+                      </DropdownMenuItem>
+                    )}
+                    {onDelete && (
+                      <DropdownMenuItem
+                        disabled={isDeleting}
+                        className="text-destructive data-[highlighted]:bg-destructive/10"
+                        onClick={onDelete}
+                      >
+                        Supprimer
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuPopup>
+                </DropdownMenuPositioner>
+              </DropdownMenuPortal>
+            </DropdownMenu>
           )}
         </div>
 

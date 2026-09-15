@@ -1,15 +1,7 @@
 import { useId, useState } from "react";
 import { X } from "lucide-react";
 
-import {
-  Button,
-  Card,
-  CardBody,
-  Field,
-  IconButton,
-  Input,
-  Textarea,
-} from "@shared/ui";
+import { Button, Field, IconButton, Input, Textarea } from "@shared/ui";
 import type { Need, Project } from "@/domain";
 import { useUpdateProject } from "@/api/queries/projects";
 import { TagPicker } from "./TagPicker";
@@ -67,89 +59,85 @@ export function ProjectEditForm({
   }
 
   return (
-    <Card>
-      <CardBody>
-        <Field label="Titre" htmlFor={titleId} required>
-          <Input
-            id={titleId}
-            value={title}
-            maxLength={70}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </Field>
-        <Field
-          label="Accroche"
-          htmlFor={taglineId}
-          required
-          description={`${tagline.length}/140`}
-        >
-          <Input
-            id={taglineId}
-            value={tagline}
-            maxLength={140}
-            onChange={(e) => setTagline(e.target.value)}
-          />
-        </Field>
-        <Field label="Description" htmlFor={descriptionId}>
-          <Textarea
-            id={descriptionId}
-            value={description}
-            maxLength={5000}
-            rows={8}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </Field>
-        <Field label="Thèmes" required>
-          <TagPicker selected={tags} onChange={setTags} />
-        </Field>
-        <Field label="Ce que tu cherches" description="Optionnel">
-          <ul className="flex flex-col gap-2">
-            {needs.map((need) => (
-              <li key={need.id} className="flex items-center gap-2">
-                <span className="flex-1 text-body-sm text-foreground">
-                  {need.label}
-                </span>
-                <IconButton
-                  aria-label="Retirer ce besoin"
-                  size="xs"
-                  onClick={() =>
-                    setNeeds((current) =>
-                      current.filter((n) => n.id !== need.id),
-                    )
-                  }
-                >
-                  <X size={14} />
-                </IconButton>
-              </li>
-            ))}
-          </ul>
-          {needs.length < 6 && (
-            <div className="mt-2 flex gap-2">
-              <Input
-                value={newNeedLabel}
-                maxLength={40}
-                placeholder="quelqu'un pour…"
-                onChange={(e) => setNewNeedLabel(e.target.value)}
-              />
-              <Button variant="outline" onClick={addNeed}>
-                Ajouter
-              </Button>
-            </div>
-          )}
-        </Field>
+    <div className="flex flex-col gap-4">
+      <Field label="Titre" htmlFor={titleId} required>
+        <Input
+          id={titleId}
+          value={title}
+          maxLength={70}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </Field>
+      <Field
+        label="Accroche"
+        htmlFor={taglineId}
+        required
+        description={`${tagline.length}/140`}
+      >
+        <Input
+          id={taglineId}
+          value={tagline}
+          maxLength={140}
+          onChange={(e) => setTagline(e.target.value)}
+        />
+      </Field>
+      <Field label="Description" htmlFor={descriptionId}>
+        <Textarea
+          id={descriptionId}
+          value={description}
+          maxLength={5000}
+          rows={8}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </Field>
+      <Field label="Thèmes" required>
+        <TagPicker selected={tags} onChange={setTags} />
+      </Field>
+      <Field label="Ce que tu cherches" description="Optionnel">
+        <ul className="flex flex-col gap-2">
+          {needs.map((need) => (
+            <li key={need.id} className="flex items-center gap-2">
+              <span className="flex-1 text-body-sm text-foreground">
+                {need.label}
+              </span>
+              <IconButton
+                aria-label="Retirer ce besoin"
+                size="xs"
+                onClick={() =>
+                  setNeeds((current) => current.filter((n) => n.id !== need.id))
+                }
+              >
+                <X size={14} />
+              </IconButton>
+            </li>
+          ))}
+        </ul>
+        {needs.length < 6 && (
+          <div className="mt-2 flex gap-2">
+            <Input
+              value={newNeedLabel}
+              maxLength={40}
+              placeholder="quelqu'un pour…"
+              onChange={(e) => setNewNeedLabel(e.target.value)}
+            />
+            <Button variant="outline" onClick={addNeed}>
+              Ajouter
+            </Button>
+          </div>
+        )}
+      </Field>
 
-        <div className="flex gap-2">
-          <Button
-            disabled={!canSubmit || updateProject.isPending}
-            onClick={handleSubmit}
-          >
-            Enregistrer
-          </Button>
-          <Button variant="ghost" onClick={onClose}>
-            Annuler
-          </Button>
-        </div>
-      </CardBody>
-    </Card>
+      <div className="flex gap-2">
+        <Button
+          disabled={!canSubmit || updateProject.isPending}
+          onClick={handleSubmit}
+        >
+          Enregistrer
+        </Button>
+        <Button variant="ghost" onClick={onClose}>
+          Annuler
+        </Button>
+      </div>
+    </div>
   );
 }

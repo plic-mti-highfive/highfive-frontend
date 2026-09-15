@@ -83,16 +83,20 @@ export function SearchPage() {
       ? sortParam
       : "recents";
 
-  const hasQuery = Boolean(q.trim()) || activeTags.length > 0;
+  const hasQuery =
+    Boolean(q.trim()) || activeTags.length > 0 || typeParam !== null;
 
   useDocumentTitle(q ? `Résultats pour « ${q} »` : "Recherche");
 
-  const results = useSearch({
-    q: q || undefined,
-    types: [TYPE_TO_DOMAIN[activeType]],
-    tags: activeTags.length ? activeTags : undefined,
-    sort: SORT_TO_DOMAIN[activeSort],
-  });
+  const results = useSearch(
+    {
+      q: q || undefined,
+      types: [TYPE_TO_DOMAIN[activeType]],
+      tags: activeTags.length ? activeTags : undefined,
+      sort: SORT_TO_DOMAIN[activeSort],
+    },
+    { enabled: hasQuery },
+  );
 
   // R-R2 : recherche vide -> les themes les plus actifs plutot qu'un ecran blanc.
   const trendingTags = useTrendingTags();

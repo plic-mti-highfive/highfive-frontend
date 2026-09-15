@@ -1,12 +1,23 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Share2 } from "lucide-react";
 
-import { Avatar, Badge, Button, IconButton, TagPill } from "@shared/ui";
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  DialogClose,
+  DialogPopup,
+  DialogTitle,
+  IconButton,
+  TagPill,
+} from "@shared/ui";
 import { HighfiveButton } from "@shared/components/projects";
 import type { Project, UserSummary } from "@/domain";
 import { PARTICIPATION_LABEL, STATE_LABEL, STATE_TONE } from "../lib/labels";
 import { JoinAction } from "./JoinAction";
+import { ProjectEditForm } from "./ProjectEditForm";
 
 /**
  * En-tete de la fiche (doc 13 E-10) : porteur, titre en Geist (R-DA... le
@@ -33,8 +44,8 @@ export function ProjectHeader({
   canEdit: boolean;
   highfiveGiven: boolean;
 }) {
-  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   async function handleShare() {
     try {
@@ -96,12 +107,22 @@ export function ProjectHeader({
             isMember={isMember}
           />
           {canEdit && (
-            <Button
-              variant="outline"
-              onClick={() => navigate(`/projets/${project.slug}?modifier=1`)}
-            >
-              Modifier
-            </Button>
+            <>
+              <Button variant="outline" onClick={() => setEditOpen(true)}>
+                Modifier
+              </Button>
+              <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <DialogPopup className="max-w-2xl overflow-y-auto max-h-[90vh]">
+                  <DialogTitle>Modifier le projet</DialogTitle>
+                  <div className="mt-4">
+                    <ProjectEditForm
+                      project={project}
+                      onClose={() => setEditOpen(false)}
+                    />
+                  </div>
+                </DialogPopup>
+              </Dialog>
+            </>
           )}
         </div>
 

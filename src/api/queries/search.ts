@@ -10,11 +10,14 @@ import type { SearchParams } from "@/domain";
  * l'ecran le temps de la requete suivante evite un flash de squelette vide
  * a chaque caractere tape.
  */
-export function useSearch(params: SearchParams) {
+export function useSearch(
+  params: SearchParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: queryKeys.search.results(params),
     queryFn: () => searchApi.search(params),
-    enabled: Boolean(params.q || params.tags?.length),
+    enabled: options?.enabled ?? Boolean(params.q || params.tags?.length),
     placeholderData: keepPreviousData,
   });
 }

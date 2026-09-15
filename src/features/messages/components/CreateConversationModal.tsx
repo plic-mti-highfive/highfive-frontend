@@ -7,7 +7,6 @@ import {
   Avatar,
   Button,
   Dialog,
-  DialogDescription,
   DialogPopup,
   DialogTitle,
   Field,
@@ -82,9 +81,6 @@ export function CreateConversationModal({
     >
       <DialogPopup>
         <DialogTitle>Nouvelle conversation</DialogTitle>
-        <DialogDescription>
-          Choisis une ou plusieurs personnes, puis écris ton premier message.
-        </DialogDescription>
 
         <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
           <Field label="À">

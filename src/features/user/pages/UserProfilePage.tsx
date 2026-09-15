@@ -143,10 +143,12 @@ export default function UserProfilePage() {
 
           <div className="min-w-0 flex-1">
             <Tabs defaultValue="created">
-              <TabsList>
-                <TabsTab value="created">Projets créés</TabsTab>
-                <TabsTab value="joined">Projets rejoints</TabsTab>
-              </TabsList>
+              <div className="border-b border-border">
+                <TabsList>
+                  <TabsTab value="created">Projets créés</TabsTab>
+                  <TabsTab value="joined">Projets rejoints</TabsTab>
+                </TabsList>
+              </div>
 
               <TabsPanel value="created">
                 {projects.isLoading ? (

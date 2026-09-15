@@ -1,4 +1,5 @@
-import { EmptyState, Spinner, TagPill } from "@shared/ui";
+import { useState } from "react";
+import { EmptyState, Input, Spinner, TagPill } from "@shared/ui";
 import { useTags } from "@/api/queries/tags";
 
 /**
@@ -9,11 +10,14 @@ export function TagPicker({
   selected,
   onChange,
   max = 5,
+  searchable = false,
 }: {
   selected: string[];
   onChange: (tags: string[]) => void;
   max?: number;
+  searchable?: boolean;
 }) {
+  const [query, setQuery] = useState("");
   const { data: tags, isLoading } = useTags();
 
   if (isLoading) {
@@ -22,6 +26,13 @@ export function TagPicker({
   if (!tags || tags.length === 0) {
     return <EmptyState title="Aucun thème disponible pour l'instant." />;
   }
+
+  const visible =
+    searchable && query.trim()
+      ? tags.filter((t) =>
+          t.label.toLowerCase().includes(query.trim().toLowerCase()),
+        )
+      : tags;
 
   function toggle(tagId: string) {
     if (selected.includes(tagId)) {
@@ -33,8 +44,15 @@ export function TagPicker({
 
   return (
     <div className="flex flex-col gap-2">
+      {searchable && (
+        <Input
+          placeholder="Rechercher un thème…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      )}
       <div className="flex flex-wrap gap-2">
-        {tags.map((tag) => {
+        {visible.map((tag) => {
           const active = selected.includes(tag.id);
           return (
             <TagPill
@@ -48,7 +66,7 @@ export function TagPicker({
         })}
       </div>
       <p className="text-body-sm text-muted-foreground">
-        {selected.length} / {max} thèmes
+        {selected.length} / {max} thèmes sélectionnés
       </p>
     </div>
   );

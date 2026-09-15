@@ -56,9 +56,6 @@ export function CommentsSection({
     <Section title={`Commentaires (${comments.length})`}>
       {isAuthenticated ? (
         <div className="flex flex-col gap-2">
-          <p className="text-body-sm text-muted-foreground">
-            Visible par tout le monde
-          </p>
           <Textarea
             value={body}
             maxLength={1000}
@@ -66,7 +63,7 @@ export function CommentsSection({
             placeholder="Écrire un commentaire…"
             onChange={(event) => setBody(event.target.value)}
           />
-          <div>
+          <div className="flex justify-end">
             <Button
               size="sm"
               disabled={!body.trim() || createComment.isPending}

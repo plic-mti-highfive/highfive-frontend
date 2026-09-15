@@ -58,6 +58,15 @@ export { Stat, type StatProps } from "./stat";
 export { Divider, type DividerProps } from "./divider";
 
 export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuPositioner,
+  DropdownMenuPopup,
+  DropdownMenuItem,
+} from "./dropdown-menu";
+
+export {
   Table,
   TableHeader,
   TableBody,

@@ -3,11 +3,10 @@ import { EmptyState } from "@shared/ui";
 
 export function EmptyConversation() {
   return (
-    <div className="flex h-full items-center justify-center">
+    <div className="flex h-full min-w-0 flex-1 items-center justify-center bg-muted">
       <EmptyState
         icon={MessageSquare}
-        title="Choisis une conversation"
-        description="Sélectionne une discussion dans la liste, ou lance-en une nouvelle."
+        title="Pas de conversation sélectionnée"
       />
     </div>
   );
