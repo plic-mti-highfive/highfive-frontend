@@ -7,7 +7,6 @@ import {
   Badge,
   Button,
   Dialog,
-  DialogClose,
   DialogPopup,
   DialogTitle,
   IconButton,
