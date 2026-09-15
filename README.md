@@ -33,18 +33,19 @@ VITE_API_MODE=http VITE_API_URL=http://localhost:3000 pnpm dev
 
 ## Scripts
 
-| Commande             | Description                                         |
-| -------------------- | --------------------------------------------------- |
-| `pnpm dev`           | Serveur de développement (Vite HMR)                 |
-| `pnpm build`         | Vérification TypeScript + build production          |
-| `pnpm preview`       | Prévisualiser le build de production                |
-| `pnpm lint`          | ESLint sur tout le projet                           |
-| `pnpm format`        | Prettier sur tout le projet                         |
-| `pnpm test`          | Tests unitaires (Vitest)                            |
-| `pnpm test:ui`       | Interface Vitest dans le navigateur                 |
-| `pnpm test:coverage` | Rapport de couverture                               |
-| `pnpm check:tokens`  | Garde-fou tokens (`scripts/check-tokens.mjs`, V2-2) |
-| `pnpm check`         | `tsc -b && eslint . && check:tokens && vitest run`  |
+| Commande              | Description                                                            |
+| --------------------- | ---------------------------------------------------------------------- |
+| `pnpm dev`            | Serveur de développement (Vite HMR)                                    |
+| `pnpm build`          | Vérification TypeScript + build production                             |
+| `pnpm preview`        | Prévisualiser le build de production                                   |
+| `pnpm lint`           | ESLint sur tout le projet                                              |
+| `pnpm format`         | Prettier sur tout le projet                                            |
+| `pnpm test`           | Tests unitaires (Vitest)                                               |
+| `pnpm test:ui`        | Interface Vitest dans le navigateur                                    |
+| `pnpm test:coverage`  | Rapport de couverture                                                  |
+| `pnpm check:tokens`   | Garde-fou tokens (`scripts/check-tokens.mjs`, V2-2)                    |
+| `pnpm export:schemas` | Exporte les schémas Zod vers le backend (`scripts/export-schemas.mjs`) |
+| `pnpm check`          | `tsc -b && eslint . && check:tokens && vitest run`                     |
 
 Un hook pre-commit (Husky + lint-staged) lance `prettier --write .` et
 `check:tokens` sur les fichiers `.ts`/`.tsx` modifiés avant chaque commit.
@@ -61,15 +62,16 @@ L'application est servie par nginx sur `http://localhost:8080`.
 
 ```
 src/
-├── app/            App.tsx, router.tsx (routes FR), providers.tsx, layouts (coquille site, coquille atelier)
+├── app/            App.tsx, router.tsx (routes FR), providers.tsx, pages/ (pages globales), layouts/ (coquille site, coquille atelier)
 ├── domain/         Schémas zod par entité (source unique des types, z.infer)
 ├── api/            client.ts (fetch + ApiError), <domaine>.ts, queries/<domaine>.ts (hooks TanStack Query)
 ├── mocks/          browser.ts, handlers/<domaine>.ts (= spec backend), data/, db.ts
 ├── shared/
 │   ├── ui/         Primitives maison (base-ui/Radix + cva + tokens) : Button, Card, Badge, Dialog…
 │   ├── lib/        cn, dates, couleurs déterministes (accent), hooks génériques
-│   └── components/ Composants transverses composés à partir des primitives (ex. ProjectCard)
-└── features/<feature>/  components/, pages/, hooks/ — un domaine d'écrans par feature
+│   ├── components/ Composants transverses composés à partir des primitives (ex. ProjectCard)
+│   └── contexts/   Contextes React partagés (AuthContext, ThemeContext)
+└── features/<feature>/  components/, pages/, lib/ — un domaine d'écrans par feature
 ```
 
 ### Alias de chemin (Vite + TypeScript)
@@ -109,6 +111,9 @@ src/
 | Requêtes serveur       | TanStack Query                       |
 | Mock API               | MSW                                  |
 | Tableau blanc (canvas) | tldraw                               |
+| Graphiques             | recharts                             |
 | Icônes                 | lucide-react                         |
+| Dates                  | date-fns                             |
+| Composants UI (shadcn) | shadcn                               |
 | Tests                  | Vitest + @vitest/coverage-v8         |
 | Qualité                | ESLint, Prettier, Husky, lint-staged |
