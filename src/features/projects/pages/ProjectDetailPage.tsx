@@ -1,6 +1,6 @@
 import { useOutletContext } from "react-router-dom";
 
-import { EmptyState } from "@shared/ui";
+import { EmptyState, Section } from "@shared/ui";
 import { useAnnouncements } from "@/api/queries/announcements";
 import type { ProjectOutletContext } from "../components/ProjectLayout";
 import { ProjectOverviewSidebar } from "../components/ProjectOverviewSidebar";
@@ -30,10 +30,7 @@ export function ProjectDetailPage() {
           />
         )}
 
-        <section className="flex flex-col gap-3">
-          <h2 className="text-heading-md font-semibold text-foreground">
-            À propos
-          </h2>
+        <Section title="À propos">
           {project.description ? (
             <div
               className="prose-sm max-w-none text-body-md leading-relaxed text-foreground"
@@ -47,7 +44,7 @@ export function ProjectDetailPage() {
               className="rounded-lg border border-dashed border-border bg-muted"
             />
           )}
-        </section>
+        </Section>
 
         <CommentsSection
           slug={project.slug}

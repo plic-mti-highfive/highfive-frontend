@@ -1,23 +1,33 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  Button,
-  Divider,
-  EmptyState,
-  ErrorState,
-  Section,
-  Spinner,
-} from "@shared/ui";
+import { Button, EmptyState, ErrorState, Section, Spinner } from "@shared/ui";
 import { ProjectCard } from "@shared/components/projects";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
 import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
 import { useDiscoverFeed } from "@/api/queries/search";
 import { TagFilterBar } from "../components/TagFilterBar";
 import { DiscoverSectionBlock } from "../components/DiscoverSectionBlock";
-import { SuggestedPeoplePanel } from "../components/SuggestedPeoplePanel";
-import { TrendingTagsPanel } from "../components/TrendingTagsPanel";
+import { CreateProjectCta } from "../components/CreateProjectCta";
 import { FeedSkeleton } from "../components/FeedSkeleton";
+import type { DiscoverSection, DiscoverSectionId } from "@/domain";
+
+/**
+ * Ordre d'affichage volontairement distinct de l'ordre serveur (V2, retour
+ * util. "donner du rythme") : "Pour toi" juste après le projet du moment,
+ * `near_your_projects` masquée (redondante avec "Pour toi" côté Découvrir).
+ */
+const SECTION_DISPLAY_ORDER: DiscoverSectionId[] = [
+  "for_you",
+  "trending_highfives",
+  "needs_help",
+  "starting",
+];
+
+function orderedSections(sections: DiscoverSection[]): DiscoverSection[] {
+  return SECTION_DISPLAY_ORDER.map((id) =>
+    sections.find((section) => section.id === id),
+  ).filter((section): section is DiscoverSection => Boolean(section));
+}
 
 /**
  * Découvrir (doc 12 E-01, V2 retour utilisateur "Découvrir connecté trop
@@ -69,34 +79,18 @@ export default function HomePage() {
             }
           />
         ) : (
-          <div className="flex items-start gap-8">
-            <div className="flex min-w-0 flex-1 flex-col gap-9">
-              {feed.data?.moment && (
-                <>
-                  <Section title="Le projet du moment">
-                    <ProjectCard
-                      project={feed.data.moment}
-                      variant="featured"
-                    />
-                  </Section>
-                  {(feed.data.sections.length ?? 0) > 0 && <Divider />}
-                </>
-              )}
+          <div className="flex flex-col gap-9">
+            {feed.data?.moment && (
+              <Section title="Le projet du moment" titleSize="lg">
+                <ProjectCard project={feed.data.moment} variant="hero" />
+              </Section>
+            )}
 
-              {feed.data?.sections.map((section, i) => (
-                <React.Fragment key={section.id}>
-                  <DiscoverSectionBlock section={section} />
-                  {i < (feed.data?.sections.length ?? 0) - 1 && <Divider />}
-                </React.Fragment>
-              ))}
-            </div>
+            {orderedSections(feed.data?.sections ?? []).map((section) => (
+              <DiscoverSectionBlock key={section.id} section={section} />
+            ))}
 
-            <aside className="sticky top-shell-sticky hidden w-72 shrink-0 flex-col gap-6 self-start lg:flex">
-              <div className="flex flex-col gap-6 rounded-[--radius-xl] border border-[--border] bg-card p-6 shadow-[--shadow-rest]">
-                <SuggestedPeoplePanel />
-                <TrendingTagsPanel />
-              </div>
-            </aside>
+            <CreateProjectCta />
           </div>
         )}
       </main>

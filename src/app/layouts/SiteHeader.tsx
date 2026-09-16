@@ -96,7 +96,7 @@ function AccountMenu({
   return (
     <Menu.Root>
       <Menu.Trigger
-        className="flex size-10 items-center justify-center rounded-pill outline-none"
+        className="flex size-10 items-center justify-center outline-none"
         aria-label="Mon compte"
       >
         <Avatar name={displayName ?? username} src={avatar} size="md" />
@@ -111,7 +111,7 @@ function AccountMenu({
           <Menu.Popup className={popupCls}>
             <Menu.Item
               render={<Link to={`/u/${username}`} />}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 outline-none transition-colors hover:bg-muted"
+              className="flex items-center gap-3 px-3 py-2.5 outline-none transition-colors hover:bg-muted"
               onMouseEnter={() => void preloadUserProfile()}
               onFocus={() => void preloadUserProfile()}
             >

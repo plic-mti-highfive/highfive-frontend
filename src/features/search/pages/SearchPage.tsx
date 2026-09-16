@@ -312,7 +312,7 @@ export function SearchPage() {
                   <ProjectCard
                     key={project.id}
                     project={project}
-                    variant="feed"
+                    variant="card"
                   />
                 ))}
               </div>

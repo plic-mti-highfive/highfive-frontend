@@ -42,7 +42,7 @@ const SEEDS: ProjectSeed[] = [
     title: "Fresque murale collaborative",
     slug: "fresque-murale-collaborative",
     tagline:
-      "On repeint Tableau blanc du gymnase avec les habitants du quartier, un samedi par mois.",
+      "On repeint le mur du gymnase avec les habitants du quartier, un samedi par mois.",
     tags: ["dessin", "quartier"],
     needs: [
       need("quelqu'un pour la photo", "photo"),
