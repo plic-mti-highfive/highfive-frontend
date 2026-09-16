@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   moment du build : l'interface se chargeait mais aucun appel n'aboutissait.
   `VITE_API_URL` est desormais exposee en `ARG` du Dockerfile, vide par
   defaut, et une base vide signifie « meme origine ».
+- Le bundle `docs/v2/backend/schemas/` n'avait pas ete regenere apres le
+  passage de `wallToTasksInputSchema` de `elementIds` a `elements` :
+  `WallToTasksInput.json` documentait une forme qui n'existait plus ni au
+  front ni au back. Le contrat publie decrit de nouveau ce qui est reellement
+  accepte.
 
 ## [2.0.0] - 2026-09-16
 
