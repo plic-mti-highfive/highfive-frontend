@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/fraunces/wght-italic.css";
+@import "@fontsource-variable/fraunces/wght.css";
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
@@ -41,6 +41,32 @@
   --chart-3: oklch(0.4 0.02 30);
   --chart-4: oklch(0.3 0.02 30);
   --chart-5: oklch(0.2 0.02 30);
+
+  /* Élévation (valeurs brutes, aliasées en --shadow-* dans @theme) */
+  --elevation-rest:
+    0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --elevation-lift:
+    0 2px 10px -2px rgb(0 0 0 / 0.15), 0 0 0 2px var(--card-accent, transparent);
+  --elevation-lift-lg:
+    0 4px 16px -4px rgb(0 0 0 / 0.15), 0 0 0 2px var(--card-accent, transparent);
+  --elevation-overlay:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Statuts (valeurs brutes, aliasées en --color-<statut>-* dans @theme).
+     Mappés sur la roue existante : success=apple, warning=orange, info=sky,
+     danger=destructive. */
+  --success-bg: var(--color-apple-light);
+  --success-fg: var(--color-apple-dark);
+  --success-border: var(--color-apple);
+  --warning-bg: var(--color-orange-light);
+  --warning-fg: var(--color-orange-dark);
+  --warning-border: var(--color-orange);
+  --info-bg: var(--color-sky-light);
+  --info-fg: var(--color-sky-dark);
+  --info-border: var(--color-sky);
+  --danger-bg: color-mix(in srgb, var(--destructive) 12%, var(--background));
+  --danger-fg: var(--destructive);
+  --danger-border: var(--destructive);
 }
 
 .dark {
@@ -76,6 +102,26 @@
   --chart-3: oklch(0.4 0.025 280);
   --chart-4: oklch(0.3 0.025 280);
   --chart-5: oklch(0.2 0.025 280);
+
+  /* Élévation : ombres neutres plus marquées sur fond sombre */
+  --elevation-rest:
+    0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --elevation-lift:
+    0 2px 10px -2px rgb(0 0 0 / 0.45), 0 0 0 2px var(--card-accent, transparent);
+  --elevation-lift-lg:
+    0 4px 16px -4px rgb(0 0 0 / 0.45), 0 0 0 2px var(--card-accent, transparent);
+  --elevation-overlay:
+    0 10px 15px -3px rgb(0 0 0 / 0.35), 0 4px 6px -4px rgb(0 0 0 / 0.35);
+
+  /* Statuts : étapes mid/deeper pour rester lisibles sur fond sombre, même
+     mécanique que le reste de la roue (cf. DESIGN.md). */
+  --success-bg: color-mix(in srgb, var(--color-apple-deeper) 40%, var(--card));
+  --success-fg: var(--color-apple-mid);
+  --warning-bg: color-mix(in srgb, var(--color-orange-deeper) 40%, var(--card));
+  --warning-fg: var(--color-orange-mid);
+  --info-bg: color-mix(in srgb, var(--color-sky-deeper) 40%, var(--card));
+  --info-fg: var(--color-sky-mid);
+  --danger-bg: color-mix(in srgb, var(--destructive) 20%, var(--background));
 }
 
 @theme inline {
@@ -191,6 +237,13 @@
   --spacing-gap-lg: 24px;
   --spacing-gap-xl: 40px;
 
+  /* -- Largeur de contenu --
+     Namespace Tailwind v4 `--container-*` -> utilitaire `max-w-content`.
+     Doc 06 §3.1 : "largeur de contenu maximale 1240 px" (coquille site,
+     Decouvrir/recherche/fiche/profil) ; remplace `max-w-[1240px]` en dur
+     (V2-2, additif : ne modifie aucun token existant). */
+  --container-content: 1240px;
+
   /* -- Border radius -- */
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -202,6 +255,44 @@
   --border-thin: 0.5px;
   --border-accent: 1.5px;
   --border-featured: 2px;
+
+  /* -- Élévation (ombres) --
+     rest : posé, à plat (cartes/tickets/inputs au repos).
+     lift / lift-lg : réponse au survol, avec anneau teinté par entité
+       (var(--card-accent), transparent si non défini).
+     overlay : popovers/menus/dialogs — la seule ombre neutre non teintée.
+     Valeurs brutes définies sur :root/.dark (--elevation-*) pour que le
+     changement de thème s'applique sans conflit de couche avec @theme. */
+  --shadow-rest: var(--elevation-rest);
+  --shadow-lift: var(--elevation-lift);
+  --shadow-lift-lg: var(--elevation-lift-lg);
+  --shadow-overlay: var(--elevation-overlay);
+
+  /* -- Motion --
+     ease-* rejoint l'espace de noms Tailwind (utilitaires ease-standard/emphasized) ;
+     les durées (--duration-*) sont exposées via @utility plus bas, car Tailwind v4
+     n'a pas d'espace de noms de thème pour transition-duration. */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
+
+  /* -- Couleurs sémantiques de statut --
+     mappées sur la roue existante, jamais de teinte nouvelle. Valeurs brutes
+     sur :root et .dark (familles success, warning, info, danger), voir plus haut. */
+  --color-success-bg: var(--success-bg);
+  --color-success-fg: var(--success-fg);
+  --color-success-border: var(--success-border);
+
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-fg: var(--warning-fg);
+  --color-warning-border: var(--warning-border);
+
+  --color-info-bg: var(--info-bg);
+  --color-info-fg: var(--info-fg);
+  --color-info-border: var(--info-border);
+
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-fg: var(--danger-fg);
+  --color-danger-border: var(--danger-border);
 
   /* -- Tokens shadcn → Tailwind -- */
   --color-background: var(--background);
@@ -238,6 +329,182 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* -- Z-index --
+   Pas d'espace de noms de thème Tailwind pour z-index : les tokens sont de
+   simples variables, exposées en utilitaires via @utility plus bas. */
+:root {
+  --z-base: 0;
+  --z-sticky: 20;
+  --z-dropdown: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+
+  /* -- Motion (durées) -- */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+
+  /* -- Decalage de collage sous la coquille --
+     56px (en-tete) + 44px (barre de themes/onglets) = 6.25rem. Reutilise par
+     toute colonne d'appui sticky (doc 06 §3.1) ; remplace un
+     `style={{ top: "6.25rem" }}` en dur (V2-2). */
+  --offset-shell-sticky: 6.25rem;
+
+  /* -- Hauteur du seul en-tete de la coquille site --
+     56px (SiteHeader, `h-14`), sans la barre de themes/onglets propre a
+     Decouvrir. Utilise par les pages plein ecran sous l'en-tete seul
+     (messagerie) ; remplace un `h-[calc(100dvh-3.5rem)]` en dur (V2-2). */
+  --offset-shell-header: 3.5rem;
+}
+
+@utility z-base {
+  z-index: var(--z-base);
+}
+@utility z-sticky {
+  z-index: var(--z-sticky);
+}
+@utility z-dropdown {
+  z-index: var(--z-dropdown);
+}
+@utility z-overlay {
+  z-index: var(--z-overlay);
+}
+@utility z-modal {
+  z-index: var(--z-modal);
+}
+@utility z-toast {
+  z-index: var(--z-toast);
+}
+
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+@utility duration-base {
+  transition-duration: var(--duration-base);
+}
+@utility top-shell-sticky {
+  top: var(--offset-shell-sticky);
+}
+@utility h-below-header {
+  height: calc(100dvh - var(--offset-shell-header));
+}
+
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
+}
+
+/* -- Système d'accent par entité --
+   `data-accent="rose|orange|yellow|apple|sky|purple"` sur un conteneur
+   définit les variables consommées par les primitives (Card, Avatar,
+   TagPill…) : --accent-base/--accent-light/--accent-dark et --card-accent
+   (utilisé par le token --shadow-lift pour l'anneau teinté au survol).
+   Clair et sombre passent par les mêmes étapes light/mid/dark/deeper que
+   le reste de la roue. */
+[data-accent="rose"] {
+  --accent-base: var(--color-rose);
+  --accent-light: var(--color-rose-light);
+  --accent-dark: var(--color-rose-dark);
+  --card-accent: var(--color-rose);
+}
+[data-accent="orange"] {
+  --accent-base: var(--color-orange);
+  --accent-light: var(--color-orange-light);
+  --accent-dark: var(--color-orange-dark);
+  --card-accent: var(--color-orange);
+}
+[data-accent="yellow"] {
+  --accent-base: var(--color-yellow);
+  --accent-light: var(--color-yellow-light);
+  --accent-dark: var(--color-yellow-dark);
+  --card-accent: var(--color-yellow);
+}
+[data-accent="apple"] {
+  --accent-base: var(--color-apple);
+  --accent-light: var(--color-apple-light);
+  --accent-dark: var(--color-apple-dark);
+  --card-accent: var(--color-apple);
+}
+[data-accent="sky"] {
+  --accent-base: var(--color-sky);
+  --accent-light: var(--color-sky-light);
+  --accent-dark: var(--color-sky-dark);
+  --card-accent: var(--color-sky);
+}
+[data-accent="purple"] {
+  --accent-base: var(--color-purple);
+  --accent-light: var(--color-purple-light);
+  --accent-dark: var(--color-purple-dark);
+  --card-accent: var(--color-purple);
+}
+
+/* Sur fond sombre, la case "light" (fond de badge/pill) passe à l'étape
+   "deeper" et la case "dark" (texte) à l'étape "mid" — même mécanique que
+   `bg-rose-light dark:bg-rose-deeper/40` / `text-rose-dark dark:text-rose-mid`
+   utilisée ailleurs dans le système (tagColors.ts), pas un inversement brut. */
+.dark [data-accent="rose"] {
+  --accent-light: var(--color-rose-deeper);
+  --accent-dark: var(--color-rose-mid);
+}
+.dark [data-accent="orange"] {
+  --accent-light: var(--color-orange-deeper);
+  --accent-dark: var(--color-orange-mid);
+}
+.dark [data-accent="yellow"] {
+  --accent-light: var(--color-yellow-deeper);
+  --accent-dark: var(--color-yellow-mid);
+}
+.dark [data-accent="apple"] {
+  --accent-light: var(--color-apple-deeper);
+  --accent-dark: var(--color-apple-mid);
+}
+.dark [data-accent="sky"] {
+  --accent-light: var(--color-sky-deeper);
+  --accent-dark: var(--color-sky-mid);
+}
+.dark [data-accent="purple"] {
+  --accent-light: var(--color-purple-deeper);
+  --accent-dark: var(--color-purple-mid);
+}
+
+/* -- Respect de prefers-reduced-motion --
+   Neutralise animations/transitions plutôt que de les supprimer au cas par
+   cas dans chaque primitive. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -- Barre de progression de navigation (V2, retour util. 5) --
+   Indicateur global fin sous l'en-tete (NavigationProgress,
+   src/app/layouts/NavigationProgress.tsx) : chunk lazy (React.lazy) en
+   cours de chargement ou requete de page initiale (useIsFetching) sans
+   donnee encore en cache. Cadence propre (1.4s), plus lente que les
+   durees discretes --duration-fast/base/slow reservees aux transitions
+   ponctuelles ; neutralisee par la regle prefers-reduced-motion
+   ci-dessus comme toute autre animation. */
+@keyframes nav-progress-slide {
+  0% {
+    transform: translateX(-100%) scaleX(0.4);
+  }
+  50% {
+    transform: translateX(20%) scaleX(0.6);
+  }
+  100% {
+    transform: translateX(100%) scaleX(0.4);
+  }
+}
+.nav-progress-bar {
+  transform-origin: left;
+  animation: nav-progress-slide 1.4s var(--ease-standard) infinite;
 }
 
 @layer base {

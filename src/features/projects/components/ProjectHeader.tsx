@@ -1,108 +1,150 @@
-import { useNavigate } from "react-router-dom";
-import { Hand, Bookmark, Share2, Flag } from "lucide-react";
-import { AuthorChip, TagPill } from "@shared/components/projects";
-import { DropdownMenu } from "@shared/components/DropdownMenu";
-import { formatFrenchDate } from "@shared/utils/formatDate";
-import type { ProjectDto } from "@/api/types";
-import { ProjectStatus } from "@plic-mti-highfive/shared-types";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Share2 } from "lucide-react";
 
-interface ProjectHeaderProps {
-  project: ProjectDto;
-  creator?: { email: string; avatar?: string };
-  onJoinClick?: () => void;
-  onHighfiveClick?: () => void;
-}
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  DialogPopup,
+  DialogTitle,
+  IconButton,
+  TagPill,
+} from "@shared/ui";
+import { HighfiveButton } from "@shared/components/projects";
+import type { Project, UserSummary } from "@/domain";
+import { PARTICIPATION_LABEL, STATE_LABEL, STATE_TONE } from "../lib/labels";
+import { JoinAction } from "./JoinAction";
+import { ProjectEditForm } from "./ProjectEditForm";
 
+/**
+ * En-tete de la fiche (doc 13 E-10) : porteur, titre en Geist (R-DA... le
+ * display Fraunces reste reserve au seul logo, DESIGN.md "Wordmark-Only
+ * Serif Rule"), accroche, tags, etat + participation, action principale.
+ *
+ * `Project` (GET /projects/:slug) ne porte que `ownerId` — contrairement a
+ * `ProjectSummary` qui resout deja `owner`. Le porteur affiche ici vient du
+ * `TeamMember` de role "owner" dans `members` (deja recupere par
+ * `ProjectLayout` pour l'onglet Equipe), passe en prop plutot que refetch.
+ */
 export function ProjectHeader({
   project,
-  creator,
-  onJoinClick,
-  onHighfiveClick,
-}: ProjectHeaderProps) {
-  const navigate = useNavigate();
-  const creatorName = creator?.email.split("@")[0] || "Créateur inconnu";
+  owner,
+  isAuthenticated,
+  isMember,
+  canEdit,
+  highfiveGiven,
+}: {
+  project: Project;
+  owner?: UserSummary;
+  isAuthenticated: boolean;
+  isMember: boolean;
+  canEdit: boolean;
+  highfiveGiven: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  async function handleShare() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Presse-papiers indisponible (permissions, contexte non securise) :
+      // pas de raccourci de repli invente, l'action reste silencieuse.
+    }
+  }
 
   return (
-    <div className="bg-background border-b border-border">
-      <div className="max-w-[1400px] mx-auto px-6 pt-10 pb-6">
-        <div className="flex items-start justify-between gap-6 flex-wrap">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 mb-2.5">
-              <AuthorChip
-                author={creatorName}
-                avatarUrl={creator?.avatar}
-                size="md"
-              />
-              <span className="text-xs text-muted-foreground">
-                · {formatFrenchDate(project.createdAt)}
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
-              {project.name}
-            </h1>
-            {project.tags && project.tags.length > 0 && (
-              <div className="flex gap-2 flex-wrap">
-                {project.tags.map((tag) => (
-                  <TagPill
-                    key={tag}
-                    tag={tag}
-                    onClick={() =>
-                      navigate(
-                        `/search/projects?tag=${encodeURIComponent(tag)}`,
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col items-end gap-4 shrink-0">
-            <DropdownMenu
-              triggerSize="md"
-              iconSize={20}
-              offset={8}
-              items={[
-                {
-                  icon: (
-                    <Bookmark size={16} className="text-muted-foreground" />
-                  ),
-                  label: "Enregistrer",
-                  onClick: () => console.log("Enregistrer"),
-                },
-                {
-                  icon: <Share2 size={16} className="text-muted-foreground" />,
-                  label: "Partager",
-                  onClick: () => console.log("Partager"),
-                },
-                {
-                  icon: <Flag size={16} className="text-muted-foreground" />,
-                  label: "Signaler",
-                  onClick: () => console.log("Signaler"),
-                },
-              ]}
+    <header className="flex items-stretch gap-4">
+      <div className="flex flex-1 flex-col gap-4">
+        {owner && (
+          <div className="flex items-center gap-1 text-body-sm text-muted-foreground">
+            <p>Créé par</p>
+            <Avatar
+              name={owner.displayName ?? owner.username}
+              src={owner.avatar}
+              size="xs"
             />
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={onHighfiveClick}
-                title="Highfive ce projet"
-                className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-muted transition-colors"
-              >
-                <Hand size={16} className="text-foreground" />
-              </button>
-              {onJoinClick && project.status === ProjectStatus.ACTIVE && (
-                <button
-                  onClick={onJoinClick}
-                  className="px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
-                >
-                  Rejoindre le projet
-                </button>
-              )}
-            </div>
+            <Link
+              to={`/u/${owner.username}`}
+              className="font-medium text-foreground hover:underline"
+            >
+              @{owner.username}
+            </Link>
           </div>
+        )}
+
+        <h1 className="text-heading-lg font-bold text-foreground">
+          {project.title}
+        </h1>
+
+        <p className="text-body-lg text-foreground">{project.tagline}</p>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {project.tags.map((tag) => (
+            <TagPill key={tag} label={tag} />
+          ))}
+          <Badge tone={STATE_TONE[project.state]}>
+            {STATE_LABEL[project.state]}
+          </Badge>
+          <Badge tone="neutral">
+            {PARTICIPATION_LABEL[project.participation]}
+          </Badge>
         </div>
       </div>
-    </div>
+
+      <div className="flex shrink-0 flex-col items-end justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <JoinAction
+            slug={project.slug}
+            projectTitle={project.title}
+            participation={project.participation}
+            isAuthenticated={isAuthenticated}
+            isMember={isMember}
+          />
+          {canEdit && (
+            <>
+              <Button variant="outline" onClick={() => setEditOpen(true)}>
+                Modifier
+              </Button>
+              <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <DialogPopup className="max-w-2xl overflow-y-auto max-h-[90vh]">
+                  <DialogTitle>Modifier le projet</DialogTitle>
+                  <div className="mt-4">
+                    <ProjectEditForm
+                      project={project}
+                      onClose={() => setEditOpen(false)}
+                    />
+                  </div>
+                </DialogPopup>
+              </Dialog>
+            </>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <HighfiveButton
+            slug={project.slug}
+            ownerId={project.ownerId}
+            given={highfiveGiven}
+            count={project.highfiveCount}
+          />
+          <IconButton
+            aria-label={copied ? "Lien copié" : "Partager"}
+            onClick={handleShare}
+          >
+            <Share2 size={16} />
+          </IconButton>
+          {copied && (
+            <span role="status" className="text-body-sm text-muted-foreground">
+              Lien copié
+            </span>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }

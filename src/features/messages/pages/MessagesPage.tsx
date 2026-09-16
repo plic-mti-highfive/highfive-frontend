@@ -1,66 +1,92 @@
-"use client";
-
 import { useState } from "react";
-import { Footer, Header } from "@features/layout";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "@shared/contexts";
+import { useConversations } from "@/api/queries/conversations";
+import { ErrorState, Skeleton } from "@shared/ui";
+import { cn } from "@shared/lib/cn";
+import { ApiError } from "@/api/client";
 import { ConversationList } from "../components/ConversationList";
 import { ConversationDetail } from "../components/ConversationDetail";
 import { EmptyConversation } from "../components/EmptyConversation";
-import type { Conversation } from "../types";
-import { mockConversations } from "@/api/services/mock/data/mockConversations";
+import { CreateConversationModal } from "../components/CreateConversationModal";
 
+/**
+ * R-R3 : la conversation ouverte est portee par la route (`/messages/:id`,
+ * `id` optionnel) plutot que par un etat local — selectionner une
+ * conversation navigue, elle ne se contente pas de changer un `useState`.
+ */
 export function MessagesPage() {
-  const [conversations] = useState<Conversation[]>(mockConversations);
-  const [selectedConversationId, setSelectedConversationId] = useState<
-    string | null
-  >(null);
-  const [isListCollapsed, setIsListCollapsed] = useState(false);
+  const { id: conversationId } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const conversations = useConversations();
+  const [createOpen, setCreateOpen] = useState(false);
 
-  const selectedConversation = conversations.find(
-    (c) => c.id === selectedConversationId,
-  );
+  if (!user) return null;
 
   return (
     <>
-      <Header />
-      <main className="relative z-0 bg-background">
-        <div className="flex flex-col lg:flex-row h-[calc(100vh-4.375rem)]">
-          {/* Sidebar - Conversation List */}
+      <main className="bg-background">
+        <div className="flex h-below-header w-full min-w-0">
           <aside
-            className={`${
-              isListCollapsed ? "hidden" : "w-full lg:w-1/3"
-            } border-r border-border bg-sidebar lg:flex lg:flex-col`}
+            className={cn(
+              "w-full min-w-0 flex-col overflow-hidden border-r border-border lg:w-96 lg:shrink-0",
+              conversationId ? "hidden lg:flex" : "flex",
+            )}
           >
-            <ConversationList
-              conversations={conversations}
-              selectedConversationId={selectedConversationId}
-              onSelectConversation={setSelectedConversationId}
-              onToggleCollapse={() => setIsListCollapsed(!isListCollapsed)}
-            />
-          </aside>
-
-          {/* Main Content - Conversation Detail */}
-          <section
-            className={`flex-1 ${isListCollapsed ? "w-full" : "hidden lg:flex"} flex flex-col bg-muted/30`}
-          >
-            {selectedConversation ? (
-              <ConversationDetail
-                conversation={selectedConversation}
-                onToggleListCollapse={() =>
-                  setIsListCollapsed(!isListCollapsed)
+            {conversations.isLoading ? (
+              <div className="flex w-full min-w-0 flex-col gap-3 p-4">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            ) : conversations.isError ? (
+              <ErrorState
+                message={
+                  conversations.error instanceof ApiError
+                    ? conversations.error.message
+                    : "Impossible de charger tes conversations."
                 }
+                onRetry={() => conversations.refetch()}
               />
             ) : (
-              <EmptyConversation
-                isListCollapsed={isListCollapsed}
-                onToggleListCollapse={() =>
-                  setIsListCollapsed(!isListCollapsed)
-                }
+              <ConversationList
+                conversations={conversations.data ?? []}
+                currentUserId={user.id}
+                selectedConversationId={conversationId}
+                onSelect={(id) => navigate(`/messages/${id}`)}
+                onCreate={() => setCreateOpen(true)}
               />
+            )}
+          </aside>
+
+          <section
+            className={cn(
+              "min-w-0 flex-1",
+              conversationId ? "flex" : "hidden lg:flex",
+            )}
+          >
+            {conversationId ? (
+              <ConversationDetail
+                key={conversationId}
+                conversationId={conversationId}
+                currentUser={user}
+                onBack={() => navigate("/messages")}
+              />
+            ) : (
+              <EmptyConversation />
             )}
           </section>
         </div>
       </main>
-      <Footer />
+
+      <CreateConversationModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        currentUserId={user.id}
+        onCreated={(id) => navigate(`/messages/${id}`)}
+      />
     </>
   );
 }

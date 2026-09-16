@@ -1,88 +1,94 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { Header, Footer } from "@features/layout";
-import type { ProjectNewsDto } from "@/api/types";
-import { projectService } from "@/api/services";
-import { NewsCard } from "../components/NewsCard";
+import { useOutletContext } from "react-router-dom";
 
+import { EmptyState, ErrorState, Skeleton } from "@shared/ui";
+import {
+  useAnnouncements,
+  useCreateAnnouncement,
+  useDeleteAnnouncement,
+  usePinAnnouncement,
+} from "@/api/queries/announcements";
+import type { ProjectOutletContext } from "../components/ProjectLayout";
+import { AnnouncementCard } from "../components/AnnouncementCard";
+import { AnnouncementForm } from "../components/AnnouncementForm";
+
+/** Onglet Annonces (`/projets/:slug/annonces`, doc 13 E-11). R-A2 : l'epinglee en tete. */
 export function ProjectNewsPage() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [news, setNews] = useState<ProjectNewsDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [projectName, setProjectName] = useState<string | null>(null);
+  const { project, members, capabilities } =
+    useOutletContext<ProjectOutletContext>();
 
-  useEffect(() => {
-    if (!id) return;
-    Promise.all([
-      projectService.getProjectNews(id),
-      projectService.getProjectById(id),
-    ]).then(([items, project]) => {
-      const sorted = [...items].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-      setNews(sorted);
-      setProjectName(project.name);
-      setIsLoading(false);
-    });
-  }, [id]);
+  const announcementsQuery = useAnnouncements(project.slug);
+  const createAnnouncement = useCreateAnnouncement(project.slug);
+  const pinAnnouncement = usePinAnnouncement(project.slug);
+  const deleteAnnouncement = useDeleteAnnouncement(project.slug);
+
+  const announcements = announcementsQuery.data ?? [];
+  const sorted = [...announcements].sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return (
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+  });
+
+  if (
+    !announcementsQuery.isLoading &&
+    !announcementsQuery.error &&
+    sorted.length === 0
+  ) {
+    return (
+      <div className="flex flex-col gap-6">
+        {capabilities.canPostAnnouncement && (
+          <div className="mx-auto w-full max-w-2xl">
+            <AnnouncementForm
+              membersCount={members.length}
+              isSubmitting={createAnnouncement.isPending}
+              onSubmit={(input) => createAnnouncement.mutate(input)}
+            />
+          </div>
+        )}
+        <EmptyState
+          title="Pas encore d'annonce."
+          className="w-full rounded-lg border border-dashed border-border bg-muted"
+        />
+      </div>
+    );
+  }
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-background">
-        <div className="max-w-3xl mx-auto px-6 py-12">
-          <button
-            onClick={() => navigate(`/projects/${id}`)}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
-          >
-            <ArrowLeft size={16} />
-            Retour au projet
-          </button>
+    <div className="mx-auto flex max-w-2xl flex-col gap-6">
+      {capabilities.canPostAnnouncement && (
+        <AnnouncementForm
+          membersCount={members.length}
+          isSubmitting={createAnnouncement.isPending}
+          onSubmit={(input) => createAnnouncement.mutate(input)}
+        />
+      )}
 
-          <div className="mb-10">
-            <h1 className="text-3xl font-bold text-foreground">
-              Fil d'actualités
-            </h1>
-            {projectName && (
-              <p className="text-muted-foreground mt-1">{projectName}</p>
-            )}
-          </div>
-
-          {isLoading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="bg-card border border-border rounded-xl p-6 animate-pulse"
-                >
-                  <div className="h-5 bg-muted rounded w-1/3 mb-4" />
-                  <div className="space-y-2">
-                    <div className="h-3 bg-muted rounded w-full" />
-                    <div className="h-3 bg-muted rounded w-5/6" />
-                    <div className="h-3 bg-muted rounded w-4/6" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : news.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground">
-                Aucune actualité publiée pour ce projet.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {news.map((item) => (
-                <NewsCard key={item.id} news={item} />
-              ))}
-            </div>
-          )}
+      {announcementsQuery.isLoading ? (
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-28 w-full" />
+          <Skeleton className="h-28 w-full" />
         </div>
-      </main>
-      <Footer />
-    </>
+      ) : announcementsQuery.error ? (
+        <ErrorState
+          message="Les annonces n'ont pas pu être chargées."
+          onRetry={() => announcementsQuery.refetch()}
+        />
+      ) : (
+        <ul className="flex flex-col gap-4">
+          {sorted.map((announcement) => (
+            <li key={announcement.id}>
+              <AnnouncementCard
+                announcement={announcement}
+                canManage={capabilities.canPinAnnouncement}
+                isPinning={pinAnnouncement.isPending}
+                isDeleting={deleteAnnouncement.isPending}
+                onPin={() => pinAnnouncement.mutate(announcement.id)}
+                onDelete={() => deleteAnnouncement.mutate(announcement.id)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

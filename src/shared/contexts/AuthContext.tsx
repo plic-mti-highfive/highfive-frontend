@@ -1,84 +1,43 @@
-import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { authService, tokenStorage, type UserDto } from "@/api";
+import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
+import { useLogin, useLogout } from "@/api/queries/auth";
 
-interface AuthContextType {
-  user: UserDto | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
+/**
+ * Provider mince (V2, item 2 du chantier v2 "socle applicatif") : l'etat de
+ * session ne vit plus dans un React Context mais dans le cache TanStack
+ * Query, deja partage globalement par `QueryClientProvider`
+ * (src/app/providers.tsx) — voir `useCurrentUser` (src/features/auth). Ce
+ * composant ne fait plus rien lui-meme ; il est conserve uniquement pour ne
+ * pas casser l'arbre de `src/main.tsx` ni les imports existants
+ * (`@shared/contexts`) pendant que d'autres features migrent.
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserDto | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Charger l'utilisateur au montage si un token existe
-  useEffect(() => {
-    const initAuth = async () => {
-      const token = tokenStorage.getAccessToken();
-      if (token) {
-        try {
-          const currentUser = await authService.getCurrentUser();
-          setUser(currentUser);
-        } catch (error) {
-          console.error("Failed to load user:", error);
-          tokenStorage.clearTokens();
-        }
-      }
-      setIsLoading(false);
-    };
-
-    initAuth();
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    const response = await authService.login({ email, password });
-    setUser(response.user);
-  };
-
-  const register = async (email: string, password: string) => {
-    const response = await authService.register({ email, password });
-    setUser(response.user);
-  };
-
-  const logout = async () => {
-    await authService.logout();
-    setUser(null);
-  };
-
-  const refreshUser = async () => {
-    const currentUser = await authService.getCurrentUser();
-    setUser(currentUser);
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        register,
-        logout,
-        refreshUser,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <>{children}</>;
 }
 
+/**
+ * Compat pour les features qui ne sont pas dans le perimetre de ce lot
+ * (admin, messages, notifications) : memes champs qu'avant
+ * (`user`, `isAuthenticated`, `isLoading`, `login`, `logout`), mais `user`
+ * est desormais un `CurrentUser` du domaine (src/domain/user.ts) — plus de
+ * `user.profile.avatarPath` (-> `user.avatar`) ni de `user.systemRole`
+ * (-> `user.platformRole`, valeurs "member" | "admin").
+ */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  const { user, isAuthenticated, isLoading } = useCurrentUser();
+  const loginMutation = useLogin();
+  const logoutMutation = useLogout();
+
+  return {
+    user,
+    isAuthenticated,
+    isLoading,
+    login: async (email: string, password: string) => {
+      await loginMutation.mutateAsync({ email, password });
+    },
+    logout: async () => {
+      await logoutMutation.mutateAsync();
+    },
+  };
 }

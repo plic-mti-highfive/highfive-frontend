@@ -1,89 +1,168 @@
-import { useState } from "react";
-import { Header, Footer } from "@features/layout";
 import { Bell, CheckCheck } from "lucide-react";
-import { mockNotifications } from "@/api/services/mock/data/mockNotifications";
+import { useState } from "react";
+import { ApiError } from "@/api/client";
+import {
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useNotifications,
+} from "@/api/queries/notifications";
+import {
+  Button,
+  EmptyState,
+  ErrorState,
+  PageHeader,
+  Skeleton,
+} from "@shared/ui";
+import { cn } from "@shared/lib/cn";
 import { NotificationItem } from "../components/NotificationItem";
-import type { Notification } from "../types";
+import {
+  categoryLabel,
+  groupNotificationsByDate,
+  notificationCategory,
+  NOTIFICATION_CATEGORIES,
+  type NotificationCategory,
+} from "../lib/notificationGroups";
 
 export function NotificationsPage() {
-  const [notifications, setNotifications] =
-    useState<Notification[]>(mockNotifications);
+  const [category, setCategory] = useState<NotificationCategory | "all">("all");
+  const notifications = useNotifications();
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const allItems = notifications.data?.items ?? [];
+  const items =
+    category === "all"
+      ? allItems
+      : allItems.filter((n) => notificationCategory(n.type) === category);
+  const groups = groupNotificationsByDate(items);
+  const unreadCount = allItems.filter((n) => !n.read).length;
 
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const unread = notifications.filter((n) => !n.read);
-  const read = notifications.filter((n) => n.read);
+  // Seules les familles reellement presentes meritent une pilule de filtre.
+  const availableCategories = NOTIFICATION_CATEGORIES.filter((c) =>
+    allItems.some((n) => notificationCategory(n.type) === c),
+  );
 
   return (
-    <>
-      <Header />
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background">
-        <div className="px-8 py-8">
-          {/* Page header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Bell size={22} className="text-foreground" />
-              <h1 className="text-2xl font-bold text-foreground">
-                Notifications
-              </h1>
-              {unreadCount > 0 && (
-                <span className="inline-flex items-center justify-center min-w-6 h-6 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
-                  {unreadCount}
-                </span>
-              )}
-            </div>
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllRead}
-                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+    <main className="bg-background">
+      <div className="mx-auto max-w-2xl px-6 py-8">
+        <PageHeader
+          title="Notifications"
+          actions={
+            unreadCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={() => markAllRead.mutate()}
+                disabled={markAllRead.isPending}
               >
                 <CheckCheck size={16} />
                 Tout marquer comme lu
-              </button>
-            )}
+              </Button>
+            )
+          }
+        />
+
+        {availableCategories.length > 0 && (
+          <div className="mt-4 -mx-1 flex items-center gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <FilterPill
+              active={category === "all"}
+              onClick={() => setCategory("all")}
+            >
+              Tout
+            </FilterPill>
+            {availableCategories.map((c) => (
+              <FilterPill
+                key={c}
+                active={category === c}
+                onClick={() => setCategory(c)}
+              >
+                {categoryLabel(c)}
+              </FilterPill>
+            ))}
           </div>
+        )}
 
-          {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-3 text-muted-foreground">
-              <Bell size={40} strokeWidth={1.5} />
-              <p className="text-base">Aucune notification pour l'instant.</p>
+        <div className="mt-4">
+          {notifications.isLoading ? (
+            <div className="flex flex-col gap-3 py-4">
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
             </div>
+          ) : notifications.isError ? (
+            <ErrorState
+              message={
+                notifications.error instanceof ApiError
+                  ? notifications.error.message
+                  : "Impossible de charger tes notifications."
+              }
+              onRetry={() => notifications.refetch()}
+            />
+          ) : items.length === 0 ? (
+            <EmptyState
+              icon={Bell}
+              title={
+                category === "all"
+                  ? "Aucune notification pour l'instant"
+                  : "Aucune notification dans ce filtre"
+              }
+              description="Les highfives, commentaires et invitations que tu reçois apparaîtront ici."
+            />
           ) : (
-            <div className="rounded-xl border border-border overflow-hidden bg-sidebar divide-y divide-border">
-              {unread.length > 0 && (
-                <>
-                  <div className="px-4 py-2 bg-muted/50">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Nouvelles
+            <div className="flex flex-col gap-6">
+              {groups.map((group) => (
+                <section key={group.key} className="flex flex-col gap-1">
+                  <div className="flex items-center gap-3 px-2">
+                    <p className="text-label uppercase text-muted-foreground">
+                      {group.label}
                     </p>
+                    <span className="text-label tabular-nums text-muted-foreground/70">
+                      {String(group.items.length).padStart(2, "0")}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="h-px flex-1 bg-border"
+                    />
                   </div>
-                  {unread.map((notif) => (
-                    <NotificationItem key={notif.id} notification={notif} />
+                  {group.items.map((notification) => (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                      onMarkRead={(id) => markRead.mutate(id)}
+                    />
                   ))}
-                </>
-              )}
-
-              {read.length > 0 && (
-                <>
-                  <div className="px-4 py-2 bg-muted/50">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Précédentes
-                    </p>
-                  </div>
-                  {read.map((notif) => (
-                    <NotificationItem key={notif.id} notification={notif} />
-                  ))}
-                </>
-              )}
+                </section>
+              ))}
             </div>
           )}
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </main>
+  );
+}
+
+function FilterPill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button
+      variant={active ? "default" : "outline"}
+      size="xs"
+      aria-pressed={active}
+      onClick={onClick}
+      className={cn(
+        "h-7 shrink-0 rounded-full px-3",
+        !active && "text-muted-foreground",
+      )}
+    >
+      {children}
+    </Button>
   );
 }
