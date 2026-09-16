@@ -2,36 +2,13 @@ import { ArrowLeft, Lock, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
 
-import {
-  Badge,
-  Button,
-  EmptyState,
-  ErrorState,
-  Spinner,
-  TabLink,
-} from "@shared/ui";
-import type { BadgeProps } from "@shared/ui";
+import { Button, EmptyState, ErrorState, Spinner, TabLink } from "@shared/ui";
 import { useProject } from "@/api/queries/projects";
 import { useMembers } from "@/api/queries/memberships";
 import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
-import type { ProjectState } from "@/domain";
 import { InviteMemberDialog } from "../../features/lab/components/InviteMemberDialog";
 import { hasAtLeastRole } from "../../features/lab/lib/roles";
 import type { LabContext } from "../../features/lab/lib/context";
-
-const STATE_LABEL: Record<ProjectState, string> = {
-  draft: "Brouillon",
-  active: "Ouvert",
-  done: "Terminé",
-  archived: "Archivé",
-};
-
-const STATE_TONE: Record<ProjectState, NonNullable<BadgeProps["tone"]>> = {
-  draft: "neutral",
-  active: "success",
-  done: "info",
-  archived: "neutral",
-};
 
 /**
  * Coquille atelier (doc 06 §4, V2 item 3) : hauteur d'écran fixe, aucun
