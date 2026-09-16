@@ -51,7 +51,12 @@ function isFormData(value: unknown): value is FormData {
 }
 
 function buildUrl(path: string, query?: Record<string, QueryValue>): string {
-  const url = new URL(`${apiConfig.baseUrl}/api${path}`);
+  // Le second argument sert de base quand `apiConfig.baseUrl` est vide ou
+  // relatif ; il est ignore des que la base est absolue.
+  const url = new URL(
+    `${apiConfig.baseUrl}/api${path}`,
+    window.location.origin,
+  );
   if (query) {
     for (const [key, value] of Object.entries(query)) {
       if (value === undefined) continue;
