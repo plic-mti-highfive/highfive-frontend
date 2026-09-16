@@ -97,7 +97,10 @@ export function CommentsSection({
           onRetry={() => commentsQuery.refetch()}
         />
       ) : roots.length === 0 ? (
-        <EmptyState title="Personne n'a encore réagi." />
+        <EmptyState
+          title="Personne n'a encore réagi."
+          className="rounded-lg border border-dashed border-border bg-muted"
+        />
       ) : (
         <ul className="flex flex-col gap-5">
           {roots.map((comment) => (

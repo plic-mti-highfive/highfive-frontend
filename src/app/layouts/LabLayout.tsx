@@ -93,19 +93,6 @@ export function LabLayout() {
           )}
         </Link>
 
-        {project && (
-          <>
-            <Badge tone={STATE_TONE[project.state]} className="shrink-0">
-              {STATE_LABEL[project.state]}
-            </Badge>
-            {members && (
-              <span className="shrink-0 text-body-sm text-muted-foreground">
-                {members.length} membre{members.length > 1 ? "s" : ""}
-              </span>
-            )}
-          </>
-        )}
-
         {isMember && (
           <nav className="flex h-full items-center gap-1" aria-label="Le Lab">
             <TabLink to="mur">Tableau blanc</TabLink>

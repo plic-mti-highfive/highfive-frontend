@@ -64,6 +64,8 @@ export {
   DropdownMenuPositioner,
   DropdownMenuPopup,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "./dropdown-menu";
 
 export {

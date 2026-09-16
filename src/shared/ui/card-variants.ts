@@ -17,12 +17,13 @@ import { cva } from "class-variance-authority";
 // d'empilement de la page — jamais au-dessus des tokens `z-sticky`/`z-dropdown`
 // globaux.
 export const cardVariants = cva(
-  "isolate rounded-xl bg-card text-card-foreground transition-shadow duration-base",
+  "isolate rounded-xl bg-card text-card-foreground transition-[box-shadow,filter] duration-base",
   {
     variants: {
       variant: {
         flat: "shadow-rest",
-        interactive: "shadow-rest cursor-pointer hover:shadow-lift",
+        interactive:
+          "shadow-rest cursor-pointer hover:shadow-lift hover:brightness-95 dark:hover:brightness-110",
       },
     },
     defaultVariants: {

@@ -29,6 +29,30 @@ export function ProjectNewsPage() {
     );
   });
 
+  if (
+    !announcementsQuery.isLoading &&
+    !announcementsQuery.error &&
+    sorted.length === 0
+  ) {
+    return (
+      <div className="flex flex-col gap-6">
+        {capabilities.canPostAnnouncement && (
+          <div className="mx-auto w-full max-w-2xl">
+            <AnnouncementForm
+              membersCount={members.length}
+              isSubmitting={createAnnouncement.isPending}
+              onSubmit={(input) => createAnnouncement.mutate(input)}
+            />
+          </div>
+        )}
+        <EmptyState
+          title="Pas encore d'annonce."
+          className="w-full rounded-lg border border-dashed border-border bg-muted"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       {capabilities.canPostAnnouncement && (
@@ -49,8 +73,6 @@ export function ProjectNewsPage() {
           message="Les annonces n'ont pas pu être chargées."
           onRetry={() => announcementsQuery.refetch()}
         />
-      ) : sorted.length === 0 ? (
-        <EmptyState title="Pas encore d'annonce." />
       ) : (
         <ul className="flex flex-col gap-4">
           {sorted.map((announcement) => (

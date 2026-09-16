@@ -42,7 +42,10 @@ export function ProjectDetailPage() {
               }}
             />
           ) : (
-            <EmptyState title="Aucune description détaillée pour le moment." />
+            <EmptyState
+              title="Aucune description détaillée pour le moment."
+              className="rounded-lg border border-dashed border-border bg-muted"
+            />
           )}
         </section>
 

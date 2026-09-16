@@ -53,7 +53,7 @@ export function ProjectOverviewSidebar({
   return (
     <aside className="flex flex-col gap-8">
       <div className="flex flex-col gap-8 rounded-[--radius-xl] border border-[--border] bg-card p-6 shadow-[--shadow-rest]">
-        <Section title={`Équipe ${members.length}`}>
+        <Section title="Équipe">
           {members.length === 0 ? (
             <p className="text-body-sm text-muted-foreground">
               Aucun membre pour l'instant

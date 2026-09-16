@@ -57,21 +57,24 @@ export const wallHandlers = [
       const firstColumn = columns[0];
       if (!firstColumn) return errors.notFound("Aucune colonne disponible.");
 
-      const created = parsed.data.elementIds.map((elementId, index) => {
-        const task = {
-          id: nextId(),
-          columnId: firstColumn.id,
-          title: `Idee du Mur : ${elementId}`,
-          assigneeIds: [],
-          order:
-            db.tasks.find((t) => t.columnId === firstColumn.id).length + index,
-          createdBy: user!.id,
-          createdAt: new Date().toISOString(),
-          wallOriginId: elementId,
-        };
-        db.tasks.insert(task);
-        return task;
-      });
+      const created = parsed.data.elements.map(
+        ({ id: elementId, label }, index) => {
+          const task = {
+            id: nextId(),
+            columnId: firstColumn.id,
+            title: label,
+            assigneeIds: [],
+            order:
+              db.tasks.find((t) => t.columnId === firstColumn.id).length +
+              index,
+            createdBy: user!.id,
+            createdAt: new Date().toISOString(),
+            wallOriginId: elementId,
+          };
+          db.tasks.insert(task);
+          return task;
+        },
+      );
 
       return HttpResponse.json(created, { status: 201 });
     },

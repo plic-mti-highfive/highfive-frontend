@@ -5,12 +5,15 @@ import { cn } from "@shared/lib/cn";
 export interface PageHeaderProps extends React.ComponentProps<"div"> {
   title: string;
   description?: string;
+  /** Element affiche a cote du titre (compteur, badge de statut...). */
+  badge?: React.ReactNode;
   actions?: React.ReactNode;
 }
 
 function PageHeader({
   title,
   description,
+  badge,
   actions,
   className,
   ...props
@@ -25,9 +28,12 @@ function PageHeader({
       {...props}
     >
       <div className="flex flex-col gap-1.5">
-        <h1 className="text-heading-lg font-semibold text-foreground">
-          {title}
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-heading-lg font-semibold text-foreground">
+            {title}
+          </h1>
+          {badge}
+        </div>
         {description && (
           <p className="text-body-md text-muted-foreground">{description}</p>
         )}

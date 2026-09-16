@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Menu } from "@base-ui/react/menu";
+import { Check } from "lucide-react";
 
 import { cn } from "@shared/lib/cn";
 
@@ -55,6 +56,37 @@ function DropdownMenuItem({
   );
 }
 
+function DropdownMenuRadioGroup(
+  props: React.ComponentProps<typeof Menu.RadioGroup>,
+) {
+  return <Menu.RadioGroup {...props} />;
+}
+
+function DropdownMenuRadioItem({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof Menu.RadioItem>) {
+  return (
+    <Menu.RadioItem
+      closeOnClick
+      className={cn(
+        "flex w-full cursor-default items-center gap-2 px-3 py-1.5 text-body-sm text-foreground outline-none",
+        "transition-colors duration-fast data-[highlighted]:bg-muted",
+        className,
+      )}
+      {...props}
+    >
+      <span className="flex size-4 shrink-0 items-center justify-center">
+        <Menu.RadioItemIndicator>
+          <Check size={14} />
+        </Menu.RadioItemIndicator>
+      </span>
+      {children}
+    </Menu.RadioItem>
+  );
+}
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -62,4 +94,6 @@ export {
   DropdownMenuPositioner,
   DropdownMenuPopup,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 };

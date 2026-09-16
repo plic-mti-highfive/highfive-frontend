@@ -150,7 +150,7 @@ export default function WallPage() {
         />
 
         {!readOnly && (
-          <div className="pointer-events-none absolute right-3 top-3 z-10">
+          <div className="pointer-events-none absolute bottom-20 right-3 z-10">
             <Button
               className="pointer-events-auto shadow-overlay"
               size="sm"
@@ -169,9 +169,9 @@ export default function WallPage() {
         items={convertItems}
         pending={convertSelection.isPending}
         onClose={() => setConvertOpen(false)}
-        onConfirm={(elementIds) => {
+        onConfirm={(elements) => {
           convertSelection.mutate(
-            { elementIds },
+            { elements },
             {
               onSuccess: (tasks) => {
                 setConvertOpen(false);

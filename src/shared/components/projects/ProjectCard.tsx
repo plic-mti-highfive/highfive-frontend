@@ -70,16 +70,21 @@ export function ProjectCard({
       />
 
       <div className="flex items-start justify-between gap-2">
-        <h3
-          className={cn(
-            "font-bold text-foreground",
-            featured
-              ? "text-heading-lg leading-tight"
-              : "text-heading-md leading-snug line-clamp-1",
-          )}
-        >
-          {project.title}
-        </h3>
+        <div className="min-w-0">
+          <p className="text-body-sm text-muted-foreground line-clamp-1">
+            {project.owner.displayName ?? project.owner.username}
+          </p>
+          <h3
+            className={cn(
+              "font-bold text-foreground",
+              featured
+                ? "text-heading-lg leading-tight"
+                : "text-heading-md leading-snug line-clamp-1",
+            )}
+          >
+            {project.title}
+          </h3>
+        </div>
         <Badge tone="neutral" className="shrink-0">
           {participationLabel(project)}
         </Badge>

@@ -3,18 +3,14 @@ import {
   Bell,
   LogOut,
   MessageSquare,
-  Monitor,
-  Moon,
   Plus,
   Search,
   Shield,
-  Sun,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu } from "@base-ui/react/menu";
 
-import { cn } from "@shared/lib/cn";
-import { useAuth, useTheme } from "@shared/contexts";
+import { useAuth } from "@shared/contexts";
 import { Avatar, Button, IconButton } from "@shared/ui";
 // Import direct (pas via le barrel @features/search) : le barrel reexporte
 // aussi SearchPage, ce qui annulait son lazy loading dans le routeur
@@ -72,34 +68,6 @@ function NotificationsBell() {
   );
 }
 
-function ThemeOption({
-  label,
-  icon,
-  active,
-  onClick,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex flex-1 flex-col items-center gap-1 rounded-lg py-2 text-label transition-colors",
-        active
-          ? "bg-muted text-foreground"
-          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-      )}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
-
 /**
  * Menu du compte (doc 06 §3.4) : en-tete nom + @pseudo (lien profil, evite
  * la redondance "Mon profil"/"Mes projets" qui menaient toutes deux a
@@ -123,7 +91,6 @@ function AccountMenu({
   onLogout: () => void;
 }) {
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
   const unreadMessages = useUnreadMessagesCount();
 
   return (
@@ -181,29 +148,6 @@ function AccountMenu({
                 </span>
               )}
             </Menu.Item>
-
-            <div className={separatorCls} />
-
-            <div className="flex gap-1 px-3 py-1">
-              <ThemeOption
-                label="Clair"
-                icon={<Sun size={16} />}
-                active={theme === "light"}
-                onClick={() => setTheme("light")}
-              />
-              <ThemeOption
-                label="Sombre"
-                icon={<Moon size={16} />}
-                active={theme === "dark"}
-                onClick={() => setTheme("dark")}
-              />
-              <ThemeOption
-                label="Système"
-                icon={<Monitor size={16} />}
-                active={theme === "system"}
-                onClick={() => setTheme("system")}
-              />
-            </div>
 
             {isAdmin && (
               <>

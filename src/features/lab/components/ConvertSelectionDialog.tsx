@@ -18,16 +18,14 @@ export interface ConvertSelectionDialogProps {
   items: WallSelectionItem[];
   pending: boolean;
   onClose: () => void;
-  onConfirm: (elementIds: string[]) => void;
+  onConfirm: (elements: WallSelectionItem[]) => void;
 }
 
 /**
  * R-W2 : conversion d'une sélection du Mur en tâches. Le contrat
- * (`WallToTasksInput`, `src/domain/wall.ts`) ne porte qu'un tableau
- * d'identifiants d'éléments — le handler mock choisit lui-même le titre de
- * chaque tâche créée. La "proposition modifiable" (P5) porte donc sur ce
- * que le contrat expose réellement : quels éléments partent en tâches, pas
- * leur futur titre (qu'aucune route n'accepte en entrée).
+ * (`WallToTasksInput`, `src/domain/wall.ts`) porte id + label de chaque
+ * élément : le label lisible calculé côté éditeur (texte, "Forme", etc.)
+ * devient le titre de la tâche créée, plutôt que l'id brut du shape.
  *
  * La liste cochable est déléguée à `SelectionChecklist`, remontée via une
  * `key` dérivée des ids sélectionnés : le jeu de cases cochées repart de
@@ -70,7 +68,7 @@ function SelectionChecklist({
   items: WallSelectionItem[];
   pending: boolean;
   onCancel: () => void;
-  onConfirm: (elementIds: string[]) => void;
+  onConfirm: (elements: WallSelectionItem[]) => void;
 }) {
   const [kept, setKept] = useState<Set<string>>(
     () => new Set(items.map((i) => i.id)),
@@ -108,7 +106,7 @@ function SelectionChecklist({
         </Button>
         <Button
           disabled={kept.size === 0 || pending}
-          onClick={() => onConfirm([...kept])}
+          onClick={() => onConfirm(items.filter((item) => kept.has(item.id)))}
         >
           {pending
             ? "Création…"
