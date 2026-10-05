@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from "react";
 
 import type { ProjectBanner as ProjectBannerData } from "@/domain";
-import { ImageViewer } from "./ImageViewer";
+import { ImageViewer } from "@shared/components/ImageViewer";
 
 /**
  * Banniere de la fiche, au-dessus du header : le titre n'est jamais

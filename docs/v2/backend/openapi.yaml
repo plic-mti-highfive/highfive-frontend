@@ -548,6 +548,15 @@ paths:
       parameters:
         - $ref: "#/components/parameters/SlugParam"
         - $ref: "#/components/parameters/ImageIdParam"
+      requestBody:
+        required: false
+        description: Motif facultatif, journalise quand c'est un admin qui retire le media d'un autre porteur.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 1000 }
       responses:
         "204": { description: Image retiree. }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -1776,6 +1785,29 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
 
+  /admin/projects/{slug}/media:
+    get:
+      operationId: getAdminProjectMedia
+      tags: [admin]
+      summary: Medias de personnalisation d'un projet (moderation)
+      description: >-
+        Banniere et galerie du projet, y compris s'il est prive ou en
+        brouillon : l'administration doit voir ce qu'elle retire. Le retrait
+        passe par `DELETE /projects/{slug}/customization/images/{imageId}`
+        (journalise sous `remove_project_media`, avec un motif facultatif
+        dans le corps `{ reason }`).
+      parameters:
+        - $ref: "#/components/parameters/SlugParam"
+      responses:
+        "200":
+          description: Medias du projet.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProjectMedia" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
   /admin/tags:
     get:
       operationId: listAdminTags
@@ -1937,6 +1969,7 @@ components:
     AccountStatus: { $ref: "./schemas/AccountStatus.json" }
     AdminAction: { $ref: "./schemas/AdminAction.json" }
     AdminActionType: { $ref: "./schemas/AdminActionType.json" }
+    AdminProjectMedia: { $ref: "./schemas/AdminProjectMedia.json" }
     AdminStats: { $ref: "./schemas/AdminStats.json" }
     Announcement: { $ref: "./schemas/Announcement.json" }
     AnnouncementCreateInput: { $ref: "./schemas/AnnouncementCreateInput.json" }

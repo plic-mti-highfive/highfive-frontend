@@ -6,7 +6,7 @@ import { MAX_GALLERY_IMAGES, type GalleryItem } from "@/domain";
 import { GALLERY_MAX_WIDTH } from "../../lib/imageCompression";
 import { altInputId, moveItem } from "../../lib/customization";
 import { describeUploadError } from "../../lib/uploadError";
-import { ImageViewer } from "../ImageViewer";
+import { ImageViewer } from "@shared/components/ImageViewer";
 import { SortableList } from "./SortableList";
 import { ImageUploadButton } from "./ImageUploadButton";
 import type { UploadImage } from "./types";

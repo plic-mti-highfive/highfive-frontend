@@ -153,6 +153,26 @@ export const customizationHandlers = [
       );
       if (!image) return errors.notFound("Image introuvable.");
 
+      // Moderation : un admin qui retire le media d'un autre porteur est journalise (R-S4).
+      if (isAdmin && user.id !== project.ownerId) {
+        const body = (await request.json().catch(() => ({}))) as {
+          reason?: unknown;
+        };
+        const reason =
+          typeof body.reason === "string" && body.reason.trim()
+            ? body.reason.trim().slice(0, 1000)
+            : undefined;
+        db.adminActions.insert({
+          id: nextId(),
+          adminId: user.id,
+          type: "remove_project_media",
+          targetType: "project",
+          targetId: project.id,
+          reason,
+          createdAt: new Date().toISOString(),
+        });
+      }
+
       db.customizationImages.remove((i) => i.id === image.id);
       const { customization } = project;
       if (customization) {

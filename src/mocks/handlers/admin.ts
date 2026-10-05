@@ -1,5 +1,10 @@
 import { http, HttpResponse } from "msw";
-import { adminStatsSchema, currentUserSchema, type Report } from "@/domain";
+import {
+  adminProjectMediaSchema,
+  adminStatsSchema,
+  currentUserSchema,
+  type Report,
+} from "@/domain";
 import { nextId } from "../data/ids";
 import { SIGNUPS_LAST_30_DAYS } from "../data";
 import { getDb, type DbUser } from "../db";
@@ -268,6 +273,24 @@ export const adminHandlers = [
       items: page.items.map(toProjectSummary),
     });
   }),
+
+  http.get(
+    apiUrl("/admin/projects/:slug/media"),
+    async ({ request, params }) => {
+      await simulateLatency();
+      const auth = requireAdmin(request);
+      if (auth.error) return auth.error;
+      const project = getDb().projects.findOne((p) => p.slug === params.slug);
+      if (!project) return errors.notFound("Ce projet n'existe pas.");
+      const customization = project.customization;
+      return HttpResponse.json(
+        adminProjectMediaSchema.parse({
+          banner: customization?.banner,
+          gallery: customization?.gallery ?? [],
+        }),
+      );
+    },
+  ),
 
   http.delete(apiUrl("/admin/projects/:slug"), async ({ request, params }) => {
     await simulateLatency();

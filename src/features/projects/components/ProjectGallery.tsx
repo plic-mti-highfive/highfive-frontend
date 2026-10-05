@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { GalleryItem } from "@/domain";
-import { ImageViewer } from "./ImageViewer";
+import { ImageViewer } from "@shared/components/ImageViewer";
 
 /**
  * Grille de la galerie (images uniquement en v1). Chaque vignette est un

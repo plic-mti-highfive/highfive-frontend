@@ -59,6 +59,7 @@ export const queryKeys = {
     users: (cursor?: string) => ["admin", "users", cursor ?? null] as const,
     projects: (cursor?: string) =>
       ["admin", "projects", cursor ?? null] as const,
+    projectMedia: (slug: string) => ["admin", "project-media", slug] as const,
     tags: () => ["admin", "tags"] as const,
   },
 } as const;

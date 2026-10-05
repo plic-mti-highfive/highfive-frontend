@@ -307,8 +307,13 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
     pas etre publiquement devinables (URL signees ou controle d'acces sur le
     stockage objet), comme pour R-F4.
   - **Moderation** : un admin peut `DELETE` une image de n'importe quel
-    projet ; l'action est journalisee comme les autres actions admin
-    (§3 "Administration"). Le mock ne journalise pas encore (ecart, §6).
+    projet (corps facultatif `{ reason }`, 1000 caracteres au plus) ; quand il
+    agit sur le projet d'un autre porteur, l'action est journalisee dans
+    `admin_actions` sous `remove_project_media` (`targetType = project`,
+    `targetId` = id du projet, motif). Le porteur qui retire son propre media
+    n'est pas journalise. Pour voir ce qu'il retire, l'admin lit
+    `GET /admin/projects/{slug}/media` (banniere + galerie), y compris pour un
+    projet prive ou en brouillon.
 - **Limite de membres** (R-M5, doc 04 §5) : `member_limit` (2 a 200) fixee
   par le porteur, absente du contrat actuel (`ProjectUpdateInput` ne porte
   pas ce champ) — voir section 8. L'atteindre bascule `participation` en
@@ -463,7 +468,7 @@ projets. Themes affiches dans la sous-barre (front, pas une route) :
 `GET /feed/tags-trending` completes par les `interests` de la personne
 connectee, aucune route supplementaire.
 
-### Administration (10 routes)
+### Administration (11 routes)
 
 Toutes reservees `platformRole = admin` (401 si non connecte, 403 sinon).
 R-S2 (file de moderation triee : cibles a 3+ signalements distincts en
@@ -638,6 +643,7 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
 12. **Personnalisation de la fiche** (`Project.customization`,
     `ProjectSummary.accent`) : champs et routes additifs (V2-4), voir §3
     "Projets". Ecarts du mock a corriger cote backend : pas de nettoyage des
-    images orphelines, pas de journalisation de la suppression admin, images
+    images orphelines, pas de notification au porteur (R-S3) quand un admin
+    retire un media, images
     servies en `data:` URL (le backend sert de vraies URLs), pas de
     controle du type MIME reel.

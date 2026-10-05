@@ -20,9 +20,10 @@ import { getDb, seedDb } from "../db";
 import { demoDataset } from "../data";
 import { alexRivera, annickR, camillePetit } from "../data/users";
 import { toProjectSummary } from "./projectHelpers";
+import { adminHandlers } from "./admin";
 import { customizationHandlers, MAX_IMAGE_SIZE } from "./customization";
 
-const server = setupServer(...customizationHandlers);
+const server = setupServer(...customizationHandlers, ...adminHandlers);
 const OWNER_TOKEN = "owner-token";
 const MEMBER_TOKEN = "member-token";
 const ADMIN_TOKEN = "admin-token";
@@ -258,5 +259,109 @@ describe("DELETE /projects/:slug/customization/images/:imageId", () => {
   it("404 pour une image d'un autre projet", async () => {
     const foreign = project(OTHER_SLUG).customization!.gallery[0];
     expect((await deleteImage(SLUG, foreign.id, OWNER_TOKEN)).status).toBe(404);
+  });
+});
+
+describe("moderation admin des medias", () => {
+  function getMedia(slug: string, token?: string) {
+    return request(`/admin/projects/${slug}/media`, { token });
+  }
+  function removeImage(
+    slug: string,
+    imageId: string,
+    token?: string,
+    body?: unknown,
+  ) {
+    return request(`/projects/${slug}/customization/images/${imageId}`, {
+      method: "DELETE",
+      token,
+      headers: { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  }
+  const actions = () =>
+    getDb().adminActions.find((a) => a.type === "remove_project_media");
+
+  it("GET /admin/projects/:slug/media : reserve a l'administration", async () => {
+    expect((await getMedia(SLUG)).status).toBe(401);
+    expect((await getMedia(SLUG, OWNER_TOKEN)).status).toBe(403);
+    expect((await getMedia(SLUG, MEMBER_TOKEN)).status).toBe(403);
+    expect((await getMedia("n-existe-pas", ADMIN_TOKEN)).status).toBe(404);
+  });
+
+  it("renvoie la banniere et la galerie du projet", async () => {
+    const response = await getMedia(SLUG, ADMIN_TOKEN);
+    expect(response.status).toBe(200);
+    const media = (await response.json()) as {
+      banner?: { id: string };
+      gallery: { id: string }[];
+    };
+    const stored = project(SLUG).customization!;
+    expect(media.banner?.id).toBe(stored.banner?.id);
+    expect(media.gallery.map((g) => g.id)).toEqual(
+      stored.gallery.map((g) => g.id),
+    );
+  });
+
+  it("renvoie une galerie vide pour un projet sans personnalisation", async () => {
+    const plain = getDb()
+      .projects.all()
+      .find((p) => !p.customization)!;
+    const response = await getMedia(plain.slug, ADMIN_TOKEN);
+    expect(await response.json()).toEqual({ gallery: [] });
+  });
+
+  it("l'admin voit aussi les medias d'un projet prive ou en brouillon", async () => {
+    getDb().projects.update((p) => p.slug === SLUG, {
+      visibility: "private",
+      participation: "on_invite",
+      state: "draft",
+    });
+    expect((await getMedia(SLUG, ADMIN_TOKEN)).status).toBe(200);
+  });
+
+  it("un admin qui retire un media est journalise avec son motif", async () => {
+    const image = project(SLUG).customization!.gallery[0];
+    const response = await removeImage(SLUG, image.id, ADMIN_TOKEN, {
+      reason: "  Contenu inapproprie  ",
+    });
+    expect(response.status).toBe(204);
+    const [action] = actions();
+    expect(action).toMatchObject({
+      adminId: annickR.id,
+      type: "remove_project_media",
+      targetType: "project",
+      targetId: project(SLUG).id,
+      reason: "Contenu inapproprie",
+    });
+    expect(project(SLUG).customization!.gallery.map((g) => g.id)).not.toContain(
+      image.id,
+    );
+  });
+
+  it("le motif est facultatif et borne a 1000 caracteres", async () => {
+    const [first, second] = project(SLUG).customization!.gallery;
+    await removeImage(SLUG, first.id, ADMIN_TOKEN);
+    await removeImage(SLUG, second.id, ADMIN_TOKEN, {
+      reason: "x".repeat(1500),
+    });
+    const [withoutReason, withLongReason] = actions();
+    expect(withoutReason.reason).toBeUndefined();
+    expect(withLongReason.reason).toHaveLength(1000);
+  });
+
+  it("le porteur qui retire son propre media n'est pas journalise", async () => {
+    const image = project(SLUG).customization!.gallery[0];
+    expect((await removeImage(SLUG, image.id, OWNER_TOKEN)).status).toBe(204);
+    expect(actions()).toHaveLength(0);
+  });
+
+  it("un refus (membre) ni ne retire ni ne journalise", async () => {
+    const image = project(SLUG).customization!.gallery[0];
+    expect((await removeImage(SLUG, image.id, MEMBER_TOKEN)).status).toBe(403);
+    expect(actions()).toHaveLength(0);
+    expect(project(SLUG).customization!.gallery.map((g) => g.id)).toContain(
+      image.id,
+    );
   });
 });

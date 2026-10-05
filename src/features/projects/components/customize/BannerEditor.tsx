@@ -6,7 +6,7 @@ import type { ProjectBanner } from "@/domain";
 import { altInputId } from "../../lib/customization";
 import { BANNER_MAX_WIDTH } from "../../lib/imageCompression";
 import { describeUploadError } from "../../lib/uploadError";
-import { ImageViewer } from "../ImageViewer";
+import { ImageViewer } from "@shared/components/ImageViewer";
 import { ImageUploadButton } from "./ImageUploadButton";
 import type { UploadImage } from "./types";
 

@@ -43,19 +43,19 @@ membre ; `admin` = role plateforme `admin`.
 
 ## Projets (`projects.ts`)
 
-| Methode | Route                                           | Entree                      | Sortie                      | Auth/role      | Regles                                                                            |
-| ------- | ----------------------------------------------- | --------------------------- | --------------------------- | -------------- | --------------------------------------------------------------------------------- |
-| GET     | `/projects`                                     | query `q,tags,cursor,limit` | `Paginated<ProjectSummary>` | public         | R-V1 : public + actif seulement                                                   |
-| GET     | `/projects/:slug`                               | —                           | `Project`                   | public/membre+ | R-PR2 (brouillon = porteur seul), R-V3 (prive = equipe)                           |
-| POST    | `/projects`                                     | `ProjectCreateInput`        | `Project` (201)             | connecte       | R-PR1 (refine zod), etat initial `draft`                                          |
-| PATCH   | `/projects/:slug`                               | `ProjectUpdateInput`        | `Project`                   | porteur+       | R-PR1                                                                             |
-| POST    | `/projects/:slug/transition`                    | `{transition}`              | `Project`                   | porteur+       | R-PR3..R-PR6, matrice publier/terminer/rouvrir/archiver/reactiver                 |
-| DELETE  | `/projects/:slug`                               | `{confirmTitle}`            | 204                         | porteur/admin  | R-PR7 : titre saisi = confirmation                                                |
-| POST    | `/projects/:slug/transfer`                      | `{newOwnerId}`              | `Project`                   | porteur        | R-M2 : ancien porteur -> co-porteur                                               |
-| GET     | `/me/projects`                                  | —                           | `ProjectSummary[]`          | connecte       | "Mes projets"                                                                     |
-| PATCH   | `/projects/:slug/customization`                 | `ProjectCustomization`      | `Project`                   | porteur seul   | remplace tout ; chaque image doit avoir ete televersee pour ce projet (400 sinon) |
-| POST    | `/projects/:slug/customization/images`          | multipart `file`            | `{id, url}` (201)           | porteur seul   | JPEG/PNG/WebP/AVIF, 2 Mo max ; referencee au prochain PATCH                       |
-| DELETE  | `/projects/:slug/customization/images/:imageId` | —                           | 204                         | porteur/admin  | retire aussi l'image de la banniere/galerie ; moderation admin                    |
+| Methode | Route                                           | Entree                      | Sortie                      | Auth/role      | Regles                                                                                                                   |
+| ------- | ----------------------------------------------- | --------------------------- | --------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| GET     | `/projects`                                     | query `q,tags,cursor,limit` | `Paginated<ProjectSummary>` | public         | R-V1 : public + actif seulement                                                                                          |
+| GET     | `/projects/:slug`                               | —                           | `Project`                   | public/membre+ | R-PR2 (brouillon = porteur seul), R-V3 (prive = equipe)                                                                  |
+| POST    | `/projects`                                     | `ProjectCreateInput`        | `Project` (201)             | connecte       | R-PR1 (refine zod), etat initial `draft`                                                                                 |
+| PATCH   | `/projects/:slug`                               | `ProjectUpdateInput`        | `Project`                   | porteur+       | R-PR1                                                                                                                    |
+| POST    | `/projects/:slug/transition`                    | `{transition}`              | `Project`                   | porteur+       | R-PR3..R-PR6, matrice publier/terminer/rouvrir/archiver/reactiver                                                        |
+| DELETE  | `/projects/:slug`                               | `{confirmTitle}`            | 204                         | porteur/admin  | R-PR7 : titre saisi = confirmation                                                                                       |
+| POST    | `/projects/:slug/transfer`                      | `{newOwnerId}`              | `Project`                   | porteur        | R-M2 : ancien porteur -> co-porteur                                                                                      |
+| GET     | `/me/projects`                                  | —                           | `ProjectSummary[]`          | connecte       | "Mes projets"                                                                                                            |
+| PATCH   | `/projects/:slug/customization`                 | `ProjectCustomization`      | `Project`                   | porteur seul   | remplace tout ; chaque image doit avoir ete televersee pour ce projet (400 sinon)                                        |
+| POST    | `/projects/:slug/customization/images`          | multipart `file`            | `{id, url}` (201)           | porteur seul   | JPEG/PNG/WebP/AVIF, 2 Mo max ; referencee au prochain PATCH                                                              |
+| DELETE  | `/projects/:slug/customization/images/:imageId` | `{reason?}` (admin)         | 204                         | porteur/admin  | retire aussi l'image de la banniere/galerie ; admin sur le projet d'un autre : journalise `remove_project_media` + motif |
 
 ## Highfive (`highfives.ts`)
 
@@ -164,18 +164,19 @@ membre ; `admin` = role plateforme `admin`.
 
 ## Administration (`admin.ts`)
 
-| Methode | Route                              | Entree         | Sortie                      | Auth/role | Regles                                       |
-| ------- | ---------------------------------- | -------------- | --------------------------- | --------- | -------------------------------------------- |
-| GET     | `/admin/reports`                   | query `cursor` | `Paginated<ReportSummary>`  | admin     | R-S2 : cibles a 3+ signalements en tete      |
-| POST    | `/admin/reports/:reportId/resolve` | `{reason?}`    | `Report`                    | admin     | R-S4 : journalise dans `adminActions`        |
-| POST    | `/admin/reports/:reportId/reject`  | `{reason?}`    | `Report`                    | admin     | idem                                         |
-| GET     | `/admin/stats`                     | —              | `AdminStats`                | admin     | compteurs calcules en direct depuis le store |
-| GET     | `/admin/users`                     | query `cursor` | `Paginated<CurrentUser>`    | admin     | mot de passe jamais renvoye                  |
-| POST    | `/admin/users/:userId/suspend`     | `{reason?}`    | 204                         | admin     | journalise                                   |
-| POST    | `/admin/users/:userId/reactivate`  | `{reason?}`    | 204                         | admin     | leve la suspension, journalise               |
-| GET     | `/admin/projects`                  | query `cursor` | `Paginated<ProjectSummary>` | admin     | —                                            |
-| DELETE  | `/admin/projects/:slug`            | —              | 204                         | admin     | R-PR7, journalise ; voir note ci-dessous     |
-| GET     | `/admin/tags`                      | —              | `Tag[]`                     | admin     | —                                            |
+| Methode | Route                              | Entree         | Sortie                      | Auth/role | Regles                                                            |
+| ------- | ---------------------------------- | -------------- | --------------------------- | --------- | ----------------------------------------------------------------- |
+| GET     | `/admin/reports`                   | query `cursor` | `Paginated<ReportSummary>`  | admin     | R-S2 : cibles a 3+ signalements en tete                           |
+| POST    | `/admin/reports/:reportId/resolve` | `{reason?}`    | `Report`                    | admin     | R-S4 : journalise dans `adminActions`                             |
+| POST    | `/admin/reports/:reportId/reject`  | `{reason?}`    | `Report`                    | admin     | idem                                                              |
+| GET     | `/admin/stats`                     | —              | `AdminStats`                | admin     | compteurs calcules en direct depuis le store                      |
+| GET     | `/admin/users`                     | query `cursor` | `Paginated<CurrentUser>`    | admin     | mot de passe jamais renvoye                                       |
+| POST    | `/admin/users/:userId/suspend`     | `{reason?}`    | 204                         | admin     | journalise                                                        |
+| POST    | `/admin/users/:userId/reactivate`  | `{reason?}`    | 204                         | admin     | leve la suspension, journalise                                    |
+| GET     | `/admin/projects`                  | query `cursor` | `Paginated<ProjectSummary>` | admin     | —                                                                 |
+| DELETE  | `/admin/projects/:slug`            | —              | 204                         | admin     | R-PR7, journalise ; voir note ci-dessous                          |
+| GET     | `/admin/projects/:slug/media`      | —              | `AdminProjectMedia`         | admin     | banniere + galerie, meme d'un projet prive/brouillon (moderation) |
+| GET     | `/admin/tags`                      | —              | `Tag[]`                     | admin     | —                                                                 |
 
 **`/feed/discover` — sections (V2, retour utilisateur "Decouvrir connecte
 trop pauvre") :** `DiscoverSection` (`src/domain/search.ts`) = `{ id,

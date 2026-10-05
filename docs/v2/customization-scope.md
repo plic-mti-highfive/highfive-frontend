@@ -77,8 +77,10 @@ projets auront des images).
 
 ### Modération
 
-- Un admin doit pouvoir voir et retirer un média. Important mais non prioritaire : le contrat
-  prévoit l'action, l'UI admin est reportée.
+- Un admin voit et retire un média : bouton « Médias » par projet dans l'administration (liste
+  de la bannière et de la galerie, agrandissement, retrait avec motif facultatif). Fonctionne
+  aussi pour un projet privé ou en brouillon (`GET /admin/projects/:slug/media`). Le retrait
+  est journalisé sous `remove_project_media`.
 
 ### Décisions complémentaires (après exploration du code)
 

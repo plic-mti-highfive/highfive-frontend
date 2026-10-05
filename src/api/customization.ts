@@ -33,12 +33,18 @@ export function uploadCustomizationImage(
   });
 }
 
-/** Porteur ou administration : retire l'image (et sa reference dans la banniere/galerie). */
+/**
+ * Porteur ou administration : retire l'image (et sa reference dans la
+ * banniere/galerie). `reason` est journalise quand c'est un admin qui retire
+ * le media d'un autre porteur.
+ */
 export function deleteCustomizationImage(
   slug: string,
   imageId: string,
+  reason?: string,
 ): Promise<void> {
   return apiFetch(`/projects/${slug}/customization/images/${imageId}`, {
     method: "DELETE",
+    body: reason ? { reason } : undefined,
   });
 }

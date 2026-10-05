@@ -19,7 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   porteur sur `/projets/:slug/personnaliser` avec apercu live : accent,
   banniere (point focal, texte alternatif obligatoire), sections reordonnables
   par boutons ou glisser-deposer (dnd-kit), galerie, compression WebP cote
-  client, garde de sortie.
+  client, garde de sortie. Moderation : bouton « Medias » par projet dans
+  l'administration (voir, agrandir, retirer avec motif), journalise sous
+  `remove_project_media`.
 
 ### Changed
 
