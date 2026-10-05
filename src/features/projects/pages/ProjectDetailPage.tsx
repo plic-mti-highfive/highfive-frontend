@@ -1,59 +1,25 @@
 import { useOutletContext } from "react-router-dom";
 
-import { EmptyState, Section } from "@shared/ui";
-import { useAnnouncements } from "@/api/queries/announcements";
 import type { ProjectOutletContext } from "../components/ProjectLayout";
-import { ProjectOverviewSidebar } from "../components/ProjectOverviewSidebar";
-import { PinnedAnnouncementPreview } from "../components/PinnedAnnouncementPreview";
-import { CommentsSection } from "../components/CommentsSection";
-import { renderRestrictedMarkdown } from "../lib/markdown";
+import { ProjectOverview } from "../components/ProjectOverview";
 
 /**
  * Onglet Aperçu (`/projets/:slug`, doc 13 E-10) : annonce épinglée en
- * rappel, description, commentaires. L'en-tête (titre/accroche/tags/action
- * principale) vit dans `ProjectLayout`, partagé par les trois onglets.
+ * rappel, description, galerie, commentaires — dans l'ordre choisi par le
+ * porteur (`Project.customization.sections`). L'en-tête (titre/accroche/
+ * tags/action principale) vit dans `ProjectLayout`, partagé par les trois
+ * onglets.
  */
 export function ProjectDetailPage() {
   const { project, members, capabilities } =
     useOutletContext<ProjectOutletContext>();
 
-  const announcementsQuery = useAnnouncements(project.slug);
-  const pinned = announcementsQuery.data?.find((item) => item.pinned);
-
   return (
-    <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
-      <div className="flex flex-col gap-10 lg:col-span-2">
-        {pinned && (
-          <PinnedAnnouncementPreview
-            slug={project.slug}
-            announcement={pinned}
-          />
-        )}
-
-        <Section title="À propos">
-          {project.description ? (
-            <div
-              className="prose-sm max-w-none text-body-md leading-relaxed text-foreground"
-              dangerouslySetInnerHTML={{
-                __html: renderRestrictedMarkdown(project.description),
-              }}
-            />
-          ) : (
-            <EmptyState
-              title="Aucune description détaillée pour le moment."
-              className="rounded-lg border border-dashed border-border bg-muted"
-            />
-          )}
-        </Section>
-
-        <CommentsSection
-          slug={project.slug}
-          isAuthenticated={capabilities.canComment}
-          canModerate={capabilities.canModerateComments}
-        />
-      </div>
-
-      <ProjectOverviewSidebar project={project} members={members} />
-    </div>
+    <ProjectOverview
+      project={project}
+      members={members}
+      canComment={capabilities.canComment}
+      canModerateComments={capabilities.canModerateComments}
+    />
   );
 }

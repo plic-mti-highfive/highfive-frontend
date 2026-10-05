@@ -14,6 +14,8 @@ export interface ProjectCapabilities {
   isMember: boolean;
   /** Modifier titre, accroche, description, tags, besoins. */
   canEdit: boolean;
+  /** Personnaliser la fiche (banniere, accent, sections, galerie) : porteur seul. */
+  canCustomize: boolean;
   /** Publier, archiver, transferer : porteur seul. */
   canPublish: boolean;
   canArchive: boolean;
@@ -49,6 +51,7 @@ export function getProjectCapabilities(
     role,
     isMember: role !== undefined,
     canEdit: isOwnerOrCoOwner,
+    canCustomize: isOwner,
     canPublish: isOwner,
     canArchive: isOwner,
     canTransfer: isOwner,

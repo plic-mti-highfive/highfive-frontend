@@ -102,7 +102,7 @@ export function ProjectCard({
   rank,
   className,
 }: ProjectCardProps) {
-  const accent = getAccent(project.id);
+  const accent = project.accent ?? getAccent(project.id);
   const href = `/projets/${project.slug}`;
   const unmetNeeds = project.needs.filter((need) => !need.fulfilled);
   const team =

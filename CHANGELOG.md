@@ -14,7 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ordonnables et masquables, galerie de 8 images au plus. Contrat additif
   (`Project.customization`, `ProjectSummary.accent`, trois routes) documente
   dans `docs/v2/customization-scope.md`, `API-ROUTES.md`, `openapi.yaml` et
-  `SPEC.md`. Lot 1 : domaine, mock MSW et contrat (pas encore d'interface).
+  `SPEC.md`. Rendu de la fiche : banniere, header teinte, sections ordonnees,
+  galerie et visionneuse accessible, accent sur les cartes. L'editeur du
+  porteur arrive dans un lot suivant.
 
 ### Changed
 

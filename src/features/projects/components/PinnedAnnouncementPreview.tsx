@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { Badge, Card, CardBody } from "@shared/ui";
+import type { AccentName } from "@shared/lib/accent";
 import { formatExactDateTime, formatRelativeDate } from "@shared/lib/dates";
 import type { AnnouncementWithAuthor } from "@/api/announcements";
 
@@ -8,13 +9,16 @@ import type { AnnouncementWithAuthor } from "@/api/announcements";
 export function PinnedAnnouncementPreview({
   slug,
   announcement,
+  accent = "orange",
 }: {
   slug: string;
   announcement: AnnouncementWithAuthor;
+  /** Accent du projet (personnalisation) ; `orange` par defaut, comme avant. */
+  accent?: AccentName;
 }) {
   return (
     <Link to={`/projets/${slug}/annonces`}>
-      <Card variant="interactive" data-accent="orange">
+      <Card variant="interactive" data-accent={accent}>
         <CardBody>
           <div className="flex items-center gap-2">
             <Badge tone="warning">Épinglée</Badge>

@@ -9,6 +9,7 @@ import { useProjectHighfivers } from "@/api/queries/highfives";
 import { ApiError } from "@/api/client";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
 import { getMembershipRole, getProjectCapabilities } from "../lib/capabilities";
+import { ProjectBanner } from "./ProjectBanner";
 import { ProjectHeader } from "./ProjectHeader";
 
 export interface ProjectOutletContext {
@@ -114,8 +115,35 @@ export function ProjectLayout() {
     user && highfiversQuery.data?.items.some((person) => person.id === user.id),
   );
 
+  // Accent choisi par le porteur : pose `data-accent` sur toute la fiche (les
+  // variables `--accent-*` en descendent) et teinte le header. Sans accent,
+  // aucun attribut ni fond : la fiche reste identique a celle d'origine.
+  const accent = project.customization?.accent;
+  const header = (
+    <ProjectHeader
+      project={project}
+      owner={owner}
+      isAuthenticated={isAuthenticated}
+      isMember={capabilities.isMember}
+      canEdit={capabilities.canEdit}
+      highfiveGiven={highfiveGiven}
+      tinted={accent !== undefined}
+    />
+  );
+  // `border-[var(--accent-base)]` n'est valide que sous un `data-accent` :
+  // on ne le passe qu'avec un accent, sinon l'onglet garde `border-foreground`.
+  const accentTabClass = accent
+    ? ({ isActive }: { isActive: boolean }) =>
+        isActive ? "border-[var(--accent-base)]" : undefined
+    : undefined;
+
   return (
-    <div className="mx-auto flex max-w-content flex-col gap-6 px-6 py-10">
+    <div
+      data-accent={accent}
+      className="mx-auto flex max-w-content flex-col gap-6 px-6 py-10"
+    >
+      <ProjectBanner banner={project.customization?.banner} />
+
       {project.state === "done" && (
         <div className="rounded-lg bg-info-bg px-4 py-3 text-body-sm text-info-fg">
           Ce projet est terminé. Le Lab est en lecture seule, les commentaires
@@ -129,22 +157,21 @@ export function ProjectLayout() {
         </div>
       )}
 
-      <ProjectHeader
-        project={project}
-        owner={owner}
-        isAuthenticated={isAuthenticated}
-        isMember={capabilities.isMember}
-        canEdit={capabilities.canEdit}
-        highfiveGiven={highfiveGiven}
-      />
+      {accent ? (
+        <div className="rounded-xl bg-[var(--accent-light)] p-6">{header}</div>
+      ) : (
+        header
+      )}
 
       <nav className="border-b border-border" aria-label="Sections du projet">
         <div className="flex gap-1">
-          <TabLink to={`/projets/${slug}`} end>
+          <TabLink to={`/projets/${slug}`} end className={accentTabClass}>
             Aperçu
           </TabLink>
-          <TabLink to={`/projets/${slug}/annonces`}>Annonces</TabLink>
-          <TabLink to={`/projets/${slug}/equipe`}>
+          <TabLink to={`/projets/${slug}/annonces`} className={accentTabClass}>
+            Annonces
+          </TabLink>
+          <TabLink to={`/projets/${slug}/equipe`} className={accentTabClass}>
             <span className="flex items-center gap-2">
               Équipe
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">

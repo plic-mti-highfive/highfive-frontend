@@ -35,6 +35,7 @@ export function ProjectHeader({
   isMember,
   canEdit,
   highfiveGiven,
+  tinted = false,
 }: {
   project: Project;
   owner?: UserSummary;
@@ -42,6 +43,8 @@ export function ProjectHeader({
   isMember: boolean;
   canEdit: boolean;
   highfiveGiven: boolean;
+  /** Le header est pose sur le fond teinte de l'accent du projet : tags et badges passent sur fond carte pour rester lisibles. */
+  tinted?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -58,7 +61,7 @@ export function ProjectHeader({
   }
 
   return (
-    <header className="flex items-stretch gap-4">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
       <div className="flex flex-1 flex-col gap-4">
         {owner && (
           <div className="flex items-center gap-1 text-body-sm text-muted-foreground">
@@ -85,18 +88,25 @@ export function ProjectHeader({
 
         <div className="flex flex-wrap items-center gap-2">
           {project.tags.map((tag) => (
-            <TagPill key={tag} label={tag} />
+            <TagPill
+              key={tag}
+              label={tag}
+              className={tinted ? "bg-card" : undefined}
+            />
           ))}
-          <Badge tone={STATE_TONE[project.state]}>
+          <Badge
+            tone={STATE_TONE[project.state]}
+            className={tinted ? "bg-card" : undefined}
+          >
             {STATE_LABEL[project.state]}
           </Badge>
-          <Badge tone="neutral">
+          <Badge tone="neutral" className={tinted ? "bg-card" : undefined}>
             {PARTICIPATION_LABEL[project.participation]}
           </Badge>
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end justify-between gap-3">
+      <div className="flex shrink-0 flex-col items-start justify-between gap-3 sm:items-end">
         <div className="flex flex-wrap items-center gap-3">
           <JoinAction
             slug={project.slug}
