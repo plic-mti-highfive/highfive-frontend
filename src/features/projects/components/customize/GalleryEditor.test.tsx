@@ -78,9 +78,9 @@ describe("GalleryEditor", () => {
       screen.getByRole("button", { name: "Descendre l'image 1" }),
     );
     expect(alts()).toBe("Image 2|Image 1|Image 3");
-    expect(screen.getByRole("status").textContent).toBe(
-      "Image 1 déplacée en position 2 sur 3.",
-    );
+    expect(
+      screen.getByText("Image 1 déplacée en position 2 sur 3."),
+    ).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Monter l'image 3" }));
     expect(alts()).toBe("Image 2|Image 3|Image 1");
   });

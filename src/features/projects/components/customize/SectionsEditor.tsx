@@ -4,10 +4,12 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { Checkbox, IconButton } from "@shared/ui";
 import type { CustomizationSection } from "@/domain";
 import { moveItem, SECTION_LABEL } from "../../lib/customization";
+import { SortableList } from "./SortableList";
 
 /**
  * Ordre et visibilite des sections de l'Apercu. Reordonnancement par
- * boutons ↑/↓ (alternative sans glisser, WCAG 2.5.7) ; chaque deplacement
+ * glisser-deposer (poignee) ou par boutons ↑/↓ (alternative sans glisser,
+ * WCAG 2.5.7) ; chaque deplacement
  * est annonce dans une region `role="status"`. Les boutons aux extremites
  * restent focusables (`focusableWhenDisabled`) pour que le focus ne soit
  * pas perdu quand l'element atteint le haut ou le bas.
@@ -36,14 +38,17 @@ export function SectionsEditor({
         Coche pour afficher une section, et change son ordre avec les flèches.
         La colonne « Équipe » reste toujours à droite.
       </p>
-      <ol className="flex flex-col gap-2">
-        {sections.map((section, index) => {
+      <SortableList
+        items={sections}
+        getLabel={(section) => SECTION_LABEL[section.id]}
+        onReorder={(next) => onChange(next)}
+        className="flex flex-col gap-2"
+        itemClassName="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2"
+        renderItem={(section, index, handle) => {
           const label = SECTION_LABEL[section.id];
           return (
-            <li
-              key={section.id}
-              className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2"
-            >
+            <>
+              {handle}
               <label className="flex flex-1 items-center gap-3 text-body-md text-foreground">
                 <Checkbox
                   checked={section.visible}
@@ -77,10 +82,10 @@ export function SectionsEditor({
               >
                 <ArrowDown size={16} />
               </IconButton>
-            </li>
+            </>
           );
-        })}
-      </ol>
+        }}
+      />
       <p role="status" className="sr-only">
         {announcement}
       </p>

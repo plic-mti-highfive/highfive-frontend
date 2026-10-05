@@ -39,17 +39,17 @@ describe("SectionsEditor", () => {
       screen.getByRole("button", { name: "Descendre « Annonce épinglée »" }),
     );
     expect(state()).toBe("about:on,pinned:on,gallery:on,comments:on");
-    expect(screen.getByRole("status").textContent).toBe(
-      "Annonce épinglée déplacée en position 2 sur 4.",
-    );
+    expect(
+      screen.getByText("Annonce épinglée déplacée en position 2 sur 4."),
+    ).toBeTruthy();
 
     await user.click(
       screen.getByRole("button", { name: "Monter « Galerie »" }),
     );
     expect(state()).toBe("about:on,gallery:on,pinned:on,comments:on");
-    expect(screen.getByRole("status").textContent).toBe(
-      "Galerie déplacée en position 2 sur 4.",
-    );
+    expect(
+      screen.getByText("Galerie déplacée en position 2 sur 4."),
+    ).toBeTruthy();
   });
 
   it("laisse les boutons des extremites focusables mais sans effet", async () => {

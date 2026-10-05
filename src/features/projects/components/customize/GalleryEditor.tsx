@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 
 import { Checkbox, Field, IconButton, Input } from "@shared/ui";
@@ -7,13 +7,15 @@ import { GALLERY_MAX_WIDTH } from "../../lib/imageCompression";
 import { altInputId, moveItem } from "../../lib/customization";
 import { describeUploadError } from "../../lib/uploadError";
 import { ImageViewer } from "../ImageViewer";
+import { SortableList } from "./SortableList";
 import { ImageUploadButton } from "./ImageUploadButton";
 import type { UploadImage } from "./types";
 
 /**
  * Edition de la galerie (8 images maximum) : ajout (plusieurs fichiers a la
  * fois), texte alternatif obligatoire sauf image decorative, legende
- * facultative, reordonnancement par boutons ↑/↓ annonce en `role="status"`.
+ * facultative, reordonnancement par glisser-deposer (poignee) ou boutons ↑/↓,
+ * annonce en `role="status"`.
  */
 export function GalleryEditor({
   gallery,
@@ -86,14 +88,22 @@ export function GalleryEditor({
       </p>
 
       {gallery.length > 0 && (
-        <ol className="flex flex-col gap-4">
-          {gallery.map((item, index) => (
+        <SortableList
+          items={gallery}
+          getLabel={(item) => `Image ${gallery.indexOf(item) + 1}`}
+          onReorder={(next) => {
+            onChange(next);
+            setAnnouncement("Ordre de la galerie modifié.");
+          }}
+          className="flex flex-col gap-4"
+          itemClassName="rounded-lg border border-border bg-card p-3"
+          renderItem={(item, index, handle) => (
             <GalleryItemEditor
-              key={item.id}
               item={item}
               position={index + 1}
               total={gallery.length}
               error={issues[item.id]}
+              handle={handle}
               onChange={(patch) => update(item.id, patch)}
               onMove={(direction) => move(index, direction)}
               onZoom={() => setViewIndex(index)}
@@ -103,8 +113,8 @@ export function GalleryEditor({
                 setAnnouncement(`Image ${index + 1} supprimée.`);
               }}
             />
-          ))}
-        </ol>
+          )}
+        />
       )}
 
       <div>
@@ -150,6 +160,7 @@ function GalleryItemEditor({
   position,
   total,
   error,
+  handle,
   onChange,
   onMove,
   onZoom,
@@ -159,6 +170,8 @@ function GalleryItemEditor({
   position: number;
   total: number;
   error?: string;
+  /** Poignee de glisser-deposer fournie par `SortableList`. */
+  handle: ReactNode;
   onChange: (patch: Partial<GalleryItem>) => void;
   onMove: (direction: -1 | 1) => void;
   onZoom: () => void;
@@ -168,7 +181,7 @@ function GalleryItemEditor({
   const label = `image ${position}`;
 
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3">
+    <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
         <button
           type="button"
@@ -224,6 +237,7 @@ function GalleryItemEditor({
         </div>
       </div>
       <div className="flex items-center justify-end gap-2">
+        <span className="mr-auto">{handle}</span>
         <IconButton
           aria-label={`Monter l'${label}`}
           variant="outline"
@@ -250,6 +264,6 @@ function GalleryItemEditor({
           <Trash2 size={16} />
         </IconButton>
       </div>
-    </li>
+    </div>
   );
 }

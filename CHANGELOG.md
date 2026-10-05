@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   galerie et visionneuse accessible, accent sur les cartes. Editeur du
   porteur sur `/projets/:slug/personnaliser` avec apercu live : accent,
   banniere (point focal, texte alternatif obligatoire), sections reordonnables
-  par boutons, galerie, compression WebP cote client, garde de sortie.
+  par boutons ou glisser-deposer (dnd-kit), galerie, compression WebP cote
+  client, garde de sortie.
 
 ### Changed
 

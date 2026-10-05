@@ -71,7 +71,8 @@ projets auront des images).
   vraie fiche.
 - Enregistrement explicite ; confirmation si on quitte avec des changements non sauvegardés.
 - **Réordonnancement** : boutons ↑/↓ (alternative sans glisser, exigée par WCAG 2.2 critère
-  2.5.7, toujours visibles) + glisser-déposer en amélioration (dnd-kit) dans un lot ultérieur.
+  2.5.7, toujours visibles) + glisser-déposer par une poignée (dnd-kit : souris, tactile,
+  clavier Espace/flèches/Espace, annonces et consignes en français, sans animation de transition).
 - Accessibilité et responsive (mobile-first) dès le départ, éditeur compris.
 
 ### Modération
@@ -124,7 +125,7 @@ Upload multipart, types image uniquement, quotas à définir.
 ## Hors scope v1
 
 CSS/HTML libre, description markdown étendue, embed vidéo, bannière ou galerie sur les cartes,
-co-porteurs, thème du Lab, versionnement du thème, UI admin de modération, glisser-déposer.
+co-porteurs, thème du Lab, versionnement du thème.
 
 ## Points à signaler au backend
 
