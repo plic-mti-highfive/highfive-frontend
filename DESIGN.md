@@ -162,7 +162,7 @@ Five more hues complete the deterministic accent wheel alongside `--color-rose`,
 - **`--color-sky`** (`#3ec6f5`)
 - **`--color-purple`** (`#c24bff`)
 
-A tag, project, or assignee's color is computed by hashing its id/name and indexing into this six-color wheel — `getAccent()` in `src/shared/lib/accent.ts` returns one of `AccentName` (`"rose" | "orange" | "yellow" | "apple" | "sky" | "purple"`). A container carries that result as `data-accent="<name>"`, which defines `--accent-base`/`--accent-light`/`--accent-dark`/`--card-accent` in CSS (see `[data-accent]` in `src/index.css`) — components (`Card`, `Avatar`, `TagPill`, `Badge` tone `accent`) then style themselves purely from those variables, never from a hex value in JS. The same string always resolves to the same hue everywhere it appears, and no hue is ever chosen by hand.
+A tag, project, or assignee's color is computed by hashing its id/name and indexing into this six-color wheel — `getAccent()` in `src/shared/lib/accent.ts` returns one of `AccentName` (`"rose" | "orange" | "yellow" | "apple" | "sky" | "purple"`). A container carries that result as `data-accent="<name>"`, which defines `--accent-base`/`--accent-light`/`--accent-dark`/`--card-accent` in CSS (see `[data-accent]` in `src/index.css`) — components (`Card`, `Avatar`, `TagPill`, `Badge` tone `accent`) then style themselves purely from those variables, never from a hex value in JS. The same string always resolves to the same hue everywhere it appears, and no hue is ever chosen by hand — with one bounded exception: a project's owner may pick one of the six wheel hues for their own project (`Project.customization.accent`, surfaced as `ProjectSummary.accent`), which then replaces the hashed hue for that project only (see the Deterministic Tint Rule).
 
 ### Neutral
 
@@ -182,7 +182,7 @@ In dark mode the same roles shift to a deep violet-black base (`oklch(0.15 0.02 
 
 **The Accent-Not-Action Rule.** `--color-rose` is a signal color (identity, social action, hashed category), never the default action color. Primary buttons and links use the near-black/near-white neutral pair, not rose — this keeps the one brand accent rare and meaningful instead of diluted across every CTA.
 
-**The Deterministic Tint Rule.** Any color assigned to a tag, project, or assignee is derived by hashing its id/name through `getAccent()`, never picked manually. The same project or tag always renders in the same hue everywhere in the product; don't hardcode a specific hue to a specific entity.
+**The Deterministic Tint Rule.** Any color assigned to a tag, project, or assignee is derived by hashing its id/name through `getAccent()`, never picked manually. The same project or tag always renders in the same hue everywhere in the product; don't hardcode a specific hue to a specific entity. **Exception — project accent:** the owner of a project may choose its accent from the six wheel hues (never a free color). That choice replaces the hashed hue for that one project everywhere the project appears (its fiche and its cards), and falls back to `getAccent(project.id)` when unset. Tags, users and assignees stay strictly hashed, and a project's accent never recolors its tags, its CTA or any other entity's identity color.
 
 ## Typography
 
@@ -308,4 +308,4 @@ Circular; renders the real photo when available, and otherwise deterministic ini
 - **Don't** apply the Fraunces display serif to anything other than the literal "HighFive!" wordmark — all headlines, including large ones, use Geist (The Wordmark-Only Serif Rule).
 - **Don't** default to a corporate SaaS blue as a primary or accent color — the system's identity color is warm rose, its neutrals are warm cream/ink, not cool gray-blue.
 - **Don't** add ambient/resting shadows to cards or tickets; elevation only appears as a direct response to hover.
-- **Don't** manually assign a specific hue to a specific tag, project, or user — always go through the deterministic hash so the same name always resolves the same way.
+- **Don't** manually assign a specific hue to a specific tag or user — always go through the deterministic hash so the same name always resolves the same way. (A project's owner may choose that project's accent among the six wheel hues; see the Deterministic Tint Rule exception.)
