@@ -3,6 +3,7 @@ import { announcementHandlers } from "./announcements";
 import { authHandlers } from "./auth";
 import { commentHandlers } from "./comments";
 import { conversationHandlers } from "./conversations";
+import { customizationHandlers } from "./customization";
 import { fileHandlers } from "./files";
 import { highfiveHandlers } from "./highfives";
 import { membershipHandlers } from "./memberships";
@@ -20,6 +21,7 @@ export const handlers = [
   ...tagHandlers,
   ...userHandlers,
   ...projectHandlers,
+  ...customizationHandlers,
   ...highfiveHandlers,
   ...membershipHandlers,
   ...announcementHandlers,

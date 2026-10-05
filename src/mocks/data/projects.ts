@@ -6,6 +6,7 @@ import {
   type ProjectState,
   type Visibility,
 } from "@/domain";
+import { CUSTOMIZATIONS } from "./customizationFixtures";
 import { daysAgo, hoursAgo, nextId } from "./ids";
 import * as u from "./users";
 
@@ -408,6 +409,7 @@ export const PROJECTS: Project[] = SEEDS.map((seed) =>
     participation: seed.participation,
     state: seed.state,
     ownerId: seed.ownerId,
+    customization: CUSTOMIZATIONS[seed.slug],
     highfiveCount: seed.highfiveCount,
     createdAt: daysAgo(seed.createdDaysAgo),
     updatedAt: hoursAgo(seed.lastActivityHoursAgo),

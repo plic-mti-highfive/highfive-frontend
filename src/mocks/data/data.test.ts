@@ -46,6 +46,22 @@ describe("jeu de demo v2", () => {
     }
   });
 
+  it("les personnalisations de demo sont valides et leurs images ont un enregistrement", () => {
+    const customized = demoDataset.projects.filter((p) => p.customization);
+    expect(customized.length).toBeGreaterThanOrEqual(3);
+    const records = new Set(
+      demoDataset.customizationImages.map(
+        (image) => `${image.projectId}:${image.id}`,
+      ),
+    );
+    for (const project of customized) {
+      const { banner, gallery } = project.customization!;
+      for (const image of [...(banner ? [banner] : []), ...gallery]) {
+        expect(records.has(`${project.id}:${image.id}`)).toBe(true);
+      }
+    }
+  });
+
   it("chaque appartenance, demande et invitation respecte son schema", () => {
     for (const membership of demoDataset.memberships) {
       expect(() => membershipSchema.parse(membership)).not.toThrow();

@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { idSchema, isoDateTimeSchema, slugSchema } from "./common";
+import { projectCustomizationSchema } from "./customization";
+import { tagAccentSchema } from "./tag";
 import { userSummarySchema } from "./user";
 
 /**
@@ -62,6 +64,8 @@ const projectBaseFields = {
   participation: participationSchema,
   state: projectStateSchema,
   ownerId: idSchema,
+  /** Personnalisation de la fiche (porteur seul, optionnelle, additif V2-4). */
+  customization: projectCustomizationSchema.optional(),
   highfiveCount: z.number().int().nonnegative(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
@@ -101,6 +105,11 @@ export const projectSummarySchema = z.object({
   /** Porteur + quelques membres, pour l'AvatarGroup de la carte (max 6). */
   teamPreview: z.array(userSummarySchema).max(6).default([]),
   owner: userSummarySchema,
+  /**
+   * Accent choisi par le porteur (`Project.customization.accent`), additif
+   * V2-4. Absent = la carte retombe sur `getAccent(project.id)`.
+   */
+  accent: tagAccentSchema.optional(),
 });
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;
 

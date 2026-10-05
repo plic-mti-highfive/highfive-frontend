@@ -247,7 +247,7 @@ jamais nommes. `GET /feed/people` public, colonne d'appui — pas de regle
 metier stricte cote mock (retourne un echantillon), a affiner si besoin
 produit (diversite, exclusion des personnes deja suivies...).
 
-### Projets (8 routes)
+### Projets (11 routes)
 
 Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
 
@@ -276,6 +276,35 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
   R-M2 exige "l'accord explicite" du nouveau porteur au moment du transfert
   — **le mock l'applique immediatement sans accord** (ecart, voir section 8) ; le backend devrait creer une invitation de transfert acceptee par le
   destinataire plutot qu'un transfert direct, si le produit le confirme.
+- **Personnalisation de la fiche** (`PATCH /projects/{slug}/customization`,
+  `POST` et `DELETE /projects/{slug}/customization/images[/{imageId}]`) :
+  banniere, accent, sections et galerie, voir `docs/v2/customization-scope.md`.
+  Regles serveur :
+  - **Porteur seul** (`project.ownerId`, compte `active`) : un co-porteur
+    n'a pas ce droit, contrairement a `PATCH /projects/{slug}`. La
+    personnalisation fait partie du projet et **suit le transfert** de
+    propriete sans etre remise a zero.
+  - Le `PATCH` **remplace** l'objet complet (`Project.customization`) ; le
+    `PATCH /projects/{slug}` generique l'ignore.
+  - Regles que le JSON Schema ne represente pas (`superRefine`) : `sections`
+    contient chacune des quatre sections (`pinned`, `about`, `gallery`,
+    `comments`) exactement une fois ; les `id` de la galerie sont uniques ;
+    la galerie compte 8 images au plus ; chaque image porte un `alt`
+    non vide, sauf si `decorative` est vrai ; les URLs d'images sont en
+    `https://` (ou `data:image/` dans le mock), jamais d'autre schema.
+  - Chaque `id` d'image du corps doit appartenir a ce projet (televerse via
+    `POST .../images`) : sinon 400. Ne jamais accepter une URL arbitraire.
+  - **Images** : `multipart/form-data`, champ `file`, JPEG/PNG/WebP/AVIF
+    uniquement (verifier le type MIME reel du contenu, pas le `Content-Type`
+    declare), 2 Mo au plus (le client compresse en WebP avant l'envoi).
+    Les images televersees mais jamais referencees par un `PATCH` doivent
+    etre **nettoyees cote backend** (job planifie ou TTL).
+  - **Projet prive** (R-V3) : les URLs d'images d'un projet prive ne doivent
+    pas etre publiquement devinables (URL signees ou controle d'acces sur le
+    stockage objet), comme pour R-F4.
+  - **Moderation** : un admin peut `DELETE` une image de n'importe quel
+    projet ; l'action est journalisee comme les autres actions admin
+    (§3 "Administration"). Le mock ne journalise pas encore (ecart, §6).
 - **Limite de membres** (R-M5, doc 04 §5) : `member_limit` (2 a 200) fixee
   par le porteur, absente du contrat actuel (`ProjectUpdateInput` ne porte
   pas ce champ) — voir section 8. L'atteindre bascule `participation` en
@@ -602,3 +631,9 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
 11. **`DELETE /admin/projects/{slug}`** : conserve au contrat mais orphelin
     cote UI (voir §3 "Administration") — decision ouverte : garder pour un
     usage programmatique futur, ou retirer.
+12. **Personnalisation de la fiche** (`Project.customization`,
+    `ProjectSummary.accent`) : champs et routes additifs (V2-4), voir §3
+    "Projets". Ecarts du mock a corriger cote backend : pas de nettoyage des
+    images orphelines, pas de journalisation de la suppression admin, images
+    servies en `data:` URL (le backend sert de vraies URLs), pas de
+    controle du type MIME reel.

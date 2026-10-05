@@ -43,16 +43,19 @@ membre ; `admin` = role plateforme `admin`.
 
 ## Projets (`projects.ts`)
 
-| Methode | Route                        | Entree                      | Sortie                      | Auth/role      | Regles                                                            |
-| ------- | ---------------------------- | --------------------------- | --------------------------- | -------------- | ----------------------------------------------------------------- |
-| GET     | `/projects`                  | query `q,tags,cursor,limit` | `Paginated<ProjectSummary>` | public         | R-V1 : public + actif seulement                                   |
-| GET     | `/projects/:slug`            | —                           | `Project`                   | public/membre+ | R-PR2 (brouillon = porteur seul), R-V3 (prive = equipe)           |
-| POST    | `/projects`                  | `ProjectCreateInput`        | `Project` (201)             | connecte       | R-PR1 (refine zod), etat initial `draft`                          |
-| PATCH   | `/projects/:slug`            | `ProjectUpdateInput`        | `Project`                   | porteur+       | R-PR1                                                             |
-| POST    | `/projects/:slug/transition` | `{transition}`              | `Project`                   | porteur+       | R-PR3..R-PR6, matrice publier/terminer/rouvrir/archiver/reactiver |
-| DELETE  | `/projects/:slug`            | `{confirmTitle}`            | 204                         | porteur/admin  | R-PR7 : titre saisi = confirmation                                |
-| POST    | `/projects/:slug/transfer`   | `{newOwnerId}`              | `Project`                   | porteur        | R-M2 : ancien porteur -> co-porteur                               |
-| GET     | `/me/projects`               | —                           | `ProjectSummary[]`          | connecte       | "Mes projets"                                                     |
+| Methode | Route                                           | Entree                      | Sortie                      | Auth/role      | Regles                                                                            |
+| ------- | ----------------------------------------------- | --------------------------- | --------------------------- | -------------- | --------------------------------------------------------------------------------- |
+| GET     | `/projects`                                     | query `q,tags,cursor,limit` | `Paginated<ProjectSummary>` | public         | R-V1 : public + actif seulement                                                   |
+| GET     | `/projects/:slug`                               | —                           | `Project`                   | public/membre+ | R-PR2 (brouillon = porteur seul), R-V3 (prive = equipe)                           |
+| POST    | `/projects`                                     | `ProjectCreateInput`        | `Project` (201)             | connecte       | R-PR1 (refine zod), etat initial `draft`                                          |
+| PATCH   | `/projects/:slug`                               | `ProjectUpdateInput`        | `Project`                   | porteur+       | R-PR1                                                                             |
+| POST    | `/projects/:slug/transition`                    | `{transition}`              | `Project`                   | porteur+       | R-PR3..R-PR6, matrice publier/terminer/rouvrir/archiver/reactiver                 |
+| DELETE  | `/projects/:slug`                               | `{confirmTitle}`            | 204                         | porteur/admin  | R-PR7 : titre saisi = confirmation                                                |
+| POST    | `/projects/:slug/transfer`                      | `{newOwnerId}`              | `Project`                   | porteur        | R-M2 : ancien porteur -> co-porteur                                               |
+| GET     | `/me/projects`                                  | —                           | `ProjectSummary[]`          | connecte       | "Mes projets"                                                                     |
+| PATCH   | `/projects/:slug/customization`                 | `ProjectCustomization`      | `Project`                   | porteur seul   | remplace tout ; chaque image doit avoir ete televersee pour ce projet (400 sinon) |
+| POST    | `/projects/:slug/customization/images`          | multipart `file`            | `{id, url}` (201)           | porteur seul   | JPEG/PNG/WebP/AVIF, 2 Mo max ; referencee au prochain PATCH                       |
+| DELETE  | `/projects/:slug/customization/images/:imageId` | —                           | 204                         | porteur/admin  | retire aussi l'image de la banniere/galerie ; moderation admin                    |
 
 ## Highfive (`highfives.ts`)
 
@@ -228,6 +231,16 @@ de moderation montre le contenu signale sans nouvelle route.
   supplementaire par carte affichee dans un fil de 12+ projets. `teamPreview`
   reprend le porteur puis jusqu'a 5 membres (`toProjectSummary`,
   `src/mocks/handlers/projectHelpers.ts`).
+- **`Project.customization` / `ProjectSummary.accent`** (`src/domain/customization.ts`,
+  `src/domain/project.ts`, lot Personnalisation de la fiche) : champs optionnels
+  additifs (aucun champ existant renomme/retire). `customization` porte la banniere
+  (avec point focal), l'accent (une des six teintes), l'ordre/visibilite des quatre
+  sections de l'Apercu et la galerie (8 images max, `alt` obligatoire sauf image
+  decorative). Reserve au porteur, elle suit le projet au transfert. `accent` est
+  copie dans `ProjectSummary` pour que `ProjectCard` prenne la meme teinte que la
+  fiche sans requete supplementaire (`toProjectSummary`,
+  `src/mocks/handlers/projectHelpers.ts`). Trois routes ajoutees (voir « Projets »),
+  decrites dans `docs/v2/customization-scope.md`.
 - **`SearchSort` = `"active"`** (`src/domain/search.ts`) ajoute au triplet
   existant `recent/popular/relevant` : le doc 12 (E-02) liste trois tris pour
   `/recherche` — "Les plus récents", "Les plus highfivés", "Les plus actifs" —

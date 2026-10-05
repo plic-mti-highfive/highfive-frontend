@@ -81,6 +81,107 @@
       "format": "uuid",
       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
     },
+    "customization": {
+      "type": "object",
+      "properties": {
+        "banner": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "url": {
+              "type": "string",
+              "pattern": "^(https?:\\/\\/|data:image\\/)"
+            },
+            "alt": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "decorative": {
+              "type": "boolean"
+            },
+            "focal": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "required": ["x", "y"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["id", "url", "alt", "decorative", "focal"],
+          "additionalProperties": false
+        },
+        "accent": {
+          "type": "string",
+          "enum": ["rose", "orange", "yellow", "apple", "sky", "purple"]
+        },
+        "sections": {
+          "minItems": 4,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": ["pinned", "about", "gallery", "comments"]
+              },
+              "visible": {
+                "type": "boolean"
+              }
+            },
+            "required": ["id", "visible"],
+            "additionalProperties": false
+          }
+        },
+        "gallery": {
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "url": {
+                "type": "string",
+                "pattern": "^(https?:\\/\\/|data:image\\/)"
+              },
+              "alt": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "decorative": {
+                "type": "boolean"
+              },
+              "caption": {
+                "type": "string",
+                "maxLength": 140
+              }
+            },
+            "required": ["id", "url", "alt", "decorative"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["sections", "gallery"],
+      "additionalProperties": false
+    },
     "highfiveCount": {
       "type": "integer",
       "minimum": 0,

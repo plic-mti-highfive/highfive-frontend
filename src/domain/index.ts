@@ -7,6 +7,7 @@ export * from "./common";
 export * from "./tag";
 export * from "./user";
 export * from "./project";
+export * from "./customization";
 export * from "./membership";
 export * from "./highfive";
 export * from "./announcement";

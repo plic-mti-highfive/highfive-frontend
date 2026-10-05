@@ -140,6 +140,10 @@
       },
       "required": ["id", "username", "avatar"],
       "additionalProperties": false
+    },
+    "accent": {
+      "type": "string",
+      "enum": ["rose", "orange", "yellow", "apple", "sky", "purple"]
     }
   },
   "required": [
