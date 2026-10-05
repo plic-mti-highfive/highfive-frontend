@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { presetColor } from "@shared/lib/accentPresets";
 import { DEFAULT_SECTIONS, type ProjectCustomization } from "@/domain";
-import { resolveSections } from "./customization";
+import {
+  ALT_REQUIRED_MESSAGE,
+  altInputId,
+  getDraftIssues,
+  isDraftDirty,
+  moveItem,
+  resolveSections,
+  toDraft,
+} from "./customization";
 
 function withSections(
   sections: ProjectCustomization["sections"],
@@ -63,5 +72,174 @@ describe("resolveSections", () => {
     const resolved = resolveSections(undefined);
     resolved[0].visible = false;
     expect(DEFAULT_SECTIONS[0].visible).toBe(true);
+  });
+});
+
+describe("moveItem", () => {
+  it("echange avec le voisin du dessus ou du dessous", () => {
+    expect(moveItem(["a", "b", "c"], 1, -1)).toEqual(["b", "a", "c"]);
+    expect(moveItem(["a", "b", "c"], 1, 1)).toEqual(["a", "c", "b"]);
+  });
+
+  it("ne bouge pas aux extremites ni hors bornes, et ne mute pas l'entree", () => {
+    const items = ["a", "b", "c"];
+    expect(moveItem(items, 0, -1)).toEqual(["a", "b", "c"]);
+    expect(moveItem(items, 2, 1)).toEqual(["a", "b", "c"]);
+    expect(moveItem(items, 5, -1)).toEqual(["a", "b", "c"]);
+    expect(moveItem(items, -1, 1)).toEqual(["a", "b", "c"]);
+    expect(moveItem(items, 1, 1)).not.toBe(items);
+    expect(items).toEqual(["a", "b", "c"]);
+  });
+});
+
+describe("toDraft et isDraftDirty", () => {
+  const IMAGE = {
+    id: "00000000-0000-4000-8c0d-000000000001",
+    url: "https://example.test/1.webp",
+    alt: "Image 1",
+    decorative: false,
+  };
+
+  it("part de la personnalisation par defaut sans personnalisation enregistree", () => {
+    expect(toDraft(undefined)).toEqual({
+      banner: undefined,
+      accent: undefined,
+      sections: DEFAULT_SECTIONS,
+      gallery: [],
+    });
+  });
+
+  it("un brouillon intact n'est pas modifie, avec ou sans personnalisation", () => {
+    expect(isDraftDirty(toDraft(undefined), undefined)).toBe(false);
+    const saved: ProjectCustomization = {
+      accent: presetColor("sky"),
+      sections: [...DEFAULT_SECTIONS],
+      gallery: [IMAGE],
+    };
+    expect(isDraftDirty(toDraft(saved), saved)).toBe(false);
+  });
+
+  it("ignore l'ordre des cles dans la comparaison", () => {
+    const saved: ProjectCustomization = {
+      sections: [...DEFAULT_SECTIONS],
+      gallery: [IMAGE],
+    };
+    const reordered = JSON.parse(
+      JSON.stringify({
+        gallery: [
+          { decorative: false, alt: "Image 1", url: IMAGE.url, id: IMAGE.id },
+        ],
+        sections: DEFAULT_SECTIONS,
+      }),
+    ) as ProjectCustomization;
+    expect(isDraftDirty(reordered, saved)).toBe(false);
+  });
+
+  it("detecte un changement d'accent, d'ordre, de visibilite ou d'image", () => {
+    const base = toDraft(undefined);
+    expect(
+      isDraftDirty({ ...base, accent: presetColor("rose") }, undefined),
+    ).toBe(true);
+    expect(
+      isDraftDirty(
+        { ...base, sections: moveItem(base.sections, 0, 1) },
+        undefined,
+      ),
+    ).toBe(true);
+    expect(
+      isDraftDirty(
+        {
+          ...base,
+          sections: base.sections.map((s) =>
+            s.id === "about" ? { ...s, visible: false } : s,
+          ),
+        },
+        undefined,
+      ),
+    ).toBe(true);
+    expect(isDraftDirty({ ...base, gallery: [IMAGE] }, undefined)).toBe(true);
+  });
+
+  it("revenir a l'etat enregistre annule le statut modifie", () => {
+    const base = toDraft(undefined);
+    const changed = { ...base, accent: presetColor("rose") };
+    expect(isDraftDirty(changed, undefined)).toBe(true);
+    expect(isDraftDirty({ ...changed, accent: undefined }, undefined)).toBe(
+      false,
+    );
+  });
+});
+
+describe("getDraftIssues", () => {
+  const ok = {
+    id: "00000000-0000-4000-8c0d-000000000001",
+    url: "https://example.test/1.webp",
+    alt: "Une image",
+    decorative: false,
+  };
+  const missing = {
+    ...ok,
+    id: "00000000-0000-4000-8c0d-000000000002",
+    alt: " ",
+  };
+
+  it("ne signale rien quand tout est decrit ou decoratif", () => {
+    const issues = getDraftIssues({
+      sections: [...DEFAULT_SECTIONS],
+      gallery: [ok, { ...missing, decorative: true }],
+    });
+    expect(issues.count).toBe(0);
+    expect(issues.gallery).toEqual({});
+    expect(issues.banner).toBeUndefined();
+  });
+
+  it("signale la banniere et les images de galerie sans texte alternatif", () => {
+    const issues = getDraftIssues({
+      sections: [...DEFAULT_SECTIONS],
+      banner: { ...ok, alt: "", focal: { x: 50, y: 50 } },
+      gallery: [ok, missing],
+    });
+    expect(issues.count).toBe(2);
+    expect(issues.banner).toBe(ALT_REQUIRED_MESSAGE);
+    expect(Object.keys(issues.gallery)).toEqual([missing.id]);
+  });
+
+  it("nomme les images a corriger dans l'ordre de la page, avec l'id de leur champ", () => {
+    const issues = getDraftIssues({
+      sections: [...DEFAULT_SECTIONS],
+      banner: { ...ok, alt: "", focal: { x: 50, y: 50 } },
+      gallery: [
+        ok,
+        missing,
+        { ...missing, id: "00000000-0000-4000-8c0d-000000000003" },
+      ],
+    });
+    expect(issues.items.map((item) => item.label)).toEqual([
+      "Bannière",
+      "Image 2",
+      "Image 3",
+    ]);
+    expect(issues.items.map((item) => item.inputId)).toEqual([
+      altInputId("banner"),
+      altInputId(missing.id),
+      altInputId("00000000-0000-4000-8c0d-000000000003"),
+    ]);
+    expect(issues.count).toBe(3);
+  });
+
+  it("ignore les images decoratives meme sans aucun texte", () => {
+    const issues = getDraftIssues({
+      sections: [...DEFAULT_SECTIONS],
+      gallery: [{ ...missing, decorative: true }],
+    });
+    expect(issues.items).toEqual([]);
+  });
+});
+
+describe("altInputId", () => {
+  it("est stable et distinct entre la banniere et chaque image", () => {
+    expect(altInputId("banner")).toBe("customize-alt-banner");
+    expect(altInputId("abc")).toBe("customize-alt-abc");
+    expect(altInputId("abc")).not.toBe(altInputId("banner"));
   });
 });

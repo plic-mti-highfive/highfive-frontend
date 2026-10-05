@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { presetColor } from "@shared/lib/accentPresets";
 import { projectSchema, type Project } from "@/domain";
 import { ProjectOverview } from "./ProjectOverview";
 
@@ -15,8 +16,15 @@ vi.mock("./CommentsSection", () => ({
   CommentsSection: () => <section data-testid="comments">Commentaires</section>,
 }));
 vi.mock("./PinnedAnnouncementPreview", () => ({
-  PinnedAnnouncementPreview: ({ accent }: { accent?: string }) => (
-    <section data-testid="pinned" data-pinned-accent={accent ?? ""}>
+  PinnedAnnouncementPreview: ({
+    inheritAccent,
+  }: {
+    inheritAccent?: boolean;
+  }) => (
+    <section
+      data-testid="pinned"
+      data-inherit-accent={String(Boolean(inheritAccent))}
+    >
       Épinglée
     </section>
   ),
@@ -93,7 +101,7 @@ describe("ProjectOverview", () => {
     renderOverview(project());
     expect(order()).toEqual(["pinned", "À propos", "comments"]);
     expect(screen.getByTestId("sidebar").dataset.accented).toBe("false");
-    expect(screen.getByTestId("pinned").dataset.pinnedAccent).toBe("");
+    expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("false");
   });
 
   it("applique l'ordre choisi et masque les sections cachees", () => {
@@ -134,8 +142,10 @@ describe("ProjectOverview", () => {
 
   it("transmet l'accent a l'annonce epinglee et a la sidebar", () => {
     state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
-    renderOverview(project({ sections: DEFAULT, gallery: [], accent: "sky" }));
-    expect(screen.getByTestId("pinned").dataset.pinnedAccent).toBe("sky");
+    renderOverview(
+      project({ sections: DEFAULT, gallery: [], accent: presetColor("sky") }),
+    );
+    expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("true");
     expect(screen.getByTestId("sidebar").dataset.accented).toBe("true");
   });
 

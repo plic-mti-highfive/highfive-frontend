@@ -18,6 +18,9 @@ export const preloadProjectFiche = () =>
 export const preloadProjectDetail = () =>
   import("@features/projects/pages/ProjectDetailPage");
 
+export const preloadCustomizeProject = () =>
+  import("@features/projects/pages/ProjectCustomizePage");
+
 export const preloadUserProfile = () =>
   import("@features/user/pages/UserProfilePage");
 

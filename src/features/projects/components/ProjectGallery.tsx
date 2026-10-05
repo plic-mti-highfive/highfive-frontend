@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { GalleryItem } from "@/domain";
-import { ProjectGalleryLightbox } from "./ProjectGalleryLightbox";
+import { ImageViewer } from "./ImageViewer";
 
 /**
  * Grille de la galerie (images uniquement en v1). Chaque vignette est un
@@ -54,10 +54,10 @@ export function ProjectGallery({
           );
         })}
       </ul>
-      <ProjectGalleryLightbox
-        gallery={gallery}
+      <ImageViewer
+        images={gallery}
         index={openIndex}
-        projectTitle={projectTitle}
+        title={`Galerie du projet ${projectTitle}`}
         onIndexChange={setOpenIndex}
         onClose={() => setOpenIndex(null)}
       />

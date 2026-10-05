@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { presetColor } from "@shared/lib/accentPresets";
 import {
   DEFAULT_SECTIONS,
   MAX_GALLERY_IMAGES,
@@ -133,13 +134,13 @@ describe("projectCustomizationSchema", () => {
     expect(
       projectCustomizationSchema.safeParse({
         ...customization(),
-        accent: "sky",
+        accent: presetColor("sky"),
       }).success,
     ).toBe(true);
     expect(
       projectCustomizationSchema.safeParse({
         ...customization(),
-        accent: "teal",
+        accent: "rouge",
       }).success,
     ).toBe(false);
   });
@@ -181,9 +182,9 @@ describe("champs additifs (V2-4)", () => {
     expect(projectSchema.parse(baseProject).customization).toBeUndefined();
     const parsed = projectSchema.parse({
       ...baseProject,
-      customization: customization({ accent: "purple" }),
+      customization: customization({ accent: presetColor("purple") }),
     });
-    expect(parsed.customization?.accent).toBe("purple");
+    expect(parsed.customization?.accent).toBe(presetColor("purple"));
   });
 
   it("`ProjectSummary.accent` est optionnel", () => {
@@ -208,10 +209,11 @@ describe("champs additifs (V2-4)", () => {
     };
     expect(projectSummarySchema.parse(summary).accent).toBeUndefined();
     expect(
-      projectSummarySchema.parse({ ...summary, accent: "rose" }).accent,
-    ).toBe("rose");
+      projectSummarySchema.parse({ ...summary, accent: presetColor("rose") })
+        .accent,
+    ).toBe(presetColor("rose"));
     expect(
-      projectSummarySchema.safeParse({ ...summary, accent: "teal" }).success,
+      projectSummarySchema.safeParse({ ...summary, accent: "rouge" }).success,
     ).toBe(false);
   });
 });

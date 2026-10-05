@@ -3,6 +3,7 @@ import {
   type CustomizationSection,
   type ProjectCustomization,
 } from "@/domain";
+import { presetColor } from "@shared/lib/accentPresets";
 import type { DbCustomizationImage } from "../db";
 
 /**
@@ -77,7 +78,7 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
       decorative: false,
       focal: { x: 50, y: 50 },
     },
-    accent: "rose",
+    accent: presetColor("rose"),
     sections: [...DEFAULT_SECTIONS],
     gallery: [
       {
@@ -98,7 +99,7 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
   },
   // Pas de banniere : accent apple et sections reordonnees (A propos en premier).
   "jardin-partage-derriere-lecole": {
-    accent: "apple",
+    accent: presetColor("apple"),
     sections: sections(["about", "pinned", "gallery", "comments"]),
     gallery: [
       {
@@ -118,7 +119,7 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
       decorative: false,
       focal: { x: 20, y: 70 },
     },
-    accent: "sky",
+    accent: presetColor("sky"),
     sections: sections(
       ["about", "gallery", "pinned", "comments"],
       ["comments"],

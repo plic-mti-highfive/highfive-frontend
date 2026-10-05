@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Avatar, AvatarGroup, Badge, Card, Divider, TagPill } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import { getAccent } from "@shared/lib/accent";
+import { accentAttributes } from "@shared/lib/accentColor";
 import { getTagById, type ProjectSummary } from "@/domain";
 import { preloadProjectDetail, preloadProjectFiche } from "@/app/preload";
 
@@ -102,7 +103,8 @@ export function ProjectCard({
   rank,
   className,
 }: ProjectCardProps) {
-  const accent = project.accent ?? getAccent(project.id);
+  // Couleur choisie par le porteur, sinon teinte hachee depuis l'id du projet.
+  const accent = accentAttributes(project.accent, getAccent(project.id));
   const href = `/projets/${project.slug}`;
   const unmetNeeds = project.needs.filter((need) => !need.fulfilled);
   const team =
@@ -111,7 +113,7 @@ export function ProjectCard({
   if (variant === "list") {
     return (
       <div
-        data-accent={accent}
+        {...accent}
         className={cn(
           "group relative isolate flex items-center gap-3 rounded-lg px-3 py-3 transition-[background-color,filter] duration-base -mx-3 hover:bg-muted/60 hover:brightness-95 dark:hover:brightness-110",
           className,
@@ -165,7 +167,7 @@ export function ProjectCard({
   if (variant === "top") {
     return (
       <div
-        data-accent={accent}
+        {...accent}
         className={cn(
           "group relative isolate flex h-full flex-col gap-2 rounded-lg p-4 transition-[background-color,filter] duration-base -m-1 hover:bg-muted/60 hover:brightness-95 dark:hover:brightness-110",
           className,
@@ -221,7 +223,7 @@ export function ProjectCard({
   return (
     <Card
       variant="interactive"
-      data-accent={accent}
+      {...accent}
       className={cn("relative flex overflow-hidden", className)}
     >
       <Link

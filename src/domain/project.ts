@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { idSchema, isoDateTimeSchema, slugSchema } from "./common";
-import { projectCustomizationSchema } from "./customization";
-import { tagAccentSchema } from "./tag";
+import { accentColorSchema, projectCustomizationSchema } from "./customization";
 import { userSummarySchema } from "./user";
 
 /**
@@ -109,7 +108,7 @@ export const projectSummarySchema = z.object({
    * Accent choisi par le porteur (`Project.customization.accent`), additif
    * V2-4. Absent = la carte retombe sur `getAccent(project.id)`.
    */
-  accent: tagAccentSchema.optional(),
+  accent: accentColorSchema.optional(),
 });
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;
 

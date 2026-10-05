@@ -1,4 +1,5 @@
 import { setupServer } from "msw/node";
+import { presetColor } from "@shared/lib/accentPresets";
 import {
   afterAll,
   afterEach,
@@ -148,7 +149,7 @@ describe("PATCH /projects/:slug/customization", () => {
   it("le porteur remplace la personnalisation et le projet renvoye la porte", async () => {
     const body: ProjectCustomization = {
       ...emptyCustomization(),
-      accent: "purple",
+      accent: presetColor("purple"),
     };
     const response = await patch(SLUG, body, OWNER_TOKEN);
     expect(response.status).toBe(200);
@@ -160,11 +161,13 @@ describe("PATCH /projects/:slug/customization", () => {
   it("l'accent se retrouve dans le resume de carte", async () => {
     await patch(
       SLUG,
-      { ...emptyCustomization(), accent: "orange" },
+      { ...emptyCustomization(), accent: presetColor("orange") },
       OWNER_TOKEN,
     );
-    expect(toProjectSummary(project(SLUG)).accent).toBe("orange");
-    expect(toProjectSummary(project(OTHER_SLUG)).accent).toBe("apple");
+    expect(toProjectSummary(project(SLUG)).accent).toBe(presetColor("orange"));
+    expect(toProjectSummary(project(OTHER_SLUG)).accent).toBe(
+      presetColor("apple"),
+    );
   });
 
   it("la personnalisation suit le projet au transfert (le patch ne la remet pas a zero)", () => {

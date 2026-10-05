@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { idSchema } from "./common";
-import { tagAccentSchema } from "./tag";
 
 /**
  * Personnalisation de la fiche projet (docs/v2/customization-scope.md).
@@ -8,9 +7,16 @@ import { tagAccentSchema } from "./tag";
  * par defaut (accent hache depuis l'id, sections dans l'ordre par defaut,
  * ni banniere ni galerie).
  *
- * Pas de CSS ni de couleur libre : l'accent est l'une des six teintes de la
- * roue (`tagAccentSchema`), les images passent par l'API d'upload.
+ * Pas de CSS libre : l'accent est une couleur (`#rrggbb`) dont le front derive
+ * des variantes clair/sombre au contraste garanti
+ * (`src/shared/lib/accentColor.ts`) ; les images passent par l'API d'upload.
  */
+
+/** Couleur d'accent d'un projet : `#rrggbb` en minuscules (le client normalise la saisie). */
+export const accentColorSchema = z
+  .string()
+  .regex(/^#[0-9a-f]{6}$/, "couleur invalide (#rrggbb en minuscules)");
+export type AccentColor = z.infer<typeof accentColorSchema>;
 
 /** Nombre maximal d'images dans la galerie d'un projet. */
 export const MAX_GALLERY_IMAGES = 8;
@@ -109,7 +115,7 @@ export const DEFAULT_SECTIONS: readonly CustomizationSection[] = [
 export const projectCustomizationSchema = z
   .object({
     banner: projectBannerSchema.optional(),
-    accent: tagAccentSchema.optional(),
+    accent: accentColorSchema.optional(),
     sections: z.array(customizationSectionSchema).length(4),
     gallery: z.array(galleryItemSchema).max(MAX_GALLERY_IMAGES),
   })

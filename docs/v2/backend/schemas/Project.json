@@ -126,7 +126,7 @@
         },
         "accent": {
           "type": "string",
-          "enum": ["rose", "orange", "yellow", "apple", "sky", "purple"]
+          "pattern": "^#[0-9a-f]{6}$"
         },
         "sections": {
           "minItems": 4,

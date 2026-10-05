@@ -284,6 +284,10 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
     n'a pas ce droit, contrairement a `PATCH /projects/{slug}`. La
     personnalisation fait partie du projet et **suit le transfert** de
     propriete sans etre remise a zero.
+  - `accent` est une couleur `#rrggbb` en minuscules (`AccentColor`, regex
+    `^#[0-9a-f]{6}$`) : le backend la valide et la stocke telle quelle. Le calcul des
+    variantes clair/sombre et du contraste est **uniquement cote client**
+    (`src/shared/lib/accentColor.ts`) ; `ProjectSummary.accent` en est la copie.
   - Le `PATCH` **remplace** l'objet complet (`Project.customization`) ; le
     `PATCH /projects/{slug}` generique l'ignore.
   - Regles que le JSON Schema ne represente pas (`superRefine`) : `sections`

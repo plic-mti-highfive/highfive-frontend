@@ -10,13 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Personnalisation de la fiche projet (porteur seul) : banniere avec point
-  focal, accent choisi parmi les six teintes de la roue, sections de l'Apercu
+  focal, accent a couleur libre (variantes clair/sombre au contraste garanti), sections de l'Apercu
   ordonnables et masquables, galerie de 8 images au plus. Contrat additif
   (`Project.customization`, `ProjectSummary.accent`, trois routes) documente
   dans `docs/v2/customization-scope.md`, `API-ROUTES.md`, `openapi.yaml` et
   `SPEC.md`. Rendu de la fiche : banniere, header teinte, sections ordonnees,
-  galerie et visionneuse accessible, accent sur les cartes. L'editeur du
-  porteur arrive dans un lot suivant.
+  galerie et visionneuse accessible, accent sur les cartes. Editeur du
+  porteur sur `/projets/:slug/personnaliser` avec apercu live : accent,
+  banniere (point focal, texte alternatif obligatoire), sections reordonnables
+  par boutons, galerie, compression WebP cote client, garde de sortie.
 
 ### Changed
 

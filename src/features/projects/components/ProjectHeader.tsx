@@ -13,6 +13,7 @@ import {
   TagPill,
 } from "@shared/ui";
 import { HighfiveButton } from "@shared/components/projects";
+import { preloadCustomizeProject } from "@/app/preload";
 import type { Project, UserSummary } from "@/domain";
 import { PARTICIPATION_LABEL, STATE_LABEL, STATE_TONE } from "../lib/labels";
 import { JoinAction } from "./JoinAction";
@@ -34,6 +35,7 @@ export function ProjectHeader({
   isAuthenticated,
   isMember,
   canEdit,
+  canCustomize = false,
   highfiveGiven,
   tinted = false,
 }: {
@@ -42,6 +44,8 @@ export function ProjectHeader({
   isAuthenticated: boolean;
   isMember: boolean;
   canEdit: boolean;
+  /** Porteur seul : affiche le lien vers l'editeur de personnalisation. */
+  canCustomize?: boolean;
   highfiveGiven: boolean;
   /** Le header est pose sur le fond teinte de l'accent du projet : tags et badges passent sur fond carte pour rester lisibles. */
   tinted?: boolean;
@@ -115,6 +119,20 @@ export function ProjectHeader({
             isAuthenticated={isAuthenticated}
             isMember={isMember}
           />
+          {canCustomize && (
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  to={`/projets/${project.slug}/personnaliser`}
+                  onMouseEnter={() => void preloadCustomizeProject()}
+                  onFocus={() => void preloadCustomizeProject()}
+                />
+              }
+            >
+              Personnaliser
+            </Button>
+          )}
           {canEdit && (
             <>
               <Button variant="outline" onClick={() => setEditOpen(true)}>

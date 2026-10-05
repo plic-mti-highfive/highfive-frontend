@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 import { Badge, Card, CardBody } from "@shared/ui";
-import type { AccentName } from "@shared/lib/accent";
 import { formatExactDateTime, formatRelativeDate } from "@shared/lib/dates";
 import type { AnnouncementWithAuthor } from "@/api/announcements";
 
@@ -9,16 +8,19 @@ import type { AnnouncementWithAuthor } from "@/api/announcements";
 export function PinnedAnnouncementPreview({
   slug,
   announcement,
-  accent = "orange",
+  inheritAccent = false,
 }: {
   slug: string;
   announcement: AnnouncementWithAuthor;
-  /** Accent du projet (personnalisation) ; `orange` par defaut, comme avant. */
-  accent?: AccentName;
+  /** Le projet a un accent personnalise (pose sur un ancetre) : la carte l'herite au lieu du orange d'origine. */
+  inheritAccent?: boolean;
 }) {
   return (
     <Link to={`/projets/${slug}/annonces`}>
-      <Card variant="interactive" data-accent={accent}>
+      <Card
+        variant="interactive"
+        data-accent={inheritAccent ? undefined : "orange"}
+      >
         <CardBody>
           <div className="flex items-center gap-2">
             <Badge tone="warning">Épinglée</Badge>

@@ -9,8 +9,8 @@ import { useProjectHighfivers } from "@/api/queries/highfives";
 import { ApiError } from "@/api/client";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
 import { getMembershipRole, getProjectCapabilities } from "../lib/capabilities";
-import { ProjectBanner } from "./ProjectBanner";
-import { ProjectHeader } from "./ProjectHeader";
+import { accentAttributes } from "@shared/lib/accentColor";
+import { ProjectFicheHeader } from "./ProjectFicheHeader";
 
 export interface ProjectOutletContext {
   project: NonNullable<ReturnType<typeof useProject>["data"]>;
@@ -116,20 +116,9 @@ export function ProjectLayout() {
   );
 
   // Accent choisi par le porteur : pose `data-accent` sur toute la fiche (les
-  // variables `--accent-*` en descendent) et teinte le header. Sans accent,
-  // aucun attribut ni fond : la fiche reste identique a celle d'origine.
+  // variables `--accent-*` en descendent). Sans accent, aucun attribut ni
+  // fond : la fiche reste identique a celle d'origine.
   const accent = project.customization?.accent;
-  const header = (
-    <ProjectHeader
-      project={project}
-      owner={owner}
-      isAuthenticated={isAuthenticated}
-      isMember={capabilities.isMember}
-      canEdit={capabilities.canEdit}
-      highfiveGiven={highfiveGiven}
-      tinted={accent !== undefined}
-    />
-  );
   // `border-[var(--accent-base)]` n'est valide que sous un `data-accent` :
   // on ne le passe qu'avec un accent, sinon l'onglet garde `border-foreground`.
   const accentTabClass = accent
@@ -139,11 +128,9 @@ export function ProjectLayout() {
 
   return (
     <div
-      data-accent={accent}
+      {...accentAttributes(accent)}
       className="mx-auto flex max-w-content flex-col gap-6 px-6 py-10"
     >
-      <ProjectBanner banner={project.customization?.banner} />
-
       {project.state === "done" && (
         <div className="rounded-lg bg-info-bg px-4 py-3 text-body-sm text-info-fg">
           Ce projet est terminé. Le Lab est en lecture seule, les commentaires
@@ -157,11 +144,15 @@ export function ProjectLayout() {
         </div>
       )}
 
-      {accent ? (
-        <div className="rounded-xl bg-[var(--accent-light)] p-6">{header}</div>
-      ) : (
-        header
-      )}
+      <ProjectFicheHeader
+        project={project}
+        owner={owner}
+        isAuthenticated={isAuthenticated}
+        isMember={capabilities.isMember}
+        canEdit={capabilities.canEdit}
+        canCustomize={capabilities.canCustomize}
+        highfiveGiven={highfiveGiven}
+      />
 
       <nav className="border-b border-border" aria-label="Sections du projet">
         <div className="flex gap-1">

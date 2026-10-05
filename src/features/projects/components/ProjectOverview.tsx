@@ -47,7 +47,7 @@ export function ProjectOverview({
       <PinnedAnnouncementPreview
         slug={project.slug}
         announcement={pinned}
-        accent={accent}
+        inheritAccent={accented}
       />
     ) : null,
     about: (

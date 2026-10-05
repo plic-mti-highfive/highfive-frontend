@@ -24,15 +24,35 @@ projets auront des images).
 1. **Bannière** : image au-dessus du header de la fiche (le titre n'est jamais superposé à
    l'image : contraste garanti). Point focal `{x, y}` (en %) pour que la zone importante
    reste visible quand le ratio change (ex. 3:1 desktop, 16:9 mobile).
-2. **Accent** : une des 6 teintes de la roue (`rose`, `orange`, `yellow`, `apple`, `sky`,
-   `purple`), appliquée via le mécanisme `[data-accent]` existant. L'accent s'applique aussi
-   aux **cartes** (feed, recherche, profil) pour garder une identité cohérente ; la bannière
-   et la galerie restent sur la fiche seule.
+2. **Accent** : une **couleur libre** (`#rrggbb`), choisie au sélecteur, par code hexadécimal
+   ou parmi six couleurs rapides (la roue du design system). Les six teintes imposées
+   donnaient de mauvais rendus en thème sombre (grand bloc saturé) : le front dérive désormais,
+   pour chaque thème, une couleur d'appui (≥ 3:1), une surface teintée discrète et une couleur
+   de texte (≥ 4.5:1) au contraste garanti (`src/shared/lib/accentColor.ts`, OKLCH, même
+   teinte). « Automatique » (pas de couleur) garde la teinte hachée du projet. L'accent
+   s'applique aussi aux **cartes** (feed, recherche, profil) pour garder une identité
+   cohérente ; la bannière et la galerie restent sur la fiche seule.
 3. **Sections de l'Aperçu** : annonce épinglée, À propos, galerie, commentaires. Chacune est
    visible ou masquée, et réordonnable. La sidebar reste fixe (elle porte l'action de
    participation).
 4. **Galerie** : 8 images maximum, légende optionnelle, grille responsive et visionneuse
    accessible (lightbox).
+
+### Visionneuse et zoom
+
+- Une seule visionneuse pour la galerie, la **bannière** (cliquable sur la fiche) et les
+  aperçus de l'éditeur (bouton « Agrandir » sur la bannière et les vignettes).
+- **Vrai zoom** de 100 % à 500 % : clic sur l'image (curseur loupe, centré sur le point cliqué ; un second clic
+  dézoome), boutons, touches `+` `-` `0`, molette ;
+  l'image zoomée se déplace en glissant ou avec les flèches. Aucune animation.
+- **Plein écran** : bouton ou touche `F`. API Fullscreen du navigateur quand elle existe
+  (masque aussi son interface), sinon la visionneuse occupe toute la fenêtre. Garde le mode
+  en changeant d'image ; Échap quitte le plein écran du navigateur, puis ferme la visionneuse.
+
+### Défilement de l'éditeur
+
+- Toute la page défile (en-tête collant) ; l'aperçu est une carte bornée collée sous l'en-tête
+  (sous `lg`, onglets Édition / Aperçu).
 
 ### Images
 
@@ -82,11 +102,11 @@ projets auront des images).
 ```ts
 Project.customization?: {
   banner?: { url: string; alt: string; decorative: boolean; focal: { x: number; y: number } }
-  accent?: TagAccent
+  accent?: AccentColor // "#rrggbb" en minuscules
   sections: { id: "pinned" | "about" | "gallery" | "comments"; visible: boolean }[] // l'ordre du tableau = l'ordre d'affichage
   gallery: { id: string; url: string; alt: string; decorative: boolean; caption?: string }[] // max 8
 }
-ProjectSummary.accent?: TagAccent // issu de customization.accent, pour les cartes
+ProjectSummary.accent?: AccentColor // issu de customization.accent, pour les cartes
 ```
 
 `undefined` = apparence actuelle (accent haché depuis l'id, layout par défaut).

@@ -234,7 +234,7 @@ de moderation montre le contenu signale sans nouvelle route.
 - **`Project.customization` / `ProjectSummary.accent`** (`src/domain/customization.ts`,
   `src/domain/project.ts`, lot Personnalisation de la fiche) : champs optionnels
   additifs (aucun champ existant renomme/retire). `customization` porte la banniere
-  (avec point focal), l'accent (une des six teintes), l'ordre/visibilite des quatre
+  (avec point focal), l'accent (couleur libre `#rrggbb`, `AccentColor`), l'ordre/visibilite des quatre
   sections de l'Apercu et la galerie (8 images max, `alt` obligatoire sauf image
   decorative). Reserve au porteur, elle suit le projet au transfert. `accent` est
   copie dans `ProjectSummary` pour que `ProjectCard` prenne la meme teinte que la

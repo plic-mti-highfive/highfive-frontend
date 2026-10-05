@@ -403,6 +403,23 @@
    (utilisé par le token --shadow-lift pour l'anneau teinté au survol).
    Clair et sombre passent par les mêmes étapes light/mid/dark/deeper que
    le reste de la roue. */
+/* Accent de projet a couleur libre : `data-accent-custom` + les variables
+   --pa-* calculees par `src/shared/lib/accentColor.ts` (contraste garanti
+   pour chaque theme). Memes variables que `data-accent`, donc memes
+   consommateurs (Card, ProjectCard, liens, puces...). */
+[data-accent-custom] {
+  --accent-base: var(--pa-base);
+  --accent-light: var(--pa-surface);
+  --accent-dark: var(--pa-ink);
+  --card-accent: var(--pa-base);
+}
+.dark [data-accent-custom] {
+  --accent-base: var(--pa-base-dk);
+  --accent-light: var(--pa-surface-dk);
+  --accent-dark: var(--pa-ink-dk);
+  --card-accent: var(--pa-base-dk);
+}
+
 [data-accent="rose"] {
   --accent-base: var(--color-rose);
   --accent-light: var(--color-rose-light);

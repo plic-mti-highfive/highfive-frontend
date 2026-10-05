@@ -1933,6 +1933,7 @@ components:
     # --- Genere par `pnpm export:schemas` depuis src/domain/index.ts, un $ref
     # --- par fichier de docs/v2/backend/schemas/. Ne pas editer a la main :
     # --- regenerer le script si le domaine change.
+    AccentColor: { $ref: "./schemas/AccentColor.json" }
     AccountStatus: { $ref: "./schemas/AccountStatus.json" }
     AdminAction: { $ref: "./schemas/AdminAction.json" }
     AdminActionType: { $ref: "./schemas/AdminActionType.json" }
