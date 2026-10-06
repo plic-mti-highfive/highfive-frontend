@@ -124,9 +124,7 @@ export function ProjectMediaDialog({
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <p className="font-medium text-foreground">{entry.label}</p>
                     <p className="text-body-sm text-muted-foreground">
-                      {entry.image.decorative
-                        ? "Image décorative (sans texte alternatif)."
-                        : `Texte alternatif : ${entry.image.alt}`}
+                      Texte alternatif : {entry.image.alt}
                     </p>
                     {entry.image.caption && (
                       <p className="text-body-sm text-muted-foreground">

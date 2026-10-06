@@ -21,7 +21,6 @@ const BANNER: ProjectBanner = {
   id: "00000000-0000-4000-8c0d-000000000001",
   url: "https://example.test/banner.webp",
   alt: "Un mur peint",
-  decorative: false,
   focal: { x: 25, y: 75 },
 };
 

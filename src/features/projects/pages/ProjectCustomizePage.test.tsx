@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   members: [] as unknown[],
   userId: "00000000-0000-4000-8000-000000000200",
   update: vi.fn(),
+  updateProject: vi.fn(),
   upload: vi.fn(),
   remove: vi.fn(),
 }));
@@ -29,6 +30,14 @@ vi.mock("@/api/queries/projects", () => ({
     error: null,
     refetch: vi.fn(),
   }),
+  useUpdateProject: () => ({
+    mutate: mocks.updateProject,
+    isPending: false,
+    error: null,
+  }),
+}));
+vi.mock("../components/TagPicker", () => ({
+  TagPicker: () => <div data-testid="tag-picker" />,
 }));
 vi.mock("@/api/queries/memberships", () => ({
   useMembers: () => ({
@@ -103,11 +112,11 @@ function member(userId: string, role: TeamMember["role"]): TeamMember {
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={["/projets/projet-test/personnaliser"]}>
+    <MemoryRouter initialEntries={["/projets/projet-test/modifier"]}>
       <Routes>
         <Route path="/projets/:slug" element={<p>FICHE</p>} />
         <Route
-          path="/projets/:slug/personnaliser"
+          path="/projets/:slug/modifier"
           element={<ProjectCustomizePage />}
         />
       </Routes>
@@ -120,6 +129,7 @@ beforeEach(() => {
   mocks.members = [member(OWNER_ID, "owner"), member(MEMBER_ID, "member")];
   mocks.userId = OWNER_ID;
   mocks.update.mockReset();
+  mocks.updateProject.mockReset();
   mocks.upload.mockReset();
   mocks.remove.mockReset();
   mocks.upload.mockResolvedValue({
@@ -129,30 +139,45 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+async function openTab(user: ReturnType<typeof userEvent.setup>, name: string) {
+  await user.click(screen.getByRole("tab", { name }));
+}
+
 const png = new File([new Uint8Array(8)], "b.png", { type: "image/png" });
 
 describe("ProjectCustomizePage", () => {
-  it("refuse l'acces a quelqu'un qui n'est pas le porteur", () => {
+  it("refuse l'acces a un simple membre", () => {
     mocks.userId = MEMBER_ID;
     renderPage();
     expect(
-      screen.getByText("Seul le porteur peut personnaliser la fiche"),
+      screen.getByText(
+        "Seuls le porteur et les co-porteurs peuvent modifier la fiche",
+      ),
     ).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Enregistrer" })).toBeNull();
   });
 
-  it("refuse l'acces a un co-porteur", () => {
+  it("ne propose au co-porteur que l'onglet Infos", () => {
     mocks.members = [member(OWNER_ID, "owner"), member(MEMBER_ID, "co_owner")];
     mocks.userId = MEMBER_ID;
     renderPage();
-    expect(
-      screen.getByText("Seul le porteur peut personnaliser la fiche"),
-    ).toBeTruthy();
+    expect(screen.getByLabelText(/Titre/)).toBeTruthy();
+    // Seuls les onglets d'affichage (Edition / Apercu) restent.
+    expect(screen.getAllByRole("tab")).toHaveLength(2);
+    expect(screen.queryByRole("tab", { name: "Couleurs" })).toBeNull();
   });
 
   it("affiche l'editeur au porteur, avec l'apercu et aucune modification", () => {
     renderPage();
-    expect(screen.getByText("Personnaliser la fiche")).toBeTruthy();
+    expect(screen.getByText("Modifier la fiche")).toBeTruthy();
+    expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
+      "Édition",
+      "Aperçu",
+      "Infos",
+      "Images",
+      "Sections",
+      "Couleurs",
+    ]);
     expect(screen.getByTestId("preview").textContent).toBe("auto");
     expect(screen.queryByText("Modifications non enregistrées")).toBeNull();
   });
@@ -168,6 +193,7 @@ describe("ProjectCustomizePage", () => {
   it("met a jour l'apercu et signale les modifications non enregistrees", async () => {
     const user = userEvent.setup();
     renderPage();
+    await openTab(user, "Couleurs");
     await user.click(screen.getByRole("button", { name: "Bonbon" }));
     expect(screen.getByTestId("preview").textContent).toBe(
       presetTheme("bonbon").accent,
@@ -178,6 +204,7 @@ describe("ProjectCustomizePage", () => {
   it("demande confirmation avant de quitter avec des modifications", async () => {
     const user = userEvent.setup();
     renderPage();
+    await openTab(user, "Couleurs");
     await user.click(screen.getByRole("button", { name: "Bonbon" }));
 
     await user.click(screen.getByRole("button", { name: "Annuler" }));
@@ -201,6 +228,7 @@ describe("ProjectCustomizePage", () => {
   it("garde aussi le lien de retour quand il y a des modifications", async () => {
     const user = userEvent.setup();
     renderPage();
+    await openTab(user, "Couleurs");
     await user.click(screen.getByRole("button", { name: "Bonbon" }));
     await user.click(screen.getByRole("link", { name: /Projet test/ }));
     expect(screen.getByRole("dialog")).toBeTruthy();
@@ -210,6 +238,7 @@ describe("ProjectCustomizePage", () => {
   it("refuse d'enregistrer une image sans texte alternatif, nomme l'image et y emmene, puis enregistre une fois complete", async () => {
     const user = userEvent.setup();
     const { container } = renderPage();
+    await openTab(user, "Images");
     await user.upload(
       container.querySelector("input[type=file]") as HTMLInputElement,
       png,
@@ -246,6 +275,7 @@ describe("ProjectCustomizePage", () => {
   it("amene au champ de l'image choisie dans le resume, galerie comprise", async () => {
     const user = userEvent.setup();
     const { container } = renderPage();
+    await openTab(user, "Images");
     const inputs = container.querySelectorAll("input[type=file]");
     // 1er : banniere, 2e : galerie.
     await user.upload(inputs[0] as HTMLInputElement, png);
@@ -262,7 +292,9 @@ describe("ProjectCustomizePage", () => {
   it("envoie le brouillon complet puis retourne a la fiche apres l'enregistrement", async () => {
     const user = userEvent.setup();
     renderPage();
+    await openTab(user, "Couleurs");
     await user.click(screen.getByRole("button", { name: "Océan" }));
+    await openTab(user, "Sections");
     await user.click(
       screen.getByRole("button", { name: "Descendre « Annonce épinglée »" }),
     );
@@ -275,8 +307,9 @@ describe("ProjectCustomizePage", () => {
     ];
     expect(draft.theme).toEqual(presetTheme("ocean"));
     expect(draft.sections.map((s) => s.id)).toEqual([
-      "about",
+      "needs",
       "pinned",
+      "about",
       "gallery",
       "comments",
     ]);
@@ -284,9 +317,67 @@ describe("ProjectCustomizePage", () => {
     expect(screen.getByText("FICHE")).toBeTruthy();
   });
 
+  it("enregistre les infos puis retourne a la fiche, sans toucher a la personnalisation", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const title = screen.getByLabelText(/Titre/);
+    await user.clear(title);
+    await user.type(title, "  Nouveau titre  ");
+    expect(screen.getByText("Modifications non enregistrées")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Enregistrer" }));
+
+    expect(mocks.updateProject).toHaveBeenCalledTimes(1);
+    const [input, options] = mocks.updateProject.mock.calls[0] as [
+      { title: string; tagline: string },
+      { onSuccess: () => void },
+    ];
+    expect(input.title).toBe("Nouveau titre");
+    expect(input.tagline).toBe("Une accroche");
+    await act(async () => options.onSuccess());
+    expect(mocks.update).not.toHaveBeenCalled();
+    expect(screen.getByText("FICHE")).toBeTruthy();
+  });
+
+  it("refuse d'enregistrer des infos invalides et amene au champ", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await openTab(user, "Couleurs");
+    await user.click(screen.getByRole("button", { name: "Bonbon" }));
+    await openTab(user, "Infos");
+    await user.clear(screen.getByLabelText(/Titre/));
+    await openTab(user, "Couleurs");
+    await user.click(screen.getByRole("button", { name: "Enregistrer" }));
+
+    expect(mocks.updateProject).not.toHaveBeenCalled();
+    expect(mocks.update).not.toHaveBeenCalled();
+    expect(
+      screen.getByText("Le titre doit faire au moins 3 caractères."),
+    ).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByLabelText(/Titre/));
+  });
+
+  it("enregistre les infos avant la personnalisation quand les deux changent", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.type(screen.getByLabelText(/Titre/), " 2");
+    await openTab(user, "Couleurs");
+    await user.click(screen.getByRole("button", { name: "Bonbon" }));
+    await user.click(screen.getByRole("button", { name: "Enregistrer" }));
+
+    expect(mocks.updateProject).toHaveBeenCalledTimes(1);
+    expect(mocks.update).not.toHaveBeenCalled();
+    const [, options] = mocks.updateProject.mock.calls[0] as [
+      unknown,
+      { onSuccess: () => void },
+    ];
+    await act(async () => options.onSuccess());
+    expect(mocks.update).toHaveBeenCalledTimes(1);
+  });
+
   it("nettoie sur le serveur les images televersees puis abandonnees", async () => {
     const user = userEvent.setup();
     const { container } = renderPage();
+    await openTab(user, "Images");
     await user.upload(
       container.querySelector("input[type=file]") as HTMLInputElement,
       png,
@@ -303,6 +394,7 @@ describe("ProjectCustomizePage", () => {
   it("retirer une image juste televersee la supprime sur le serveur", async () => {
     const user = userEvent.setup();
     const { container } = renderPage();
+    await openTab(user, "Images");
     await user.upload(
       container.querySelector("input[type=file]") as HTMLInputElement,
       png,

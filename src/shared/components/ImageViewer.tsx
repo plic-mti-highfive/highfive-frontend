@@ -23,7 +23,6 @@ import { Dialog, DialogPopup, DialogTitle, IconButton } from "@shared/ui";
 export interface ViewerImage {
   url: string;
   alt: string;
-  decorative: boolean;
   caption?: string;
 }
 
@@ -363,7 +362,7 @@ function ViewerBody({
       >
         <img
           src={image.url}
-          alt={image.decorative ? "" : image.alt}
+          alt={image.alt}
           draggable={false}
           style={zoomStyle}
           className={cn(

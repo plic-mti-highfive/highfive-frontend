@@ -1,7 +1,7 @@
 import { useId, useState, type CSSProperties, type MouseEvent } from "react";
 import { Maximize2, Trash2 } from "lucide-react";
 
-import { Button, Checkbox, Field, IconButton, Input } from "@shared/ui";
+import { Button, Field, IconButton, Input } from "@shared/ui";
 import type { ProjectBanner } from "@/domain";
 import { altInputId } from "../../lib/customization";
 import { BANNER_MAX_WIDTH } from "../../lib/imageCompression";
@@ -52,7 +52,6 @@ export function BannerEditor({
         id: uploaded.id,
         url: uploaded.url,
         alt: "",
-        decorative: false,
         focal: banner?.focal ?? DEFAULT_FOCAL,
       });
     } catch (caught) {
@@ -185,33 +184,19 @@ export function BannerEditor({
       <Field
         label="Texte alternatif"
         htmlFor={altInputId("banner")}
-        required={!banner.decorative}
-        description={
-          banner.decorative
-            ? "Image décorative : aucun texte alternatif n'est nécessaire."
-            : "Obligatoire. Décris l'image pour les personnes qui ne la voient pas."
-        }
+        required
+        description="Décris l'image pour les personnes qui ne la voient pas."
         error={error}
       >
         <Input
           id={altInputId("banner")}
           value={banner.alt}
-          disabled={banner.decorative}
-          aria-required={!banner.decorative}
+          aria-required
           maxLength={200}
           aria-invalid={Boolean(error)}
           onChange={(event) => onChange({ ...banner, alt: event.target.value })}
         />
       </Field>
-      <label className="flex items-center gap-2 text-body-sm text-foreground">
-        <Checkbox
-          checked={banner.decorative}
-          onCheckedChange={(checked) =>
-            onChange({ ...banner, decorative: checked })
-          }
-        />
-        Image décorative (aucun texte alternatif nécessaire)
-      </label>
 
       <div className="flex flex-wrap items-center gap-2">
         <ImageUploadButton

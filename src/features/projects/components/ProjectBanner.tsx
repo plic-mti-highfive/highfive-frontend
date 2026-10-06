@@ -6,8 +6,7 @@ import { ImageViewer } from "@shared/components/ImageViewer";
 /**
  * Banniere de la fiche, au-dessus du header : le titre n'est jamais
  * superpose a l'image (contraste garanti). Le point focal reste visible
- * quand le ratio change (16:9 sur mobile, 3:1 des `md`). L'image
- * decorative est rendue avec `alt=""`. Un clic (ou Entree) l'ouvre en grand
+ * quand le ratio change (16:9 sur mobile, 3:1 des `md`). Un clic (ou Entree) l'ouvre en grand
  * dans la visionneuse, avec zoom : utile pour un schema ou une capture dense.
  *
  * Aucun rendu sans banniere (pas de bloc vide, pas de placeholder).
@@ -26,10 +25,7 @@ export function ProjectBanner({
   const focalStyle = {
     "--focal": `${banner.focal.x}% ${banner.focal.y}%`,
   } as CSSProperties;
-  const label =
-    banner.decorative || !banner.alt
-      ? "Agrandir la bannière"
-      : `Agrandir la bannière : ${banner.alt}`;
+  const label = `Agrandir la bannière : ${banner.alt}`;
 
   return (
     <figure className="overflow-hidden rounded-xl border border-border bg-muted">
@@ -42,7 +38,7 @@ export function ProjectBanner({
         <div className="aspect-video md:aspect-[3/1]">
           <img
             src={banner.url}
-            alt={banner.decorative ? "" : banner.alt}
+            alt={banner.alt}
             fetchPriority="high"
             decoding="async"
             style={focalStyle}

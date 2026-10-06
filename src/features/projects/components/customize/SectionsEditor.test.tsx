@@ -26,10 +26,11 @@ describe("SectionsEditor", () => {
   it("liste les sections dans l'ordre avec leur visibilite", () => {
     render(<Harness />);
     const items = screen.getAllByRole("listitem");
-    expect(items).toHaveLength(4);
+    expect(items).toHaveLength(5);
     expect(within(items[0]).getByText("Annonce épinglée")).toBeTruthy();
-    expect(within(items[3]).getByText("Commentaires")).toBeTruthy();
-    expect(screen.getAllByRole("checkbox")).toHaveLength(4);
+    expect(within(items[1]).getByText("On recherche")).toBeTruthy();
+    expect(within(items[4]).getByText("Commentaires")).toBeTruthy();
+    expect(screen.getAllByRole("checkbox")).toHaveLength(5);
   });
 
   it("descend et monte une section avec les boutons, et l'annonce", async () => {
@@ -38,17 +39,17 @@ describe("SectionsEditor", () => {
     await user.click(
       screen.getByRole("button", { name: "Descendre « Annonce épinglée »" }),
     );
-    expect(state()).toBe("about:on,pinned:on,gallery:on,comments:on");
+    expect(state()).toBe("needs:on,pinned:on,about:on,gallery:on,comments:on");
     expect(
-      screen.getByText("Annonce épinglée déplacée en position 2 sur 4."),
+      screen.getByText("Annonce épinglée déplacée en position 2 sur 5."),
     ).toBeTruthy();
 
     await user.click(
       screen.getByRole("button", { name: "Monter « Galerie »" }),
     );
-    expect(state()).toBe("about:on,gallery:on,pinned:on,comments:on");
+    expect(state()).toBe("needs:on,pinned:on,gallery:on,about:on,comments:on");
     expect(
-      screen.getByText("Galerie déplacée en position 2 sur 4."),
+      screen.getByText("Galerie déplacée en position 3 sur 5."),
     ).toBeTruthy();
   });
 
@@ -69,7 +70,7 @@ describe("SectionsEditor", () => {
     ).not.toBeNull();
     await user.click(up);
     await user.click(down);
-    expect(state()).toBe("pinned:on,about:on,gallery:on,comments:on");
+    expect(state()).toBe("pinned:on,needs:on,about:on,gallery:on,comments:on");
     up.focus();
     expect(document.activeElement).toBe(up);
   });
@@ -89,8 +90,8 @@ describe("SectionsEditor", () => {
     render(<Harness />);
     const gallery = screen.getByRole("checkbox", { name: "Galerie" });
     await user.click(gallery);
-    expect(state()).toBe("pinned:on,about:on,gallery:off,comments:on");
+    expect(state()).toBe("pinned:on,needs:on,about:on,gallery:off,comments:on");
     await user.click(gallery);
-    expect(state()).toBe("pinned:on,about:on,gallery:on,comments:on");
+    expect(state()).toBe("pinned:on,needs:on,about:on,gallery:on,comments:on");
   });
 });

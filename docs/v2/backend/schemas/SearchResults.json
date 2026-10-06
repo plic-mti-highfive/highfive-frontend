@@ -167,10 +167,8 @@
                   },
                   "alt": {
                     "type": "string",
-                    "maxLength": 200
-                  },
-                  "decorative": {
-                    "type": "boolean"
+                    "maxLength": 200,
+                    "minLength": 1
                   },
                   "focal": {
                     "type": "object",
@@ -190,7 +188,7 @@
                     "additionalProperties": false
                   }
                 },
-                "required": ["id", "url", "alt", "decorative", "focal"],
+                "required": ["id", "url", "alt", "focal"],
                 "additionalProperties": false
               }
             },

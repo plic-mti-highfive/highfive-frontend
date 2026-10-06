@@ -215,16 +215,23 @@ export function AppRouter() {
           />
         </Route>
 
-        {/* Editeur de personnalisation de la fiche : coquille propre (hauteur
-            d'ecran fixe, formulaire + apercu live), hors `SiteLayout`. La
-            reserve au porteur est verifiee par la page elle-meme. */}
+        {/* Editeur de la fiche (infos + personnalisation) : coquille propre
+            (hauteur d'ecran fixe, formulaire + apercu live), hors
+            `SiteLayout`. Les droits (porteur, co-porteur) sont verifies par la
+            page elle-meme. */}
         <Route
-          path="/projets/:slug/personnaliser"
+          path="/projets/:slug/modifier"
           element={
             <ProtectedRoute>
               {withSuspense(<ProjectCustomizePage />)}
             </ProtectedRoute>
           }
+        />
+
+        {/* Ancienne adresse de l'editeur de personnalisation. */}
+        <Route
+          path="/projets/:slug/personnaliser"
+          element={<Navigate to="../modifier" relative="path" replace />}
         />
 
         {/* Coquille atelier — Le Lab (doc 06 §4) */}

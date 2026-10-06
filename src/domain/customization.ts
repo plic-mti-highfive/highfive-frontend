@@ -53,30 +53,16 @@ const imageUrlSchema = z
   .regex(/^(https?:\/\/|data:image\/)/, "url d'image invalide");
 
 /**
- * Champs communs d'une image personnalisee. Accessibilite : un texte
- * alternatif est obligatoire, sauf si le porteur declare l'image decorative
- * (`decorative: true`, rendue avec `alt=""`).
+ * Champs communs d'une image personnalisee. Accessibilite : le texte
+ * alternatif est toujours obligatoire, y compris pour une image purement
+ * decorative (il n'y a pas d'exception : la description reste utile, et
+ * l'image reste ouvrable en grand).
  */
 const imageFields = {
   id: idSchema,
   url: imageUrlSchema,
-  alt: z.string().max(200),
-  decorative: z.boolean(),
+  alt: z.string().trim().min(1, "Un texte alternatif est requis.").max(200),
 };
-
-function assertAltOrDecorative(
-  image: { alt: string; decorative: boolean },
-  ctx: z.RefinementCtx,
-) {
-  if (!image.decorative && image.alt.trim().length === 0) {
-    ctx.addIssue({
-      code: "custom",
-      message:
-        "Un texte alternatif est requis, sauf si l'image est decorative.",
-      path: ["alt"],
-    });
-  }
-}
 
 /** Reponse de `POST /projects/:slug/customization/images` : l'image est televersee, pas encore referencee. */
 export const customizationImageUploadSchema = z.object({
@@ -94,19 +80,22 @@ export const bannerFocalSchema = z.object({
 });
 export type BannerFocal = z.infer<typeof bannerFocalSchema>;
 
-export const projectBannerSchema = z
-  .object({ ...imageFields, focal: bannerFocalSchema })
-  .superRefine(assertAltOrDecorative);
+export const projectBannerSchema = z.object({
+  ...imageFields,
+  focal: bannerFocalSchema,
+});
 export type ProjectBanner = z.infer<typeof projectBannerSchema>;
 
-export const galleryItemSchema = z
-  .object({ ...imageFields, caption: z.string().max(140).optional() })
-  .superRefine(assertAltOrDecorative);
+export const galleryItemSchema = z.object({
+  ...imageFields,
+  caption: z.string().max(140).optional(),
+});
 export type GalleryItem = z.infer<typeof galleryItemSchema>;
 
 /** Sections de l'onglet Apercu que le porteur peut ordonner et masquer (la sidebar reste fixe). */
 export const customizationSectionIdSchema = z.enum([
   "pinned",
+  "needs",
   "about",
   "gallery",
   "comments",
@@ -124,31 +113,44 @@ export type CustomizationSection = z.infer<typeof customizationSectionSchema>;
 /** Ordre et visibilite par defaut : celui de la fiche d'un projet non personnalise. */
 export const DEFAULT_SECTIONS: readonly CustomizationSection[] = [
   { id: "pinned", visible: true },
+  { id: "needs", visible: true },
   { id: "about", visible: true },
   { id: "gallery", visible: true },
   { id: "comments", visible: true },
 ];
 
+/** Sections presentes dans toute personnalisation, y compris celles d'avant `needs`. */
+const REQUIRED_SECTION_IDS: readonly CustomizationSectionId[] = [
+  "pinned",
+  "about",
+  "gallery",
+  "comments",
+];
+
 /**
  * Corps de `PATCH /projects/:slug/customization` (remplacement complet) et
  * champ `Project.customization`. Regles non representees dans le JSON Schema
- * (voir docs/v2/backend/SPEC.md) : `sections` contient chacune des quatre
- * sections exactement une fois ; les `id` de la galerie sont uniques.
+ * (voir docs/v2/backend/SPEC.md) : `sections` contient `pinned`, `about`,
+ * `gallery` et `comments` exactement une fois, et `needs` au plus une fois
+ * (absente des personnalisations enregistrees avant son ajout) ; les `id` de
+ * la galerie sont uniques.
  */
 export const projectCustomizationSchema = z
   .object({
     banner: projectBannerSchema.optional(),
     theme: projectThemeSchema.optional(),
-    sections: z.array(customizationSectionSchema).length(4),
+    sections: z.array(customizationSectionSchema).min(4).max(5),
     gallery: z.array(galleryItemSchema).max(MAX_GALLERY_IMAGES),
   })
   .superRefine((customization, ctx) => {
     const sectionIds = new Set(customization.sections.map((s) => s.id));
-    if (sectionIds.size !== customizationSectionIdSchema.options.length) {
+    const allDistinct = sectionIds.size === customization.sections.length;
+    const hasRequired = REQUIRED_SECTION_IDS.every((id) => sectionIds.has(id));
+    if (!allDistinct || !hasRequired) {
       ctx.addIssue({
         code: "custom",
         message:
-          "Chaque section (pinned, about, gallery, comments) doit apparaitre exactement une fois.",
+          "Chaque section (pinned, about, gallery, comments) doit apparaitre exactement une fois, et needs au plus une fois.",
         path: ["sections"],
       });
     }

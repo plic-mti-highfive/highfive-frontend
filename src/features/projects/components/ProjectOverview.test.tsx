@@ -30,9 +30,11 @@ vi.mock("./PinnedAnnouncementPreview", () => ({
   ),
 }));
 vi.mock("./ProjectOverviewSidebar", () => ({
-  ProjectOverviewSidebar: ({ accented }: { accented?: boolean }) => (
-    <aside data-testid="sidebar" data-accented={String(Boolean(accented))} />
-  ),
+  ProjectOverviewSidebar: () => <aside data-testid="sidebar" />,
+}));
+
+vi.mock("./NearbyProjects", () => ({
+  NearbyProjects: () => <section data-testid="nearby" />,
 }));
 
 afterEach(() => {
@@ -57,9 +59,15 @@ const BASE = {
   lastActivityAt: "2026-09-01T10:00:00.000Z",
 };
 
-function project(customization?: unknown): Project {
-  return projectSchema.parse({ ...BASE, customization });
+function project(customization?: unknown, needs: unknown[] = []): Project {
+  return projectSchema.parse({ ...BASE, customization, needs });
 }
+
+const NEED = {
+  id: "00000000-0000-4000-8000-000000000301",
+  label: "des velos a preter",
+  fulfilled: false,
+};
 
 function renderOverview(p: Project, preview = false) {
   return render(
@@ -92,7 +100,6 @@ const IMAGE = {
   id: "00000000-0000-4000-8c0d-000000000001",
   url: "https://example.test/1.webp",
   alt: "Image 1",
-  decorative: false,
 };
 
 describe("ProjectOverview", () => {
@@ -100,7 +107,6 @@ describe("ProjectOverview", () => {
     state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
     renderOverview(project());
     expect(order()).toEqual(["pinned", "À propos", "comments"]);
-    expect(screen.getByTestId("sidebar").dataset.accented).toBe("false");
     expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("false");
   });
 
@@ -140,7 +146,7 @@ describe("ProjectOverview", () => {
     expect(order()).not.toContain("Galerie");
   });
 
-  it("transmet le theme a l'annonce epinglee et a la sidebar", () => {
+  it("transmet le theme a l'annonce epinglee", () => {
     state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
     renderOverview(
       project({
@@ -150,7 +156,36 @@ describe("ProjectOverview", () => {
       }),
     );
     expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("true");
-    expect(screen.getByTestId("sidebar").dataset.accented).toBe("true");
+  });
+
+  it("place les besoins apres l'annonce epinglee par defaut", () => {
+    state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
+    renderOverview(project(undefined, [NEED]));
+    expect(order()).toEqual(["pinned", "On recherche", "À propos", "comments"]);
+    expect(screen.getByText("des velos a preter")).toBeTruthy();
+  });
+
+  it("place les besoins en tete sans annonce epinglee, et rien sans besoin", () => {
+    renderOverview(project(undefined, [NEED]));
+    expect(order()).toEqual(["On recherche", "À propos", "comments"]);
+    cleanup();
+    renderOverview(project());
+    expect(order()).not.toContain("On recherche");
+  });
+
+  it("suit l'ordre et la visibilite choisis pour les besoins", () => {
+    const sections = (needsVisible: boolean) => [
+      { id: "about", visible: true },
+      { id: "needs", visible: needsVisible },
+      { id: "pinned", visible: false },
+      { id: "gallery", visible: true },
+      { id: "comments", visible: true },
+    ];
+    renderOverview(project({ sections: sections(true), gallery: [] }, [NEED]));
+    expect(order()).toEqual(["À propos", "On recherche", "comments"]);
+    cleanup();
+    renderOverview(project({ sections: sections(false), gallery: [] }, [NEED]));
+    expect(order()).toEqual(["À propos", "comments"]);
   });
 
   it("en apercu, remplace les commentaires par un bloc leger", () => {
@@ -162,6 +197,7 @@ describe("ProjectOverview", () => {
 
 const DEFAULT = [
   { id: "pinned", visible: true },
+  { id: "needs", visible: true },
   { id: "about", visible: true },
   { id: "gallery", visible: true },
   { id: "comments", visible: true },

@@ -16,7 +16,6 @@ const BANNER: ProjectBanner = {
   id: "00000000-0000-4000-8c0d-000000000001",
   url: "https://example.test/banner.webp",
   alt: "Un mur peint",
-  decorative: false,
   focal: { x: 50, y: 50 },
 };
 const UPLOADED = {
@@ -85,7 +84,6 @@ describe("BannerEditor", () => {
       id: UPLOADED.id,
       url: UPLOADED.url,
       alt: "",
-      decorative: false,
       focal: { x: 50, y: 50 },
     });
   });
@@ -131,14 +129,10 @@ describe("BannerEditor", () => {
     expect(state()?.focal).toEqual({ x: 100, y: 0 });
   });
 
-  it("modifie l'alt et le caractere decoratif", async () => {
+  it("modifie l'alt", async () => {
     const { user, state } = setup({ initial: { ...BANNER, alt: "" } });
     await user.type(screen.getByLabelText(/Texte alternatif/), "Mur");
     expect(state()?.alt).toBe("Mur");
-    await user.click(
-      screen.getByRole("checkbox", { name: /Image décorative/ }),
-    );
-    expect(state()?.decorative).toBe(true);
   });
 
   it("affiche l'erreur d'alt et marque le champ invalide", () => {
@@ -187,24 +181,13 @@ describe("BannerEditor", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("marque le texte alternatif comme obligatoire (etoile et aria-required) sauf image decorative", async () => {
-    const user = userEvent.setup();
+  it("marque le texte alternatif comme obligatoire, sans case pour s'en dispenser", () => {
     setup({ initial: { ...BANNER, alt: "" } });
     const field = screen.getByLabelText(/Texte alternatif/) as HTMLInputElement;
     expect(field.id).toBe("customize-alt-banner");
     expect(field.getAttribute("aria-required")).toBe("true");
     expect(field.disabled).toBe(false);
     expect(screen.getByText("*")).toBeTruthy();
-    expect(screen.getByText(/Obligatoire\./)).toBeTruthy();
-
-    await user.click(
-      screen.getByRole("checkbox", { name: /Image décorative/ }),
-    );
-    expect(screen.queryByText("*")).toBeNull();
-    expect(field.disabled).toBe(true);
-    expect(field.getAttribute("aria-required")).toBe("false");
-    expect(
-      screen.getByText(/Image décorative : aucun texte alternatif/),
-    ).toBeTruthy();
+    expect(screen.queryByRole("checkbox")).toBeNull();
   });
 });

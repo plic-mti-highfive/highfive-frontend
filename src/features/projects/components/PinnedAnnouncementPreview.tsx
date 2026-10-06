@@ -19,6 +19,7 @@ export function PinnedAnnouncementPreview({
     <Link to={`/projets/${slug}/annonces`}>
       <Card
         variant="interactive"
+        className="border border-border"
         data-accent={inheritAccent ? undefined : "orange"}
       >
         <CardBody>

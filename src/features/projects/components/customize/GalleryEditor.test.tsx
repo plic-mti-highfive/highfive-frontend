@@ -14,7 +14,6 @@ function item(n: number, overrides: Partial<GalleryItem> = {}): GalleryItem {
     id: `00000000-0000-4000-8c0d-${String(n).padStart(12, "0")}`,
     url: `https://example.test/${n}.webp`,
     alt: `Image ${n}`,
-    decorative: false,
     ...overrides,
   };
 }
@@ -145,7 +144,7 @@ describe("GalleryEditor", () => {
     const first = item(1, { alt: "" });
     setup({
       initial: [first, item(2)],
-      issues: { [first.id]: "Décris l'image, ou coche « Image décorative »." },
+      issues: { [first.id]: "Décris l'image pour continuer." },
     });
     expect(screen.getByRole("alert").textContent).toContain("Décris l'image");
     const fields = screen.getAllByLabelText(/Texte alternatif/);
@@ -162,7 +161,7 @@ describe("GalleryEditor", () => {
     expect(onDiscardImage).toHaveBeenCalledWith(item(2).id);
   });
 
-  it("modifie l'alt, la legende et le caractere decoratif", async () => {
+  it("modifie l'alt et la legende", async () => {
     const { user } = setup({ initial: [item(1, { alt: "" })] });
     await user.type(screen.getByLabelText(/Texte alternatif/), "Un mur");
     expect(alts()).toBe("Un mur");
@@ -170,14 +169,6 @@ describe("GalleryEditor", () => {
     expect((screen.getByLabelText(/Légende/) as HTMLInputElement).value).toBe(
       "Premier jet",
     );
-    await user.click(
-      screen.getByRole("checkbox", { name: "Image décorative" }),
-    );
-    expect(
-      screen
-        .getByRole("checkbox", { name: "Image décorative" })
-        .getAttribute("aria-checked"),
-    ).toBe("true");
   });
 
   it("agrandit une vignette dans la visionneuse, a la bonne image, et permet de parcourir la galerie", async () => {
@@ -196,23 +187,17 @@ describe("GalleryEditor", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("n'affiche l'etoile (champ obligatoire) que sur les images non decoratives, et desactive le champ des decoratives", () => {
-    setup({
-      initial: [item(1, { alt: "" }), item(2, { alt: "", decorative: true })],
-    });
+  it("marque le texte alternatif de chaque image comme obligatoire, sans case pour s'en dispenser", () => {
+    setup({ initial: [item(1, { alt: "" }), item(2, { alt: "" })] });
     const fields = screen.getAllByLabelText(
       /Texte alternatif/,
     ) as HTMLInputElement[];
-    expect(fields[0].getAttribute("aria-required")).toBe("true");
-    expect(fields[0].disabled).toBe(false);
-    expect(fields[1].disabled).toBe(true);
-    expect(fields[1].getAttribute("aria-required")).toBe("false");
-    // Une seule etoile : celle de la 1re image.
-    expect(screen.getAllByText("*")).toHaveLength(1);
+    for (const field of fields) {
+      expect(field.getAttribute("aria-required")).toBe("true");
+      expect(field.disabled).toBe(false);
+    }
+    expect(screen.getAllByText("*")).toHaveLength(2);
     expect(fields[0].id).toBe(`customize-alt-${item(1).id}`);
-    expect(
-      screen.getByText(/Image décorative : aucun texte alternatif/),
-    ).toBeTruthy();
-    expect(screen.getByText(/Obligatoire\./)).toBeTruthy();
+    expect(screen.queryByRole("checkbox")).toBeNull();
   });
 });

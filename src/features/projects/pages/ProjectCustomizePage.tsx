@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Lock } from "lucide-react";
 
@@ -10,6 +10,7 @@ import {
   Spinner,
   Tabs,
   TabsList,
+  TabsPanel,
   TabsTab,
 } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
@@ -19,7 +20,7 @@ import { ConfirmActionDialog } from "@features/admin/components/ConfirmActionDia
 import { ApiError } from "@/api/client";
 import type { TeamMember } from "@/api/memberships";
 import { useMembers } from "@/api/queries/memberships";
-import { useProject } from "@/api/queries/projects";
+import { useProject, useUpdateProject } from "@/api/queries/projects";
 import {
   useDeleteCustomizationImage,
   useUpdateCustomization,
@@ -29,19 +30,38 @@ import type { Project, ProjectCustomization } from "@/domain";
 import { BannerEditor } from "../components/customize/BannerEditor";
 import { CustomizePreview } from "../components/customize/CustomizePreview";
 import { GalleryEditor } from "../components/customize/GalleryEditor";
+import { InfoEditor } from "../components/customize/InfoEditor";
 import { SectionsEditor } from "../components/customize/SectionsEditor";
 import { ThemeEditor } from "../components/customize/ThemeEditor";
 import type { UploadImage } from "../components/customize/types";
 import { getMembershipRole, getProjectCapabilities } from "../lib/capabilities";
 import { getDraftIssues, isDraftDirty, toDraft } from "../lib/customization";
 import { compressImage } from "../lib/imageCompression";
+import {
+  applyInfoDraft,
+  getInfoIssues,
+  isInfoDirty,
+  toInfoDraft,
+  toUpdateInput,
+} from "../lib/projectInfo";
 import { useUnsavedChangesGuard } from "../lib/useUnsavedChangesGuard";
 
+type EditorTab = "infos" | "images" | "sections" | "colors";
+
+const EDITOR_TABS: { value: EditorTab; label: string }[] = [
+  { value: "infos", label: "Infos" },
+  { value: "images", label: "Images" },
+  { value: "sections", label: "Sections" },
+  { value: "colors", label: "Couleurs" },
+];
+
 /**
- * Editeur de personnalisation de la fiche (`/projets/:slug/personnaliser`),
- * porteur seul. Coquille a hauteur d'ecran comme Le Lab : en-tete avec
+ * Editeur de la fiche (`/projets/:slug/modifier`) : un seul point d'entree
+ * pour les infos (titre, accroche, description, themes, besoins ; porteur et
+ * co-porteurs) et la personnalisation (images, sections, couleurs ; porteur
+ * seul), en onglets. Coquille a hauteur d'ecran comme Le Lab : en-tete avec
  * retour nomme vers la fiche, puis formulaire et apercu live cote a cote
- * (onglets Edition / Apercu sous `lg`). Enregistrement explicite, garde
+ * (onglets Edition / Apercu sous `lg`). Un seul bouton Enregistrer, garde
  * « changements non sauvegardes » (voir `useUnsavedChangesGuard`).
  */
 export function ProjectCustomizePage() {
@@ -51,7 +71,7 @@ export function ProjectCustomizePage() {
   const membersQuery = useMembers(slug);
 
   useDocumentTitle(
-    projectQuery.data ? `Personnaliser ${projectQuery.data.title}` : undefined,
+    projectQuery.data ? `Modifier ${projectQuery.data.title}` : undefined,
   );
 
   if (projectQuery.isLoading || membersQuery.isLoading || isUserLoading) {
@@ -110,14 +130,14 @@ export function ProjectCustomizePage() {
     isAuthenticated,
   );
 
-  if (!capabilities.canCustomize) {
+  if (!capabilities.canEdit) {
     return (
       <Shell>
         <div className="flex h-full items-center justify-center">
           <EmptyState
             icon={Lock}
-            title="Seul le porteur peut personnaliser la fiche"
-            description="La personnalisation (bannière, sections, galerie, couleurs) est réservée au créateur du projet."
+            title="Seuls le porteur et les co-porteurs peuvent modifier la fiche"
+            description="Les infos du projet sont modifiables par l'équipe porteuse, la personnalisation (images, sections, couleurs) par le porteur seul."
             action={
               <Button render={<Link to={`/projets/${slug}`} />}>
                 Voir la fiche du projet
@@ -129,7 +149,13 @@ export function ProjectCustomizePage() {
     );
   }
 
-  return <CustomizeEditor project={project} members={members} />;
+  return (
+    <CustomizeEditor
+      project={project}
+      members={members}
+      canCustomize={capabilities.canCustomize}
+    />
+  );
 }
 
 /** Coquille a hauteur d'ecran des etats de chargement/erreur/permission. */
@@ -140,9 +166,12 @@ function Shell({ children }: { children: React.ReactNode }) {
 function CustomizeEditor({
   project,
   members,
+  canCustomize,
 }: {
   project: Project;
   members: TeamMember[];
+  /** Porteur seul : sans ce droit, seul l'onglet Infos est proposé. */
+  canCustomize: boolean;
 }) {
   const navigate = useNavigate();
   const ficheUrl = `/projets/${project.slug}`;
@@ -151,6 +180,8 @@ function CustomizeEditor({
   const [draft, setDraft] = useState<ProjectCustomization>(() =>
     toDraft(saved),
   );
+  const [info, setInfo] = useState(() => toInfoDraft(project));
+  const [tab, setTab] = useState<EditorTab>("infos");
   const [view, setView] = useState<"edit" | "preview">("edit");
   const [submitted, setSubmitted] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
@@ -161,13 +192,26 @@ function CustomizeEditor({
   /** Images televersees pendant cette session d'edition (a nettoyer si abandonnees). */
   const uploadedIds = useRef(new Set<string>());
 
+  const updateProject = useUpdateProject(project.slug);
   const updateCustomization = useUpdateCustomization(project.slug);
   const uploadImageMutation = useUploadCustomizationImage(project.slug);
   const deleteImageMutation = useDeleteCustomizationImage(project.slug);
 
-  const dirty = isDraftDirty(draft, saved);
+  const infoDirty = isInfoDirty(info, project);
+  const customizationDirty = canCustomize && isDraftDirty(draft, saved);
+  const dirty = infoDirty || customizationDirty;
+  const infoIssues = getInfoIssues(info);
   const issues = getDraftIssues(draft);
   useUnsavedChangesGuard(dirty);
+
+  // Apercu live : la fiche telle qu'elle serait avec les infos du brouillon.
+  const previewProject = useMemo(
+    () => applyInfoDraft(project, info),
+    [project, info],
+  );
+  const tabs = canCustomize
+    ? EDITOR_TABS
+    : EDITOR_TABS.filter((item) => item.value === "infos");
 
   const uploadImage: UploadImage = async (file, maxWidth) => {
     const compressed = await compressImage(file, { maxWidth });
@@ -200,18 +244,38 @@ function CustomizeEditor({
   }
 
   function handleSave() {
-    if (issues.count > 0) {
+    if (infoIssues.length > 0 || (canCustomize && issues.count > 0)) {
       setSubmitted(true);
       setView("edit");
-      setFocusTarget({ inputId: issues.items[0].inputId });
+      if (infoIssues.length > 0) {
+        setTab("infos");
+        setFocusTarget({ inputId: infoIssues[0].inputId });
+      } else {
+        setTab("images");
+        setFocusTarget({ inputId: issues.items[0].inputId });
+      }
       return;
     }
-    updateCustomization.mutate(draft, {
-      onSuccess: () => navigate(ficheUrl),
-    });
+    const saveCustomization = () => {
+      if (customizationDirty) {
+        updateCustomization.mutate(draft, {
+          onSuccess: () => navigate(ficheUrl),
+        });
+      } else {
+        navigate(ficheUrl);
+      }
+    };
+    if (infoDirty) {
+      updateProject.mutate(toUpdateInput(info), {
+        onSuccess: saveCustomization,
+      });
+    } else {
+      saveCustomization();
+    }
   }
 
-  const saveError = updateCustomization.error;
+  const isSaving = updateProject.isPending || updateCustomization.isPending;
+  const saveError = updateProject.error ?? updateCustomization.error;
 
   // Apres un enregistrement refuse : va au premier champ a corriger (une fois
   // l'onglet Edition affiche, d'ou l'effet plutot qu'un appel direct).
@@ -222,7 +286,8 @@ function CustomizeEditor({
     field?.focus();
   }, [focusTarget]);
 
-  function focusField(inputId: string) {
+  function focusField(inputId: string, target: EditorTab) {
+    setTab(target);
     setFocusTarget({ inputId });
   }
 
@@ -245,7 +310,7 @@ function CustomizeEditor({
             <span className="truncate">{project.title}</span>
           </Link>
           <span className="hidden text-body-md text-muted-foreground sm:inline">
-            Personnaliser la fiche
+            Modifier la fiche
           </span>
           <div className="ml-auto flex shrink-0 items-center gap-2">
             {dirty && (
@@ -259,14 +324,8 @@ function CustomizeEditor({
             <Button variant="outline" size="sm" onClick={requestLeave}>
               Annuler
             </Button>
-            <Button
-              size="sm"
-              disabled={updateCustomization.isPending}
-              onClick={handleSave}
-            >
-              {updateCustomization.isPending
-                ? "Enregistrement…"
-                : "Enregistrer"}
+            <Button size="sm" disabled={isSaving} onClick={handleSave}>
+              {isSaving ? "Enregistrement…" : "Enregistrer"}
             </Button>
           </div>
         </header>
@@ -297,21 +356,42 @@ function CustomizeEditor({
                 : "L'enregistrement a échoué. Réessaie dans un instant."}
             </p>
           )}
-          {submitted && issues.count > 0 && (
+          {submitted && infoIssues.length > 0 && (
+            <div
+              role="alert"
+              className="flex flex-col gap-2 rounded-lg border border-danger-border bg-danger-bg p-3 text-body-sm text-danger-fg"
+            >
+              <p>Impossible d'enregistrer : complète les infos du projet.</p>
+              <ul className="flex flex-wrap gap-x-4 gap-y-1">
+                {infoIssues.map((item) => (
+                  <li key={item.inputId}>
+                    <button
+                      type="button"
+                      onClick={() => focusField(item.inputId, "infos")}
+                      className="font-medium underline underline-offset-2"
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {submitted && canCustomize && issues.count > 0 && (
             <div
               role="alert"
               className="flex flex-col gap-2 rounded-lg border border-danger-border bg-danger-bg p-3 text-body-sm text-danger-fg"
             >
               <p>
-                Impossible d'enregistrer : il manque un texte alternatif.
-                Complète-le, ou coche « Image décorative ».
+                Impossible d'enregistrer : il manque un texte alternatif. Décris
+                chaque image pour continuer.
               </p>
               <ul className="flex flex-wrap gap-x-4 gap-y-1">
                 {issues.items.map((item) => (
                   <li key={item.key}>
                     <button
                       type="button"
-                      onClick={() => focusField(item.inputId)}
+                      onClick={() => focusField(item.inputId, "images")}
                       className="font-medium underline underline-offset-2"
                     >
                       {item.label}
@@ -322,39 +402,76 @@ function CustomizeEditor({
             </div>
           )}
 
-          <Section title="Bannière">
-            <BannerEditor
-              banner={draft.banner}
-              error={submitted ? issues.banner : undefined}
-              onChange={(banner) => setDraft((d) => ({ ...d, banner }))}
-              onUpload={uploadImage}
-              onDiscardImage={discardImage}
-            />
-          </Section>
+          <Tabs
+            value={tab}
+            onValueChange={(next) => setTab(next as EditorTab)}
+            className="gap-6"
+          >
+            {tabs.length > 1 && (
+              <TabsList
+                aria-label="Parties de la fiche"
+                className="w-full border-b border-border"
+              >
+                {tabs.map((item) => (
+                  <TabsTab key={item.value} value={item.value}>
+                    {item.label}
+                  </TabsTab>
+                ))}
+              </TabsList>
+            )}
 
-          <Section title="Sections de l'Aperçu">
-            <SectionsEditor
-              sections={draft.sections}
-              onChange={(sections) => setDraft((d) => ({ ...d, sections }))}
-            />
-          </Section>
-
-          <Section title="Galerie">
-            <GalleryEditor
-              gallery={draft.gallery}
-              issues={submitted ? issues.gallery : {}}
-              onChange={(gallery) => setDraft((d) => ({ ...d, gallery }))}
-              onUpload={uploadImage}
-              onDiscardImage={discardImage}
-            />
-          </Section>
-
-          <Section title="Couleurs de la fiche">
-            <ThemeEditor
-              value={draft.theme}
-              onChange={(theme) => setDraft((d) => ({ ...d, theme }))}
-            />
-          </Section>
+            <TabsPanel value="infos">
+              <InfoEditor
+                value={info}
+                onChange={setInfo}
+                showIssues={submitted}
+              />
+            </TabsPanel>
+            {canCustomize && (
+              <>
+                <TabsPanel value="images" className="flex flex-col gap-8">
+                  <Section title="Bannière">
+                    <BannerEditor
+                      banner={draft.banner}
+                      error={submitted ? issues.banner : undefined}
+                      onChange={(banner) => setDraft((d) => ({ ...d, banner }))}
+                      onUpload={uploadImage}
+                      onDiscardImage={discardImage}
+                    />
+                  </Section>
+                  <Section title="Galerie">
+                    <GalleryEditor
+                      gallery={draft.gallery}
+                      issues={submitted ? issues.gallery : {}}
+                      onChange={(gallery) =>
+                        setDraft((d) => ({ ...d, gallery }))
+                      }
+                      onUpload={uploadImage}
+                      onDiscardImage={discardImage}
+                    />
+                  </Section>
+                </TabsPanel>
+                <TabsPanel value="sections">
+                  <Section title="Sections de l'Aperçu">
+                    <SectionsEditor
+                      sections={draft.sections}
+                      onChange={(sections) =>
+                        setDraft((d) => ({ ...d, sections }))
+                      }
+                    />
+                  </Section>
+                </TabsPanel>
+                <TabsPanel value="colors">
+                  <Section title="Couleurs de la fiche">
+                    <ThemeEditor
+                      value={draft.theme}
+                      onChange={(theme) => setDraft((d) => ({ ...d, theme }))}
+                    />
+                  </Section>
+                </TabsPanel>
+              </>
+            )}
+          </Tabs>
         </div>
 
         <div
@@ -368,7 +485,7 @@ function CustomizeEditor({
               suffisent. */}
           <div className="lg:sticky lg:top-16 lg:max-h-[calc(100dvh-5rem)] lg:overflow-y-auto">
             <CustomizePreview
-              project={project}
+              project={previewProject}
               members={members}
               draft={draft}
             />
@@ -380,7 +497,7 @@ function CustomizeEditor({
         open={confirmLeave}
         onOpenChange={setConfirmLeave}
         title="Quitter sans enregistrer ?"
-        description="Tes modifications de la personnalisation seront perdues."
+        description="Tes modifications de la fiche seront perdues."
         confirmLabel="Quitter sans enregistrer"
         cancelLabel="Continuer à modifier"
         destructive

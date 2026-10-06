@@ -6,8 +6,7 @@ import { ImageViewer } from "@shared/components/ImageViewer";
 /**
  * Grille de la galerie (images uniquement en v1). Chaque vignette est un
  * vrai `<button>` qui ouvre la visionneuse ; son nom accessible reprend la
- * legende, a defaut le texte alternatif, a defaut sa position (image
- * decorative sans legende). Rien n'est rendu si la galerie est vide.
+ * legende, a defaut le texte alternatif. Rien n'est rendu si la galerie est vide.
  */
 export function ProjectGallery({
   gallery,
@@ -23,10 +22,7 @@ export function ProjectGallery({
     <>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {gallery.map((item, index) => {
-          const label =
-            item.caption ||
-            (item.decorative ? "" : item.alt) ||
-            `${index + 1} sur ${gallery.length}`;
+          const label = item.caption || item.alt;
           return (
             <li key={item.id}>
               <figure className="flex flex-col gap-1.5">
@@ -38,7 +34,7 @@ export function ProjectGallery({
                 >
                   <img
                     src={item.url}
-                    alt={item.decorative ? "" : item.alt}
+                    alt={item.alt}
                     loading="lazy"
                     decoding="async"
                     className="aspect-[3/2] w-full object-cover"

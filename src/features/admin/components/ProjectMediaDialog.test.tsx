@@ -21,7 +21,6 @@ vi.mock("@/api/queries/admin", () => ({
 
 const IMAGE_BASE = {
   url: "https://example.test/x.webp",
-  decorative: false,
 };
 const MEDIA: AdminProjectMedia = {
   banner: {
@@ -40,8 +39,7 @@ const MEDIA: AdminProjectMedia = {
     {
       ...IMAGE_BASE,
       id: "00000000-0000-4000-8c0d-000000000003",
-      alt: "",
-      decorative: true,
+      alt: "Atelier du samedi",
     },
   ],
 };
@@ -91,7 +89,7 @@ describe("ProjectMediaDialog", () => {
     expect(within(items[1]).getByText("Légende : Palette")).toBeTruthy();
     expect(within(items[2]).getByText("Image 2")).toBeTruthy();
     expect(
-      within(items[2]).getByText("Image décorative (sans texte alternatif)."),
+      within(items[2]).getByText("Texte alternatif : Atelier du samedi"),
     ).toBeTruthy();
   });
 

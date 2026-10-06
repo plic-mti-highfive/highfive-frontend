@@ -12,16 +12,11 @@ function item(n: number, overrides: Partial<GalleryItem> = {}): GalleryItem {
     id: `00000000-0000-4000-8c0d-${String(n).padStart(12, "0")}`,
     url: `https://example.test/${n}.webp`,
     alt: `Image ${n}`,
-    decorative: false,
     ...overrides,
   };
 }
 
-const GALLERY = [
-  item(1, { caption: "Premier jet" }),
-  item(2),
-  item(3, { alt: "", decorative: true }),
-];
+const GALLERY = [item(1, { caption: "Premier jet" }), item(2), item(3)];
 
 function setup(gallery = GALLERY) {
   const user = userEvent.setup();
@@ -47,7 +42,7 @@ describe("ProjectGallery", () => {
     ).toBeTruthy();
     // Decorative sans legende : repli sur la position.
     expect(
-      screen.getByRole("button", { name: "Agrandir l'image : 3 sur 3" }),
+      screen.getByRole("button", { name: "Agrandir l'image : Image 3" }),
     ).toBeTruthy();
   });
 
@@ -110,13 +105,6 @@ describe("ProjectGallery", () => {
     const user = setup();
     await user.click(screen.getByRole("button", { name: /Image 2/ }));
     expect(screen.getByRole("dialog").className).toContain("transition-none");
-  });
-
-  it("rend l'image decorative avec un alt vide dans la visionneuse", async () => {
-    const user = setup();
-    await user.click(screen.getByRole("button", { name: /3 sur 3/ }));
-    const dialog = screen.getByRole("dialog");
-    expect(dialog.querySelector("img")?.getAttribute("alt")).toBe("");
   });
 
   it("n'affiche pas de navigation pour une image unique", async () => {

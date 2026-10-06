@@ -101,6 +101,12 @@ membre ; `admin` = role plateforme `admin`.
 | POST    | `/comments/:commentId/hide` | —                    | 204             | porteur+/admin | R-C3                                       |
 | DELETE  | `/comments/:commentId`      | —                    | 204             | admin          | R-C3 : suppression admin uniquement        |
 
+## Signalements (`reports.ts`)
+
+| Methode | Route      | Entree              | Sortie         | Auth/role | Regles                                                                                                                                 |
+| ------- | ---------- | ------------------- | -------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| POST    | `/reports` | `ReportCreateInput` | `Report` (201) | connecte  | R-S1 (motif enumere), 403 si compte suspendu ou contenu a soi, 404 si la cible n'existe plus, 409 si deja signale par la meme personne |
+
 ## Tâches (`tasks.ts`)
 
 | Methode | Route                     | Entree              | Sortie         | Auth/role | Regles                                               |
@@ -237,8 +243,7 @@ de moderation montre le contenu signale sans nouvelle route.
   additifs (aucun champ existant renomme/retire). `customization` porte la banniere
   (avec point focal), le theme (palette de quatre couleurs `#rrggbb` : `background`, `panel`, `text`, `accent`,
   toutes obligatoires ensemble, `ProjectTheme`), l'ordre/visibilite des quatre
-  sections de l'Apercu et la galerie (8 images max, `alt` obligatoire sauf image
-  decorative). Reserve au porteur, elle suit le projet au transfert. `theme.accent` est
+  sections de l'Apercu et la galerie (8 images max, `alt` obligatoire). Reserve au porteur, elle suit le projet au transfert. `theme.accent` est
   copie dans `ProjectSummary.accent` pour que `ProjectCard` prenne la meme teinte que la
   fiche sans requete supplementaire (`toProjectSummary`,
   `src/mocks/handlers/projectHelpers.ts`). `ProjectSummary.banner` (meme schema que

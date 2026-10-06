@@ -62,8 +62,8 @@ projets auront des images).
 
 - Compression côté client avant upload : redimensionnement et passage en WebP (bannière
   ≤ 1600 px de large, galerie ≤ 1200 px).
-- Texte alternatif **obligatoire** sur chaque image, avec une case « image décorative » pour
-  s'en dispenser.
+- Texte alternatif **obligatoire** sur chaque image, sans exception (pas de case « image
+  décorative »).
 - Aucun placeholder : pas d'image = pas de bloc. La section galerie n'apparaît que s'il y a
   des images.
 - Mock : images stockées en mémoire côté MSW. Fixtures de démo neutres (dégradés, SVG), pas de
@@ -71,8 +71,12 @@ projets auront des images).
 
 ### Éditeur
 
-- Page dédiée `/projets/:slug/personnaliser`, réservée au porteur, avec **aperçu live** de la
-  vraie fiche.
+- Page dédiée `/projets/:slug/modifier` (l'ancienne adresse `/personnaliser` redirige), avec
+  **aperçu live** de la vraie fiche. Un seul bouton « Modifier la fiche » y mène, en quatre
+  onglets : **Infos** (titre, accroche, description, thèmes, besoins ; porteur et co-porteurs),
+  puis **Images** (bannière, galerie), **Sections** et **Couleurs** (porteur seul : un
+  co-porteur ne voit que Infos). Un seul bouton Enregistrer : les infos (`PATCH /projects/:slug`)
+  d'abord, puis la personnalisation (`PATCH …/customization`).
 - Enregistrement explicite ; confirmation si on quitte avec des changements non sauvegardés.
 - **Réordonnancement** : boutons ↑/↓ (alternative sans glisser, exigée par WCAG 2.2 critère
   2.5.7, toujours visibles) + glisser-déposer par une poignée (dnd-kit : souris, tactile,
@@ -123,10 +127,10 @@ projets auront des images).
 
 ```ts
 Project.customization?: {
-  banner?: { url: string; alt: string; decorative: boolean; focal: { x: number; y: number } }
+  banner?: { url: string; alt: string; focal: { x: number; y: number } }
   theme?: { background: string; panel: string; text: string; accent: string } // "#rrggbb" en minuscules, les quatre ensemble
-  sections: { id: "pinned" | "about" | "gallery" | "comments"; visible: boolean }[] // l'ordre du tableau = l'ordre d'affichage
-  gallery: { id: string; url: string; alt: string; decorative: boolean; caption?: string }[] // max 8
+  sections: { id: "pinned" | "needs" | "about" | "gallery" | "comments"; visible: boolean }[] // l'ordre du tableau = l'ordre d'affichage
+  gallery: { id: string; url: string; alt: string; caption?: string }[] // max 8
 }
 ProjectSummary.accent?: AccentColor // issu de customization.theme.accent, pour les cartes
 ProjectSummary.banner?: ProjectBanner // issu de customization.banner, pour les cartes `card` et `hero`

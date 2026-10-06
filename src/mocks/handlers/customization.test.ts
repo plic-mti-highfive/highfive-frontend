@@ -132,7 +132,7 @@ describe("PATCH /projects/:slug/customization", () => {
     const stored = project(SLUG).customization!;
     const body: ProjectCustomization = {
       ...stored,
-      gallery: [{ ...stored.gallery[0], alt: "", decorative: false }],
+      gallery: [{ ...stored.gallery[0], alt: "" }],
     };
     expect((await patch(SLUG, body, OWNER_TOKEN)).status).toBe(400);
   });
@@ -226,9 +226,7 @@ describe("POST /projects/:slug/customization/images", () => {
 
     const body: ProjectCustomization = {
       ...emptyCustomization(),
-      gallery: [
-        { id, url: imageUrl, alt: "Nouvelle image", decorative: false },
-      ],
+      gallery: [{ id, url: imageUrl, alt: "Nouvelle image" }],
     };
     expect((await patch(SLUG, body, OWNER_TOKEN)).status).toBe(200);
   });

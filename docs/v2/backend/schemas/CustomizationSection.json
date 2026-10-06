@@ -4,7 +4,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "enum": ["pinned", "about", "gallery", "comments"]
+      "enum": ["pinned", "needs", "about", "gallery", "comments"]
     },
     "visible": {
       "type": "boolean"

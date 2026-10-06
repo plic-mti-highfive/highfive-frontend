@@ -32,6 +32,7 @@ export function resolveSections(
 /** Libelles des sections de l'Apercu dans l'editeur. */
 export const SECTION_LABEL: Record<CustomizationSection["id"], string> = {
   pinned: "Annonce épinglée",
+  needs: "On recherche",
   about: "À propos",
   gallery: "Galerie",
   comments: "Commentaires",
@@ -85,8 +86,7 @@ export function isDraftDirty(
   return stableStringify(draft) !== stableStringify(toDraft(saved));
 }
 
-export const ALT_REQUIRED_MESSAGE =
-  "Décris l'image, ou coche « Image décorative ».";
+export const ALT_REQUIRED_MESSAGE = "Décris l'image pour continuer.";
 
 /** Id du champ « Texte alternatif » d'une image (`"banner"` ou l'id d'une image de galerie) : sert aux libelles, au focus et aux liens du resume d'erreurs. */
 export function altInputId(key: string): string {
@@ -113,11 +113,11 @@ export interface DraftIssues {
   count: number;
 }
 
-function missingAlt(image: { alt: string; decorative: boolean }): boolean {
-  return !image.decorative && image.alt.trim().length === 0;
+function missingAlt(image: { alt: string }): boolean {
+  return image.alt.trim().length === 0;
 }
 
-/** Problemes bloquant l'enregistrement : un texte alternatif manque (hors images decoratives). */
+/** Problemes bloquant l'enregistrement : un texte alternatif manque. */
 export function getDraftIssues(draft: ProjectCustomization): DraftIssues {
   const issues: DraftIssues = { gallery: {}, items: [], count: 0 };
   function add(key: string, label: string) {

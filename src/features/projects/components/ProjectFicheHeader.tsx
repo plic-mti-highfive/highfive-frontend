@@ -14,7 +14,6 @@ export function ProjectFicheHeader({
   isAuthenticated,
   isMember,
   canEdit,
-  canCustomize,
   highfiveGiven,
 }: {
   project: Project;
@@ -22,7 +21,6 @@ export function ProjectFicheHeader({
   isAuthenticated: boolean;
   isMember: boolean;
   canEdit: boolean;
-  canCustomize: boolean;
   highfiveGiven: boolean;
 }) {
   const themed = project.customization?.theme !== undefined;
@@ -33,7 +31,6 @@ export function ProjectFicheHeader({
       isAuthenticated={isAuthenticated}
       isMember={isMember}
       canEdit={canEdit}
-      canCustomize={canCustomize}
       highfiveGiven={highfiveGiven}
       tinted={themed}
     />

@@ -292,17 +292,20 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
     secondaire, texte des boutons) et la correction du contraste sont **uniquement
     cote client** (`src/shared/lib/projectTheme.ts`). `ProjectSummary.accent` est la
     copie de `theme.accent`.
-  - `ProjectSummary.banner` est la copie de `customization.banner` (url, alt, decorative,
+  - `ProjectSummary.banner` est la copie de `customization.banner` (url, alt,
     focal) pour les cartes du fil, de la recherche et du profil. Un fil charge 12 projets ou plus :
     servir pour les cartes une **variante miniature** (environ 640 px de large) plutot que la
     banniere de 1600 px / 2 Mo. Pour un projet prive, l'URL ne doit pas etre devinable (R-V3).
   - Le `PATCH` **remplace** l'objet complet (`Project.customization`) ; le
     `PATCH /projects/{slug}` generique l'ignore.
   - Regles que le JSON Schema ne represente pas (`superRefine`) : `sections`
-    contient chacune des quatre sections (`pinned`, `about`, `gallery`,
-    `comments`) exactement une fois ; les `id` de la galerie sont uniques ;
+    contient chacune des quatre sections `pinned`, `about`, `gallery`,
+    `comments` exactement une fois et `needs` ("On recherche", les profils
+    recherches) au plus une fois ; les personnalisations enregistrees avant
+    l'ajout de `needs` n'en ont pas : a la migration, l'inserer juste apres
+    `pinned`, visible (le client complete a la fin si elle manque) ; les `id` de la galerie sont uniques ;
     la galerie compte 8 images au plus ; chaque image porte un `alt`
-    non vide, sauf si `decorative` est vrai ; les URLs d'images sont en
+    non vide (pas d'exception « image décorative » : le champ `decorative` n'existe plus) ; les URLs d'images sont en
     `https://` (ou `data:image/` dans le mock), jamais d'autre schema.
   - Chaque `id` d'image du corps doit appartenir a ce projet (televerse via
     `POST .../images`) : sinon 400. Ne jamais accepter une URL arbitraire.
@@ -626,14 +629,13 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
    l'absence totale de route de creation de tag, y compris en
    administration — a confirmer que c'est volontaire meme cote admin, ou si
    l'admin doit pouvoir en ajouter par script/migration uniquement).
-6. **Creation de signalement** : `reportCreateInputSchema` existe dans
-   `src/domain/admin.ts` et est exporte (`ReportCreateInput.json` genere),
-   mais **aucune route** `POST /reports` n'est appelee par
-   `src/api/*.ts` — alors que `05-ROLES-PERMISSIONS.md` §3.1/§3.4 liste
-   "Signaler" comme une action ouverte a porteur/co-porteur/membre/
-   observateur/visiteur connecte. Proposition : `POST /reports`
-   (connecte, corps `ReportCreateInput`, 201 `Report`), a ajouter au
-   contrat front avant que l'ecran de signalement existe reellement.
+6. **Creation de signalement** : `POST /reports` (connecte, corps
+   `ReportCreateInput`, 201 `Report`) est maintenant dans le contrat front
+   (`src/api/reports.ts`, mock `src/mocks/handlers/reports.ts`), appele
+   depuis le menu d'un commentaire. Regles : 403 si compte suspendu ou
+   contenu a soi, 404 si la cible n'existe plus, 409 si la meme personne a
+   deja signale la cible (R-S2 compte des signalements distincts). Seul le
+   type de cible `comment` a un ecran de signalement pour l'instant.
 7. **Limite de membres par projet** (R-M5) : voir §3 "Projets" — champ
    absent de `ProjectUpdateInput`.
 8. **Reglage Mur/Taches ouverts aux observateurs** (doc 05 §3.3 note 1) :
