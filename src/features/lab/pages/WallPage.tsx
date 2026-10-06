@@ -61,7 +61,7 @@ function describeShape(editor: Editor, shape: TLShape): string {
 }
 
 /**
- * Tableau blanc (`/projets/:slug/lab/mur`, doc 04 §10, V2-10) : un seul espace
+ * Mur (`/projets/:slug/lab/mur`, doc 04 §10, V2-10) : un seul espace
  * tldraw qui remplace les deux anciens espaces de travail (l'un
  * collaboratif via Yjs/Hocuspocus, l'autre un tableau de post-its maison).
  * Aucune configuration WebSocket n'existe dans ce lot (le seul flux temps
@@ -74,7 +74,7 @@ function describeShape(editor: Editor, shape: TLShape): string {
  */
 export default function WallPage() {
   const { slug, project, readOnly: shellReadOnly } = useLabContext();
-  useDocumentTitle(`Tableau blanc · ${project.title}`);
+  useDocumentTitle(`Mur · ${project.title}`);
   const isMobile = useIsMobile();
   const colorScheme = useTldrawColorScheme();
   const convertSelection = useConvertWallSelectionToTasks(slug);
@@ -120,12 +120,11 @@ export default function WallPage() {
     <div className="flex h-full flex-col">
       {isMobile ? (
         <p className="shrink-0 border-b border-warning-border/30 bg-warning-bg px-4 py-2 text-body-sm text-warning-fg">
-          Le tableau blanc se modifie depuis un ordinateur : lecture seule sur
-          mobile.
+          Le Mur se modifie depuis un ordinateur : lecture seule sur mobile.
         </p>
       ) : shellReadOnly ? (
         <p className="shrink-0 border-b border-border bg-muted px-4 py-2 text-body-sm text-muted-foreground">
-          Lecture seule : tu ne peux pas modifier le tableau blanc.
+          Lecture seule : tu ne peux pas modifier le Mur.
         </p>
       ) : (
         <p className="shrink-0 border-b border-info-border/30 bg-info-bg px-4 py-2 text-body-sm text-info-fg">
@@ -157,7 +156,7 @@ export default function WallPage() {
               disabled={selectedIds.length === 0}
               onClick={openConvertDialog}
             >
-              Convertir la sélection en tâches
+              Convertir la sélection en étapes
               {selectedIds.length > 0 ? ` (${selectedIds.length})` : ""}
             </Button>
           </div>
@@ -177,7 +176,7 @@ export default function WallPage() {
                 setConvertOpen(false);
                 editor?.selectNone();
                 setSuccessMessage(
-                  `${tasks.length} tâche${tasks.length > 1 ? "s" : ""} créée${tasks.length > 1 ? "s" : ""} dans Étapes.`,
+                  `${tasks.length} étape${tasks.length > 1 ? "s" : ""} créée${tasks.length > 1 ? "s" : ""} dans les Étapes.`,
                 );
               },
             },

@@ -20,6 +20,12 @@ export const teamMemberSchema = membershipSchema.extend({
 });
 export type TeamMember = z.infer<typeof teamMemberSchema>;
 
+/** Demande en attente : le contrat v2 ne porte que `userId`, le profil resume du demandeur est joint pour l'affichage. */
+export const joinRequestWithUserSchema = joinRequestSchema.extend({
+  user: userSummarySchema,
+});
+export type JoinRequestWithUser = z.infer<typeof joinRequestWithUserSchema>;
+
 export function listMembers(slug: string): Promise<TeamMember[]> {
   return apiFetch(`/projects/${slug}/members`, {
     schema: z.array(teamMemberSchema),
@@ -54,9 +60,9 @@ export function leaveProject(slug: string): Promise<void> {
   return apiFetch(`/projects/${slug}/leave`, { method: "POST" });
 }
 
-export function listJoinRequests(slug: string): Promise<JoinRequest[]> {
+export function listJoinRequests(slug: string): Promise<JoinRequestWithUser[]> {
   return apiFetch(`/projects/${slug}/join-requests`, {
-    schema: z.array(joinRequestSchema),
+    schema: z.array(joinRequestWithUserSchema),
   });
 }
 

@@ -138,9 +138,13 @@ export const membershipHandlers = [
       if (!hasAtLeastRole(role ?? "observer", "co_owner"))
         return errors.forbidden();
 
-      const requests = getDb().joinRequests.find(
-        (r) => r.projectId === project.id,
-      );
+      const db = getDb();
+      const requests = db.joinRequests
+        .find((r) => r.projectId === project.id)
+        .map((r) => ({
+          ...r,
+          user: toUserSummary(db.users.findOne((u) => u.id === r.userId)!),
+        }));
       return HttpResponse.json(requests);
     },
   ),

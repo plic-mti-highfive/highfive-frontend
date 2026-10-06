@@ -41,10 +41,10 @@ export function ConvertSelectionDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogPopup>
-        <DialogTitle>Convertir la sélection en tâches</DialogTitle>
+        <DialogTitle>Convertir la sélection en étapes</DialogTitle>
         <DialogDescription>
-          Chaque élément coché devient une tâche dans la première colonne des
-          étapes du projet.
+          Chaque élément coché devient une étape dans la première colonne des
+          Étapes.
         </DialogDescription>
 
         <SelectionChecklist
@@ -110,7 +110,7 @@ function SelectionChecklist({
         >
           {pending
             ? "Création…"
-            : `Créer ${kept.size} tâche${kept.size > 1 ? "s" : ""}`}
+            : `Créer ${kept.size} étape${kept.size > 1 ? "s" : ""}`}
         </Button>
       </div>
     </>

@@ -432,7 +432,7 @@ obligatoire : un evenement sur une cible deja notifiee et non lue ajoute un
 acteur a la notification existante — `notification_actors` — plutot que
 d'en creer une nouvelle ; la fenetre de regroupement est a definir cote
 produit, ex. tant que `read = false`). R-N3 (`target` toujours resolu pour
-un routage exact vers `/projets/:slug`, `/projets/:slug/lab/taches` ou
+un routage exact vers `/projets/:slug`, `/projets/:slug/lab/etapes` ou
 `/messages/:id`). R-N4 (preferences par type/canal, defauts : tout dans
 l'app, e-mail en plus pour `invitation_received`, `join_request_received`,
 `message_received` — plus "message non lu depuis 24h" selon doc 04 §14,
