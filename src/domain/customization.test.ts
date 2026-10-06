@@ -24,7 +24,7 @@ function customization(
 }
 
 function galleryItem(id: string, alt = "Une image") {
-  return { id, url: URL, alt, decorative: false };
+  return { id, url: URL, alt };
 }
 
 describe("projectCustomizationSchema", () => {
