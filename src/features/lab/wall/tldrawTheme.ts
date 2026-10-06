@@ -20,3 +20,16 @@ export function useTldrawColorScheme(): "light" | "dark" {
   const { resolvedTheme } = useTheme();
   return resolvedTheme;
 }
+
+/**
+ * Couleur du curseur d'une personne presente sur le Mur : stable pour un
+ * meme identifiant. C'est une donnee passee a tldraw (record de presence), pas
+ * du style de l'application, d'ou sa place dans ce fichier exempte.
+ */
+export function presenceColorFor(userId: string): string {
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    hash = (hash * 31 + userId.charCodeAt(i)) | 0;
+  }
+  return `hsl(${Math.abs(hash) % 360} 70% 50%)`;
+}

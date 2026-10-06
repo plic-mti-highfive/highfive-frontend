@@ -3,15 +3,27 @@ import { Tldraw, renderPlaintextFromRichText } from "tldraw";
 import type { Editor, TLShape, TLShapeId } from "@tldraw/editor";
 import "tldraw/tldraw.css";
 
-import { Button } from "@shared/ui";
+import { Button, ErrorState, Spinner } from "@shared/ui";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
-import { useConvertWallSelectionToTasks } from "@/api/queries/wall";
+import { ApiError } from "@/api/client";
+import { useSession } from "@/api/queries/auth";
+import {
+  useAcceptSuggestedTasks,
+  useConvertWallSelectionToTasks,
+  useSuggestWallTasks,
+} from "@/api/queries/wall";
 import { useLabContext } from "../lib/context";
 import { useTldrawColorScheme } from "../wall/tldrawTheme";
+import { publishLocalPresence } from "../wall/presence";
+import { useWallSync, type WallSync } from "../wall/useWallSync";
 import {
   ConvertSelectionDialog,
   type WallSelectionItem,
 } from "../components/ConvertSelectionDialog";
+import {
+  SuggestTasksDialog,
+  type SuggestTasksPhase,
+} from "../components/SuggestTasksDialog";
 
 const MOBILE_BREAKPOINT = 640;
 
@@ -62,15 +74,13 @@ function describeShape(editor: Editor, shape: TLShape): string {
 
 /**
  * Mur (`/projets/:slug/lab/mur`, doc 04 §10, V2-10) : un seul espace
- * tldraw qui remplace les deux anciens espaces de travail (l'un
- * collaboratif via Yjs/Hocuspocus, l'autre un tableau de post-its maison).
- * Aucune configuration WebSocket n'existe dans ce lot (le seul flux temps
- * réel du dépôt reposait sur une route de session dédiée à l'ancien espace
- * collaboratif, hors du contrat v2 — voir `docs/v2/API-ROUTES.md`) :
- * l'éditeur tourne donc en
- * mode local, persisté par onglet via `persistenceKey` (IndexedDB), avec un
- * bandeau clair plutôt qu'une fausse synchronisation (P7 : jamais d'écran
- * d'erreur générique).
+ * tldraw, partagé en temps réel entre les membres via le service canvas
+ * (Yjs/Hocuspocus, `useWallSync`) et persisté côté serveur. Le bandeau reflète
+ * l'état réel de la connexion (jamais de faux « synchronisé »).
+ *
+ * Deux façons de créer des étapes depuis le Mur : convertir la sélection
+ * (un élément = une étape, sans IA) ou « Suggérer des tâches (IA) » (le core
+ * lit le Mur, l'IA propose, l'utilisateur valide).
  */
 export default function WallPage() {
   const { slug, project, readOnly: shellReadOnly } = useLabContext();
@@ -78,6 +88,10 @@ export default function WallPage() {
   const isMobile = useIsMobile();
   const colorScheme = useTldrawColorScheme();
   const convertSelection = useConvertWallSelectionToTasks(slug);
+  const suggest = useSuggestWallTasks(slug);
+  const acceptSuggestions = useAcceptSuggestedTasks(slug);
+  const sync = useWallSync(slug);
+  const { data: me } = useSession();
 
   const [editor, setEditor] = useState<Editor | null>(null);
   const [selectedIds, setSelectedIds] = useState<TLShapeId[]>([]);
@@ -85,11 +99,22 @@ export default function WallPage() {
   const [convertItems, setConvertItems] = useState<WallSelectionItem[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const readOnly = shellReadOnly || isMobile;
+  const [suggestOpen, setSuggestOpen] = useState(false);
+
+  // Le serveur impose la lecture seule aux observateurs (`role: viewer`).
+  const readOnly = shellReadOnly || isMobile || sync.role === "viewer";
 
   useEffect(() => {
     editor?.updateInstanceState({ isReadonly: readOnly });
   }, [editor, readOnly]);
+
+  const awareness = sync.awareness;
+  const meId = me?.id;
+  const meName = me?.displayName ?? me?.username;
+  useEffect(() => {
+    if (!editor || !awareness || !meId || !meName) return;
+    return publishLocalPresence(awareness, editor, { id: meId, name: meName });
+  }, [editor, awareness, meId, meName]);
 
   useEffect(() => {
     if (!successMessage) return;
@@ -104,7 +129,11 @@ export default function WallPage() {
       () => setSelectedIds(mounted.getSelectedShapeIds()),
       { source: "user", scope: "all" },
     );
-    return unlisten;
+    return () => {
+      unlisten();
+      setEditor(null);
+      setSelectedIds([]);
+    };
   }
 
   function openConvertDialog() {
@@ -116,6 +145,28 @@ export default function WallPage() {
     setConvertOpen(true);
   }
 
+  function openSuggestDialog() {
+    acceptSuggestions.reset();
+    setSuggestOpen(true);
+    suggest.mutate();
+  }
+
+  function closeSuggestDialog() {
+    setSuggestOpen(false);
+    suggest.reset();
+    acceptSuggestions.reset();
+  }
+
+  const suggestPhase: SuggestTasksPhase = suggest.isPending
+    ? "loading"
+    : suggest.isError
+      ? "error"
+      : suggest.data?.empty
+        ? "empty"
+        : suggest.data
+          ? "ready"
+          : "loading";
+
   return (
     <div className="flex h-full flex-col">
       {isMobile ? (
@@ -126,11 +177,9 @@ export default function WallPage() {
         <p className="shrink-0 border-b border-border bg-muted px-4 py-2 text-body-sm text-muted-foreground">
           Lecture seule : tu ne peux pas modifier le Mur.
         </p>
-      ) : (
-        <p className="shrink-0 border-b border-info-border/30 bg-info-bg px-4 py-2 text-body-sm text-info-fg">
-          Les modifications ne sont pas partagées pour l'instant.
-        </p>
-      )}
+      ) : null}
+
+      <SyncBanner sync={sync} />
 
       {successMessage && (
         <p
@@ -142,14 +191,39 @@ export default function WallPage() {
       )}
 
       <div className="relative min-h-0 flex-1">
-        <Tldraw
-          persistenceKey={`highfive-wall-${slug}`}
-          colorScheme={colorScheme}
-          onMount={handleMount}
-        />
+        {sync.status === "ready" && sync.store ? (
+          <Tldraw
+            key={sync.store.id}
+            store={sync.store}
+            colorScheme={colorScheme}
+            onMount={handleMount}
+          />
+        ) : sync.status === "error" ? (
+          <ErrorState
+            className="h-full"
+            message={sync.error ?? "Le Mur est indisponible."}
+            onRetry={sync.retry}
+          />
+        ) : (
+          <div
+            className="flex h-full items-center justify-center gap-3 text-body-md text-muted-foreground"
+            role="status"
+          >
+            <Spinner size="sm" />
+            <span>Connexion au Mur…</span>
+          </div>
+        )}
 
-        {!readOnly && (
-          <div className="pointer-events-none absolute bottom-20 right-3 z-10">
+        {!readOnly && sync.status === "ready" && (
+          <div className="pointer-events-none absolute bottom-20 right-3 z-10 flex flex-col items-end gap-2">
+            <Button
+              className="pointer-events-auto shadow-overlay"
+              size="sm"
+              variant="outline"
+              onClick={openSuggestDialog}
+            >
+              Suggérer des étapes (IA)
+            </Button>
             <Button
               className="pointer-events-auto shadow-overlay"
               size="sm"
@@ -162,6 +236,34 @@ export default function WallPage() {
           </div>
         )}
       </div>
+
+      <SuggestTasksDialog
+        open={suggestOpen}
+        phase={suggestPhase}
+        proposals={suggest.data?.tasks ?? []}
+        errorMessage={suggest.isError ? apiMessage(suggest.error) : undefined}
+        accepting={acceptSuggestions.isPending}
+        acceptError={
+          acceptSuggestions.isError
+            ? apiMessage(acceptSuggestions.error)
+            : undefined
+        }
+        onClose={closeSuggestDialog}
+        onRetry={() => suggest.mutate()}
+        onConfirm={(tasks) =>
+          acceptSuggestions.mutate(
+            { tasks },
+            {
+              onSuccess: (created) => {
+                closeSuggestDialog();
+                setSuccessMessage(
+                  `${created.length} étape${created.length > 1 ? "s" : ""} créée${created.length > 1 ? "s" : ""} dans les Étapes.`,
+                );
+              },
+            },
+          )
+        }
+      />
 
       <ConvertSelectionDialog
         open={convertOpen}
@@ -184,5 +286,49 @@ export default function WallPage() {
         }}
       />
     </div>
+  );
+}
+
+function apiMessage(error: unknown): string {
+  if (error instanceof ApiError && error.message) return error.message;
+  return "Une erreur est survenue. Réessaie dans un instant.";
+}
+
+/** État honnête de la synchronisation (connexion, hors ligne, erreur). */
+function SyncBanner({ sync }: { sync: WallSync }) {
+  if (sync.status === "loading") {
+    return (
+      <p
+        role="status"
+        className="shrink-0 border-b border-info-border/30 bg-info-bg px-4 py-2 text-body-sm text-info-fg"
+      >
+        Connexion au Mur partagé…
+      </p>
+    );
+  }
+  if (sync.status === "error") return null;
+  if (sync.connection === "offline") {
+    return (
+      <div
+        role="alert"
+        className="flex shrink-0 items-center justify-between gap-3 border-b border-warning-border/30 bg-warning-bg px-4 py-2 text-body-sm text-warning-fg"
+      >
+        <span>
+          {sync.error ??
+            "Hors ligne : tes modifications ne sont pas partagées pour l'instant et seront envoyées à la reconnexion."}
+        </span>
+        <Button size="sm" variant="outline" onClick={sync.retry}>
+          Réessayer
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <p
+      role="status"
+      className="shrink-0 border-b border-success-border/30 bg-success-bg px-4 py-2 text-body-sm text-success-fg"
+    >
+      Mur partagé : les modifications sont synchronisées en temps réel.
+    </p>
   );
 }

@@ -102,7 +102,7 @@ describe("POST /reports", () => {
     const response = await report(
       {
         targetType: "comment",
-        targetId: "00000000-0000-4000-8000-0000000000ff",
+        targetId: "00000000-0000-4000-8000-ffffffffffff",
         reason: "spam",
       },
       READER_TOKEN,

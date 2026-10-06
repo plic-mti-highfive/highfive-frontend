@@ -30,6 +30,8 @@ export const queryKeys = {
     columns: (slug: string) => ["projects", slug, "columns"] as const,
     tasks: (slug: string) => ["projects", slug, "tasks"] as const,
     wall: (slug: string) => ["projects", slug, "wall"] as const,
+    wallSession: (slug: string) =>
+      ["projects", slug, "wall", "session"] as const,
     files: (slug: string) => ["projects", slug, "files"] as const,
   },
   feed: {
