@@ -147,6 +147,22 @@ export function contrastRatio(hexA: string, hexB: string): number {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
+/** `true` si du texte noir contraste mieux que du blanc sur `hex` : la couleur est « claire ». */
+export function isLightColor(hex: string): boolean {
+  return contrastRatio(hex, "#000000") >= contrastRatio(hex, "#ffffff");
+}
+
+/** Melange `amount` (0 a 1) de `b` dans `a`, en OKLab. */
+export function mixColors(a: string, b: string, amount: number): string {
+  const labA = hexToOklab(a);
+  const labB = hexToOklab(b);
+  return labToHex([
+    labA[0] + (labB[0] - labA[0]) * amount,
+    labA[1] + (labB[1] - labA[1]) * amount,
+    labA[2] + (labB[2] - labA[2]) * amount,
+  ]);
+}
+
 /** Fonds de reference de chaque theme : memes valeurs OKLCH que `--background` / `--card` de `src/index.css`. */
 export const ACCENT_THEME_SURFACES = {
   light: {
@@ -166,7 +182,7 @@ export const ACCENT_THEME_SURFACES = {
  * `minimum` contre toutes les couleurs de `against`. Theme clair : on assombrit ;
  * theme sombre : on eclaircit. Une couleur deja assez contrastee est renvoyee telle quelle.
  */
-function ensureContrast(
+export function ensureContrast(
   hex: string,
   theme: "light" | "dark",
   against: string[],
@@ -185,8 +201,15 @@ function ensureContrast(
   return theme === "light" ? "#000000" : "#ffffff";
 }
 
-function deriveTheme(base: string, theme: "light" | "dark"): AccentThemeTokens {
-  const { background, card, mix } = ACCENT_THEME_SURFACES[theme];
+/**
+ * Variantes d'une couleur d'accent sur des fonds donnes (fond de page, fond
+ * des blocs) ; `mix` est la part de couleur dans la surface teintee.
+ */
+export function deriveAccentOn(
+  base: string,
+  theme: "light" | "dark",
+  { background, card, mix }: { background: string; card: string; mix: number },
+): AccentThemeTokens {
   const baseLab = hexToOklab(base);
   const backgroundLab = hexToOklab(background);
   const surface = labToHex([
@@ -201,6 +224,10 @@ function deriveTheme(base: string, theme: "light" | "dark"): AccentThemeTokens {
     // Texte : 4.5:1 sur le fond, la carte et la surface teintee.
     ink: ensureContrast(base, theme, [background, card, surface], 4.5),
   };
+}
+
+function deriveTheme(base: string, theme: "light" | "dark"): AccentThemeTokens {
+  return deriveAccentOn(base, theme, ACCENT_THEME_SURFACES[theme]);
 }
 
 const cache = new Map<string, AccentTokens>();

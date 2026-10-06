@@ -463,7 +463,7 @@ paths:
     patch:
       operationId: updateProjectCustomization
       tags: [projects]
-      summary: Personnaliser la fiche (banniere, accent, sections, galerie) — porteur seul
+      summary: Personnaliser la fiche (banniere, theme, sections, galerie) — porteur seul
       description: >-
         Remplace la personnalisation complete (`Project.customization`). Chaque
         image referencee doit avoir ete televersee pour ce projet via

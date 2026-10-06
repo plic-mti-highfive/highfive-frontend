@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { presetColor } from "@shared/lib/accentPresets";
+import { presetTheme } from "@shared/lib/projectThemePresets";
 import {
   DEFAULT_SECTIONS,
   MAX_GALLERY_IMAGES,
@@ -130,17 +130,30 @@ describe("projectCustomizationSchema", () => {
     );
   });
 
-  it("n'accepte que les six teintes de la roue", () => {
+  it("accepte un theme complet de quatre couleurs #rrggbb, et refuse le reste", () => {
+    const theme = presetTheme("ocean");
     expect(
-      projectCustomizationSchema.safeParse({
-        ...customization(),
-        accent: presetColor("sky"),
-      }).success,
+      projectCustomizationSchema.safeParse({ ...customization(), theme })
+        .success,
     ).toBe(true);
     expect(
       projectCustomizationSchema.safeParse({
         ...customization(),
-        accent: "rouge",
+        theme: { ...theme, accent: "rouge" },
+      }).success,
+    ).toBe(false);
+    // Un theme est un tout : une couleur manquante est refusee.
+    expect(
+      projectCustomizationSchema.safeParse({
+        ...customization(),
+        theme: { background: theme.background, accent: theme.accent },
+      }).success,
+    ).toBe(false);
+    // Les majuscules ne sont pas normalisees par le schema (le client le fait).
+    expect(
+      projectCustomizationSchema.safeParse({
+        ...customization(),
+        theme: { ...theme, text: theme.text.toUpperCase() },
       }).success,
     ).toBe(false);
   });
@@ -182,9 +195,9 @@ describe("champs additifs (V2-4)", () => {
     expect(projectSchema.parse(baseProject).customization).toBeUndefined();
     const parsed = projectSchema.parse({
       ...baseProject,
-      customization: customization({ accent: presetColor("purple") }),
+      customization: customization({ theme: presetTheme("nuit") }),
     });
-    expect(parsed.customization?.accent).toBe(presetColor("purple"));
+    expect(parsed.customization?.theme).toEqual(presetTheme("nuit"));
   });
 
   it("`ProjectSummary.accent` est optionnel", () => {
@@ -209,9 +222,11 @@ describe("champs additifs (V2-4)", () => {
     };
     expect(projectSummarySchema.parse(summary).accent).toBeUndefined();
     expect(
-      projectSummarySchema.parse({ ...summary, accent: presetColor("rose") })
-        .accent,
-    ).toBe(presetColor("rose"));
+      projectSummarySchema.parse({
+        ...summary,
+        accent: presetTheme("bonbon").accent,
+      }).accent,
+    ).toBe(presetTheme("bonbon").accent);
     expect(
       projectSummarySchema.safeParse({ ...summary, accent: "rouge" }).success,
     ).toBe(false);

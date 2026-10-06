@@ -109,7 +109,7 @@ export const projectSummarySchema = z.object({
   teamPreview: z.array(userSummarySchema).max(6).default([]),
   owner: userSummarySchema,
   /**
-   * Accent choisi par le porteur (`Project.customization.accent`), additif
+   * Accent du theme choisi par le porteur (`Project.customization.theme.accent`), additif
    * V2-4. Absent = la carte retombe sur `getAccent(project.id)`.
    */
   accent: accentColorSchema.optional(),

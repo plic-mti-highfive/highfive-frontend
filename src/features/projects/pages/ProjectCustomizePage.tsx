@@ -26,11 +26,11 @@ import {
   useUploadCustomizationImage,
 } from "@/api/queries/customization";
 import type { Project, ProjectCustomization } from "@/domain";
-import { AccentPicker } from "../components/customize/AccentPicker";
 import { BannerEditor } from "../components/customize/BannerEditor";
 import { CustomizePreview } from "../components/customize/CustomizePreview";
 import { GalleryEditor } from "../components/customize/GalleryEditor";
 import { SectionsEditor } from "../components/customize/SectionsEditor";
+import { ThemeEditor } from "../components/customize/ThemeEditor";
 import type { UploadImage } from "../components/customize/types";
 import { getMembershipRole, getProjectCapabilities } from "../lib/capabilities";
 import { getDraftIssues, isDraftDirty, toDraft } from "../lib/customization";
@@ -117,7 +117,7 @@ export function ProjectCustomizePage() {
           <EmptyState
             icon={Lock}
             title="Seul le porteur peut personnaliser la fiche"
-            description="La personnalisation (bannière, couleur, sections, galerie) est réservée au créateur du projet."
+            description="La personnalisation (bannière, sections, galerie, couleurs) est réservée au créateur du projet."
             action={
               <Button render={<Link to={`/projets/${slug}`} />}>
                 Voir la fiche du projet
@@ -322,13 +322,6 @@ function CustomizeEditor({
             </div>
           )}
 
-          <Section title="Couleur d'accent">
-            <AccentPicker
-              value={draft.accent}
-              onChange={(accent) => setDraft((d) => ({ ...d, accent }))}
-            />
-          </Section>
-
           <Section title="Bannière">
             <BannerEditor
               banner={draft.banner}
@@ -355,20 +348,25 @@ function CustomizeEditor({
               onDiscardImage={discardImage}
             />
           </Section>
+
+          <Section title="Couleurs de la fiche">
+            <ThemeEditor
+              value={draft.theme}
+              onChange={(theme) => setDraft((d) => ({ ...d, theme }))}
+            />
+          </Section>
         </div>
 
         <div
           className={cn(
-            "bg-muted/40 p-4 sm:p-6 lg:col-span-2 lg:block",
+            "p-4 sm:p-6 lg:col-span-2 lg:block",
             view === "preview" ? "block" : "hidden",
           )}
         >
-          <p className="mb-3 text-label uppercase text-muted-foreground">
-            Aperçu en direct
-          </p>
-          {/* Carte bornee et collee sous l'en-tete : son bord est visible, elle defile
-              a l'interieur sans etre coupee par le bas de la fenetre. */}
-          <div className="overflow-y-auto rounded-xl border border-border bg-background lg:sticky lg:top-16 lg:max-h-[calc(100dvh-5rem)]">
+          {/* Colle sous l'en-tete et defile a l'interieur sans etre coupe par le
+              bas de la fenetre ; aucun cadre : les sections de l'apercu se
+              suffisent. */}
+          <div className="lg:sticky lg:top-16 lg:max-h-[calc(100dvh-5rem)] lg:overflow-y-auto">
             <CustomizePreview
               project={project}
               members={members}

@@ -3,7 +3,7 @@ import {
   type CustomizationSection,
   type ProjectCustomization,
 } from "@/domain";
-import { presetColor } from "@shared/lib/accentPresets";
+import { presetTheme } from "@shared/lib/projectThemePresets";
 import type { DbCustomizationImage } from "../db";
 
 /**
@@ -69,7 +69,7 @@ const IMAGES = {
 
 /** Personnalisation par slug de projet (porteur de demo : Alex Rivera, fresque murale). */
 export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
-  // Banniere + galerie + accent rose, ordre par defaut.
+  // Banniere + galerie + palette Bonbon, ordre par defaut.
   "fresque-murale-collaborative": {
     banner: {
       id: imageId(IMAGES.fresqueBanner.n),
@@ -78,7 +78,7 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
       decorative: false,
       focal: { x: 50, y: 50 },
     },
-    accent: presetColor("rose"),
+    theme: presetTheme("bonbon"),
     sections: [...DEFAULT_SECTIONS],
     gallery: [
       {
@@ -97,9 +97,9 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
       },
     ],
   },
-  // Pas de banniere : accent apple et sections reordonnees (A propos en premier).
+  // Pas de banniere : palette Forêt et sections reordonnees (A propos en premier).
   "jardin-partage-derriere-lecole": {
-    accent: presetColor("apple"),
+    theme: presetTheme("foret"),
     sections: sections(["about", "pinned", "gallery", "comments"]),
     gallery: [
       {
@@ -110,7 +110,7 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
       },
     ],
   },
-  // Banniere decentree (point focal), accent sky, galerie avant l'annonce epinglee, commentaires masques.
+  // Banniere decentree (point focal), palette Océan, galerie avant l'annonce epinglee, commentaires masques.
   "maree-basse-jeu-video": {
     banner: {
       id: imageId(IMAGES.mareeBanner.n),
@@ -119,7 +119,7 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
       decorative: false,
       focal: { x: 20, y: 70 },
     },
-    accent: presetColor("sky"),
+    theme: presetTheme("ocean"),
     sections: sections(
       ["about", "gallery", "pinned", "comments"],
       ["comments"],

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { presetColor } from "@shared/lib/accentPresets";
+import { presetTheme } from "@shared/lib/projectThemePresets";
 import { projectSchema, type Project } from "@/domain";
 import { ProjectOverview } from "./ProjectOverview";
 
@@ -140,10 +140,14 @@ describe("ProjectOverview", () => {
     expect(order()).not.toContain("Galerie");
   });
 
-  it("transmet l'accent a l'annonce epinglee et a la sidebar", () => {
+  it("transmet le theme a l'annonce epinglee et a la sidebar", () => {
     state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
     renderOverview(
-      project({ sections: DEFAULT, gallery: [], accent: presetColor("sky") }),
+      project({
+        sections: DEFAULT,
+        gallery: [],
+        theme: presetTheme("ocean"),
+      }),
     );
     expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("true");
     expect(screen.getByTestId("sidebar").dataset.accented).toBe("true");

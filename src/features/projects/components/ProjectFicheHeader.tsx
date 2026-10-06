@@ -5,7 +5,7 @@ import { ProjectHeader } from "./ProjectHeader";
 /**
  * Haut de la fiche : banniere puis header. Partage entre la fiche
  * (`ProjectLayout`) et l'apercu live de l'editeur de personnalisation, pour
- * que l'apercu rende exactement la fiche. Avec un accent, le header est pose
+ * que l'apercu rende exactement la fiche. Avec un theme, le header est pose
  * sur un fond teinte ; sans, rien ne change par rapport a la fiche d'origine.
  */
 export function ProjectFicheHeader({
@@ -25,7 +25,7 @@ export function ProjectFicheHeader({
   canCustomize: boolean;
   highfiveGiven: boolean;
 }) {
-  const accent = project.customization?.accent;
+  const themed = project.customization?.theme !== undefined;
   const header = (
     <ProjectHeader
       project={project}
@@ -35,7 +35,7 @@ export function ProjectFicheHeader({
       canEdit={canEdit}
       canCustomize={canCustomize}
       highfiveGiven={highfiveGiven}
-      tinted={accent !== undefined}
+      tinted={themed}
     />
   );
 
@@ -45,7 +45,7 @@ export function ProjectFicheHeader({
         banner={project.customization?.banner}
         projectTitle={project.title}
       />
-      {accent ? (
+      {themed ? (
         <div className="rounded-xl bg-[var(--accent-light)] p-6">{header}</div>
       ) : (
         header

@@ -43,7 +43,7 @@ export function toDraft(
 ): ProjectCustomization {
   return {
     banner: customization?.banner,
-    accent: customization?.accent,
+    theme: customization?.theme,
     sections: resolveSections(customization),
     gallery: customization?.gallery ?? [],
   };
@@ -173,7 +173,7 @@ export function toCardPreview(
     membersCount: members.length,
     teamPreview: team.slice(0, 6),
     owner,
-    accent: draft.accent,
+    accent: draft.theme?.accent,
     banner: draft.banner,
   };
 }

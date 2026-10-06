@@ -72,10 +72,11 @@ function coverIn(container: HTMLElement) {
   return container.querySelector<HTMLImageElement>(`img[src="${BANNER.url}"]`);
 }
 
-describe("CustomizePreview — aperçu de la carte", () => {
+describe("CustomizePreview — carte du projet", () => {
   it("montre la carte du projet avec la bannière du brouillon et son point focal", () => {
     const { container } = renderPreview(draftWith(BANNER));
-    expect(screen.getByText("Aperçu de la carte")).toBeTruthy();
+    expect(screen.getByText("Carte du projet")).toBeTruthy();
+    expect(screen.getByText("Fiche du projet")).toBeTruthy();
     expect(screen.getByText("Fresque murale")).toBeTruthy();
     expect(coverIn(container)?.style.getPropertyValue("--focal")).toBe(
       "25% 75%",
@@ -111,8 +112,9 @@ describe("CustomizePreview — aperçu de la carte", () => {
     expect(screen.getByText("Fresque murale")).toBeTruthy();
   });
 
-  it("pas d'aperçu de carte tant que l'équipe n'est pas chargée", () => {
+  it("pas de section carte tant que l'équipe n'est pas chargée", () => {
     renderPreview(draftWith(BANNER), []);
-    expect(screen.queryByText("Aperçu de la carte")).toBeNull();
+    expect(screen.queryByText("Carte du projet")).toBeNull();
+    expect(screen.getByText("Fiche du projet")).toBeTruthy();
   });
 });

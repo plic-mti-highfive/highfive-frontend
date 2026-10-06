@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { presetColor } from "@shared/lib/accentPresets";
+import { presetTheme } from "@shared/lib/projectThemePresets";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -60,7 +60,7 @@ vi.mock("../lib/imageCompression", async (importOriginal) => ({
 }));
 vi.mock("../components/customize/CustomizePreview", () => ({
   CustomizePreview: ({ draft }: { draft: ProjectCustomization }) => (
-    <div data-testid="preview">{draft.accent ?? "auto"}</div>
+    <div data-testid="preview">{draft.theme?.accent ?? "auto"}</div>
   ),
 }));
 
@@ -168,15 +168,17 @@ describe("ProjectCustomizePage", () => {
   it("met a jour l'apercu et signale les modifications non enregistrees", async () => {
     const user = userEvent.setup();
     renderPage();
-    await user.click(screen.getByRole("button", { name: "Rose" }));
-    expect(screen.getByTestId("preview").textContent).toBe(presetColor("rose"));
+    await user.click(screen.getByRole("button", { name: "Bonbon" }));
+    expect(screen.getByTestId("preview").textContent).toBe(
+      presetTheme("bonbon").accent,
+    );
     expect(screen.getByText("Modifications non enregistrées")).toBeTruthy();
   });
 
   it("demande confirmation avant de quitter avec des modifications", async () => {
     const user = userEvent.setup();
     renderPage();
-    await user.click(screen.getByRole("button", { name: "Rose" }));
+    await user.click(screen.getByRole("button", { name: "Bonbon" }));
 
     await user.click(screen.getByRole("button", { name: "Annuler" }));
     expect(screen.getByRole("dialog")).toBeTruthy();
@@ -199,7 +201,7 @@ describe("ProjectCustomizePage", () => {
   it("garde aussi le lien de retour quand il y a des modifications", async () => {
     const user = userEvent.setup();
     renderPage();
-    await user.click(screen.getByRole("button", { name: "Rose" }));
+    await user.click(screen.getByRole("button", { name: "Bonbon" }));
     await user.click(screen.getByRole("link", { name: /Projet test/ }));
     expect(screen.getByRole("dialog")).toBeTruthy();
     expect(screen.queryByText("FICHE")).toBeNull();
@@ -260,7 +262,7 @@ describe("ProjectCustomizePage", () => {
   it("envoie le brouillon complet puis retourne a la fiche apres l'enregistrement", async () => {
     const user = userEvent.setup();
     renderPage();
-    await user.click(screen.getByRole("button", { name: "Bleu ciel" }));
+    await user.click(screen.getByRole("button", { name: "Océan" }));
     await user.click(
       screen.getByRole("button", { name: "Descendre « Annonce épinglée »" }),
     );
@@ -271,7 +273,7 @@ describe("ProjectCustomizePage", () => {
       ProjectCustomization,
       { onSuccess: () => void },
     ];
-    expect(draft.accent).toBe(presetColor("sky"));
+    expect(draft.theme).toEqual(presetTheme("ocean"));
     expect(draft.sections.map((s) => s.id)).toEqual([
       "about",
       "pinned",

@@ -1,5 +1,5 @@
 import { setupServer } from "msw/node";
-import { presetColor } from "@shared/lib/accentPresets";
+import { presetTheme } from "@shared/lib/projectThemePresets";
 import {
   afterAll,
   afterEach,
@@ -150,7 +150,7 @@ describe("PATCH /projects/:slug/customization", () => {
   it("le porteur remplace la personnalisation et le projet renvoye la porte", async () => {
     const body: ProjectCustomization = {
       ...emptyCustomization(),
-      accent: presetColor("purple"),
+      theme: presetTheme("nuit"),
     };
     const response = await patch(SLUG, body, OWNER_TOKEN);
     expect(response.status).toBe(200);
@@ -159,15 +159,17 @@ describe("PATCH /projects/:slug/customization", () => {
     expect(project(SLUG).customization).toEqual(body);
   });
 
-  it("l'accent se retrouve dans le resume de carte", async () => {
+  it("l'accent du theme se retrouve dans le resume de carte", async () => {
     await patch(
       SLUG,
-      { ...emptyCustomization(), accent: presetColor("orange") },
+      { ...emptyCustomization(), theme: presetTheme("papier") },
       OWNER_TOKEN,
     );
-    expect(toProjectSummary(project(SLUG)).accent).toBe(presetColor("orange"));
+    expect(toProjectSummary(project(SLUG)).accent).toBe(
+      presetTheme("papier").accent,
+    );
     expect(toProjectSummary(project(OTHER_SLUG)).accent).toBe(
-      presetColor("apple"),
+      presetTheme("foret").accent,
     );
   });
 

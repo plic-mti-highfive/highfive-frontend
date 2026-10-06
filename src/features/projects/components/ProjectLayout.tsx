@@ -7,9 +7,10 @@ import { useProject } from "@/api/queries/projects";
 import { useMembers } from "@/api/queries/memberships";
 import { useProjectHighfivers } from "@/api/queries/highfives";
 import { ApiError } from "@/api/client";
+import { cn } from "@shared/lib/cn";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
 import { getMembershipRole, getProjectCapabilities } from "../lib/capabilities";
-import { accentAttributes } from "@shared/lib/accentColor";
+import { projectThemeAttributes } from "@shared/lib/projectTheme";
 import { ProjectFicheHeader } from "./ProjectFicheHeader";
 
 export interface ProjectOutletContext {
@@ -115,69 +116,77 @@ export function ProjectLayout() {
     user && highfiversQuery.data?.items.some((person) => person.id === user.id),
   );
 
-  // Accent choisi par le porteur : pose `data-accent` sur toute la fiche (les
-  // variables `--accent-*` en descendent). Sans accent, aucun attribut ni
-  // fond : la fiche reste identique a celle d'origine.
-  const accent = project.customization?.accent;
-  // `border-[var(--accent-base)]` n'est valide que sous un `data-accent` :
-  // on ne le passe qu'avec un accent, sinon l'onglet garde `border-foreground`.
-  const accentTabClass = accent
+  // Theme choisi par le porteur : la fiche entiere (fond plein cadre, blocs,
+  // texte, liens, boutons) prend sa palette via `data-project-theme` ; les
+  // variables `--accent-*` en descendent. Sans theme, aucun attribut ni fond :
+  // la fiche reste identique a celle d'origine.
+  const theme = project.customization?.theme;
+  const themed = theme !== undefined;
+  // `border-[var(--accent-base)]` n'est valide que sous un theme : on ne le
+  // passe qu'avec un theme, sinon l'onglet garde `border-foreground`.
+  const accentTabClass = themed
     ? ({ isActive }: { isActive: boolean }) =>
         isActive ? "border-[var(--accent-base)]" : undefined
     : undefined;
 
   return (
     <div
-      {...accentAttributes(accent)}
-      className="mx-auto flex max-w-content flex-col gap-6 px-6 py-10"
+      {...projectThemeAttributes(theme)}
+      // Le fond du thème descend derrière la barre d'onglets mobile.
+      className={cn(themed && "max-sm:-mb-14 max-sm:pb-14")}
     >
-      {project.state === "done" && (
-        <div className="rounded-lg bg-info-bg px-4 py-3 text-body-sm text-info-fg">
-          Ce projet est terminé. Le Lab est en lecture seule, les commentaires
-          restent ouverts.
-        </div>
-      )}
-      {project.state === "archived" && (
-        <div className="rounded-lg bg-muted px-4 py-3 text-body-sm text-muted-foreground">
-          <Lock size={14} className="mr-1.5 inline align-text-bottom" />
-          Ce projet est archivé.
-        </div>
-      )}
+      <div className="mx-auto flex max-w-content flex-col gap-6 px-6 py-10">
+        {project.state === "done" && (
+          <div className="rounded-lg bg-info-bg px-4 py-3 text-body-sm text-info-fg">
+            Ce projet est terminé. Le Lab est en lecture seule, les commentaires
+            restent ouverts.
+          </div>
+        )}
+        {project.state === "archived" && (
+          <div className="rounded-lg bg-muted px-4 py-3 text-body-sm text-muted-foreground">
+            <Lock size={14} className="mr-1.5 inline align-text-bottom" />
+            Ce projet est archivé.
+          </div>
+        )}
 
-      <ProjectFicheHeader
-        project={project}
-        owner={owner}
-        isAuthenticated={isAuthenticated}
-        isMember={capabilities.isMember}
-        canEdit={capabilities.canEdit}
-        canCustomize={capabilities.canCustomize}
-        highfiveGiven={highfiveGiven}
-      />
+        <ProjectFicheHeader
+          project={project}
+          owner={owner}
+          isAuthenticated={isAuthenticated}
+          isMember={capabilities.isMember}
+          canEdit={capabilities.canEdit}
+          canCustomize={capabilities.canCustomize}
+          highfiveGiven={highfiveGiven}
+        />
 
-      <nav className="border-b border-border" aria-label="Sections du projet">
-        <div className="flex gap-1">
-          <TabLink to={`/projets/${slug}`} end className={accentTabClass}>
-            Aperçu
-          </TabLink>
-          <TabLink to={`/projets/${slug}/annonces`} className={accentTabClass}>
-            Annonces
-          </TabLink>
-          <TabLink to={`/projets/${slug}/equipe`} className={accentTabClass}>
-            <span className="flex items-center gap-2">
-              Équipe
-              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
-                {members.length}
+        <nav className="border-b border-border" aria-label="Sections du projet">
+          <div className="flex gap-1">
+            <TabLink to={`/projets/${slug}`} end className={accentTabClass}>
+              Aperçu
+            </TabLink>
+            <TabLink
+              to={`/projets/${slug}/annonces`}
+              className={accentTabClass}
+            >
+              Annonces
+            </TabLink>
+            <TabLink to={`/projets/${slug}/equipe`} className={accentTabClass}>
+              <span className="flex items-center gap-2">
+                Équipe
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
+                  {members.length}
+                </span>
               </span>
-            </span>
-          </TabLink>
-        </div>
-      </nav>
+            </TabLink>
+          </div>
+        </nav>
 
-      <Outlet
-        context={
-          { project, members, capabilities } satisfies ProjectOutletContext
-        }
-      />
+        <Outlet
+          context={
+            { project, members, capabilities } satisfies ProjectOutletContext
+          }
+        />
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { presetColor } from "@shared/lib/accentPresets";
+import { presetTheme } from "@shared/lib/projectThemePresets";
 import type { TeamMember } from "@/api/memberships";
 import {
   DEFAULT_SECTIONS,
@@ -109,7 +109,7 @@ describe("toDraft et isDraftDirty", () => {
   it("part de la personnalisation par defaut sans personnalisation enregistree", () => {
     expect(toDraft(undefined)).toEqual({
       banner: undefined,
-      accent: undefined,
+      theme: undefined,
       sections: DEFAULT_SECTIONS,
       gallery: [],
     });
@@ -118,7 +118,7 @@ describe("toDraft et isDraftDirty", () => {
   it("un brouillon intact n'est pas modifie, avec ou sans personnalisation", () => {
     expect(isDraftDirty(toDraft(undefined), undefined)).toBe(false);
     const saved: ProjectCustomization = {
-      accent: presetColor("sky"),
+      theme: presetTheme("ocean"),
       sections: [...DEFAULT_SECTIONS],
       gallery: [IMAGE],
     };
@@ -141,10 +141,10 @@ describe("toDraft et isDraftDirty", () => {
     expect(isDraftDirty(reordered, saved)).toBe(false);
   });
 
-  it("detecte un changement d'accent, d'ordre, de visibilite ou d'image", () => {
+  it("detecte un changement de theme, d'ordre, de visibilite ou d'image", () => {
     const base = toDraft(undefined);
     expect(
-      isDraftDirty({ ...base, accent: presetColor("rose") }, undefined),
+      isDraftDirty({ ...base, theme: presetTheme("bonbon") }, undefined),
     ).toBe(true);
     expect(
       isDraftDirty(
@@ -168,9 +168,9 @@ describe("toDraft et isDraftDirty", () => {
 
   it("revenir a l'etat enregistre annule le statut modifie", () => {
     const base = toDraft(undefined);
-    const changed = { ...base, accent: presetColor("rose") };
+    const changed = { ...base, theme: presetTheme("bonbon") };
     expect(isDraftDirty(changed, undefined)).toBe(true);
-    expect(isDraftDirty({ ...changed, accent: undefined }, undefined)).toBe(
+    expect(isDraftDirty({ ...changed, theme: undefined }, undefined)).toBe(
       false,
     );
   });
@@ -292,23 +292,23 @@ describe("toCardPreview", () => {
     };
   }
 
-  it("reprend l'accent et la banniere du brouillon, pas ceux du projet enregistre", () => {
+  it("reprend l'accent du theme et la banniere du brouillon, pas ceux du projet enregistre", () => {
     const saved: Project = {
       ...PROJECT,
       customization: {
-        accent: presetColor("sky"),
+        theme: presetTheme("ocean"),
         sections: [...DEFAULT_SECTIONS],
         gallery: [],
       },
     };
     const draft: ProjectCustomization = {
-      accent: presetColor("rose"),
+      theme: presetTheme("bonbon"),
       banner: BANNER,
       sections: [...DEFAULT_SECTIONS],
       gallery: [],
     };
     const preview = toCardPreview(saved, [member(1, "owner")], draft);
-    expect(preview?.accent).toBe(presetColor("rose"));
+    expect(preview?.accent).toBe(presetTheme("bonbon").accent);
     expect(preview?.banner).toEqual(BANNER);
     expect(
       toCardPreview(saved, [member(1, "owner")], toDraft(undefined)),

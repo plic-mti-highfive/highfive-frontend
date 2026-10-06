@@ -235,10 +235,11 @@ de moderation montre le contenu signale sans nouvelle route.
 - **`Project.customization` / `ProjectSummary.accent`** (`src/domain/customization.ts`,
   `src/domain/project.ts`, lot Personnalisation de la fiche) : champs optionnels
   additifs (aucun champ existant renomme/retire). `customization` porte la banniere
-  (avec point focal), l'accent (couleur libre `#rrggbb`, `AccentColor`), l'ordre/visibilite des quatre
+  (avec point focal), le theme (palette de quatre couleurs `#rrggbb` : `background`, `panel`, `text`, `accent`,
+  toutes obligatoires ensemble, `ProjectTheme`), l'ordre/visibilite des quatre
   sections de l'Apercu et la galerie (8 images max, `alt` obligatoire sauf image
-  decorative). Reserve au porteur, elle suit le projet au transfert. `accent` est
-  copie dans `ProjectSummary` pour que `ProjectCard` prenne la meme teinte que la
+  decorative). Reserve au porteur, elle suit le projet au transfert. `theme.accent` est
+  copie dans `ProjectSummary.accent` pour que `ProjectCard` prenne la meme teinte que la
   fiche sans requete supplementaire (`toProjectSummary`,
   `src/mocks/handlers/projectHelpers.ts`). `ProjectSummary.banner` (meme schema que
   `Project.customization.banner`, optionnel) en est la copie pour les cartes `card` et `hero`.

@@ -278,16 +278,20 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
   destinataire plutot qu'un transfert direct, si le produit le confirme.
 - **Personnalisation de la fiche** (`PATCH /projects/{slug}/customization`,
   `POST` et `DELETE /projects/{slug}/customization/images[/{imageId}]`) :
-  banniere, accent, sections et galerie, voir `docs/v2/customization-scope.md`.
+  banniere, theme, sections et galerie, voir `docs/v2/customization-scope.md`.
   Regles serveur :
   - **Porteur seul** (`project.ownerId`, compte `active`) : un co-porteur
     n'a pas ce droit, contrairement a `PATCH /projects/{slug}`. La
     personnalisation fait partie du projet et **suit le transfert** de
     propriete sans etre remise a zero.
-  - `accent` est une couleur `#rrggbb` en minuscules (`AccentColor`, regex
-    `^#[0-9a-f]{6}$`) : le backend la valide et la stocke telle quelle. Le calcul des
-    variantes clair/sombre et du contraste est **uniquement cote client**
-    (`src/shared/lib/accentColor.ts`) ; `ProjectSummary.accent` en est la copie.
+  - `theme` (optionnel) est une palette de quatre couleurs `#rrggbb` en minuscules
+    (regex `^#[0-9a-f]{6}$`) : `background` (fond de page), `panel` (fond des blocs),
+    `text` et `accent`. Les quatre sont obligatoires ensemble (un theme est un tout ;
+    absent = la fiche suit le theme du site). Le backend les valide et les stocke
+    telles quelles, **sans verifier le contraste** : la derivation (bordures, texte
+    secondaire, texte des boutons) et la correction du contraste sont **uniquement
+    cote client** (`src/shared/lib/projectTheme.ts`). `ProjectSummary.accent` est la
+    copie de `theme.accent`.
   - `ProjectSummary.banner` est la copie de `customization.banner` (url, alt, decorative,
     focal) pour les cartes du fil, de la recherche et du profil. Un fil charge 12 projets ou plus :
     servir pour les cartes une **variante miniature** (environ 640 px de large) plutot que la

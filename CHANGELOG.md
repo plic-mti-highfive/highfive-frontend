@@ -10,15 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Personnalisation de la fiche projet (porteur seul) : banniere avec point
-  focal, accent a couleur libre (variantes clair/sombre au contraste garanti), sections de l'Apercu
+  focal, palette de couleurs optionnelle (fond, blocs, texte, accent ; imposee a la fiche, contraste garanti), sections de l'Apercu
   ordonnables et masquables, galerie de 8 images au plus. Contrat additif
   (`Project.customization`, `ProjectSummary.accent`, trois routes) documente
   dans `docs/v2/customization-scope.md`, `API-ROUTES.md`, `openapi.yaml` et
-  `SPEC.md`. Rendu de la fiche : banniere, header teinte, sections ordonnees,
+  `SPEC.md`. Rendu de la fiche : banniere, palette plein cadre, sections ordonnees,
   galerie et visionneuse accessible, accent sur les cartes. Editeur du
-  porteur sur `/projets/:slug/personnaliser` avec apercu live : accent,
-  banniere (point focal, texte alternatif obligatoire), sections reordonnables
-  par boutons ou glisser-deposer (dnd-kit), galerie, compression WebP cote
+  porteur sur `/projets/:slug/personnaliser` avec apercu live : banniere
+  (point focal, texte alternatif obligatoire), sections reordonnables
+  par boutons ou glisser-deposer (dnd-kit), galerie, couleurs (presets et
+  ajustement libre, en dernier car facultatif), compression WebP cote
   client, garde de sortie. Moderation : bouton « Medias » par projet dans
   l'administration (voir, agrandir, retirer avec motif), journalise sous
   `remove_project_media`.

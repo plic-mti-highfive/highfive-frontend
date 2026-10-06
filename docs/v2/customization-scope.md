@@ -5,7 +5,7 @@ Statut : scope validé, plan d'implémentation à rédiger. Branche : `feat/proj
 ## Objectif
 
 Le porteur d'un projet personnalise la fiche de son projet (à la itch.io, sans CSS libre) :
-bannière, couleur d'accent, sections de l'Aperçu et galerie d'images. Les visiteurs voient
+bannière, sections de l'Aperçu, galerie d'images et, en option, une palette de couleurs. Les visiteurs voient
 le résultat. C'est une fonctionnalité optionnelle qui rend le site plus vivant : un projet
 sans personnalisation s'affiche exactement comme aujourd'hui (on estime qu'environ 30 % des
 projets auront des images).
@@ -24,15 +24,18 @@ projets auront des images).
 1. **Bannière** : image au-dessus du header de la fiche (le titre n'est jamais superposé à
    l'image : contraste garanti). Point focal `{x, y}` (en %) pour que la zone importante
    reste visible quand le ratio change (ex. 3:1 desktop, 16:9 mobile).
-2. **Accent** : une **couleur libre** (`#rrggbb`), choisie au sélecteur, par code hexadécimal
-   ou parmi six couleurs rapides (la roue du design system). Les six teintes imposées
-   donnaient de mauvais rendus en thème sombre (grand bloc saturé) : le front dérive désormais,
-   pour chaque thème, une couleur d'appui (≥ 3:1), une surface teintée discrète et une couleur
-   de texte (≥ 4.5:1) au contraste garanti (`src/shared/lib/accentColor.ts`, OKLCH, même
-   teinte). « Automatique » (pas de couleur) garde la teinte hachée du projet. L'accent
-   s'applique aussi aux **cartes** (feed, recherche, profil) pour garder une identité
-   cohérente. La **bannière** s'affiche aussi sur les cartes `card` et `hero`, recadrée
-   autour du point focal (voir « Bannière sur les cartes ») ; la galerie reste sur la fiche seule.
+2. **Couleurs (optionnel)** : une **palette de quatre couleurs** (`#rrggbb`) : fond de la page,
+   fond des blocs, texte, accent (liens, boutons, onglet actif). Choix d'un des six presets
+   (Papier, Forêt, Bonbon, Nuit, Océan, Terminal), puis ajustement libre au sélecteur ou par code
+   hexadécimal. Absente, la fiche suit le thème du site. La palette est un tout (les quatre
+   couleurs ensemble) et **s'impose à la fiche quel que soit le thème clair/sombre du visiteur**
+   (la nav et le pied de page restent ceux du site). Le front dérive le reste (bordures, texte
+   secondaire, texte des boutons) et **corrige les couleurs peu lisibles** : texte ≥ 4.5:1 sur
+   le fond et les blocs, lien ≥ 4.5:1, appui ≥ 3:1 (`src/shared/lib/projectTheme.ts`, OKLCH,
+   même teinte) ; l'éditeur signale quand le texte a été ajusté. `theme.accent` s'applique aussi
+   aux **cartes** (feed, recherche, profil) via `ProjectSummary.accent`. La **bannière** s'affiche
+   aussi sur les cartes `card` et `hero`, recadrée autour du point focal (voir « Bannière sur les
+   cartes ») ; la galerie reste sur la fiche seule. Hors V1 : image de fond, polices, rayon.
 3. **Sections de l'Aperçu** : annonce épinglée, À propos, galerie, commentaires. Chacune est
    visible ou masquée, et réordonnable. La sidebar reste fixe (elle porte l'action de
    participation).
@@ -85,13 +88,18 @@ projets auront des images).
 
 ### Décisions complémentaires (après exploration du code)
 
-- **Accent « marqué »** : en plus des touches d'accent discrètes (onglet actif, puce des titres
-  de section, annonce épinglée, liens du markdown, liseré de la sidebar, focus de la galerie),
-  le header de la fiche prend un fond léger `accent-light`. Les `TagPill`, le CTA et les
-  autres boutons gardent leurs couleurs (règle « Accent-Not-Action »). Contraste à vérifier
-  pour les 6 teintes en clair et en sombre.
-- **`DESIGN.md`** amendé : exception encadrée à la « Deterministic Tint Rule » pour l'accent
-  choisi par le porteur (fallback `getAccent(id)` inchangé).
+- **Thème de fiche** : le wrapper de la fiche (`data-project-theme`) recâble les tokens
+  sémantiques (`--background`, `--card`, `--foreground`, `--primary`, `--border`…) sur la palette ;
+  `Card`, `Button`, `Section`… suivent sans modification. Les puces de titre, l'onglet actif,
+  les liens du markdown et le fond du header (`accent-light`) viennent des `--accent-*` dérivés.
+  Les boutons primaires de la fiche prennent donc la couleur d'accent (la règle
+  « Accent-Not-Action » est levée dans la fiche d'un projet themé, seulement) ; les `TagPill`
+  gardent leur teinte hachée. Limite connue : les variantes Tailwind `dark:` suivent le thème du
+  site, pas celui de la fiche (les paires restent lisibles, mais ne sont pas retravaillées).
+- **Éditeur** : le contenu d'abord (bannière, sections, galerie), les couleurs en dernier et
+  facultatives.
+- **`DESIGN.md`** amendé : exception encadrée à la « Deterministic Tint Rule » et à
+  « Accent-Not-Action » pour la palette choisie par le porteur (fallback `getAccent(id)` inchangé).
 - **Tests de composants** : ajout de `jsdom`, `@testing-library/react` et
   `@testing-library/user-event` en devDependencies, environnement activé fichier par fichier.
 - **Garde « changements non sauvegardés »** : `useBlocker` est inutilisable (l'app utilise
@@ -116,15 +124,15 @@ projets auront des images).
 ```ts
 Project.customization?: {
   banner?: { url: string; alt: string; decorative: boolean; focal: { x: number; y: number } }
-  accent?: AccentColor // "#rrggbb" en minuscules
+  theme?: { background: string; panel: string; text: string; accent: string } // "#rrggbb" en minuscules, les quatre ensemble
   sections: { id: "pinned" | "about" | "gallery" | "comments"; visible: boolean }[] // l'ordre du tableau = l'ordre d'affichage
   gallery: { id: string; url: string; alt: string; decorative: boolean; caption?: string }[] // max 8
 }
-ProjectSummary.accent?: AccentColor // issu de customization.accent, pour les cartes
+ProjectSummary.accent?: AccentColor // issu de customization.theme.accent, pour les cartes
 ProjectSummary.banner?: ProjectBanner // issu de customization.banner, pour les cartes `card` et `hero`
 ```
 
-`undefined` = apparence actuelle (accent haché depuis l'id, layout par défaut).
+`undefined` = apparence actuelle (thème du site, accent de carte haché depuis l'id, layout par défaut).
 
 ## API (à consigner dans `API-ROUTES.md`, handlers MSW, `schemas/`)
 

@@ -38,8 +38,7 @@ export function ProjectOverview({
   const announcementsQuery = useAnnouncements(project.slug);
   const pinned = announcementsQuery.data?.find((item) => item.pinned);
   const customization = project.customization;
-  const accent = customization?.accent;
-  const accented = accent !== undefined;
+  const accented = customization?.theme !== undefined;
   const gallery = customization?.gallery ?? [];
 
   const sections: Record<CustomizationSectionId, ReactNode> = {

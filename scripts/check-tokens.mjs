@@ -29,7 +29,11 @@ const EXEMPT_FILES = new Set([
   "src/shared/lib/accentColor.test.ts",
   "src/shared/lib/accentPresets.ts",
   "src/shared/lib/accentPresets.test.ts",
-  "src/features/projects/components/customize/AccentPicker.test.tsx",
+  "src/shared/lib/projectTheme.ts",
+  "src/shared/lib/projectTheme.test.ts",
+  "src/shared/lib/projectThemePresets.ts",
+  "src/shared/lib/projectThemePresets.test.ts",
+  "src/features/projects/components/customize/ThemeEditor.test.tsx",
 ]);
 
 // Commentaires (// ligne, /* bloc */, JSDoc) : jamais verifies — seul le code

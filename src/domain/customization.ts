@@ -4,19 +4,42 @@ import { idSchema } from "./common";
 /**
  * Personnalisation de la fiche projet (docs/v2/customization-scope.md).
  * Reservee au porteur ; optionnelle : `Project.customization` absent = fiche
- * par defaut (accent hache depuis l'id, sections dans l'ordre par defaut,
- * ni banniere ni galerie).
+ * par defaut (theme du site, sections dans l'ordre par defaut, ni banniere
+ * ni galerie).
  *
- * Pas de CSS libre : l'accent est une couleur (`#rrggbb`) dont le front derive
- * des variantes clair/sombre au contraste garanti
- * (`src/shared/lib/accentColor.ts`) ; les images passent par l'API d'upload.
+ * Pas de CSS libre : le theme est une palette de quatre couleurs (`#rrggbb`)
+ * dont le front derive le reste au contraste garanti
+ * (`src/shared/lib/projectTheme.ts`) ; les images passent par l'API d'upload.
  */
 
-/** Couleur d'accent d'un projet : `#rrggbb` en minuscules (le client normalise la saisie). */
-export const accentColorSchema = z
+/** Couleur : `#rrggbb` en minuscules (le client normalise la saisie). */
+export const hexColorSchema = z
   .string()
   .regex(/^#[0-9a-f]{6}$/, "couleur invalide (#rrggbb en minuscules)");
+
+/** Couleur d'identite d'un projet (`theme.accent`), aussi copiee sur ses cartes. */
+export const accentColorSchema = hexColorSchema;
 export type AccentColor = z.infer<typeof accentColorSchema>;
+
+/**
+ * Palette de la fiche : quatre couleurs, toutes obligatoires (une palette
+ * est un tout, pas une couleur isolee). Absente = la fiche suit le theme du
+ * site. La fiche impose sa palette quel que soit le theme clair/sombre du
+ * visiteur ; le front en derive le reste (bordures, texte secondaire, texte
+ * des boutons) et corrige les couleurs trop peu contrastees
+ * (`src/shared/lib/projectTheme.ts`).
+ */
+export const projectThemeSchema = z.object({
+  /** Fond de la page. */
+  background: hexColorSchema,
+  /** Fond des blocs (cartes, commentaires, panneaux). */
+  panel: hexColorSchema,
+  /** Texte principal. */
+  text: hexColorSchema,
+  /** Liens, boutons, onglet actif, puces et anneaux de focus. */
+  accent: accentColorSchema,
+});
+export type ProjectTheme = z.infer<typeof projectThemeSchema>;
 
 /** Nombre maximal d'images dans la galerie d'un projet. */
 export const MAX_GALLERY_IMAGES = 8;
@@ -115,7 +138,7 @@ export const DEFAULT_SECTIONS: readonly CustomizationSection[] = [
 export const projectCustomizationSchema = z
   .object({
     banner: projectBannerSchema.optional(),
-    accent: accentColorSchema.optional(),
+    theme: projectThemeSchema.optional(),
     sections: z.array(customizationSectionSchema).length(4),
     gallery: z.array(galleryItemSchema).max(MAX_GALLERY_IMAGES),
   })
