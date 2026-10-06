@@ -141,7 +141,9 @@ export async function apiFetch(
     throw new ApiError(
       response.status,
       errorBody?.code ?? "unknown_error",
-      errorBody?.message ?? response.statusText ?? "Erreur inconnue.",
+      // `||` et non `??` : `statusText` est vide en HTTP/2, et un message
+      // vide donnerait une alerte vide dans l'interface.
+      errorBody?.message || response.statusText || "Erreur inconnue.",
       errorBody?.details,
     );
   }
