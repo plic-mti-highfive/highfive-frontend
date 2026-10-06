@@ -1,7 +1,15 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
-import { Button, Field, IconButton, Input, Textarea } from "@shared/ui";
+import {
+  Button,
+  Checkbox,
+  Field,
+  IconButton,
+  Input,
+  Textarea,
+} from "@shared/ui";
+import { cn } from "@shared/lib/cn";
 import {
   INFO_FIELD_IDS,
   INFO_NEED_MIN,
@@ -92,40 +100,84 @@ export function InfoEditor({
           />
         </div>
       </Field>
-      <Field label="Ce que tu cherches" description="Optionnel">
-        <ul className="flex flex-col gap-2">
-          {value.needs.map((need) => (
-            <li key={need.id} className="flex items-center gap-2">
-              <span className="flex-1 text-body-sm text-foreground">
-                {need.label}
-              </span>
-              <IconButton
-                aria-label="Retirer ce besoin"
-                size="xs"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    needs: value.needs.filter((n) => n.id !== need.id),
-                  })
-                }
+      <Field
+        label="On recherche"
+        description={`Optionnel · ${value.needs.length}/${INFO_NEEDS_MAX} profils`}
+      >
+        {value.needs.length > 0 && (
+          <ul className="flex flex-col gap-2">
+            {value.needs.map((need) => (
+              <li
+                key={need.id}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg border border-border px-3 py-2",
+                  need.fulfilled ? "bg-muted" : "bg-card",
+                )}
               >
-                <X size={14} />
-              </IconButton>
-            </li>
-          ))}
-        </ul>
+                <span
+                  className={cn(
+                    "min-w-0 flex-1 break-words text-body-md",
+                    need.fulfilled
+                      ? "text-muted-foreground line-through"
+                      : "font-medium text-foreground",
+                  )}
+                >
+                  {need.label}
+                </span>
+                <label className="flex shrink-0 items-center gap-1.5 text-body-sm text-muted-foreground">
+                  <Checkbox
+                    checked={need.fulfilled}
+                    onCheckedChange={(checked) =>
+                      onChange({
+                        ...value,
+                        needs: value.needs.map((n) =>
+                          n.id === need.id ? { ...n, fulfilled: checked } : n,
+                        ),
+                      })
+                    }
+                  />
+                  Pourvu
+                </label>
+                <IconButton
+                  aria-label={`Retirer « ${need.label} »`}
+                  size="xs"
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      needs: value.needs.filter((n) => n.id !== need.id),
+                    })
+                  }
+                >
+                  <X size={14} />
+                </IconButton>
+              </li>
+            ))}
+          </ul>
+        )}
         {value.needs.length < INFO_NEEDS_MAX && (
-          <div className="mt-2 flex gap-2">
+          <form
+            className="mt-2 flex gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              addNeed();
+            }}
+          >
             <Input
               value={newNeedLabel}
               maxLength={40}
+              aria-label="Nouveau profil recherché"
               placeholder="quelqu'un pour…"
               onChange={(e) => setNewNeedLabel(e.target.value)}
             />
-            <Button variant="outline" onClick={addNeed}>
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={newNeedLabel.trim().length < INFO_NEED_MIN}
+            >
+              <Plus aria-hidden="true" />
               Ajouter
             </Button>
-          </div>
+          </form>
         )}
       </Field>
     </div>
