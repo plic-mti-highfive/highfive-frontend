@@ -21,17 +21,14 @@ const MAX_AVATARS = 6;
 export function ProjectOverviewSidebar({
   project,
   members,
-  accented = false,
 }: {
   project: Project;
   members: TeamMember[];
-  /** Un accent de projet est actif (`data-accent` sur un ancetre) : puce teintee devant les titres. */
-  accented?: boolean;
 }) {
   return (
     <aside className="flex flex-col gap-6">
       <ProjectPanel>
-        <Section title="Équipe" accentMarker={accented}>
+        <Section title="Équipe">
           {members.length === 0 ? (
             <p className="text-body-sm text-muted-foreground">
               Aucun membre pour l'instant
@@ -66,7 +63,7 @@ export function ProjectOverviewSidebar({
       </ProjectPanel>
 
       <ProjectPanel>
-        <Section title="Infos" accentMarker={accented}>
+        <Section title="Infos">
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-body-sm">
             <dt className="text-muted-foreground">Créé le</dt>
             <dd className="text-right text-foreground">

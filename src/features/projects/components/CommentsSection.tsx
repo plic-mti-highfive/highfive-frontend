@@ -18,12 +18,10 @@ export function CommentsSection({
   slug,
   isAuthenticated,
   canModerate,
-  accentMarker = false,
 }: {
   slug: string;
   isAuthenticated: boolean;
   canModerate: boolean;
-  accentMarker?: boolean;
 }) {
   const navigate = useNavigate();
   const [body, setBody] = useState("");
@@ -48,10 +46,7 @@ export function CommentsSection({
   }
 
   return (
-    <Section
-      title={`Commentaires (${comments.length})`}
-      accentMarker={accentMarker}
-    >
+    <Section title={`Commentaires (${comments.length})`}>
       {isAuthenticated ? (
         <div className="flex flex-col gap-2">
           <Textarea

@@ -10,13 +10,7 @@ import type { Project } from "@/domain";
  * reste fidele a l'intention ("proche" = memes themes) sans inventer de route
  * hors de `docs/v2/API-ROUTES.md`.
  */
-export function NearbyProjects({
-  project,
-  accentMarker = false,
-}: {
-  project: Project;
-  accentMarker?: boolean;
-}) {
+export function NearbyProjects({ project }: { project: Project }) {
   const { data } = useProjects({ tags: project.tags, limit: 4 });
   const nearby = (data?.items ?? [])
     .filter((item) => item.slug !== project.slug)
@@ -27,7 +21,6 @@ export function NearbyProjects({
   return (
     <Section
       title="Dans le même esprit"
-      accentMarker={accentMarker}
       className="border-t border-border pt-10"
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -7,19 +7,12 @@ export interface SectionProps extends React.ComponentProps<"section"> {
   actions?: React.ReactNode;
   /** `lg` : titre de section de premier niveau (Découvrir). `md` (défaut) : sous-titre compact (panneaux latéraux). */
   titleSize?: "md" | "lg";
-  /**
-   * Petite puce devant le titre, teintee par l'accent du conteneur
-   * (`data-accent`). A n'activer que si un ancetre porte un accent : sans
-   * `--accent-base`, la puce serait invisible mais prendrait quand meme la place.
-   */
-  accentMarker?: boolean;
 }
 
 function Section({
   title,
   actions,
   titleSize = "md",
-  accentMarker = false,
   children,
   className,
   ...props
@@ -32,12 +25,6 @@ function Section({
     >
       {(title || actions) && (
         <div className="flex items-center gap-4">
-          {title && accentMarker && (
-            <span
-              aria-hidden="true"
-              className="-mr-2 size-2 shrink-0 rounded-pill bg-[var(--accent-base)]"
-            />
-          )}
           {title && (
             <h2
               className={cn(

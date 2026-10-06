@@ -44,7 +44,7 @@ export function ProjectOverview({
   const customization = project.customization;
   const accented = customization?.theme !== undefined;
   const gallery = customization?.gallery ?? [];
-  const needs = <ProjectNeeds needs={project.needs} accentMarker={accented} />;
+  const needs = <ProjectNeeds needs={project.needs} />;
 
   const sections: Record<CustomizationSectionId, ReactNode> = {
     pinned: pinned ? (
@@ -56,7 +56,7 @@ export function ProjectOverview({
     ) : null,
     about: (
       <ProjectPanel>
-        <Section title="À propos" accentMarker={accented}>
+        <Section title="À propos">
           {project.description ? (
             <div
               className={cn(
@@ -78,14 +78,14 @@ export function ProjectOverview({
     gallery:
       gallery.length > 0 ? (
         <ProjectPanel>
-          <Section title="Galerie" accentMarker={accented}>
+          <Section title="Galerie">
             <ProjectGallery gallery={gallery} projectTitle={project.title} />
           </Section>
         </ProjectPanel>
       ) : null,
     comments: preview ? (
       <ProjectPanel>
-        <Section title="Commentaires" accentMarker={accented}>
+        <Section title="Commentaires">
           <p className="text-body-sm text-muted-foreground">
             Les commentaires s'affichent ici.
           </p>
@@ -97,7 +97,6 @@ export function ProjectOverview({
           slug={project.slug}
           isAuthenticated={canComment}
           canModerate={canModerateComments}
-          accentMarker={accented}
         />
       </ProjectPanel>
     ),
@@ -127,14 +126,10 @@ export function ProjectOverview({
           {needsIndex >= visible.length && needs}
         </div>
 
-        <ProjectOverviewSidebar
-          project={project}
-          members={members}
-          accented={accented}
-        />
+        <ProjectOverviewSidebar project={project} members={members} />
       </div>
 
-      <NearbyProjects project={project} accentMarker={accented} />
+      <NearbyProjects project={project} />
     </div>
   );
 }

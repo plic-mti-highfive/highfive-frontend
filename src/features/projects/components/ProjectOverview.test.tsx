@@ -30,9 +30,7 @@ vi.mock("./PinnedAnnouncementPreview", () => ({
   ),
 }));
 vi.mock("./ProjectOverviewSidebar", () => ({
-  ProjectOverviewSidebar: ({ accented }: { accented?: boolean }) => (
-    <aside data-testid="sidebar" data-accented={String(Boolean(accented))} />
-  ),
+  ProjectOverviewSidebar: () => <aside data-testid="sidebar" />,
 }));
 
 vi.mock("./NearbyProjects", () => ({
@@ -110,7 +108,6 @@ describe("ProjectOverview", () => {
     state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
     renderOverview(project());
     expect(order()).toEqual(["pinned", "À propos", "comments"]);
-    expect(screen.getByTestId("sidebar").dataset.accented).toBe("false");
     expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("false");
   });
 
@@ -150,7 +147,7 @@ describe("ProjectOverview", () => {
     expect(order()).not.toContain("Galerie");
   });
 
-  it("transmet le theme a l'annonce epinglee et a la sidebar", () => {
+  it("transmet le theme a l'annonce epinglee", () => {
     state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
     renderOverview(
       project({
@@ -160,7 +157,6 @@ describe("ProjectOverview", () => {
       }),
     );
     expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("true");
-    expect(screen.getByTestId("sidebar").dataset.accented).toBe("true");
   });
 
   it("place les besoins juste apres l'annonce epinglee", () => {

@@ -10,13 +10,7 @@ import { ProjectPanel } from "./ProjectPanel";
  * (c'est ce qui donne envie de rejoindre). Les besoins ouverts passent avant
  * les besoins pourvus, qui restent visibles mais barres. Absent sans besoin.
  */
-export function ProjectNeeds({
-  needs,
-  accentMarker = false,
-}: {
-  needs: Need[];
-  accentMarker?: boolean;
-}) {
+export function ProjectNeeds({ needs }: { needs: Need[] }) {
   if (needs.length === 0) return null;
 
   const sorted = [...needs].sort(
@@ -28,7 +22,6 @@ export function ProjectNeeds({
     <ProjectPanel>
       <Section
         title="On recherche"
-        accentMarker={accentMarker}
         actions={
           openCount > 0 ? (
             <Badge tone="info">
