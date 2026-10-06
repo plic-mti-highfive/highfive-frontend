@@ -275,12 +275,16 @@ de moderation montre le contenu signale sans nouvelle route.
   par lui-meme). Adaptes avec des acteurs coherents (yanis.f pour la demande,
   marc.leroy pour l'invitation) en gardant le meme type de notification et la
   meme cible.
-- **Equipe complete uniquement sur 5 projets** (Fresque murale, Jardin partage,
-  Maree basse, Repair cafe, Distribution de soupe) : les 20 autres projets du jeu
-  de demo n'ont que la ligne d'appartenance du porteur (R-M1 est donc respectee
-  partout), `membersCount` restant un champ affiche independant du nombre de
-  lignes `Membership` reellement modelisees — comme n'importe quel compteur
-  serveur (R-X2).
+- **Jeu de demo etoffe au-dela du doc 23** : le doc 23 prevoit 12 comptes et des
+  equipes completes sur quelques projets seulement ; le mock en compte 23 et donne
+  a chaque projet hors brouillon une vraie equipe (3 a 8 membres), un « A propos »,
+  des annonces, des fils de commentaires, un tableau de taches, des fichiers et un
+  canal de messagerie qui miroite l'equipe. `membersCount` et `teamPreview` sont
+  calcules sur ces lignes. Les compteurs `highfiveCount` restent des valeurs
+  serveur independantes (R-X2) : huit lignes `Highfive` au plus par projet.
+  `lastActivityAt` est remontee au contenu le plus recent du projet
+  (`withDerivedActivity`, `src/mocks/data/index.ts`). Les invariants sont verifies
+  par `src/mocks/data/data.test.ts` (« plateforme vivante »).
 - **25 projets** : le doc 23 §2 n'en liste que 18 ; 7 ont ete ajoutes dans le
   meme ton pour atteindre la volumetrie demandee par le lot (~25).
 - **Auth mock** : jeton porteur (Bearer) stocke via `tokenStorage`

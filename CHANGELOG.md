@@ -29,6 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Jeu de demo (MSW) beaucoup plus vivant : 23 comptes, un « A propos » sur
+  chaque projet hors brouillon, des equipes de 3 a 8 membres, des annonces, des
+  fils de commentaires (reponses, commentaire masque, compte supprime), des
+  tableaux de taches (echeances, colonnes propres a certains projets), des
+  fichiers de tous types, un canal par projet, des conversations et
+  notifications pour plusieurs comptes, des signalements dans tous leurs etats.
+  Le contenu est coherent (dates, roles, appartenances) et verifie par
+  `src/mocks/data/data.test.ts`.
 - `DESIGN.md` : exception encadree a la « Deterministic Tint Rule » pour
   l'accent de projet choisi par son porteur.
 

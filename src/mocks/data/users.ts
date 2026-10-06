@@ -88,7 +88,7 @@ export const marcLeroy = makeUser({
   email: "marc.leroy@example.com",
   bio: "Son, montage, et beaucoup trop de câbles.",
   interests: ["musique", "video"],
-  createdAt: daysAgo(180),
+  createdAt: daysAgo(260),
   lastVisitAt: daysAgo(1),
   password: "demo1234",
 });
@@ -99,7 +99,7 @@ export const claraMartinez = makeUser({
   email: "clara.martinez@example.com",
   bio: "Prof de maths le jour, chorale le mardi.",
   interests: ["entraide-scolaire", "musique"],
-  createdAt: daysAgo(150),
+  createdAt: daysAgo(220),
   lastVisitAt: daysAgo(3),
   password: "demo1234",
 });
@@ -143,7 +143,7 @@ export const yanisF = makeUser({
   email: "yanis.f@example.com",
   bio: "Skate, béton, et un peu de soudure.",
   interests: ["sport", "bricolage"],
-  createdAt: daysAgo(60),
+  createdAt: daysAgo(140),
   lastVisitAt: daysAgo(4),
   password: "demo1234",
 });
@@ -157,6 +157,126 @@ export const annickR = makeUser({
   platformRole: "admin",
   createdAt: daysAgo(500),
   lastVisitAt: hoursAgo(6),
+  password: "demo1234",
+});
+
+export const julienGarnier = makeUser({
+  username: "julien.garnier",
+  displayName: "Julien Garnier",
+  email: "julien.garnier@example.com",
+  bio: "Menuisier à la retraite. Mon atelier est plein d'outils qui s'ennuient.",
+  interests: ["bricolage", "reparation"],
+  createdAt: daysAgo(280),
+  lastVisitAt: hoursAgo(26),
+  password: "demo1234",
+});
+
+export const amelieVasseur = makeUser({
+  username: "amelie.vasseur",
+  displayName: "Amélie Vasseur",
+  email: "amelie.vasseur@example.com",
+  bio: "Infirmière de nuit. Le jour, je cuisine pour trop de monde.",
+  interests: ["cuisine", "solidarite", "quartier"],
+  createdAt: daysAgo(230),
+  lastVisitAt: hoursAgo(11),
+  password: "demo1234",
+});
+
+export const karimHaddad = makeUser({
+  username: "karim.haddad",
+  displayName: "Karim Haddad",
+  email: "karim.haddad@example.com",
+  bio: "Étudiant en histoire. Je pose beaucoup de questions aux anciens.",
+  interests: ["histoire", "ecriture", "langues"],
+  createdAt: daysAgo(75),
+  lastVisitAt: hoursAgo(4),
+  password: "demo1234",
+});
+
+export const oceaneL = makeUser({
+  username: "oceane.l",
+  displayName: "Océane Lambert",
+  email: "oceane.l@example.com",
+  bio: "Plutôt bottes que baskets. Je ramasse, je plante, je trie.",
+  interests: ["environnement", "jardinage", "animaux"],
+  createdAt: daysAgo(45),
+  lastVisitAt: daysAgo(1),
+  password: "demo1234",
+});
+
+export const paulMercier = makeUser({
+  username: "paul.mercier",
+  displayName: "Paul Mercier",
+  email: "paul.mercier@example.com",
+  bio: "Ancien prof de SVT. Je ne sais pas me taire devant un arbre.",
+  interests: ["sciences", "environnement", "jardinage"],
+  createdAt: daysAgo(330),
+  lastVisitAt: daysAgo(2),
+  password: "demo1234",
+});
+
+export const yasmineT = makeUser({
+  username: "yasmine.t",
+  displayName: "Yasmine Toumi",
+  email: "yasmine.t@example.com",
+  bio: "Illustratrice. Je dessine dans les marges, sur les nappes, sur les murs.",
+  interests: ["dessin", "spectacle", "ecriture"],
+  createdAt: daysAgo(140),
+  lastVisitAt: hoursAgo(9),
+  password: "demo1234",
+});
+
+export const hugoLemaire = makeUser({
+  username: "hugo.lemaire",
+  displayName: "Hugo Lemaire",
+  email: "hugo.lemaire@example.com",
+  bio: "Développeur le jour, joueur de plateau la nuit.",
+  interests: ["code", "jeu-video", "jeux"],
+  createdAt: daysAgo(110),
+  lastVisitAt: hoursAgo(14),
+  password: "demo1234",
+});
+
+export const mathildeD = makeUser({
+  username: "mathilde.d",
+  displayName: "Mathilde Dubois",
+  email: "mathilde.d@example.com",
+  bio: "Vétérinaire. Oui, je regarde déjà vos chats avec un œil professionnel.",
+  interests: ["animaux", "environnement"],
+  createdAt: daysAgo(190),
+  lastVisitAt: daysAgo(6),
+  password: "demo1234",
+});
+
+export const baptisteN = makeUser({
+  username: "baptiste.n",
+  displayName: "Baptiste Noël",
+  email: "baptiste.n@example.com",
+  bio: "Guitare, un peu de basse, beaucoup de répétitions mal rangées.",
+  interests: ["musique", "evenement", "spectacle"],
+  createdAt: daysAgo(160),
+  lastVisitAt: hoursAgo(7),
+  password: "demo1234",
+});
+
+/** Compte tout neuf : auteur du commentaire de démarchage signalé (voir `comments.ts`). */
+export const cedricP = makeUser({
+  username: "cedric.p",
+  displayName: "Cédric Pasquier",
+  email: "cedric.p@example.com",
+  createdAt: daysAgo(2),
+  lastVisitAt: hoursAgo(4),
+  password: "demo1234",
+});
+
+/** Compte suspendu : auteur d'un commentaire indesirable, pour l'administration. */
+export const fabriceV = makeUser({
+  username: "fabrice.v",
+  displayName: "Fabrice Vidal",
+  email: "fabrice.v@example.com",
+  accountStatus: "suspended",
+  createdAt: daysAgo(34),
+  lastVisitAt: daysAgo(8),
   password: "demo1234",
 });
 
@@ -182,6 +302,17 @@ export const USERS: DbUser[] = [
   nadiaK,
   yanisF,
   annickR,
+  julienGarnier,
+  amelieVasseur,
+  karimHaddad,
+  oceaneL,
+  paulMercier,
+  yasmineT,
+  hugoLemaire,
+  mathildeD,
+  baptisteN,
+  fabriceV,
+  cedricP,
   compteSupprime,
 ];
 
