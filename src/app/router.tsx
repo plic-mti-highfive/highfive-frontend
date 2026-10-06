@@ -14,6 +14,7 @@ import { LabLayout, SiteLayout } from "./layouts";
 import { NavigationPendingProvider } from "./navigation-pending";
 import {
   preloadCreateProject,
+  preloadCustomizeProject,
   preloadHome,
   preloadMessages,
   preloadNotifications,
@@ -44,6 +45,9 @@ const SearchPage = lazy(() =>
 );
 const UserProfilePage = lazy(preloadUserProfile);
 const CreateProjectPage = lazy(preloadCreateProject);
+const ProjectCustomizePage = lazy(() =>
+  preloadCustomizeProject().then((m) => ({ default: m.ProjectCustomizePage })),
+);
 const ProjectLayout = lazy(() =>
   preloadProjectFiche().then((m) => ({ default: m.ProjectLayout })),
 );
@@ -210,6 +214,18 @@ export function AppRouter() {
             }
           />
         </Route>
+
+        {/* Editeur de personnalisation de la fiche : coquille propre (hauteur
+            d'ecran fixe, formulaire + apercu live), hors `SiteLayout`. La
+            reserve au porteur est verifiee par la page elle-meme. */}
+        <Route
+          path="/projets/:slug/personnaliser"
+          element={
+            <ProtectedRoute>
+              {withSuspense(<ProjectCustomizePage />)}
+            </ProtectedRoute>
+          }
+        />
 
         {/* Coquille atelier — Le Lab (doc 06 §4) */}
         <Route path="/projets/:slug/lab" element={<LabLayout />}>

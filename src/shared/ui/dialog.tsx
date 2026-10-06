@@ -40,21 +40,26 @@ interface DialogPopupProps extends React.ComponentProps<
   typeof DialogPrimitive.Popup
 > {
   showClose?: boolean;
+  /** `false` : ni fondu ni zoom a l'ouverture/fermeture (popup et fond). */
+  animated?: boolean;
 }
 
 function DialogPopup({
   className,
   children,
   showClose = true,
+  animated = true,
   ...props
 }: DialogPopupProps) {
   return (
     <DialogPortal>
-      <DialogBackdrop />
+      <DialogBackdrop className={animated ? undefined : "transition-none"} />
       <DialogPrimitive.Popup
         data-slot="dialog-popup"
         className={cn(
           "fixed top-1/2 left-1/2 z-modal w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-card p-6 shadow-overlay outline-none transition-all duration-base data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+          !animated &&
+            "transition-none data-[starting-style]:scale-100 data-[starting-style]:opacity-100 data-[ending-style]:scale-100 data-[ending-style]:opacity-100",
           className,
         )}
         {...props}

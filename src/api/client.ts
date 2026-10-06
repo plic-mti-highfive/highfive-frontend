@@ -51,7 +51,12 @@ function isFormData(value: unknown): value is FormData {
 }
 
 function buildUrl(path: string, query?: Record<string, QueryValue>): string {
-  const url = new URL(`${apiConfig.baseUrl}/api${path}`);
+  // Le second argument sert de base quand `apiConfig.baseUrl` est vide ou
+  // relatif ; il est ignore des que la base est absolue.
+  const url = new URL(
+    `${apiConfig.baseUrl}/api${path}`,
+    window.location.origin,
+  );
   if (query) {
     for (const [key, value] of Object.entries(query)) {
       if (value === undefined) continue;
@@ -136,7 +141,9 @@ export async function apiFetch(
     throw new ApiError(
       response.status,
       errorBody?.code ?? "unknown_error",
-      errorBody?.message ?? response.statusText ?? "Erreur inconnue.",
+      // `||` et non `??` : `statusText` est vide en HTTP/2, et un message
+      // vide donnerait une alerte vide dans l'interface.
+      errorBody?.message || response.statusText || "Erreur inconnue.",
       errorBody?.details,
     );
   }

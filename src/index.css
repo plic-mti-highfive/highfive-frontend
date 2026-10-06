@@ -403,6 +403,59 @@
    (utilisé par le token --shadow-lift pour l'anneau teinté au survol).
    Clair et sombre passent par les mêmes étapes light/mid/dark/deeper que
    le reste de la roue. */
+/* Accent de projet a couleur libre : `data-accent-custom` + les variables
+   --pa-* calculees par `src/shared/lib/accentColor.ts` (contraste garanti
+   pour chaque theme). Memes variables que `data-accent`, donc memes
+   consommateurs (Card, ProjectCard, liens, puces...). */
+[data-accent-custom] {
+  --accent-base: var(--pa-base);
+  --accent-light: var(--pa-surface);
+  --accent-dark: var(--pa-ink);
+  --card-accent: var(--pa-base);
+}
+.dark [data-accent-custom] {
+  --accent-base: var(--pa-base-dk);
+  --accent-light: var(--pa-surface-dk);
+  --accent-dark: var(--pa-ink-dk);
+  --card-accent: var(--pa-base-dk);
+}
+
+/* Theme de fiche projet : `data-project-theme` + les variables --pt-*
+   calculees par `src/shared/lib/projectTheme.ts` (contraste garanti). La
+   fiche impose sa palette quel que soit le theme du site : on recable ici les
+   tokens semantiques, donc Card, Button, Section... suivent sans changement.
+   Les memes variables --accent-* que `data-accent` alimentent puces, liens,
+   onglet actif et anneaux. */
+[data-project-theme] {
+  --background: var(--pt-background);
+  --foreground: var(--pt-text);
+  --card: var(--pt-panel);
+  --card-foreground: var(--pt-text);
+  --popover: var(--pt-panel);
+  --popover-foreground: var(--pt-text);
+  --primary: var(--pt-accent);
+  --primary-foreground: var(--pt-on-accent);
+  --secondary: var(--pt-muted);
+  --secondary-foreground: var(--pt-text);
+  --muted: var(--pt-muted);
+  --muted-foreground: var(--pt-muted-text);
+  --accent: var(--pt-muted);
+  --accent-foreground: var(--pt-text);
+  --border: var(--pt-border);
+  --input: var(--pt-border);
+  --ring: var(--pt-accent);
+  --accent-base: var(--pt-accent);
+  --accent-light: var(--pt-accent-surface);
+  --accent-dark: var(--pt-accent-ink);
+  --card-accent: var(--pt-accent);
+  background-color: var(--pt-background);
+  color: var(--pt-text);
+  color-scheme: light;
+}
+[data-project-theme][data-project-scheme="dark"] {
+  color-scheme: dark;
+}
+
 [data-accent="rose"] {
   --accent-base: var(--color-rose);
   --accent-light: var(--color-rose-light);

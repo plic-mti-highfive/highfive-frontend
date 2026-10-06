@@ -25,6 +25,7 @@ import {
 import type { ProjectState, ProjectSummary } from "@/domain";
 import { PROJECT_STATE_LABELS } from "../lib/labels";
 import { ConfirmActionDialog } from "./ConfirmActionDialog";
+import { ProjectMediaDialog } from "./ProjectMediaDialog";
 import { LoadMoreButton } from "./LoadMoreButton";
 
 const STATE_TONE: Record<ProjectState, "success" | "info" | "neutral"> = {
@@ -40,6 +41,7 @@ export function ProjectsSection() {
     null,
   );
   const [confirmTitle, setConfirmTitle] = useState("");
+  const [mediaProject, setMediaProject] = useState<ProjectSummary | null>(null);
 
   const projectsQuery = useAdminProjectsInfinite();
   const deleteProject = useDeleteProjectAsAdmin();
@@ -147,6 +149,13 @@ export function ProjectsSection() {
                       Voir
                     </Link>
                     <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setMediaProject(project)}
+                    >
+                      Médias
+                    </Button>
+                    <Button
                       variant="destructive"
                       size="sm"
                       onClick={() => setProjectToDelete(project)}
@@ -166,6 +175,13 @@ export function ProjectsSection() {
         isFetchingNextPage={projectsQuery.isFetchingNextPage}
         onClick={() => projectsQuery.fetchNextPage()}
       />
+
+      {mediaProject && (
+        <ProjectMediaDialog
+          project={mediaProject}
+          onClose={() => setMediaProject(null)}
+        />
+      )}
 
       <ConfirmActionDialog
         open={projectToDelete !== null}

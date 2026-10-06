@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { apiFetch } from "./client";
 import {
+  adminProjectMediaSchema,
   adminStatsSchema,
   currentUserSchema,
   paginatedSchema,
@@ -8,6 +9,7 @@ import {
   reportSchema,
   reportSummarySchema,
   tagSchema,
+  type AdminProjectMedia,
   type AdminStats,
   type CurrentUser,
   type Paginated,
@@ -88,6 +90,13 @@ export function listAdminProjects(
 /** R-PR7 : suppression reservee au porteur et a l'administration. */
 export function adminDeleteProject(slug: string): Promise<void> {
   return apiFetch(`/admin/projects/${slug}`, { method: "DELETE" });
+}
+
+/** Medias de personnalisation d'un projet (banniere + galerie), meme prive ou en brouillon. */
+export function getAdminProjectMedia(slug: string): Promise<AdminProjectMedia> {
+  return apiFetch(`/admin/projects/${slug}/media`, {
+    schema: adminProjectMediaSchema,
+  });
 }
 
 export function listAdminTags(): Promise<Tag[]> {

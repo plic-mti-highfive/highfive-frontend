@@ -35,6 +35,20 @@ import type {
  */
 export type DbUser = CurrentUser & { passwordHash: string };
 
+/**
+ * Image de personnalisation televersee (`POST /projects/:slug/customization/images`).
+ * `url` est une data URL (le mock ne sert pas d'octets) ; l'image reste ici
+ * meme si elle n'est pas (ou plus) referencee par `Project.customization`
+ * (le backend reel nettoiera les images orphelines).
+ */
+export interface DbCustomizationImage {
+  id: string;
+  projectId: string;
+  url: string;
+  size: number;
+  mimeType: string;
+}
+
 class Table<T> {
   private rows: T[];
 
@@ -107,6 +121,7 @@ export interface MockDatabase {
   tasks: Table<Task>;
   walls: Table<Wall>;
   files: Table<ProjectFile>;
+  customizationImages: Table<DbCustomizationImage>;
   conversations: Table<Conversation>;
   messages: Table<Message>;
   notifications: Table<Notification>;
@@ -131,6 +146,7 @@ export interface DemoDataset {
   tasks: Task[];
   walls: Wall[];
   files: ProjectFile[];
+  customizationImages: DbCustomizationImage[];
   conversations: Conversation[];
   messages: Message[];
   notifications: Notification[];
@@ -155,6 +171,10 @@ function buildDb(dataset: DemoDataset): MockDatabase {
     tasks: new Table(dataset.tasks, byShallowEquality),
     walls: new Table(dataset.walls, byShallowEquality),
     files: new Table(dataset.files, byShallowEquality),
+    customizationImages: new Table(
+      dataset.customizationImages,
+      byShallowEquality,
+    ),
     conversations: new Table(dataset.conversations, byShallowEquality),
     messages: new Table(dataset.messages, byShallowEquality),
     notifications: new Table(dataset.notifications, byShallowEquality),

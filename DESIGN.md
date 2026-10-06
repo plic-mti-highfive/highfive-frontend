@@ -162,7 +162,7 @@ Five more hues complete the deterministic accent wheel alongside `--color-rose`,
 - **`--color-sky`** (`#3ec6f5`)
 - **`--color-purple`** (`#c24bff`)
 
-A tag, project, or assignee's color is computed by hashing its id/name and indexing into this six-color wheel — `getAccent()` in `src/shared/lib/accent.ts` returns one of `AccentName` (`"rose" | "orange" | "yellow" | "apple" | "sky" | "purple"`). A container carries that result as `data-accent="<name>"`, which defines `--accent-base`/`--accent-light`/`--accent-dark`/`--card-accent` in CSS (see `[data-accent]` in `src/index.css`) — components (`Card`, `Avatar`, `TagPill`, `Badge` tone `accent`) then style themselves purely from those variables, never from a hex value in JS. The same string always resolves to the same hue everywhere it appears, and no hue is ever chosen by hand.
+A tag, project, or assignee's color is computed by hashing its id/name and indexing into this six-color wheel — `getAccent()` in `src/shared/lib/accent.ts` returns one of `AccentName` (`"rose" | "orange" | "yellow" | "apple" | "sky" | "purple"`). A container carries that result as `data-accent="<name>"`, which defines `--accent-base`/`--accent-light`/`--accent-dark`/`--card-accent` in CSS (see `[data-accent]` in `src/index.css`) — components (`Card`, `Avatar`, `TagPill`, `Badge` tone `accent`) then style themselves purely from those variables, never from a hex value in JS. The same string always resolves to the same hue everywhere it appears, and no hue is ever chosen by hand — with one bounded exception: a project's owner may pick a color for their own project (`Project.customization.accent`, surfaced as `ProjectSummary.accent`), which then replaces the hashed hue for that project only (see the Deterministic Tint Rule).
 
 ### Neutral
 
@@ -182,7 +182,7 @@ In dark mode the same roles shift to a deep violet-black base (`oklch(0.15 0.02 
 
 **The Accent-Not-Action Rule.** `--color-rose` is a signal color (identity, social action, hashed category), never the default action color. Primary buttons and links use the near-black/near-white neutral pair, not rose — this keeps the one brand accent rare and meaningful instead of diluted across every CTA.
 
-**The Deterministic Tint Rule.** Any color assigned to a tag, project, or assignee is derived by hashing its id/name through `getAccent()`, never picked manually. The same project or tag always renders in the same hue everywhere in the product; don't hardcode a specific hue to a specific entity.
+**The Deterministic Tint Rule.** Any color assigned to a tag, project, or assignee is derived by hashing its id/name through `getAccent()`, never picked manually. The same project or tag always renders in the same hue everywhere in the product; don't hardcode a specific hue to a specific entity. **Exception — project theme:** the owner of a project may choose a four-color palette for its fiche (`Project.customization.theme`: page background, panel, text, accent — any `#rrggbb`, offered through six presets and free adjustment). The palette is imposed on that fiche whatever the visitor's light/dark theme: `[data-project-theme]` in `src/index.css` rewires the semantic tokens (`--background`, `--card`, `--foreground`, `--primary`, `--border`…) onto `--pt-*` variables, so `Card`, `Button`, `Section` follow untouched. Within a themed fiche only, the primary button takes the accent (the Accent-Not-Action Rule is lifted there; everywhere else it stands). The accent also replaces the hashed hue on that project's cards (`ProjectSummary.accent`), and falls back to `getAccent(project.id)` when unset. A free color is never used raw: `src/shared/lib/projectTheme.ts` derives, in OKLCH keeping the hue and moving only lightness, a text ≥ 4.5:1 and a muted text ≥ 4.5:1 on background and panel, an accent base (≥ 3:1), a discreet tinted surface and a link ink (≥ 4.5:1), and picks black or white for button text. Tags, users and assignees stay strictly hashed: a project's palette never recolors them or any other entity's identity color.
 
 ## Typography
 
@@ -277,6 +277,7 @@ Buttons, inputs, and cards read as **soft and inviting**: generous radii, light 
 - **Background:** each card is internally banded (header/body/footer strips), all derived from `color-mix(in srgb, <accent> X%, var(--card))` at different mix strengths — never a flat single fill.
 - **Shadow Strategy:** see Elevation & Depth — flat at rest, tinted lift on hover.
 - **Border:** none; the color bands and hover ring carry the boundary instead of a stroke.
+- **Cover image (optional):** a project card (`card`, and `hero` where it replaces the CSS pattern panel) shows the owner's banner as a 16:9 strip at the top, cropped around its focal point, on a `bg-muted` ground while loading. No border, no resting shadow, no zoom on hover (the tinted ring stays the only hover response), no text over the image. It is decorative (`alt=""`) because the card link already carries the project title. No image means no strip: no placeholder. Dense variants (`list`, `top`) never show it.
 - **Internal Padding:** compact cards use `20px` horizontal / `16px` vertical; the hero card scales up to `32px` / `28px`.
 
 ### Inputs / Fields
@@ -308,4 +309,4 @@ Circular; renders the real photo when available, and otherwise deterministic ini
 - **Don't** apply the Fraunces display serif to anything other than the literal "HighFive!" wordmark — all headlines, including large ones, use Geist (The Wordmark-Only Serif Rule).
 - **Don't** default to a corporate SaaS blue as a primary or accent color — the system's identity color is warm rose, its neutrals are warm cream/ink, not cool gray-blue.
 - **Don't** add ambient/resting shadows to cards or tickets; elevation only appears as a direct response to hover.
-- **Don't** manually assign a specific hue to a specific tag, project, or user — always go through the deterministic hash so the same name always resolves the same way.
+- **Don't** manually assign a specific hue to a specific tag or user — always go through the deterministic hash so the same name always resolves the same way. (A project's owner may choose that project's accent color; see the Deterministic Tint Rule exception.)

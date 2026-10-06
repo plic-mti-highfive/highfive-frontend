@@ -247,7 +247,7 @@ jamais nommes. `GET /feed/people` public, colonne d'appui — pas de regle
 metier stricte cote mock (retourne un echantillon), a affiner si besoin
 produit (diversite, exclusion des personnes deja suivies...).
 
-### Projets (8 routes)
+### Projets (11 routes)
 
 Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
 
@@ -276,6 +276,52 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
   R-M2 exige "l'accord explicite" du nouveau porteur au moment du transfert
   — **le mock l'applique immediatement sans accord** (ecart, voir section 8) ; le backend devrait creer une invitation de transfert acceptee par le
   destinataire plutot qu'un transfert direct, si le produit le confirme.
+- **Personnalisation de la fiche** (`PATCH /projects/{slug}/customization`,
+  `POST` et `DELETE /projects/{slug}/customization/images[/{imageId}]`) :
+  banniere, theme, sections et galerie, voir `docs/v2/customization-scope.md`.
+  Regles serveur :
+  - **Porteur seul** (`project.ownerId`, compte `active`) : un co-porteur
+    n'a pas ce droit, contrairement a `PATCH /projects/{slug}`. La
+    personnalisation fait partie du projet et **suit le transfert** de
+    propriete sans etre remise a zero.
+  - `theme` (optionnel) est une palette de quatre couleurs `#rrggbb` en minuscules
+    (regex `^#[0-9a-f]{6}$`) : `background` (fond de page), `panel` (fond des blocs),
+    `text` et `accent`. Les quatre sont obligatoires ensemble (un theme est un tout ;
+    absent = la fiche suit le theme du site). Le backend les valide et les stocke
+    telles quelles, **sans verifier le contraste** : la derivation (bordures, texte
+    secondaire, texte des boutons) et la correction du contraste sont **uniquement
+    cote client** (`src/shared/lib/projectTheme.ts`). `ProjectSummary.accent` est la
+    copie de `theme.accent`.
+  - `ProjectSummary.banner` est la copie de `customization.banner` (url, alt, decorative,
+    focal) pour les cartes du fil, de la recherche et du profil. Un fil charge 12 projets ou plus :
+    servir pour les cartes une **variante miniature** (environ 640 px de large) plutot que la
+    banniere de 1600 px / 2 Mo. Pour un projet prive, l'URL ne doit pas etre devinable (R-V3).
+  - Le `PATCH` **remplace** l'objet complet (`Project.customization`) ; le
+    `PATCH /projects/{slug}` generique l'ignore.
+  - Regles que le JSON Schema ne represente pas (`superRefine`) : `sections`
+    contient chacune des quatre sections (`pinned`, `about`, `gallery`,
+    `comments`) exactement une fois ; les `id` de la galerie sont uniques ;
+    la galerie compte 8 images au plus ; chaque image porte un `alt`
+    non vide, sauf si `decorative` est vrai ; les URLs d'images sont en
+    `https://` (ou `data:image/` dans le mock), jamais d'autre schema.
+  - Chaque `id` d'image du corps doit appartenir a ce projet (televerse via
+    `POST .../images`) : sinon 400. Ne jamais accepter une URL arbitraire.
+  - **Images** : `multipart/form-data`, champ `file`, JPEG/PNG/WebP/AVIF
+    uniquement (verifier le type MIME reel du contenu, pas le `Content-Type`
+    declare), 2 Mo au plus (le client compresse en WebP avant l'envoi).
+    Les images televersees mais jamais referencees par un `PATCH` doivent
+    etre **nettoyees cote backend** (job planifie ou TTL).
+  - **Projet prive** (R-V3) : les URLs d'images d'un projet prive ne doivent
+    pas etre publiquement devinables (URL signees ou controle d'acces sur le
+    stockage objet), comme pour R-F4.
+  - **Moderation** : un admin peut `DELETE` une image de n'importe quel
+    projet (corps facultatif `{ reason }`, 1000 caracteres au plus) ; quand il
+    agit sur le projet d'un autre porteur, l'action est journalisee dans
+    `admin_actions` sous `remove_project_media` (`targetType = project`,
+    `targetId` = id du projet, motif). Le porteur qui retire son propre media
+    n'est pas journalise. Pour voir ce qu'il retire, l'admin lit
+    `GET /admin/projects/{slug}/media` (banniere + galerie), y compris pour un
+    projet prive ou en brouillon.
 - **Limite de membres** (R-M5, doc 04 §5) : `member_limit` (2 a 200) fixee
   par le porteur, absente du contrat actuel (`ProjectUpdateInput` ne porte
   pas ce champ) — voir section 8. L'atteindre bascule `participation` en
@@ -430,7 +476,7 @@ projets. Themes affiches dans la sous-barre (front, pas une route) :
 `GET /feed/tags-trending` completes par les `interests` de la personne
 connectee, aucune route supplementaire.
 
-### Administration (10 routes)
+### Administration (11 routes)
 
 Toutes reservees `platformRole = admin` (401 si non connecte, 403 sinon).
 R-S2 (file de moderation triee : cibles a 3+ signalements distincts en
@@ -602,3 +648,10 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
 11. **`DELETE /admin/projects/{slug}`** : conserve au contrat mais orphelin
     cote UI (voir §3 "Administration") — decision ouverte : garder pour un
     usage programmatique futur, ou retirer.
+12. **Personnalisation de la fiche** (`Project.customization`,
+    `ProjectSummary.accent`/`banner`) : champs et routes additifs (V2-4), voir §3
+    "Projets". Ecarts du mock a corriger cote backend : pas de nettoyage des
+    images orphelines, pas de notification au porteur (R-S3) quand un admin
+    retire un media, images
+    servies en `data:` URL (le backend sert de vraies URLs), pas de
+    controle du type MIME reel.

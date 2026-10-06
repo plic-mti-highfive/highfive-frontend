@@ -3,6 +3,7 @@ import type { DemoDataset } from "../db";
 import { ANNOUNCEMENTS } from "./announcements";
 import { COMMENTS } from "./comments";
 import { CONVERSATIONS, MESSAGES } from "./conversations";
+import { buildCustomizationImages } from "./customizationFixtures";
 import { FILES } from "./files";
 import { HIGHFIVES } from "./highfives";
 import { MEMBERSHIPS } from "./memberships";
@@ -40,6 +41,9 @@ export const demoDataset: DemoDataset = {
   tasks: TASKS,
   walls: WALLS,
   files: FILES,
+  customizationImages: buildCustomizationImages(
+    new Map(PROJECTS.map((project) => [project.slug, project.id])),
+  ),
   conversations: CONVERSATIONS,
   messages: MESSAGES,
   notifications: NOTIFICATIONS,

@@ -4,6 +4,7 @@ import { Avatar, Section, Stat } from "@shared/ui";
 import type { Need, Project } from "@/domain";
 import type { TeamMember } from "@/api/memberships";
 import { formatAbsoluteDate, formatExactDateTime } from "@shared/lib/dates";
+import { cn } from "@shared/lib/cn";
 import { ROLE_LABEL } from "../lib/labels";
 import { NearbyProjects } from "./NearbyProjects";
 
@@ -44,15 +45,28 @@ function NeedsList({ needs }: { needs: Need[] }) {
 export function ProjectOverviewSidebar({
   project,
   members,
+  accented = false,
 }: {
   project: Project;
   members: TeamMember[];
+  /** Un accent de projet est actif (`data-accent` sur un ancetre) : liseré teinte en haut de la carte. */
+  accented?: boolean;
 }) {
   const isActiveThisWeek = isActiveWithinAWeek(project.lastActivityAt);
 
   return (
     <aside className="flex flex-col gap-8">
-      <div className="flex flex-col gap-8 rounded-[--radius-xl] border border-[--border] bg-card p-6 shadow-[--shadow-rest]">
+      <div
+        className={cn(
+          "flex flex-col gap-8 overflow-hidden rounded-[--radius-xl] border border-[--border] bg-card p-6 shadow-[--shadow-rest]",
+        )}
+      >
+        {accented && (
+          <div
+            aria-hidden="true"
+            className="-mx-6 -mt-6 -mb-3.5 h-1.5 shrink-0 bg-[var(--accent-base)]"
+          />
+        )}
         <Section title="Équipe">
           {members.length === 0 ? (
             <p className="text-body-sm text-muted-foreground">

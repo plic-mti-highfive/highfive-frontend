@@ -6,7 +6,9 @@ import {
 } from "@tanstack/react-query";
 import * as adminApi from "../admin";
 import * as commentsApi from "../comments";
+import * as customizationApi from "../customization";
 import * as projectsApi from "../projects";
+import { invalidateProjectCards } from "./customization";
 import { queryKeys } from "./keys";
 
 export function useReports(cursor?: string) {
@@ -147,6 +149,37 @@ export function useDeleteProjectAsAdmin() {
     }) => projectsApi.deleteProject(slug, confirmTitle),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "projects"] });
+    },
+  });
+}
+
+/** Banniere et galerie d'un projet pour la moderation (n'interroge rien tant que `enabled` est faux). */
+export function useAdminProjectMedia(slug: string, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.admin.projectMedia(slug),
+    queryFn: () => adminApi.getAdminProjectMedia(slug),
+    enabled: enabled && Boolean(slug),
+  });
+}
+
+/**
+ * Retrait d'un media par l'administration : reutilise
+ * `DELETE /projects/:slug/customization/images/:imageId` (deja ouvert aux
+ * admins ; le motif est journalise cote serveur).
+ */
+export function useAdminRemoveProjectMedia(slug: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ imageId, reason }: { imageId: string; reason?: string }) =>
+      customizationApi.deleteCustomizationImage(slug, imageId, reason),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.projectMedia(slug),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.detail(slug),
+      });
+      void invalidateProjectCards(queryClient);
     },
   });
 }

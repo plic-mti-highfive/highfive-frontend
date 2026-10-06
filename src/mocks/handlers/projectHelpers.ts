@@ -33,6 +33,8 @@ export function toProjectSummary(project: Project) {
     membersCount,
     teamPreview,
     owner: toUserSummary(owner),
+    accent: project.customization?.theme?.accent,
+    banner: project.customization?.banner,
   };
 }
 

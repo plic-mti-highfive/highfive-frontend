@@ -7,6 +7,13 @@ export interface ApiConfig {
   baseUrl: string;
 }
 
+/**
+ * Base du backend. `??` et non `||` : une chaine vide est une valeur utile,
+ * elle signifie « meme origine que la page ». C'est le cas des images Docker,
+ * ou le front et l'API sont servis par la meme gateway et ou l'URL publique
+ * n'est pas connue au moment du build. Non defini (developpement avec
+ * `pnpm dev`), on garde le backend local.
+ */
 export const apiConfig: ApiConfig = {
-  baseUrl: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseUrl: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
 };

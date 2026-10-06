@@ -1,11 +1,12 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { Hand, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { Avatar, AvatarGroup, Badge, Card, Divider, TagPill } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import { getAccent } from "@shared/lib/accent";
-import { getTagById, type ProjectSummary } from "@/domain";
+import { accentAttributes } from "@shared/lib/accentColor";
+import { getTagById, type ProjectBanner, type ProjectSummary } from "@/domain";
 import { preloadProjectDetail, preloadProjectFiche } from "@/app/preload";
 
 function preloadFiche() {
@@ -37,8 +38,8 @@ function participationLabel(project: ProjectSummary): string {
     : PARTICIPATION_LABEL[project.participation];
 }
 
-/** Motif décoratif du panneau `hero` : purement CSS, dérivé de l'accent du
- * projet, pas d'assets image (aucun champ `cover`/`image` sur `ProjectSummary`). */
+/** Motif décoratif du panneau `hero` quand le projet n'a pas de bannière :
+ * purement CSS, dérivé de l'accent du projet. */
 const HERO_PATTERNS = [
   "dots",
   "stripes-diagonal",
@@ -77,6 +78,49 @@ function hashChar(value: string): number {
   return Math.abs(hash);
 }
 
+/**
+ * Bannière du projet, recadrée autour de son point focal. Décorative (`alt=""`,
+ * masquée aux lecteurs d'écran) : le lien de la carte porte déjà le titre du
+ * projet. Ratio réservé par le parent (pas de décalage au chargement), fond
+ * `bg-muted` le temps du chargement, jamais de texte posé sur l'image.
+ */
+function CardCover({
+  banner,
+  eager,
+  onError,
+  className,
+}: {
+  banner: ProjectBanner;
+  /** `hero` : image probablement visible dès l'arrivée, chargée sans attendre. */
+  eager: boolean;
+  onError: () => void;
+  className?: string;
+}) {
+  // Variable CSS dynamique uniquement (V2-2) ; construite hors JSX comme dans
+  // `ProjectBanner` pour passer `check-tokens` après prettier.
+  const focalStyle = {
+    "--focal": `${banner.focal.x}% ${banner.focal.y}%`,
+  } as CSSProperties;
+
+  return (
+    <div
+      aria-hidden="true"
+      className={cn("relative shrink-0 overflow-hidden bg-muted", className)}
+    >
+      <img
+        src={banner.url}
+        alt=""
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : "auto"}
+        decoding="async"
+        style={focalStyle}
+        onError={onError}
+        className="absolute inset-0 size-full object-cover object-[position:var(--focal)]"
+      />
+    </div>
+  );
+}
+
 export interface ProjectCardProps {
   project: ProjectSummary;
   /**
@@ -102,7 +146,11 @@ export function ProjectCard({
   rank,
   className,
 }: ProjectCardProps) {
-  const accent = getAccent(project.id);
+  // Couleur choisie par le porteur, sinon teinte hachee depuis l'id du projet.
+  const accent = accentAttributes(project.accent, getAccent(project.id));
+  // Image en erreur : la carte retombe sur le rendu sans image. Mémorisée par
+  // URL pour qu'un autre fichier (aperçu de l'éditeur) retente le chargement.
+  const [failedCoverUrl, setFailedCoverUrl] = useState<string | null>(null);
   const href = `/projets/${project.slug}`;
   const unmetNeeds = project.needs.filter((need) => !need.fulfilled);
   const team =
@@ -111,7 +159,7 @@ export function ProjectCard({
   if (variant === "list") {
     return (
       <div
-        data-accent={accent}
+        {...accent}
         className={cn(
           "group relative isolate flex items-center gap-3 rounded-lg px-3 py-3 transition-[background-color,filter] duration-base -mx-3 hover:bg-muted/60 hover:brightness-95 dark:hover:brightness-110",
           className,
@@ -165,7 +213,7 @@ export function ProjectCard({
   if (variant === "top") {
     return (
       <div
-        data-accent={accent}
+        {...accent}
         className={cn(
           "group relative isolate flex h-full flex-col gap-2 rounded-lg p-4 transition-[background-color,filter] duration-base -m-1 hover:bg-muted/60 hover:brightness-95 dark:hover:brightness-110",
           className,
@@ -217,12 +265,20 @@ export function ProjectCard({
   }
 
   const hero = variant === "hero";
+  const cover =
+    project.banner && project.banner.url !== failedCoverUrl
+      ? project.banner
+      : undefined;
 
   return (
     <Card
       variant="interactive"
-      data-accent={accent}
-      className={cn("relative flex overflow-hidden", className)}
+      {...accent}
+      className={cn(
+        "relative flex overflow-hidden",
+        cover && (hero ? "flex-col sm:flex-row" : "flex-col"),
+        className,
+      )}
     >
       <Link
         to={href}
@@ -231,6 +287,19 @@ export function ProjectCard({
         onFocus={preloadFiche}
         className="absolute inset-0 z-10 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       />
+
+      {cover && (
+        <CardCover
+          banner={cover}
+          eager={hero}
+          onError={() => setFailedCoverUrl(cover.url)}
+          className={
+            hero
+              ? "aspect-video w-full sm:order-last sm:aspect-auto sm:w-64"
+              : "aspect-video w-full"
+          }
+        />
+      )}
 
       <div
         className={cn(
@@ -323,7 +392,7 @@ export function ProjectCard({
         )}
       </div>
 
-      {hero && (
+      {hero && !cover && (
         <div
           aria-hidden="true"
           className="hidden w-64 shrink-0 sm:block"

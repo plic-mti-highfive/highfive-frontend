@@ -9,5 +9,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Personnalisation de la fiche projet (porteur seul) : banniere avec point
+  focal, palette de couleurs optionnelle (fond, blocs, texte, accent ; imposee a la fiche, contraste garanti), sections de l'Apercu
+  ordonnables et masquables, galerie de 8 images au plus. Contrat additif
+  (`Project.customization`, `ProjectSummary.accent`, trois routes) documente
+  dans `docs/v2/customization-scope.md`, `API-ROUTES.md`, `openapi.yaml` et
+  `SPEC.md`. Rendu de la fiche : banniere, palette plein cadre, sections ordonnees,
+  galerie et visionneuse accessible, accent sur les cartes. Editeur du
+  porteur sur `/projets/:slug/personnaliser` avec apercu live : banniere
+  (point focal, texte alternatif obligatoire), sections reordonnables
+  par boutons ou glisser-deposer (dnd-kit), galerie, couleurs (presets et
+  ajustement libre, en dernier car facultatif), compression WebP cote
+  client, garde de sortie. Moderation : bouton « Medias » par projet dans
+  l'administration (voir, agrandir, retirer avec motif), journalise sous
+  `remove_project_media`.
+- La banniere du projet s'affiche sur les cartes `card` et `hero` (fil,
+  recherche, profil), recadree autour du point focal ; apercu de la carte dans
+  l'editeur de personnalisation. Contrat additif : `ProjectSummary.banner`.
+
+### Changed
+
+- `DESIGN.md` : exception encadree a la « Deterministic Tint Rule » pour
+  l'accent de projet choisi par son porteur.
+
+## [2.0.1] - 2026-09-16
+
+### Fixed
+
+- Les appels API tombent sur l'origine de la page au lieu de
+  `http://localhost:3000` fige au build. Dans une image Docker, le front et
+  l'API sont servis par la meme gateway et l'URL publique n'est pas connue au
+  moment du build : l'interface se chargeait mais aucun appel n'aboutissait.
+  `VITE_API_URL` est desormais exposee en `ARG` du Dockerfile, vide par
+  defaut, et une base vide signifie « meme origine ».
+- Le bundle `docs/v2/backend/schemas/` n'avait pas ete regenere apres le
+  passage de `wallToTasksInputSchema` de `elementIds` a `elements` :
+  `WallToTasksInput.json` documentait une forme qui n'existait plus ni au
+  front ni au back. Le contrat publie decrit de nouveau ce qui est reellement
+  accepte.
+
+## [2.0.0] - 2026-09-16
+
+### Added
+
 - Docker support with `Dockerfile` for containerized deployment
 - GitHub Actions CI/CD pipeline (`.github/workflows/pipeline.yml`)

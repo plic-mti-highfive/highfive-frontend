@@ -13,6 +13,7 @@ import {
   TagPill,
 } from "@shared/ui";
 import { HighfiveButton } from "@shared/components/projects";
+import { preloadCustomizeProject } from "@/app/preload";
 import type { Project, UserSummary } from "@/domain";
 import { PARTICIPATION_LABEL, STATE_LABEL, STATE_TONE } from "../lib/labels";
 import { JoinAction } from "./JoinAction";
@@ -34,14 +35,20 @@ export function ProjectHeader({
   isAuthenticated,
   isMember,
   canEdit,
+  canCustomize = false,
   highfiveGiven,
+  tinted = false,
 }: {
   project: Project;
   owner?: UserSummary;
   isAuthenticated: boolean;
   isMember: boolean;
   canEdit: boolean;
+  /** Porteur seul : affiche le lien vers l'editeur de personnalisation. */
+  canCustomize?: boolean;
   highfiveGiven: boolean;
+  /** Le header est pose sur le fond teinte de l'accent du projet : tags et badges passent sur fond carte pour rester lisibles. */
+  tinted?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -58,7 +65,7 @@ export function ProjectHeader({
   }
 
   return (
-    <header className="flex items-stretch gap-4">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
       <div className="flex flex-1 flex-col gap-4">
         {owner && (
           <div className="flex items-center gap-1 text-body-sm text-muted-foreground">
@@ -85,18 +92,25 @@ export function ProjectHeader({
 
         <div className="flex flex-wrap items-center gap-2">
           {project.tags.map((tag) => (
-            <TagPill key={tag} label={tag} />
+            <TagPill
+              key={tag}
+              label={tag}
+              className={tinted ? "bg-card" : undefined}
+            />
           ))}
-          <Badge tone={STATE_TONE[project.state]}>
+          <Badge
+            tone={STATE_TONE[project.state]}
+            className={tinted ? "bg-card" : undefined}
+          >
             {STATE_LABEL[project.state]}
           </Badge>
-          <Badge tone="neutral">
+          <Badge tone="neutral" className={tinted ? "bg-card" : undefined}>
             {PARTICIPATION_LABEL[project.participation]}
           </Badge>
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end justify-between gap-3">
+      <div className="flex shrink-0 flex-col items-start justify-between gap-3 sm:items-end">
         <div className="flex flex-wrap items-center gap-3">
           <JoinAction
             slug={project.slug}
@@ -105,6 +119,20 @@ export function ProjectHeader({
             isAuthenticated={isAuthenticated}
             isMember={isMember}
           />
+          {canCustomize && (
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  to={`/projets/${project.slug}/personnaliser`}
+                  onMouseEnter={() => void preloadCustomizeProject()}
+                  onFocus={() => void preloadCustomizeProject()}
+                />
+              }
+            >
+              Personnaliser
+            </Button>
+          )}
           {canEdit && (
             <>
               <Button variant="outline" onClick={() => setEditOpen(true)}>

@@ -8,13 +8,19 @@ import type { AnnouncementWithAuthor } from "@/api/announcements";
 export function PinnedAnnouncementPreview({
   slug,
   announcement,
+  inheritAccent = false,
 }: {
   slug: string;
   announcement: AnnouncementWithAuthor;
+  /** Le projet a un accent personnalise (pose sur un ancetre) : la carte l'herite au lieu du orange d'origine. */
+  inheritAccent?: boolean;
 }) {
   return (
     <Link to={`/projets/${slug}/annonces`}>
-      <Card variant="interactive" data-accent="orange">
+      <Card
+        variant="interactive"
+        data-accent={inheritAccent ? undefined : "orange"}
+      >
         <CardBody>
           <div className="flex items-center gap-2">
             <Badge tone="warning">Épinglée</Badge>

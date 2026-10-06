@@ -18,7 +18,23 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 // - src/features/lab/wall/tldrawTheme.ts : palette interne du package
 //   `tldraw` (formes/notes/curseurs), independante de nos tokens (voir le
 //   commentaire en tete de ce fichier) ; seul endroit qui y touche.
-const EXEMPT_FILES = new Set(["src/features/lab/wall/tldrawTheme.ts"]);
+//
+// - Calcul et donnees de couleur de l'accent de projet : ce sont des valeurs de
+//   couleur manipulees comme des donnees (conversion OKLab, contraste, presets
+//   miroir de src/index.css, cas de test), pas du style ecrit en dur. Le style
+//   rendu reste exclusivement porte par des variables CSS (--pa-*).
+const EXEMPT_FILES = new Set([
+  "src/features/lab/wall/tldrawTheme.ts",
+  "src/shared/lib/accentColor.ts",
+  "src/shared/lib/accentColor.test.ts",
+  "src/shared/lib/accentPresets.ts",
+  "src/shared/lib/accentPresets.test.ts",
+  "src/shared/lib/projectTheme.ts",
+  "src/shared/lib/projectTheme.test.ts",
+  "src/shared/lib/projectThemePresets.ts",
+  "src/shared/lib/projectThemePresets.test.ts",
+  "src/features/projects/components/customize/ThemeEditor.test.tsx",
+]);
 
 // Commentaires (// ligne, /* bloc */, JSDoc) : jamais verifies — seul le code
 // reellement execute/rendu compte pour ces regles (voir stripComments()).
