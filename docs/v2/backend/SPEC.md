@@ -288,6 +288,10 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
     `^#[0-9a-f]{6}$`) : le backend la valide et la stocke telle quelle. Le calcul des
     variantes clair/sombre et du contraste est **uniquement cote client**
     (`src/shared/lib/accentColor.ts`) ; `ProjectSummary.accent` en est la copie.
+  - `ProjectSummary.banner` est la copie de `customization.banner` (url, alt, decorative,
+    focal) pour les cartes du fil, de la recherche et du profil. Un fil charge 12 projets ou plus :
+    servir pour les cartes une **variante miniature** (environ 640 px de large) plutot que la
+    banniere de 1600 px / 2 Mo. Pour un projet prive, l'URL ne doit pas etre devinable (R-V3).
   - Le `PATCH` **remplace** l'objet complet (`Project.customization`) ; le
     `PATCH /projects/{slug}` generique l'ignore.
   - Regles que le JSON Schema ne represente pas (`superRefine`) : `sections`
@@ -641,7 +645,7 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
     cote UI (voir §3 "Administration") — decision ouverte : garder pour un
     usage programmatique futur, ou retirer.
 12. **Personnalisation de la fiche** (`Project.customization`,
-    `ProjectSummary.accent`) : champs et routes additifs (V2-4), voir §3
+    `ProjectSummary.accent`/`banner`) : champs et routes additifs (V2-4), voir §3
     "Projets". Ecarts du mock a corriger cote backend : pas de nettoyage des
     images orphelines, pas de notification au porteur (R-S3) quand un admin
     retire un media, images

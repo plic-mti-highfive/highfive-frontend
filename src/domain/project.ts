@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { idSchema, isoDateTimeSchema, slugSchema } from "./common";
-import { accentColorSchema, projectCustomizationSchema } from "./customization";
+import {
+  accentColorSchema,
+  projectBannerSchema,
+  projectCustomizationSchema,
+} from "./customization";
 import { userSummarySchema } from "./user";
 
 /**
@@ -109,6 +113,11 @@ export const projectSummarySchema = z.object({
    * V2-4. Absent = la carte retombe sur `getAccent(project.id)`.
    */
   accent: accentColorSchema.optional(),
+  /**
+   * Bannière du projet (`Project.customization.banner`), additif V2-4. La
+   * carte la recadre autour du point focal ; absente = carte sans image.
+   */
+  banner: projectBannerSchema.optional(),
 });
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;
 

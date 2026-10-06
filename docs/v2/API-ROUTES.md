@@ -240,8 +240,9 @@ de moderation montre le contenu signale sans nouvelle route.
   decorative). Reserve au porteur, elle suit le projet au transfert. `accent` est
   copie dans `ProjectSummary` pour que `ProjectCard` prenne la meme teinte que la
   fiche sans requete supplementaire (`toProjectSummary`,
-  `src/mocks/handlers/projectHelpers.ts`). Trois routes ajoutees (voir « Projets »),
-  decrites dans `docs/v2/customization-scope.md`.
+  `src/mocks/handlers/projectHelpers.ts`). `ProjectSummary.banner` (meme schema que
+  `Project.customization.banner`, optionnel) en est la copie pour les cartes `card` et `hero`.
+  Trois routes ajoutees (voir « Projets »), decrites dans `docs/v2/customization-scope.md`.
 - **`SearchSort` = `"active"`** (`src/domain/search.ts`) ajoute au triplet
   existant `recent/popular/relevant` : le doc 12 (E-02) liste trois tris pour
   `/recherche` — "Les plus récents", "Les plus highfivés", "Les plus actifs" —

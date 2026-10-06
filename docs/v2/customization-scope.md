@@ -31,7 +31,8 @@ projets auront des images).
    de texte (≥ 4.5:1) au contraste garanti (`src/shared/lib/accentColor.ts`, OKLCH, même
    teinte). « Automatique » (pas de couleur) garde la teinte hachée du projet. L'accent
    s'applique aussi aux **cartes** (feed, recherche, profil) pour garder une identité
-   cohérente ; la bannière et la galerie restent sur la fiche seule.
+   cohérente. La **bannière** s'affiche aussi sur les cartes `card` et `hero`, recadrée
+   autour du point focal (voir « Bannière sur les cartes ») ; la galerie reste sur la fiche seule.
 3. **Sections de l'Aperçu** : annonce épinglée, À propos, galerie, commentaires. Chacune est
    visible ou masquée, et réordonnable. La sidebar reste fixe (elle porte l'action de
    participation).
@@ -100,6 +101,16 @@ projets auront des images).
   téléversées mais non référencées sont à nettoyer côté backend. GIF refusé en v1 (perte
   d'animation silencieuse) ; entrée jpeg/png/webp/avif ≤ 10 Mo, sortie compressée ≤ 2 Mo.
 
+### Bannière sur les cartes
+
+- Même image et même point focal que la fiche : la carte la recadre (bandeau 16:9). Pas de champ
+  `cover` dédié.
+- Variantes `card` (bandeau en haut) et `hero` (remplace le motif CSS du panneau latéral ; bandeau en
+  haut sur mobile). Les variantes denses `list` et `top` n'affichent pas d'image.
+- `alt=""` sur la carte : le lien de la carte porte déjà le titre du projet. Image absente ou en
+  erreur de chargement = carte sans bloc image, comme avant.
+- L'éditeur affiche un aperçu de la carte avec le brouillon, pour régler le point focal.
+
 ## Contrat de données (additif, règle V2-4)
 
 ```ts
@@ -110,6 +121,7 @@ Project.customization?: {
   gallery: { id: string; url: string; alt: string; decorative: boolean; caption?: string }[] // max 8
 }
 ProjectSummary.accent?: AccentColor // issu de customization.accent, pour les cartes
+ProjectSummary.banner?: ProjectBanner // issu de customization.banner, pour les cartes `card` et `hero`
 ```
 
 `undefined` = apparence actuelle (accent haché depuis l'id, layout par défaut).
@@ -126,7 +138,7 @@ Upload multipart, types image uniquement, quotas à définir.
 
 ## Hors scope v1
 
-CSS/HTML libre, description markdown étendue, embed vidéo, bannière ou galerie sur les cartes,
+CSS/HTML libre, description markdown étendue, embed vidéo, galerie sur les cartes, image de carte distincte de la bannière,
 co-porteurs, thème du Lab, versionnement du thème.
 
 ## Points à signaler au backend

@@ -171,6 +171,15 @@ describe("PATCH /projects/:slug/customization", () => {
     );
   });
 
+  it("la banniere se retrouve dans le resume de carte, et le retrait l'en enleve", async () => {
+    const banner = project(SLUG).customization!.banner!;
+    expect(toProjectSummary(project(SLUG)).banner).toEqual(banner);
+    expect(toProjectSummary(project(OTHER_SLUG)).banner).toBeUndefined();
+
+    await patch(SLUG, emptyCustomization(), OWNER_TOKEN);
+    expect(toProjectSummary(project(SLUG)).banner).toBeUndefined();
+  });
+
   it("la personnalisation suit le projet au transfert (le patch ne la remet pas a zero)", () => {
     const before = project(SLUG).customization;
     getDb().projects.update((p) => p.slug === SLUG, {

@@ -277,6 +277,7 @@ Buttons, inputs, and cards read as **soft and inviting**: generous radii, light 
 - **Background:** each card is internally banded (header/body/footer strips), all derived from `color-mix(in srgb, <accent> X%, var(--card))` at different mix strengths — never a flat single fill.
 - **Shadow Strategy:** see Elevation & Depth — flat at rest, tinted lift on hover.
 - **Border:** none; the color bands and hover ring carry the boundary instead of a stroke.
+- **Cover image (optional):** a project card (`card`, and `hero` where it replaces the CSS pattern panel) shows the owner's banner as a 16:9 strip at the top, cropped around its focal point, on a `bg-muted` ground while loading. No border, no resting shadow, no zoom on hover (the tinted ring stays the only hover response), no text over the image. It is decorative (`alt=""`) because the card link already carries the project title. No image means no strip: no placeholder. Dense variants (`list`, `top`) never show it.
 - **Internal Padding:** compact cards use `20px` horizontal / `16px` vertical; the hero card scales up to `32px` / `28px`.
 
 ### Inputs / Fields

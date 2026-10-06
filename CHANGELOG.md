@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   client, garde de sortie. Moderation : bouton « Medias » par projet dans
   l'administration (voir, agrandir, retirer avec motif), journalise sous
   `remove_project_media`.
+- La banniere du projet s'affiche sur les cartes `card` et `hero` (fil,
+  recherche, profil), recadree autour du point focal ; apercu de la carte dans
+  l'editeur de personnalisation. Contrat additif : `ProjectSummary.banner`.
 
 ### Changed
 
