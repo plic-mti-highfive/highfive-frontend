@@ -292,7 +292,7 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
     secondaire, texte des boutons) et la correction du contraste sont **uniquement
     cote client** (`src/shared/lib/projectTheme.ts`). `ProjectSummary.accent` est la
     copie de `theme.accent`.
-  - `ProjectSummary.banner` est la copie de `customization.banner` (url, alt, decorative,
+  - `ProjectSummary.banner` est la copie de `customization.banner` (url, alt,
     focal) pour les cartes du fil, de la recherche et du profil. Un fil charge 12 projets ou plus :
     servir pour les cartes une **variante miniature** (environ 640 px de large) plutot que la
     banniere de 1600 px / 2 Mo. Pour un projet prive, l'URL ne doit pas etre devinable (R-V3).
@@ -305,7 +305,7 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
     l'ajout de `needs` n'en ont pas : a la migration, l'inserer juste apres
     `pinned`, visible (le client complete a la fin si elle manque) ; les `id` de la galerie sont uniques ;
     la galerie compte 8 images au plus ; chaque image porte un `alt`
-    non vide, sauf si `decorative` est vrai ; les URLs d'images sont en
+    non vide (pas d'exception « image décorative » : le champ `decorative` n'existe plus) ; les URLs d'images sont en
     `https://` (ou `data:image/` dans le mock), jamais d'autre schema.
   - Chaque `id` d'image du corps doit appartenir a ce projet (televerse via
     `POST .../images`) : sinon 400. Ne jamais accepter une URL arbitraire.

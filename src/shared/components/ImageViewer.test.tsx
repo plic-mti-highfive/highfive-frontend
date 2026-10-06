@@ -12,9 +12,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 
 const IMAGES: ViewerImage[] = [
-  { url: "https://example.test/1.webp", alt: "Image 1", decorative: false },
-  { url: "https://example.test/2.webp", alt: "Image 2", decorative: false },
-  { url: "https://example.test/3.webp", alt: "", decorative: true },
+  { url: "https://example.test/1.webp", alt: "Image 1" },
+  { url: "https://example.test/2.webp", alt: "Image 2" },
+  { url: "https://example.test/3.webp", alt: "Image 3" },
 ];
 
 beforeEach(() => {
@@ -368,11 +368,11 @@ describe("ImageViewer", () => {
     });
   });
 
-  it("rend l'image decorative avec un alt vide et affiche la legende", () => {
+  it("rend l'image avec son alt et affiche la legende", () => {
     render(
       <Harness images={[{ ...IMAGES[2], caption: "Une legende" }]} start={0} />,
     );
-    expect(image().getAttribute("alt")).toBe("");
+    expect(image().getAttribute("alt")).toBe("Image 3");
     expect(screen.getByText("Une legende")).toBeTruthy();
   });
 

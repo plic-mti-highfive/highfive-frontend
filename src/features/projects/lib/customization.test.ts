@@ -105,7 +105,6 @@ describe("toDraft et isDraftDirty", () => {
     id: "00000000-0000-4000-8c0d-000000000001",
     url: "https://example.test/1.webp",
     alt: "Image 1",
-    decorative: false,
   };
 
   it("part de la personnalisation par defaut sans personnalisation enregistree", () => {
@@ -134,9 +133,7 @@ describe("toDraft et isDraftDirty", () => {
     };
     const reordered = JSON.parse(
       JSON.stringify({
-        gallery: [
-          { decorative: false, alt: "Image 1", url: IMAGE.url, id: IMAGE.id },
-        ],
+        gallery: [{ alt: "Image 1", url: IMAGE.url, id: IMAGE.id }],
         sections: DEFAULT_SECTIONS,
       }),
     ) as ProjectCustomization;
@@ -183,7 +180,6 @@ describe("getDraftIssues", () => {
     id: "00000000-0000-4000-8c0d-000000000001",
     url: "https://example.test/1.webp",
     alt: "Une image",
-    decorative: false,
   };
   const missing = {
     ...ok,
@@ -191,10 +187,10 @@ describe("getDraftIssues", () => {
     alt: " ",
   };
 
-  it("ne signale rien quand tout est decrit ou decoratif", () => {
+  it("ne signale rien quand tout est decrit", () => {
     const issues = getDraftIssues({
       sections: [...DEFAULT_SECTIONS],
-      gallery: [ok, { ...missing, decorative: true }],
+      gallery: [ok],
     });
     expect(issues.count).toBe(0);
     expect(issues.gallery).toEqual({});
@@ -234,14 +230,6 @@ describe("getDraftIssues", () => {
     ]);
     expect(issues.count).toBe(3);
   });
-
-  it("ignore les images decoratives meme sans aucun texte", () => {
-    const issues = getDraftIssues({
-      sections: [...DEFAULT_SECTIONS],
-      gallery: [{ ...missing, decorative: true }],
-    });
-    expect(issues.items).toEqual([]);
-  });
 });
 
 describe("altInputId", () => {
@@ -273,7 +261,6 @@ describe("toCardPreview", () => {
     id: "00000000-0000-4000-8c0d-000000000001",
     url: "https://example.test/banner.webp",
     alt: "Un mur peint",
-    decorative: false,
     focal: { x: 10, y: 90 },
   };
 

@@ -53,30 +53,16 @@ const imageUrlSchema = z
   .regex(/^(https?:\/\/|data:image\/)/, "url d'image invalide");
 
 /**
- * Champs communs d'une image personnalisee. Accessibilite : un texte
- * alternatif est obligatoire, sauf si le porteur declare l'image decorative
- * (`decorative: true`, rendue avec `alt=""`).
+ * Champs communs d'une image personnalisee. Accessibilite : le texte
+ * alternatif est toujours obligatoire, y compris pour une image purement
+ * decorative (il n'y a pas d'exception : la description reste utile, et
+ * l'image reste ouvrable en grand).
  */
 const imageFields = {
   id: idSchema,
   url: imageUrlSchema,
-  alt: z.string().max(200),
-  decorative: z.boolean(),
+  alt: z.string().trim().min(1, "Un texte alternatif est requis.").max(200),
 };
-
-function assertAltOrDecorative(
-  image: { alt: string; decorative: boolean },
-  ctx: z.RefinementCtx,
-) {
-  if (!image.decorative && image.alt.trim().length === 0) {
-    ctx.addIssue({
-      code: "custom",
-      message:
-        "Un texte alternatif est requis, sauf si l'image est decorative.",
-      path: ["alt"],
-    });
-  }
-}
 
 /** Reponse de `POST /projects/:slug/customization/images` : l'image est televersee, pas encore referencee. */
 export const customizationImageUploadSchema = z.object({
@@ -94,14 +80,16 @@ export const bannerFocalSchema = z.object({
 });
 export type BannerFocal = z.infer<typeof bannerFocalSchema>;
 
-export const projectBannerSchema = z
-  .object({ ...imageFields, focal: bannerFocalSchema })
-  .superRefine(assertAltOrDecorative);
+export const projectBannerSchema = z.object({
+  ...imageFields,
+  focal: bannerFocalSchema,
+});
 export type ProjectBanner = z.infer<typeof projectBannerSchema>;
 
-export const galleryItemSchema = z
-  .object({ ...imageFields, caption: z.string().max(140).optional() })
-  .superRefine(assertAltOrDecorative);
+export const galleryItemSchema = z.object({
+  ...imageFields,
+  caption: z.string().max(140).optional(),
+});
 export type GalleryItem = z.infer<typeof galleryItemSchema>;
 
 /** Sections de l'onglet Apercu que le porteur peut ordonner et masquer (la sidebar reste fixe). */

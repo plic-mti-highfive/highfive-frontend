@@ -237,8 +237,7 @@ de moderation montre le contenu signale sans nouvelle route.
   additifs (aucun champ existant renomme/retire). `customization` porte la banniere
   (avec point focal), le theme (palette de quatre couleurs `#rrggbb` : `background`, `panel`, `text`, `accent`,
   toutes obligatoires ensemble, `ProjectTheme`), l'ordre/visibilite des quatre
-  sections de l'Apercu et la galerie (8 images max, `alt` obligatoire sauf image
-  decorative). Reserve au porteur, elle suit le projet au transfert. `theme.accent` est
+  sections de l'Apercu et la galerie (8 images max, `alt` obligatoire). Reserve au porteur, elle suit le projet au transfert. `theme.accent` est
   copie dans `ProjectSummary.accent` pour que `ProjectCard` prenne la meme teinte que la
   fiche sans requete supplementaire (`toProjectSummary`,
   `src/mocks/handlers/projectHelpers.ts`). `ProjectSummary.banner` (meme schema que

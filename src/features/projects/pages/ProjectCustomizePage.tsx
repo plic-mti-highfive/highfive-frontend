@@ -383,8 +383,8 @@ function CustomizeEditor({
               className="flex flex-col gap-2 rounded-lg border border-danger-border bg-danger-bg p-3 text-body-sm text-danger-fg"
             >
               <p>
-                Impossible d'enregistrer : il manque un texte alternatif.
-                Complète-le, ou coche « Image décorative ».
+                Impossible d'enregistrer : il manque un texte alternatif. Décris
+                chaque image pour continuer.
               </p>
               <ul className="flex flex-wrap gap-x-4 gap-y-1">
                 {issues.items.map((item) => (

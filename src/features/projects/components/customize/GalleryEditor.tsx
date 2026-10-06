@@ -1,7 +1,7 @@
 import { useId, useState, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 
-import { Checkbox, Field, IconButton, Input } from "@shared/ui";
+import { Field, IconButton, Input } from "@shared/ui";
 import { MAX_GALLERY_IMAGES, type GalleryItem } from "@/domain";
 import { GALLERY_MAX_WIDTH } from "../../lib/imageCompression";
 import { altInputId, moveItem } from "../../lib/customization";
@@ -13,7 +13,7 @@ import type { UploadImage } from "./types";
 
 /**
  * Edition de la galerie (8 images maximum) : ajout (plusieurs fichiers a la
- * fois), texte alternatif obligatoire sauf image decorative, legende
+ * fois), texte alternatif obligatoire, legende
  * facultative, reordonnancement par glisser-deposer (poignee) ou boutons ↑/↓,
  * annonce en `role="status"`.
  */
@@ -49,7 +49,6 @@ export function GalleryEditor({
           id: uploaded.id,
           url: uploaded.url,
           alt: "",
-          decorative: false,
         });
       } catch (caught) {
         errors.push(`${file.name} : ${describeUploadError(caught)}`);
@@ -199,31 +198,19 @@ function GalleryItemEditor({
           <Field
             label="Texte alternatif"
             htmlFor={altInputId(item.id)}
-            required={!item.decorative}
-            description={
-              item.decorative
-                ? "Image décorative : aucun texte alternatif n'est nécessaire."
-                : "Obligatoire. Décris l'image pour les personnes qui ne la voient pas."
-            }
+            required
+            description="Décris l'image pour les personnes qui ne la voient pas."
             error={error}
           >
             <Input
               id={altInputId(item.id)}
               value={item.alt}
-              disabled={item.decorative}
-              aria-required={!item.decorative}
+              aria-required
               maxLength={200}
               aria-invalid={Boolean(error)}
               onChange={(event) => onChange({ alt: event.target.value })}
             />
           </Field>
-          <label className="flex items-center gap-2 text-body-sm text-foreground">
-            <Checkbox
-              checked={item.decorative}
-              onCheckedChange={(checked) => onChange({ decorative: checked })}
-            />
-            Image décorative
-          </label>
           <Field label="Légende (facultative)" htmlFor={captionId}>
             <Input
               id={captionId}

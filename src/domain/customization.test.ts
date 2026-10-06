@@ -34,18 +34,17 @@ describe("projectCustomizationSchema", () => {
     ).not.toThrow();
   });
 
-  it("exige un texte alternatif, sauf image decorative", () => {
+  it("exige toujours un texte alternatif, sans exception", () => {
     const withoutAlt = customization({
       gallery: [galleryItem(IMAGE_ID, "  ")],
     });
     expect(projectCustomizationSchema.safeParse(withoutAlt).success).toBe(
       false,
     );
-
-    const decorative = customization({
-      gallery: [{ ...galleryItem(IMAGE_ID, ""), decorative: true }],
+    const described = customization({
+      gallery: [galleryItem(IMAGE_ID, "Un mur peint")],
     });
-    expect(projectCustomizationSchema.safeParse(decorative).success).toBe(true);
+    expect(projectCustomizationSchema.safeParse(described).success).toBe(true);
   });
 
   it("applique la meme regle d'alt a la banniere", () => {
@@ -53,17 +52,11 @@ describe("projectCustomizationSchema", () => {
       id: IMAGE_ID,
       url: URL,
       alt: "",
-      decorative: false,
       focal: { x: 50, y: 50 },
     };
     expect(
       projectCustomizationSchema.safeParse(customization({ banner })).success,
     ).toBe(false);
-    expect(
-      projectCustomizationSchema.safeParse(
-        customization({ banner: { ...banner, decorative: true } }),
-      ).success,
-    ).toBe(true);
   });
 
   it("borne le point focal de la banniere a 0-100", () => {
@@ -71,7 +64,6 @@ describe("projectCustomizationSchema", () => {
       id: IMAGE_ID,
       url: URL,
       alt: "Banniere",
-      decorative: false,
       focal: { x: 101, y: 50 },
     };
     expect(

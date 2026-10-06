@@ -62,8 +62,8 @@ projets auront des images).
 
 - Compression côté client avant upload : redimensionnement et passage en WebP (bannière
   ≤ 1600 px de large, galerie ≤ 1200 px).
-- Texte alternatif **obligatoire** sur chaque image, avec une case « image décorative » pour
-  s'en dispenser.
+- Texte alternatif **obligatoire** sur chaque image, sans exception (pas de case « image
+  décorative »).
 - Aucun placeholder : pas d'image = pas de bloc. La section galerie n'apparaît que s'il y a
   des images.
 - Mock : images stockées en mémoire côté MSW. Fixtures de démo neutres (dégradés, SVG), pas de
@@ -127,10 +127,10 @@ projets auront des images).
 
 ```ts
 Project.customization?: {
-  banner?: { url: string; alt: string; decorative: boolean; focal: { x: number; y: number } }
+  banner?: { url: string; alt: string; focal: { x: number; y: number } }
   theme?: { background: string; panel: string; text: string; accent: string } // "#rrggbb" en minuscules, les quatre ensemble
   sections: { id: "pinned" | "needs" | "about" | "gallery" | "comments"; visible: boolean }[] // l'ordre du tableau = l'ordre d'affichage
-  gallery: { id: string; url: string; alt: string; decorative: boolean; caption?: string }[] // max 8
+  gallery: { id: string; url: string; alt: string; caption?: string }[] // max 8
 }
 ProjectSummary.accent?: AccentColor // issu de customization.theme.accent, pour les cartes
 ProjectSummary.banner?: ProjectBanner // issu de customization.banner, pour les cartes `card` et `hero`

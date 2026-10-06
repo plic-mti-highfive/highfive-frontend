@@ -100,7 +100,6 @@ const IMAGE = {
   id: "00000000-0000-4000-8c0d-000000000001",
   url: "https://example.test/1.webp",
   alt: "Image 1",
-  decorative: false,
 };
 
 describe("ProjectOverview", () => {
