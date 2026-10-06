@@ -37,11 +37,10 @@ const needs = () =>
   }[];
 
 describe("InfoEditor — profils recherches", () => {
-  it("marque un profil comme pourvu et le retire", async () => {
+  it("retire un profil", async () => {
     const user = userEvent.setup();
     render(<Harness />);
-    await user.click(screen.getByRole("checkbox", { name: "Pourvu" }));
-    expect(needs()[0].fulfilled).toBe(true);
+    expect(screen.queryByRole("checkbox")).toBeNull();
     await user.click(
       screen.getByRole("button", {
         name: "Retirer « quelqu'un pour la photo »",

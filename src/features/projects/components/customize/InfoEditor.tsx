@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 
-import {
-  Button,
-  Checkbox,
-  Field,
-  IconButton,
-  Input,
-  Textarea,
-} from "@shared/ui";
+import { Button, Field, IconButton, Input, Textarea } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import {
   INFO_FIELD_IDS,
@@ -124,20 +117,6 @@ export function InfoEditor({
                 >
                   {need.label}
                 </span>
-                <label className="flex shrink-0 items-center gap-1.5 text-body-sm text-muted-foreground">
-                  <Checkbox
-                    checked={need.fulfilled}
-                    onCheckedChange={(checked) =>
-                      onChange({
-                        ...value,
-                        needs: value.needs.map((n) =>
-                          n.id === need.id ? { ...n, fulfilled: checked } : n,
-                        ),
-                      })
-                    }
-                  />
-                  Pourvu
-                </label>
                 <IconButton
                   aria-label={`Retirer « ${need.label} »`}
                   size="xs"
