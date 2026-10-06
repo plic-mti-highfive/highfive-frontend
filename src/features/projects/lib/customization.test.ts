@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { presetColor } from "@shared/lib/accentPresets";
-import { DEFAULT_SECTIONS, type ProjectCustomization } from "@/domain";
+import type { TeamMember } from "@/api/memberships";
+import {
+  DEFAULT_SECTIONS,
+  type Project,
+  type ProjectCustomization,
+} from "@/domain";
 import {
   ALT_REQUIRED_MESSAGE,
   altInputId,
@@ -8,6 +13,7 @@ import {
   isDraftDirty,
   moveItem,
   resolveSections,
+  toCardPreview,
   toDraft,
 } from "./customization";
 
@@ -241,5 +247,108 @@ describe("altInputId", () => {
     expect(altInputId("banner")).toBe("customize-alt-banner");
     expect(altInputId("abc")).toBe("customize-alt-abc");
     expect(altInputId("abc")).not.toBe(altInputId("banner"));
+  });
+});
+
+describe("toCardPreview", () => {
+  const PROJECT: Project = {
+    id: "00000000-0000-4000-8000-000000000001",
+    slug: "fresque",
+    title: "Fresque murale",
+    tagline: "Peindre le mur ensemble.",
+    tags: ["art"],
+    needs: [],
+    visibility: "public",
+    participation: "open",
+    state: "active",
+    ownerId: "00000000-0000-4000-8000-0000000000a1",
+    highfiveCount: 4,
+    createdAt: "2026-09-01T10:00:00.000Z",
+    updatedAt: "2026-09-01T10:00:00.000Z",
+    lastActivityAt: "2026-09-01T10:00:00.000Z",
+  };
+  const BANNER = {
+    id: "00000000-0000-4000-8c0d-000000000001",
+    url: "https://example.test/banner.webp",
+    alt: "Un mur peint",
+    decorative: false,
+    focal: { x: 10, y: 90 },
+  };
+
+  function member(n: number, role: TeamMember["role"]): TeamMember {
+    const id = `00000000-0000-4000-8000-0000000000a${n}`;
+    return {
+      projectId: PROJECT.id,
+      userId: id,
+      role,
+      joinedAt: "2026-09-01T10:00:00.000Z",
+      blocked: false,
+      user: {
+        id,
+        username: `user${n}`,
+        displayName: `User ${n}`,
+        avatar: `https://example.test/${n}.webp`,
+      },
+    };
+  }
+
+  it("reprend l'accent et la banniere du brouillon, pas ceux du projet enregistre", () => {
+    const saved: Project = {
+      ...PROJECT,
+      customization: {
+        accent: presetColor("sky"),
+        sections: [...DEFAULT_SECTIONS],
+        gallery: [],
+      },
+    };
+    const draft: ProjectCustomization = {
+      accent: presetColor("rose"),
+      banner: BANNER,
+      sections: [...DEFAULT_SECTIONS],
+      gallery: [],
+    };
+    const preview = toCardPreview(saved, [member(1, "owner")], draft);
+    expect(preview?.accent).toBe(presetColor("rose"));
+    expect(preview?.banner).toEqual(BANNER);
+    expect(
+      toCardPreview(saved, [member(1, "owner")], toDraft(undefined)),
+    ).toMatchObject({ accent: undefined, banner: undefined });
+  });
+
+  it("met le porteur en tete de l'equipe (6 au plus) et compte tous les membres", () => {
+    const members = [
+      member(2, "member"),
+      member(3, "member"),
+      member(1, "owner"),
+      ...[4, 5, 6, 7, 8].map((n) => member(n, "member")),
+    ];
+    const preview = toCardPreview(PROJECT, members, toDraft(undefined));
+    expect(preview?.owner.username).toBe("user1");
+    expect(preview?.teamPreview).toHaveLength(6);
+    expect(preview?.teamPreview[0].username).toBe("user1");
+    expect(preview?.membersCount).toBe(8);
+  });
+
+  it("copie les champs de la carte depuis le projet", () => {
+    const preview = toCardPreview(
+      PROJECT,
+      [member(1, "owner")],
+      toDraft(undefined),
+    );
+    expect(preview).toMatchObject({
+      id: PROJECT.id,
+      slug: "fresque",
+      title: "Fresque murale",
+      tagline: "Peindre le mur ensemble.",
+      highfiveCount: 4,
+      state: "active",
+    });
+  });
+
+  it("pas d'apercu tant que le porteur n'est pas dans l'equipe", () => {
+    expect(toCardPreview(PROJECT, [], toDraft(undefined))).toBeNull();
+    expect(
+      toCardPreview(PROJECT, [member(2, "member")], toDraft(undefined)),
+    ).toBeNull();
   });
 });

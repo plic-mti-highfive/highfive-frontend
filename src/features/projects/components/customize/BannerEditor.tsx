@@ -109,7 +109,8 @@ export function BannerEditor({
       <div className="flex flex-col gap-1.5">
         <p className="text-body-sm text-muted-foreground">
           Clique sur la partie importante de l'image : elle restera visible
-          quand la bannière est recadrée.
+          quand la bannière est recadrée, sur la fiche comme sur la carte du
+          projet.
         </p>
         <div
           onClick={handleImageClick}

@@ -1,7 +1,10 @@
+import type { TeamMember } from "@/api/memberships";
 import {
   DEFAULT_SECTIONS,
   type CustomizationSection,
+  type Project,
   type ProjectCustomization,
+  type ProjectSummary,
 } from "@/domain";
 
 /**
@@ -137,4 +140,40 @@ export function getDraftIssues(draft: ProjectCustomization): DraftIssues {
     }
   });
   return issues;
+}
+
+/**
+ * Resume de carte d'un projet avec le brouillon de personnalisation, pour
+ * l'apercu de la carte dans l'editeur. Meme composition que le backend : le
+ * porteur en tete de `teamPreview` (6 au plus). Sans porteur parmi les membres
+ * (equipe pas encore chargee), pas d'apercu : `null`.
+ */
+export function toCardPreview(
+  project: Project,
+  members: readonly TeamMember[],
+  draft: ProjectCustomization,
+): ProjectSummary | null {
+  const owner = members.find((member) => member.role === "owner")?.user;
+  if (!owner) return null;
+  const team = [
+    owner,
+    ...members.filter((member) => member.role !== "owner").map((m) => m.user),
+  ];
+  return {
+    id: project.id,
+    slug: project.slug,
+    title: project.title,
+    tagline: project.tagline,
+    tags: project.tags,
+    needs: project.needs,
+    visibility: project.visibility,
+    participation: project.participation,
+    state: project.state,
+    highfiveCount: project.highfiveCount,
+    membersCount: members.length,
+    teamPreview: team.slice(0, 6),
+    owner,
+    accent: draft.accent,
+    banner: draft.banner,
+  };
 }
