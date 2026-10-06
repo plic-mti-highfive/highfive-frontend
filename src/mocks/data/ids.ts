@@ -22,3 +22,9 @@ export const minutesAgo = (n: number): string => offset(n * 60 * 1000);
 export const hoursAgo = (n: number): string => offset(n * 60 * 60 * 1000);
 export const daysAgo = (n: number): string => offset(n * 24 * 60 * 60 * 1000);
 export const isoNow = (): string => DEMO_NOW.toISOString();
+
+/** Date calendaire (AAAA-MM-JJ) a `n` jours de "aujourd'hui" : negatif = passe (echeance depassee). */
+export const dateIn = (n: number): string =>
+  new Date(DEMO_NOW.getTime() + n * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
