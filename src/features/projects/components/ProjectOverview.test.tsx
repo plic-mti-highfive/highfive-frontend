@@ -35,6 +35,10 @@ vi.mock("./ProjectOverviewSidebar", () => ({
   ),
 }));
 
+vi.mock("./NearbyProjects", () => ({
+  NearbyProjects: () => <section data-testid="nearby" />,
+}));
+
 afterEach(() => {
   cleanup();
   state.announcements = [];
@@ -57,9 +61,15 @@ const BASE = {
   lastActivityAt: "2026-09-01T10:00:00.000Z",
 };
 
-function project(customization?: unknown): Project {
-  return projectSchema.parse({ ...BASE, customization });
+function project(customization?: unknown, needs: unknown[] = []): Project {
+  return projectSchema.parse({ ...BASE, customization, needs });
 }
+
+const NEED = {
+  id: "00000000-0000-4000-8000-000000000301",
+  label: "des velos a preter",
+  fulfilled: false,
+};
 
 function renderOverview(p: Project, preview = false) {
   return render(
@@ -151,6 +161,21 @@ describe("ProjectOverview", () => {
     );
     expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("true");
     expect(screen.getByTestId("sidebar").dataset.accented).toBe("true");
+  });
+
+  it("place les besoins juste apres l'annonce epinglee", () => {
+    state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
+    renderOverview(project(undefined, [NEED]));
+    expect(order()).toEqual(["pinned", "On recherche", "À propos", "comments"]);
+    expect(screen.getByText("des velos a preter")).toBeTruthy();
+  });
+
+  it("place les besoins en tete sans annonce epinglee, et rien sans besoin", () => {
+    renderOverview(project(undefined, [NEED]));
+    expect(order()).toEqual(["On recherche", "À propos", "comments"]);
+    cleanup();
+    renderOverview(project());
+    expect(order()).not.toContain("On recherche");
   });
 
   it("en apercu, remplace les commentaires par un bloc leger", () => {

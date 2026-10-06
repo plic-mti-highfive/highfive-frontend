@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  Button,
-  EmptyState,
-  ErrorState,
-  Section,
-  Skeleton,
-  Textarea,
-} from "@shared/ui";
+import { Button, ErrorState, Section, Skeleton, Textarea } from "@shared/ui";
 import {
   useComments,
   useCreateComment,
@@ -102,10 +95,9 @@ export function CommentsSection({
           onRetry={() => commentsQuery.refetch()}
         />
       ) : roots.length === 0 ? (
-        <EmptyState
-          title="Personne n'a encore réagi."
-          className="rounded-lg border border-dashed border-border bg-muted"
-        />
+        <p className="text-body-sm text-muted-foreground">
+          Personne n'a encore réagi.
+        </p>
       ) : (
         <ul className="flex flex-col gap-5">
           {roots.map((comment) => (

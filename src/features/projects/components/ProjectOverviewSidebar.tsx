@@ -1,47 +1,23 @@
 import { Link } from "react-router-dom";
 
-import { Avatar, Section, Stat } from "@shared/ui";
-import type { Need, Project } from "@/domain";
+import { Avatar, AvatarGroup, Section } from "@shared/ui";
+import type { Project } from "@/domain";
 import type { TeamMember } from "@/api/memberships";
-import { formatAbsoluteDate, formatExactDateTime } from "@shared/lib/dates";
-import { cn } from "@shared/lib/cn";
-import { ROLE_LABEL } from "../lib/labels";
-import { NearbyProjects } from "./NearbyProjects";
+import {
+  formatAbsoluteDate,
+  formatExactDateTime,
+  formatRelativeDate,
+} from "@shared/lib/dates";
+import { ProjectPanel } from "./ProjectPanel";
 
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const MAX_AVATARS = 6;
 
-/** Hors du corps du composant : `Date.now()` y est un appel impur (react-hooks/purity). */
-function isActiveWithinAWeek(lastActivityAt: string): boolean {
-  return Date.now() - new Date(lastActivityAt).getTime() < SEVEN_DAYS_MS;
-}
-
-function NeedsList({ needs }: { needs: Need[] }) {
-  if (needs.length === 0) return null;
-  const sorted = [...needs].sort(
-    (a, b) => Number(a.fulfilled) - Number(b.fulfilled),
-  );
-
-  return (
-    <Section title="Profils recherchés">
-      <ul className="flex flex-col gap-2">
-        {sorted.map((need) => (
-          <li
-            key={need.id}
-            className={
-              need.fulfilled
-                ? "text-body-sm text-muted-foreground line-through"
-                : "text-body-sm text-foreground"
-            }
-          >
-            {need.label}
-          </li>
-        ))}
-      </ul>
-    </Section>
-  );
-}
-
-/** Colonne d'appui de l'apercu (doc 13 E-10) : equipe, besoins, chiffres, projets proches. */
+/**
+ * Colonne d'appui de l'apercu : un resume de l'equipe (le detail et la
+ * gestion des demandes restent dans l'onglet Equipe) et les reperes de dates.
+ * Les compteurs (highfives, membres) ne sont pas repetes ici : le bouton
+ * Highfive et l'onglet Equipe les portent deja.
+ */
 export function ProjectOverviewSidebar({
   project,
   members,
@@ -49,84 +25,70 @@ export function ProjectOverviewSidebar({
 }: {
   project: Project;
   members: TeamMember[];
-  /** Un accent de projet est actif (`data-accent` sur un ancetre) : liseré teinte en haut de la carte. */
+  /** Un accent de projet est actif (`data-accent` sur un ancetre) : puce teintee devant les titres. */
   accented?: boolean;
 }) {
-  const isActiveThisWeek = isActiveWithinAWeek(project.lastActivityAt);
-
   return (
-    <aside className="flex flex-col gap-8">
-      <div
-        className={cn(
-          "flex flex-col gap-8 overflow-hidden rounded-[--radius-xl] border border-[--border] bg-card p-6 shadow-[--shadow-rest]",
-        )}
-      >
-        {accented && (
-          <div
-            aria-hidden="true"
-            className="-mx-6 -mt-6 -mb-3.5 h-1.5 shrink-0 bg-[var(--accent-base)]"
-          />
-        )}
-        <Section title="Équipe">
+    <aside className="flex flex-col gap-6">
+      <ProjectPanel>
+        <Section title="Équipe" accentMarker={accented}>
           {members.length === 0 ? (
             <p className="text-body-sm text-muted-foreground">
               Aucun membre pour l'instant
             </p>
           ) : (
-            <ul className="flex flex-col gap-2">
-              {members.slice(0, 3).map((member) => (
-                <li key={member.userId} className="flex items-center gap-2">
+            <>
+              <AvatarGroup>
+                {members.slice(0, MAX_AVATARS).map((member) => (
                   <Avatar
+                    key={member.userId}
                     name={member.user.displayName ?? member.user.username}
                     src={member.user.avatar}
-                    size="sm"
+                    size="md"
                   />
-                  <Link
-                    to={`/u/${member.user.username}`}
-                    className="flex-1 truncate text-body-sm font-medium text-foreground hover:underline"
-                  >
-                    @{member.user.username}
-                  </Link>
-                  <span className="text-body-sm text-muted-foreground">
-                    {ROLE_LABEL[member.role]}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </AvatarGroup>
+              <p className="text-body-sm text-muted-foreground">
+                {members.length} {members.length === 1 ? "membre" : "membres"}
+                {members.length > MAX_AVATARS && (
+                  <> dont {MAX_AVATARS} affichés</>
+                )}
+              </p>
+            </>
           )}
-          {members.length > 3 && (
-            <Link
-              to={`/projets/${project.slug}/equipe`}
-              className="text-body-sm font-medium text-foreground hover:underline"
-            >
-              Voir l'équipe
-            </Link>
-          )}
+          <Link
+            to={`/projets/${project.slug}/equipe`}
+            className="text-body-sm font-medium text-foreground hover:underline"
+          >
+            Voir l'équipe
+          </Link>
         </Section>
+      </ProjectPanel>
 
-        <NeedsList needs={project.needs} />
-
-        <Section title="Chiffres">
-          <div className="grid grid-cols-2 gap-4">
-            <Stat value={project.highfiveCount} label="highfives" />
-            <Stat
-              value={members.length}
-              label={members.length === 1 ? "membre" : "membres"}
-            />
-          </div>
-          <p className="text-body-sm text-muted-foreground">
-            {isActiveThisWeek && <>Actif cette semaine · </>}
-            <time
-              dateTime={project.createdAt}
-              title={formatExactDateTime(project.createdAt)}
-            >
-              créé le {formatAbsoluteDate(project.createdAt)}
-            </time>
-          </p>
+      <ProjectPanel>
+        <Section title="Infos" accentMarker={accented}>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-body-sm">
+            <dt className="text-muted-foreground">Créé le</dt>
+            <dd className="text-right text-foreground">
+              <time
+                dateTime={project.createdAt}
+                title={formatExactDateTime(project.createdAt)}
+              >
+                {formatAbsoluteDate(project.createdAt)}
+              </time>
+            </dd>
+            <dt className="text-muted-foreground">Dernière activité</dt>
+            <dd className="text-right text-foreground">
+              <time
+                dateTime={project.lastActivityAt}
+                title={formatExactDateTime(project.lastActivityAt)}
+              >
+                {formatRelativeDate(project.lastActivityAt)}
+              </time>
+            </dd>
+          </dl>
         </Section>
-      </div>
-
-      <NearbyProjects project={project} />
+      </ProjectPanel>
     </aside>
   );
 }
