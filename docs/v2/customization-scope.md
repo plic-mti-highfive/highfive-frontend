@@ -71,8 +71,12 @@ projets auront des images).
 
 ### Éditeur
 
-- Page dédiée `/projets/:slug/personnaliser`, réservée au porteur, avec **aperçu live** de la
-  vraie fiche.
+- Page dédiée `/projets/:slug/modifier` (l'ancienne adresse `/personnaliser` redirige), avec
+  **aperçu live** de la vraie fiche. Un seul bouton « Modifier la fiche » y mène, en quatre
+  onglets : **Infos** (titre, accroche, description, thèmes, besoins ; porteur et co-porteurs),
+  puis **Images** (bannière, galerie), **Sections** et **Couleurs** (porteur seul : un
+  co-porteur ne voit que Infos). Un seul bouton Enregistrer : les infos (`PATCH /projects/:slug`)
+  d'abord, puis la personnalisation (`PATCH …/customization`).
 - Enregistrement explicite ; confirmation si on quitte avec des changements non sauvegardés.
 - **Réordonnancement** : boutons ↑/↓ (alternative sans glisser, exigée par WCAG 2.2 critère
   2.5.7, toujours visibles) + glisser-déposer par une poignée (dnd-kit : souris, tactile,

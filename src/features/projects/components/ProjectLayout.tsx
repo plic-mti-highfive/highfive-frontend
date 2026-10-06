@@ -155,7 +155,6 @@ export function ProjectLayout() {
           isAuthenticated={isAuthenticated}
           isMember={capabilities.isMember}
           canEdit={capabilities.canEdit}
-          canCustomize={capabilities.canCustomize}
           highfiveGiven={highfiveGiven}
         />
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@shared/ui";
 import { useCreateJoinRequest } from "@/api/queries/memberships";
@@ -38,6 +39,7 @@ export function JoinAction({
         onClick={() => navigate(`/projets/${slug}/lab`)}
       >
         Aller au Lab
+        <ArrowRight aria-hidden="true" />
       </Button>
     );
   }
@@ -50,6 +52,7 @@ export function JoinAction({
         }
       >
         Se connecter pour rejoindre
+        <ArrowRight aria-hidden="true" />
       </Button>
     );
   }

@@ -63,7 +63,6 @@ export function CustomizePreview({
             isAuthenticated
             isMember
             canEdit={false}
-            canCustomize={false}
             highfiveGiven={false}
           />
           <ProjectOverview

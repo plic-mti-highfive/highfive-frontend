@@ -1,23 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Share2 } from "lucide-react";
+import { ArrowRight, Share2 } from "lucide-react";
 
-import {
-  Avatar,
-  Badge,
-  Button,
-  Dialog,
-  DialogPopup,
-  DialogTitle,
-  IconButton,
-  TagPill,
-} from "@shared/ui";
+import { Avatar, Badge, Button, IconButton, TagPill } from "@shared/ui";
 import { HighfiveButton } from "@shared/components/projects";
 import { preloadCustomizeProject } from "@/app/preload";
 import type { Project, UserSummary } from "@/domain";
 import { PARTICIPATION_LABEL, STATE_LABEL, STATE_TONE } from "../lib/labels";
 import { JoinAction } from "./JoinAction";
-import { ProjectEditForm } from "./ProjectEditForm";
 
 /**
  * En-tete de la fiche (doc 13 E-10) : porteur, titre en Geist (R-DA... le
@@ -35,7 +25,6 @@ export function ProjectHeader({
   isAuthenticated,
   isMember,
   canEdit,
-  canCustomize = false,
   highfiveGiven,
   tinted = false,
 }: {
@@ -43,15 +32,13 @@ export function ProjectHeader({
   owner?: UserSummary;
   isAuthenticated: boolean;
   isMember: boolean;
+  /** Porteur ou co-porteur : affiche le lien vers l'editeur de la fiche. */
   canEdit: boolean;
-  /** Porteur seul : affiche le lien vers l'editeur de personnalisation. */
-  canCustomize?: boolean;
   highfiveGiven: boolean;
   /** Le header est pose sur le fond teinte de l'accent du projet : tags et badges passent sur fond carte pour rester lisibles. */
   tinted?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
 
   async function handleShare() {
     try {
@@ -119,37 +106,20 @@ export function ProjectHeader({
             isAuthenticated={isAuthenticated}
             isMember={isMember}
           />
-          {canCustomize && (
+          {canEdit && (
             <Button
               variant="outline"
               render={
                 <Link
-                  to={`/projets/${project.slug}/personnaliser`}
+                  to={`/projets/${project.slug}/modifier`}
                   onMouseEnter={() => void preloadCustomizeProject()}
                   onFocus={() => void preloadCustomizeProject()}
                 />
               }
             >
-              Personnaliser
+              Modifier la fiche
+              <ArrowRight aria-hidden="true" />
             </Button>
-          )}
-          {canEdit && (
-            <>
-              <Button variant="outline" onClick={() => setEditOpen(true)}>
-                Modifier
-              </Button>
-              <Dialog open={editOpen} onOpenChange={setEditOpen}>
-                <DialogPopup className="max-w-2xl overflow-y-auto max-h-[90vh]">
-                  <DialogTitle>Modifier le projet</DialogTitle>
-                  <div className="mt-4">
-                    <ProjectEditForm
-                      project={project}
-                      onClose={() => setEditOpen(false)}
-                    />
-                  </div>
-                </DialogPopup>
-              </Dialog>
-            </>
           )}
         </div>
 
