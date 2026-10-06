@@ -130,6 +130,31 @@ describe("projectCustomizationSchema", () => {
     );
   });
 
+  it("accepte l'ancienne liste de quatre sections, sans `needs`", () => {
+    const legacy = customization({
+      sections: [
+        { id: "pinned", visible: true },
+        { id: "about", visible: true },
+        { id: "gallery", visible: true },
+        { id: "comments", visible: true },
+      ],
+    });
+    expect(projectCustomizationSchema.safeParse(legacy).success).toBe(true);
+  });
+
+  it("refuse `needs` en double ou une liste sans les quatre sections d'origine", () => {
+    const doubled = customization({
+      sections: [
+        { id: "needs", visible: true },
+        { id: "needs", visible: false },
+        { id: "about", visible: true },
+        { id: "gallery", visible: true },
+        { id: "comments", visible: true },
+      ],
+    });
+    expect(projectCustomizationSchema.safeParse(doubled).success).toBe(false);
+  });
+
   it("accepte un theme complet de quatre couleurs #rrggbb, et refuse le reste", () => {
     const theme = presetTheme("ocean");
     expect(

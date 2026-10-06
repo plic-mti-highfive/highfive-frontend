@@ -42,6 +42,7 @@ describe("resolveSections", () => {
       "gallery",
       "pinned",
       "comments",
+      "needs",
     ]);
     expect(resolved.find((s) => s.id === "gallery")?.visible).toBe(false);
   });
@@ -57,6 +58,7 @@ describe("resolveSections", () => {
       "comments",
       "about",
       "pinned",
+      "needs",
       "gallery",
     ]);
   });
@@ -71,7 +73,7 @@ describe("resolveSections", () => {
     expect(resolved.filter((s) => s.id === "about")).toEqual([
       { id: "about", visible: false },
     ]);
-    expect(resolved).toHaveLength(4);
+    expect(resolved).toHaveLength(5);
   });
 
   it("ne mute pas les sections par defaut", () => {

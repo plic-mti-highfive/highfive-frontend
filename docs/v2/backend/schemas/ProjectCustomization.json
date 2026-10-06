@@ -67,14 +67,14 @@
     },
     "sections": {
       "minItems": 4,
-      "maxItems": 4,
+      "maxItems": 5,
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "enum": ["pinned", "about", "gallery", "comments"]
+            "enum": ["pinned", "needs", "about", "gallery", "comments"]
           },
           "visible": {
             "type": "boolean"

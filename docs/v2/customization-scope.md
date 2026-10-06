@@ -125,7 +125,7 @@ projets auront des images).
 Project.customization?: {
   banner?: { url: string; alt: string; decorative: boolean; focal: { x: number; y: number } }
   theme?: { background: string; panel: string; text: string; accent: string } // "#rrggbb" en minuscules, les quatre ensemble
-  sections: { id: "pinned" | "about" | "gallery" | "comments"; visible: boolean }[] // l'ordre du tableau = l'ordre d'affichage
+  sections: { id: "pinned" | "needs" | "about" | "gallery" | "comments"; visible: boolean }[] // l'ordre du tableau = l'ordre d'affichage
   gallery: { id: string; url: string; alt: string; decorative: boolean; caption?: string }[] // max 8
 }
 ProjectSummary.accent?: AccentColor // issu de customization.theme.accent, pour les cartes

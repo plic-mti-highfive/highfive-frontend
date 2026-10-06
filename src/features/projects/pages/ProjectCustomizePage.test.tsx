@@ -275,8 +275,9 @@ describe("ProjectCustomizePage", () => {
     ];
     expect(draft.theme).toEqual(presetTheme("ocean"));
     expect(draft.sections.map((s) => s.id)).toEqual([
-      "about",
+      "needs",
       "pinned",
+      "about",
       "gallery",
       "comments",
     ]);

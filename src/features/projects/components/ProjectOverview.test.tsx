@@ -159,7 +159,7 @@ describe("ProjectOverview", () => {
     expect(screen.getByTestId("pinned").dataset.inheritAccent).toBe("true");
   });
 
-  it("place les besoins juste apres l'annonce epinglee", () => {
+  it("place les besoins apres l'annonce epinglee par defaut", () => {
     state.announcements = [{ id: "a1", pinned: true, title: "Annonce" }];
     renderOverview(project(undefined, [NEED]));
     expect(order()).toEqual(["pinned", "On recherche", "À propos", "comments"]);
@@ -174,6 +174,21 @@ describe("ProjectOverview", () => {
     expect(order()).not.toContain("On recherche");
   });
 
+  it("suit l'ordre et la visibilite choisis pour les besoins", () => {
+    const sections = (needsVisible: boolean) => [
+      { id: "about", visible: true },
+      { id: "needs", visible: needsVisible },
+      { id: "pinned", visible: false },
+      { id: "gallery", visible: true },
+      { id: "comments", visible: true },
+    ];
+    renderOverview(project({ sections: sections(true), gallery: [] }, [NEED]));
+    expect(order()).toEqual(["À propos", "On recherche", "comments"]);
+    cleanup();
+    renderOverview(project({ sections: sections(false), gallery: [] }, [NEED]));
+    expect(order()).toEqual(["À propos", "comments"]);
+  });
+
   it("en apercu, remplace les commentaires par un bloc leger", () => {
     renderOverview(project(), true);
     expect(screen.queryByTestId("comments")).toBeNull();
@@ -183,6 +198,7 @@ describe("ProjectOverview", () => {
 
 const DEFAULT = [
   { id: "pinned", visible: true },
+  { id: "needs", visible: true },
   { id: "about", visible: true },
   { id: "gallery", visible: true },
   { id: "comments", visible: true },

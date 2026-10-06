@@ -299,8 +299,11 @@ Roles detailles dans `docs/v2/API-ROUTES.md`. Regles serveur principales :
   - Le `PATCH` **remplace** l'objet complet (`Project.customization`) ; le
     `PATCH /projects/{slug}` generique l'ignore.
   - Regles que le JSON Schema ne represente pas (`superRefine`) : `sections`
-    contient chacune des quatre sections (`pinned`, `about`, `gallery`,
-    `comments`) exactement une fois ; les `id` de la galerie sont uniques ;
+    contient chacune des quatre sections `pinned`, `about`, `gallery`,
+    `comments` exactement une fois et `needs` ("On recherche", les profils
+    recherches) au plus une fois ; les personnalisations enregistrees avant
+    l'ajout de `needs` n'en ont pas : a la migration, l'inserer juste apres
+    `pinned`, visible (le client complete a la fin si elle manque) ; les `id` de la galerie sont uniques ;
     la galerie compte 8 images au plus ; chaque image porte un `alt`
     non vide, sauf si `decorative` est vrai ; les URLs d'images sont en
     `https://` (ou `data:image/` dans le mock), jamais d'autre schema.

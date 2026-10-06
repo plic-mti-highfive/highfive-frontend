@@ -32,6 +32,7 @@ export function resolveSections(
 /** Libelles des sections de l'Apercu dans l'editeur. */
 export const SECTION_LABEL: Record<CustomizationSection["id"], string> = {
   pinned: "Annonce épinglée",
+  needs: "On recherche",
   about: "À propos",
   gallery: "Galerie",
   comments: "Commentaires",

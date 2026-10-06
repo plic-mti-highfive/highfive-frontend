@@ -107,6 +107,7 @@ export type GalleryItem = z.infer<typeof galleryItemSchema>;
 /** Sections de l'onglet Apercu que le porteur peut ordonner et masquer (la sidebar reste fixe). */
 export const customizationSectionIdSchema = z.enum([
   "pinned",
+  "needs",
   "about",
   "gallery",
   "comments",
@@ -124,31 +125,44 @@ export type CustomizationSection = z.infer<typeof customizationSectionSchema>;
 /** Ordre et visibilite par defaut : celui de la fiche d'un projet non personnalise. */
 export const DEFAULT_SECTIONS: readonly CustomizationSection[] = [
   { id: "pinned", visible: true },
+  { id: "needs", visible: true },
   { id: "about", visible: true },
   { id: "gallery", visible: true },
   { id: "comments", visible: true },
 ];
 
+/** Sections presentes dans toute personnalisation, y compris celles d'avant `needs`. */
+const REQUIRED_SECTION_IDS: readonly CustomizationSectionId[] = [
+  "pinned",
+  "about",
+  "gallery",
+  "comments",
+];
+
 /**
  * Corps de `PATCH /projects/:slug/customization` (remplacement complet) et
  * champ `Project.customization`. Regles non representees dans le JSON Schema
- * (voir docs/v2/backend/SPEC.md) : `sections` contient chacune des quatre
- * sections exactement une fois ; les `id` de la galerie sont uniques.
+ * (voir docs/v2/backend/SPEC.md) : `sections` contient `pinned`, `about`,
+ * `gallery` et `comments` exactement une fois, et `needs` au plus une fois
+ * (absente des personnalisations enregistrees avant son ajout) ; les `id` de
+ * la galerie sont uniques.
  */
 export const projectCustomizationSchema = z
   .object({
     banner: projectBannerSchema.optional(),
     theme: projectThemeSchema.optional(),
-    sections: z.array(customizationSectionSchema).length(4),
+    sections: z.array(customizationSectionSchema).min(4).max(5),
     gallery: z.array(galleryItemSchema).max(MAX_GALLERY_IMAGES),
   })
   .superRefine((customization, ctx) => {
     const sectionIds = new Set(customization.sections.map((s) => s.id));
-    if (sectionIds.size !== customizationSectionIdSchema.options.length) {
+    const allDistinct = sectionIds.size === customization.sections.length;
+    const hasRequired = REQUIRED_SECTION_IDS.every((id) => sectionIds.has(id));
+    if (!allDistinct || !hasRequired) {
       ctx.addIssue({
         code: "custom",
         message:
-          "Chaque section (pinned, about, gallery, comments) doit apparaitre exactement une fois.",
+          "Chaque section (pinned, about, gallery, comments) doit apparaitre exactement une fois, et needs au plus une fois.",
         path: ["sections"],
       });
     }

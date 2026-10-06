@@ -44,7 +44,6 @@ export function ProjectOverview({
   const customization = project.customization;
   const accented = customization?.theme !== undefined;
   const gallery = customization?.gallery ?? [];
-  const needs = <ProjectNeeds needs={project.needs} />;
 
   const sections: Record<CustomizationSectionId, ReactNode> = {
     pinned: pinned ? (
@@ -54,6 +53,7 @@ export function ProjectOverview({
         inheritAccent={accented}
       />
     ) : null,
+    needs: <ProjectNeeds needs={project.needs} />,
     about: (
       <ProjectPanel>
         <Section title="À propos">
@@ -102,28 +102,16 @@ export function ProjectOverview({
     ),
   };
 
-  const visible = resolveSections(customization)
-    .filter((section) => section.visible)
-    .flatMap((section) =>
-      sections[section.id]
-        ? [{ id: section.id, node: sections[section.id] }]
-        : [],
-    );
-  // Les besoins suivent l'annonce epinglee quand elle ouvre la colonne, sinon
-  // ils passent en tete : ce n'est pas une section reordonnable.
-  const needsIndex = visible[0]?.id === "pinned" ? 1 : 0;
-
   return (
     <div className="flex flex-col gap-10">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
-          {visible.map(({ id, node }, index) => (
-            <Fragment key={id}>
-              {index === needsIndex && needs}
-              {node}
-            </Fragment>
-          ))}
-          {needsIndex >= visible.length && needs}
+          {resolveSections(customization)
+            .filter((section) => section.visible)
+            .map((section) => {
+              const node = sections[section.id];
+              return node ? <Fragment key={section.id}>{node}</Fragment> : null;
+            })}
         </div>
 
         <ProjectOverviewSidebar project={project} members={members} />
