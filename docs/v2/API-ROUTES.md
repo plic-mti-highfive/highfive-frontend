@@ -122,10 +122,13 @@ membre ; `admin` = role plateforme `admin`.
 
 ## Tableau blanc (`wall.ts`)
 
-| Methode | Route                           | Entree             | Sortie         | Auth/role           | Regles                          |
-| ------- | ------------------------------- | ------------------ | -------------- | ------------------- | ------------------------------- |
-| GET     | `/projects/:slug/wall`          | —                  | `Wall`         | membre+/observateur | R-W1                            |
-| POST    | `/projects/:slug/wall/to-tasks` | `WallToTasksInput` | `Task[]` (201) | membre+             | R-W2 : cree dans la 1re colonne |
+| Methode | Route                                  | Entree                      | Sortie                  | Auth/role           | Regles                                                                                       |
+| ------- | -------------------------------------- | --------------------------- | ----------------------- | ------------------- | -------------------------------------------------------------------------------------------- |
+| GET     | `/projects/:slug/wall`                 | —                           | `Wall`                  | membre+/observateur | R-W1                                                                                         |
+| POST    | `/projects/:slug/wall/to-tasks`        | `WallToTasksInput`          | `Task[]` (201)          | membre+             | R-W2 : cree dans la 1re colonne                                                              |
+| GET     | `/projects/:slug/wall/session`         | —                           | `WallSession`           | observateur+        | jeton Hocuspocus (1 h) ; `role: viewer` => lecture seule                                     |
+| POST    | `/projects/:slug/wall/suggest-tasks`   | —                           | `WallSuggestions` (200) | membre+             | IA : propose, ne persiste rien ; 503 si IA non configuree ; `empty: true` si Mur trop pauvre |
+| POST    | `/projects/:slug/wall/suggested-tasks` | `AcceptSuggestedTasksInput` | `Task[]` (201)          | membre+             | cree les propositions retenues (1..50) dans la 1re colonne                                   |
 
 ## Fichiers (`files.ts`)
 
