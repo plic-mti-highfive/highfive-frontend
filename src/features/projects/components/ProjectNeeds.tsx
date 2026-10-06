@@ -16,23 +16,10 @@ export function ProjectNeeds({ needs }: { needs: Need[] }) {
   const sorted = [...needs].sort(
     (a, b) => Number(a.fulfilled) - Number(b.fulfilled),
   );
-  const openCount = needs.filter((need) => !need.fulfilled).length;
 
   return (
     <ProjectPanel>
-      <Section
-        title="On recherche"
-        actions={
-          openCount > 0 ? (
-            <Badge tone="info">
-              {openCount}{" "}
-              {openCount === 1 ? "profil ouvert" : "profils ouverts"}
-            </Badge>
-          ) : (
-            <Badge tone="success">Tous pourvus</Badge>
-          )
-        }
-      >
+      <Section title="On recherche">
         <ul className="flex flex-col gap-2">
           {sorted.map((need) => (
             <li
