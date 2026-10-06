@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { Button, ErrorState, Section, Skeleton, Textarea } from "@shared/ui";
 import {
@@ -7,7 +7,9 @@ import {
   useCreateComment,
   useHideComment,
 } from "@/api/queries/comments";
-import { CommentItem } from "./CommentItem";
+import { useCurrentUser } from "@features/auth/hooks/useCurrentUser";
+import { commentAnchor } from "../lib/commentAnchor";
+import { CommentThread } from "./CommentThread";
 
 /**
  * Commentaires en bas de l'apercu (mission item 1). R-C1/R-V5 : suivent la
@@ -24,6 +26,8 @@ export function CommentsSection({
   canModerate: boolean;
 }) {
   const navigate = useNavigate();
+  const { hash } = useLocation();
+  const { user } = useCurrentUser();
   const [body, setBody] = useState("");
   const commentsQuery = useComments(slug);
   const createComment = useCreateComment(slug);
@@ -38,6 +42,15 @@ export function CommentsSection({
     list.push(comment);
     repliesByParent.set(comment.parentId, list);
   }
+  // Une reponse dont le commentaire racine est masque n'est plus affichee : on ne la compte pas.
+  const visibleCount = roots.reduce(
+    (total, root) => total + 1 + (repliesByParent.get(root.id)?.length ?? 0),
+    0,
+  );
+  const targetPrefix = `#${commentAnchor("")}`;
+  const targetId = hash.startsWith(targetPrefix)
+    ? hash.slice(targetPrefix.length)
+    : undefined;
 
   function submitRoot() {
     const value = body.trim();
@@ -46,7 +59,7 @@ export function CommentsSection({
   }
 
   return (
-    <Section title={`Commentaires (${comments.length})`}>
+    <Section title={`Commentaires (${visibleCount})`}>
       {isAuthenticated ? (
         <div className="flex flex-col gap-2">
           <Textarea
@@ -94,36 +107,22 @@ export function CommentsSection({
           Personne n'a encore réagi.
         </p>
       ) : (
-        <ul className="flex flex-col gap-5">
+        <ul className="flex flex-col gap-6">
           {roots.map((comment) => (
-            <li key={comment.id} className="flex flex-col gap-3">
-              <CommentItem
-                comment={comment}
+            <li key={comment.id}>
+              <CommentThread
+                root={comment}
+                replies={repliesByParent.get(comment.id) ?? []}
+                currentUserId={user?.id}
                 canReply={isAuthenticated}
                 canModerate={canModerate}
-                onReply={(replyBody) =>
-                  createComment.mutate({
-                    body: replyBody,
-                    parentId: comment.id,
-                  })
+                targetId={targetId}
+                onReply={(parentId, replyBody) =>
+                  createComment.mutate({ body: replyBody, parentId })
                 }
-                onHide={
-                  canModerate ? () => hideComment.mutate(comment.id) : undefined
-                }
+                onHide={(commentId) => hideComment.mutate(commentId)}
                 isSubmittingReply={createComment.isPending}
               />
-              {(repliesByParent.get(comment.id) ?? []).map((reply) => (
-                <CommentItem
-                  key={reply.id}
-                  comment={reply}
-                  isReply
-                  canReply={false}
-                  canModerate={canModerate}
-                  onHide={
-                    canModerate ? () => hideComment.mutate(reply.id) : undefined
-                  }
-                />
-              ))}
             </li>
           ))}
         </ul>

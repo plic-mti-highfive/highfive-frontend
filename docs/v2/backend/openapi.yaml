@@ -996,6 +996,28 @@ paths:
               schema: { $ref: "#/components/schemas/ApiErrorBody" }
         "404": { $ref: "#/components/responses/NotFound" }
 
+  /reports:
+    post:
+      operationId: createReport
+      tags: [admin]
+      summary: Signaler un contenu (personne connectee, R-S1)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReportCreateInput" }
+      responses:
+        "201":
+          description: Signalement cree.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Report" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
   /comments/{commentId}/hide:
     post:
       operationId: hideComment

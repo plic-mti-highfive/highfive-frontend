@@ -101,6 +101,12 @@ membre ; `admin` = role plateforme `admin`.
 | POST    | `/comments/:commentId/hide` | —                    | 204             | porteur+/admin | R-C3                                       |
 | DELETE  | `/comments/:commentId`      | —                    | 204             | admin          | R-C3 : suppression admin uniquement        |
 
+## Signalements (`reports.ts`)
+
+| Methode | Route      | Entree              | Sortie         | Auth/role | Regles                                                                                                                                 |
+| ------- | ---------- | ------------------- | -------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| POST    | `/reports` | `ReportCreateInput` | `Report` (201) | connecte  | R-S1 (motif enumere), 403 si compte suspendu ou contenu a soi, 404 si la cible n'existe plus, 409 si deja signale par la meme personne |
+
 ## Tâches (`tasks.ts`)
 
 | Methode | Route                     | Entree              | Sortie         | Auth/role | Regles                                               |

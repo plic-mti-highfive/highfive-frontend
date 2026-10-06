@@ -629,14 +629,13 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
    l'absence totale de route de creation de tag, y compris en
    administration — a confirmer que c'est volontaire meme cote admin, ou si
    l'admin doit pouvoir en ajouter par script/migration uniquement).
-6. **Creation de signalement** : `reportCreateInputSchema` existe dans
-   `src/domain/admin.ts` et est exporte (`ReportCreateInput.json` genere),
-   mais **aucune route** `POST /reports` n'est appelee par
-   `src/api/*.ts` — alors que `05-ROLES-PERMISSIONS.md` §3.1/§3.4 liste
-   "Signaler" comme une action ouverte a porteur/co-porteur/membre/
-   observateur/visiteur connecte. Proposition : `POST /reports`
-   (connecte, corps `ReportCreateInput`, 201 `Report`), a ajouter au
-   contrat front avant que l'ecran de signalement existe reellement.
+6. **Creation de signalement** : `POST /reports` (connecte, corps
+   `ReportCreateInput`, 201 `Report`) est maintenant dans le contrat front
+   (`src/api/reports.ts`, mock `src/mocks/handlers/reports.ts`), appele
+   depuis le menu d'un commentaire. Regles : 403 si compte suspendu ou
+   contenu a soi, 404 si la cible n'existe plus, 409 si la meme personne a
+   deja signale la cible (R-S2 compte des signalements distincts). Seul le
+   type de cible `comment` a un ecran de signalement pour l'instant.
 7. **Limite de membres par projet** (R-M5) : voir §3 "Projets" — champ
    absent de `ProjectUpdateInput`.
 8. **Reglage Mur/Taches ouverts aux observateurs** (doc 05 §3.3 note 1) :

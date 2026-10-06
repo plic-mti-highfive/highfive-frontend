@@ -9,6 +9,7 @@ import { highfiveHandlers } from "./highfives";
 import { membershipHandlers } from "./memberships";
 import { notificationHandlers } from "./notifications";
 import { projectHandlers } from "./projects";
+import { reportHandlers } from "./reports";
 import { searchHandlers } from "./search";
 import { tagHandlers } from "./tags";
 import { taskHandlers } from "./tasks";
@@ -32,5 +33,6 @@ export const handlers = [
   ...conversationHandlers,
   ...notificationHandlers,
   ...searchHandlers,
+  ...reportHandlers,
   ...adminHandlers,
 ];
