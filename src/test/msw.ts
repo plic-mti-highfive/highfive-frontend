@@ -31,3 +31,28 @@ export function setupMswServer(): void {
     vi.unstubAllEnvs();
   });
 }
+
+/** Connecte `email` via l'API mock et stocke le jeton (comme le fait l'application). */
+export async function loginAs(
+  email: string,
+  password = "demo1234",
+): Promise<void> {
+  const { login } = await import("@/api/auth");
+  const { tokenStorage } = await import("@/api/token-storage");
+  const session = await login({ email, password });
+  tokenStorage.setAccessToken(session.token);
+}
+
+/** Enregistre les requetes sortantes (methode + chemin + recherche) du serveur de test. */
+export function recordRequests(): { log: string[]; stop: () => void } {
+  const log: string[] = [];
+  const listener = ({ request }: { request: Request }) => {
+    const url = new URL(request.url);
+    log.push(`${request.method} ${url.pathname}${url.search}`);
+  };
+  server.events.on("request:start", listener);
+  return {
+    log,
+    stop: () => server.events.removeListener("request:start", listener),
+  };
+}
