@@ -86,6 +86,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Supprimer » de la bulle reste donc affiche sur ses propres messages — il
   disparaissait apres 15 minutes, suppression comprise.
 
+### Fixed
+
+- La notification `admin_decision` disait « a pris une décision concernant ton
+  compte » alors que sa cible est un projet ou un commentaire (suppression
+  d'un projet, retrait d'un média, commentaire masqué) : elle dit désormais
+  « a pris une décision de modération sur » suivi de la cible.
+
 ## [2.0.1] - 2026-09-16
 
 ### Fixed
