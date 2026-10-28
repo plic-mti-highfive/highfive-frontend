@@ -4,13 +4,17 @@ import {
   conversationDetailSchema,
   conversationSchema,
   conversationSummarySchema,
+  messageUploadSchema,
   messageWithAuthorSchema,
   paginatedSchema,
   type Conversation,
   type ConversationCreateInput,
   type ConversationDetail,
+  type ConversationParticipantsAddInput,
+  type ConversationUpdateInput,
   type ConversationSummary,
   type MessageCreateInput,
+  type MessageUpload,
   type MessageWithAuthor,
   type Paginated,
 } from "@/domain";
@@ -61,7 +65,64 @@ export function sendMessage(
   });
 }
 
-/** R-MSG5 : modification possible dans les 15 minutes (verifie cote handler). */
+/**
+ * R-MSG8 : depose une image, une video ou un fichier dans la conversation.
+ * L'`id` renvoye se joint ensuite a un message
+ * (`attachment: { kind: "upload", uploadId }`).
+ */
+export function uploadMessageAttachment(
+  conversationId: string,
+  file: File,
+): Promise<MessageUpload> {
+  const body = new FormData();
+  body.append("file", file);
+  return apiFetch(`/conversations/${conversationId}/attachments`, {
+    method: "POST",
+    body,
+    schema: messageUploadSchema,
+  });
+}
+
+/** R-MSG9 : renommer un groupe (tout participant). */
+export function renameConversation(
+  conversationId: string,
+  input: ConversationUpdateInput,
+): Promise<ConversationDetail> {
+  return apiFetch(`/conversations/${conversationId}`, {
+    method: "PATCH",
+    body: input,
+    schema: conversationDetailSchema,
+  });
+}
+
+/** R-MSG9 : ajouter des personnes a un groupe (tout participant, 50 au plus). */
+export function addConversationParticipants(
+  conversationId: string,
+  input: ConversationParticipantsAddInput,
+): Promise<ConversationDetail> {
+  return apiFetch(`/conversations/${conversationId}/participants`, {
+    method: "POST",
+    body: input,
+    schema: conversationDetailSchema,
+  });
+}
+
+/** R-MSG9 : retirer quelqu'un d'un groupe (administrateur seulement). */
+export function removeConversationParticipant(
+  conversationId: string,
+  userId: string,
+): Promise<void> {
+  return apiFetch(`/conversations/${conversationId}/participants/${userId}`, {
+    method: "DELETE",
+  });
+}
+
+/** R-MSG9 : quitter un groupe ; l'administration passe au plus ancien. */
+export function leaveConversation(conversationId: string): Promise<void> {
+  return apiFetch(`/conversations/${conversationId}/leave`, { method: "POST" });
+}
+
+/** R-MSG5 : l'auteur seul, sans limite de temps ; un message supprime ne se modifie plus. */
 export function editMessage(
   messageId: string,
   body: string,
