@@ -1,12 +1,36 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import * as notificationsApi from "../notifications";
 import { queryKeys } from "./keys";
 import type { NotificationPreferencesUpdateInput } from "@/domain";
+
+/**
+ * Pas de temps reel (SPEC §5) : la premiere page, qui alimente la cloche de
+ * l'en-tete, est relue periodiquement (suspendu quand l'onglet est cache).
+ */
+const NOTIFICATIONS_POLL_MS = 30_000;
 
 export function useNotifications(cursor?: string) {
   return useQuery({
     queryKey: queryKeys.notifications.list(cursor),
     queryFn: () => notificationsApi.listNotifications(cursor),
+    refetchInterval: cursor ? false : NOTIFICATIONS_POLL_MS,
+  });
+}
+
+/** Page Notifications : "Charger la suite" accumule les pages. */
+export function useNotificationsInfinite() {
+  return useInfiniteQuery({
+    queryKey: queryKeys.notifications.infinite(),
+    queryFn: ({ pageParam }: { pageParam?: string }) =>
+      notificationsApi.listNotifications(pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    refetchInterval: NOTIFICATIONS_POLL_MS,
   });
 }
 

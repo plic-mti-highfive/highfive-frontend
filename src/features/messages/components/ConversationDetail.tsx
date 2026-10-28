@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
-import { ChevronLeft, MessageSquare } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ChevronLeft, MessageSquare, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { CurrentUser } from "@/domain";
+import type { CurrentUser, MessageAttachment } from "@/domain";
 import { ApiError } from "@/api/client";
 import {
   useConversation,
@@ -10,48 +10,111 @@ import {
   useMarkConversationRead,
   useMessages,
   useSendMessage,
+  useUploadMessageAttachment,
 } from "@/api/queries/conversations";
 import {
   Avatar,
   AvatarGroup,
+  Button,
   EmptyState,
   ErrorState,
   IconButton,
   Skeleton,
+  Spinner,
 } from "@shared/ui";
 import { getConversationDisplay } from "../lib/conversationDisplay";
+import { GroupSettingsDialog } from "./GroupSettingsDialog";
 import { MessageBubble } from "./MessageBubble";
 import { MessageDateSeparator } from "./MessageDateSeparator";
-import { MessageInput } from "./MessageInput";
+import { MessageInput, type MessageDraft } from "./MessageInput";
 
 export interface ConversationDetailProps {
   conversationId: string;
   currentUser: CurrentUser;
   onBack: () => void;
+  /** Appele quand la personne quitte le groupe ouvert. */
+  onLeft: () => void;
 }
+
+/** Distance au bas du fil sous laquelle un nouveau message fait defiler. */
+const STICK_TO_BOTTOM_PX = 120;
 
 export function ConversationDetail({
   conversationId,
   currentUser,
   onBack,
+  onLeft,
 }: ConversationDetailProps) {
   const conversation = useConversation(conversationId);
   const messages = useMessages(conversationId);
   const sendMessage = useSendMessage(conversationId);
+  const uploadAttachment = useUploadMessageAttachment(conversationId);
   const editMessage = useEditMessage(conversationId);
   const deleteMessage = useDeleteMessage(conversationId);
   const markRead = useMarkConversationRead();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const nearBottomRef = useRef(true);
+  /** Hauteur du fil avant le chargement d'une page plus ancienne. */
+  const prependAnchorRef = useRef<{ height: number; top: number } | null>(null);
+  const lastMarkedRef = useRef<string | null>(null);
+
+  // Pages les plus recentes d'abord, chacune chronologique.
+  const items = [...(messages.data?.pages ?? [])]
+    .reverse()
+    .flatMap((page) => page.items);
+  const newestId = items.at(-1)?.id;
+  const newestAuthorId = items.at(-1)?.authorId;
+  const oldestId = items[0]?.id;
+
+  // Ouvrir la conversation, puis chaque message recu pendant qu'elle est
+  // affichee, vaut lecture (eteint aussi ses notifications cote serveur).
   useEffect(() => {
-    markRead.mutate(conversationId);
-    // Une seule fois par conversation ouverte.
+    if (!newestId || lastMarkedRef.current === newestId) return;
+    const isFirst = lastMarkedRef.current === null;
+    lastMarkedRef.current = newestId;
+    if (isFirst || newestAuthorId !== currentUser.id) {
+      markRead.mutate(conversationId);
+    }
+    // markRead change a chaque rendu ; seul le dernier message compte.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationId]);
+  }, [conversationId, newestId, newestAuthorId, currentUser.id]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ block: "end" });
-  }, [messages.data?.items.length]);
+  // Une page plus ancienne arrive en haut : garder sous les yeux le meme message.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    const anchor = prependAnchorRef.current;
+    if (!el || !anchor) return;
+    el.scrollTop = el.scrollHeight - anchor.height + anchor.top;
+    prependAnchorRef.current = null;
+  }, [oldestId]);
+
+  // Un nouveau message en bas : suivre si l'on y etait, ou si c'est le sien.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !newestId) return;
+    if (nearBottomRef.current || newestAuthorId === currentUser.id) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [newestId, newestAuthorId, currentUser.id]);
+
+  function loadOlder() {
+    const el = scrollRef.current;
+    if (el) {
+      prependAnchorRef.current = { height: el.scrollHeight, top: el.scrollTop };
+    }
+    void messages.fetchNextPage();
+  }
+
+  async function handleSend({ body, file }: MessageDraft) {
+    let attachment: MessageAttachment | undefined;
+    if (file) {
+      const upload = await uploadAttachment.mutateAsync(file);
+      attachment = { kind: "upload", uploadId: upload.id };
+    }
+    await sendMessage.mutateAsync({ body: body || undefined, attachment });
+  }
 
   if (conversation.isLoading) {
     return (
@@ -83,8 +146,8 @@ export function ConversationDetail({
     conversation.data,
     currentUser.id,
   );
-  const items = messages.data?.items ?? [];
   const canWrite = currentUser.accountStatus === "active";
+  const actionError = editMessage.error ?? deleteMessage.error;
 
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col">
@@ -114,7 +177,7 @@ export function ConversationDetail({
             src={avatarPeople[0]?.avatar}
           />
         )}
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-body-lg font-semibold text-foreground">
             {conversation.data.projectSlug ? (
               <Link
@@ -133,15 +196,32 @@ export function ConversationDetail({
             </p>
           )}
         </div>
+        {conversation.data.type === "group" && (
+          <IconButton
+            aria-label="Paramètres du groupe"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <Settings size={18} />
+          </IconButton>
+        )}
       </div>
 
-      <div className="min-w-0 flex-1 overflow-y-auto py-2">
+      <div
+        ref={scrollRef}
+        className="min-w-0 flex-1 overflow-y-auto py-2"
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          nearBottomRef.current =
+            el.scrollHeight - el.scrollTop - el.clientHeight <
+            STICK_TO_BOTTOM_PX;
+        }}
+      >
         {messages.isLoading ? (
           <div className="space-y-3 p-4">
             <Skeleton className="h-10 w-2/3" />
             <Skeleton className="h-10 w-1/2 self-end" />
           </div>
-        ) : messages.isError ? (
+        ) : messages.isError && !messages.data ? (
           <ErrorState
             message="Impossible de charger les messages."
             onRetry={() => messages.refetch()}
@@ -153,35 +233,58 @@ export function ConversationDetail({
             description="Écris le premier message de cette conversation."
           />
         ) : (
-          items.map((message, index) => {
-            const previous = items[index - 1];
-            const showDateSeparator =
-              !previous ||
-              new Date(previous.sentAt).toDateString() !==
-                new Date(message.sentAt).toDateString();
-            const showAuthor =
-              !previous || previous.authorId !== message.authorId;
-            const isOwn = message.authorId === currentUser.id;
-            return (
-              <div key={message.id}>
-                {showDateSeparator && (
-                  <MessageDateSeparator iso={message.sentAt} />
-                )}
-                <MessageBubble
-                  message={message}
-                  isOwn={isOwn}
-                  showAuthor={showAuthor}
-                  onEdit={(body) =>
-                    editMessage.mutate({ messageId: message.id, body })
-                  }
-                  onDelete={() => deleteMessage.mutate(message.id)}
-                />
+          <>
+            {messages.hasNextPage && (
+              <div className="flex justify-center py-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={loadOlder}
+                  disabled={messages.isFetchingNextPage}
+                >
+                  {messages.isFetchingNextPage && <Spinner size="sm" />}
+                  Messages précédents
+                </Button>
               </div>
-            );
-          })
+            )}
+            {items.map((message, index) => {
+              const previous = items[index - 1];
+              const showDateSeparator =
+                !previous ||
+                new Date(previous.sentAt).toDateString() !==
+                  new Date(message.sentAt).toDateString();
+              const showAuthor =
+                !previous || previous.authorId !== message.authorId;
+              const isOwn = message.authorId === currentUser.id;
+              return (
+                <div key={message.id}>
+                  {showDateSeparator && (
+                    <MessageDateSeparator iso={message.sentAt} />
+                  )}
+                  <MessageBubble
+                    message={message}
+                    isOwn={isOwn}
+                    showAuthor={showAuthor}
+                    canEdit={canWrite}
+                    onEdit={(body) =>
+                      editMessage.mutate({ messageId: message.id, body })
+                    }
+                    onDelete={() => deleteMessage.mutate(message.id)}
+                  />
+                </div>
+              );
+            })}
+          </>
         )}
-        <div ref={messagesEndRef} />
       </div>
+
+      {actionError && (
+        <p role="alert" className="px-4 pb-1 text-body-sm text-destructive">
+          {actionError instanceof ApiError
+            ? actionError.message
+            : "L'action sur ce message a échoué."}
+        </p>
+      )}
 
       <MessageInput
         disabled={!canWrite}
@@ -190,8 +293,18 @@ export function ConversationDetail({
             ? undefined
             : "Ton compte est suspendu : tu ne peux plus écrire de messages."
         }
-        onSend={(body) => sendMessage.mutate({ body })}
+        onSend={handleSend}
       />
+
+      {settingsOpen && (
+        <GroupSettingsDialog
+          open
+          onOpenChange={setSettingsOpen}
+          conversation={conversation.data}
+          currentUser={currentUser}
+          onLeft={onLeft}
+        />
+      )}
     </div>
   );
 }

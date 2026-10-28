@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { X } from "lucide-react";
 import type { UserSummary } from "@/domain";
-import { useSearch } from "@/api/queries/search";
+import { ApiError } from "@/api/client";
 import { useCreateConversation } from "@/api/queries/conversations";
 import {
-  Avatar,
   Button,
   Dialog,
   DialogPopup,
@@ -13,6 +11,7 @@ import {
   Input,
   Textarea,
 } from "@shared/ui";
+import { PeoplePicker } from "./PeoplePicker";
 
 export interface CreateConversationModalProps {
   open: boolean;
@@ -32,24 +31,17 @@ export function CreateConversationModal({
   currentUserId,
   onCreated,
 }: CreateConversationModalProps) {
-  const [query, setQuery] = useState("");
   const [recipients, setRecipients] = useState<UserSummary[]>([]);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
 
-  const search = useSearch({ q: query, types: ["users"] });
-  const results = (search.data?.users?.items ?? []).filter(
-    (user) =>
-      user.id !== currentUserId && !recipients.some((r) => r.id === user.id),
-  );
-
   const createConversation = useCreateConversation();
 
   function reset() {
-    setQuery("");
     setRecipients([]);
     setTitle("");
     setMessage("");
+    createConversation.reset();
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -84,60 +76,11 @@ export function CreateConversationModal({
 
         <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
           <Field label="À">
-            {recipients.length > 0 && (
-              <div className="mb-1.5 flex flex-wrap gap-1.5">
-                {recipients.map((recipient) => (
-                  <span
-                    key={recipient.id}
-                    className="inline-flex items-center gap-1.5 rounded-pill bg-muted px-2 py-1 text-body-sm text-foreground"
-                  >
-                    {recipient.displayName ?? `@${recipient.username}`}
-                    <button
-                      type="button"
-                      aria-label={`Retirer ${recipient.displayName ?? recipient.username}`}
-                      onClick={() =>
-                        setRecipients((prev) =>
-                          prev.filter((r) => r.id !== recipient.id),
-                        )
-                      }
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Chercher un pseudo…"
-              aria-label="Chercher une personne"
+            <PeoplePicker
+              selected={recipients}
+              onChange={setRecipients}
+              excludeIds={[currentUserId]}
             />
-            {query.trim() && results.length > 0 && (
-              <div className="mt-1.5 flex flex-col gap-0.5 rounded-md border border-border bg-card p-1 shadow-rest">
-                {results.slice(0, 6).map((user) => (
-                  <button
-                    key={user.id}
-                    type="button"
-                    onClick={() => {
-                      setRecipients((prev) => [...prev, user]);
-                      setQuery("");
-                    }}
-                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-muted"
-                  >
-                    <Avatar
-                      name={user.displayName ?? user.username}
-                      src={user.avatar}
-                      size="sm"
-                    />
-                    <span className="text-body-md text-foreground">
-                      {user.displayName ?? `@${user.username}`}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
           </Field>
 
           {recipients.length > 1 && (
@@ -145,6 +88,7 @@ export function CreateConversationModal({
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                maxLength={80}
                 placeholder="Ex. Chorale du mardi"
               />
             </Field>
@@ -154,11 +98,20 @@ export function CreateConversationModal({
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              maxLength={4000}
               placeholder="Écris ton premier message…"
               rows={3}
               required
             />
           </Field>
+
+          {createConversation.error && (
+            <p role="alert" className="text-body-sm text-destructive">
+              {createConversation.error instanceof ApiError
+                ? createConversation.error.message
+                : "La conversation n'a pas pu être créée."}
+            </p>
+          )}
 
           <div className="flex justify-end gap-2">
             <Button
