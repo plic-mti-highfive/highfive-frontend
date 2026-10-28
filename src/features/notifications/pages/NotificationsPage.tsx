@@ -4,7 +4,7 @@ import { ApiError } from "@/api/client";
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
-  useNotifications,
+  useNotificationsInfinite,
 } from "@/api/queries/notifications";
 import {
   Button,
@@ -12,6 +12,7 @@ import {
   ErrorState,
   PageHeader,
   Skeleton,
+  Spinner,
 } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import { NotificationItem } from "../components/NotificationItem";
@@ -25,11 +26,12 @@ import {
 
 export function NotificationsPage() {
   const [category, setCategory] = useState<NotificationCategory | "all">("all");
-  const notifications = useNotifications();
+  const notifications = useNotificationsInfinite();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
 
-  const allItems = notifications.data?.items ?? [];
+  const allItems =
+    notifications.data?.pages.flatMap((page) => page.items) ?? [];
   const items =
     category === "all"
       ? allItems
@@ -134,6 +136,18 @@ export function NotificationsPage() {
                   ))}
                 </section>
               ))}
+            </div>
+          )}
+          {notifications.hasNextPage && (
+            <div className="flex justify-center py-6">
+              <Button
+                variant="outline"
+                onClick={() => void notifications.fetchNextPage()}
+                disabled={notifications.isFetchingNextPage}
+              >
+                {notifications.isFetchingNextPage && <Spinner size="sm" />}
+                Charger la suite
+              </Button>
             </div>
           )}
         </div>

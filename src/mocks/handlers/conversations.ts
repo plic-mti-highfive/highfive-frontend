@@ -228,13 +228,15 @@ export const conversationHandlers = [
         return errors.notFound("Conversation introuvable.");
       }
       const url = new URL(request.url);
+      // Comme le backend : la premiere page porte les plus recents, le curseur
+      // remonte vers les plus anciens, chaque page reste chronologique.
       const page = paginate(
-        messagesOf(db, conversation.id),
+        messagesOf(db, conversation.id).reverse(),
         url.searchParams.get("cursor"),
       );
       return HttpResponse.json({
         ...page,
-        items: page.items.map((m) => toMessageWithAuthor(db, m)),
+        items: page.items.reverse().map((m) => toMessageWithAuthor(db, m)),
       });
     },
   ),

@@ -11,6 +11,8 @@ export interface MessageBubbleProps {
   message: MessageWithAuthor;
   isOwn: boolean;
   showAuthor: boolean;
+  /** R-P1 : un compte suspendu supprime ses messages mais ne les modifie plus. */
+  canEdit: boolean;
   onEdit: (body: string) => void;
   onDelete: () => void;
 }
@@ -81,6 +83,7 @@ export function MessageBubble({
   message,
   isOwn,
   showAuthor,
+  canEdit,
   onEdit,
   onDelete,
 }: MessageBubbleProps) {
@@ -193,12 +196,17 @@ export function MessageBubble({
                 <Menu.Portal>
                   <Menu.Positioner side="top" align="end" sideOffset={4}>
                     <Menu.Popup className="min-w-32 rounded-md border border-border bg-card py-1 shadow-overlay">
-                      <Menu.Item
-                        className="cursor-pointer px-3 py-1.5 text-body-sm text-foreground outline-none hover:bg-muted"
-                        onClick={() => setEditing(true)}
-                      >
-                        Modifier
-                      </Menu.Item>
+                      {canEdit && (
+                        <Menu.Item
+                          className="cursor-pointer px-3 py-1.5 text-body-sm text-foreground outline-none hover:bg-muted"
+                          onClick={() => {
+                            setDraft(message.body);
+                            setEditing(true);
+                          }}
+                        >
+                          Modifier
+                        </Menu.Item>
+                      )}
                       <Menu.Item
                         className="cursor-pointer px-3 py-1.5 text-body-sm text-danger-fg outline-none hover:bg-danger-bg"
                         onClick={onDelete}
