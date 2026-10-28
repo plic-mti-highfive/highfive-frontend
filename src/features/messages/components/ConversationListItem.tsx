@@ -27,7 +27,7 @@ export function ConversationListItem({
     ? "Aucun message pour l'instant"
     : lastMessage.deleted
       ? "Message supprimé"
-      : `${isOwnLastMessage ? "Toi : " : ""}${lastMessage.body}`;
+      : `${isOwnLastMessage ? "Toi : " : ""}${lastMessage.body || (lastMessage.attachmentKind ? "Pièce jointe" : "")}`;
 
   return (
     <ListItem

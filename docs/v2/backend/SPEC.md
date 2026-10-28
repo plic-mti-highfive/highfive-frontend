@@ -409,19 +409,39 @@ porteur ou co-porteur). R-F4 (fichiers d'un projet public = publics, donc
 `GET /projects/{slug}/files` reste sans auth ; le stockage objet doit
 refleter la meme regle de visibilite si les URLs de fichiers sont signees).
 
-### Messagerie (8 routes)
+### Messagerie (13 routes)
 
 R-MSG1 (`direct` = exactement 2 participants, cree a la volee des le
 premier message, non renommable). R-MSG2 (`group` = 3 a 50, titre libre).
 R-MSG3 (`channel` = miroir exact de l'equipe d'un projet — cree/supprime
 avec le projet, participants synchronises automatiquement a chaque
-`membership` creee/retiree ; jamais de route manuelle pour y entrer/sortir).
+`membership` creee/retiree ; jamais de route manuelle pour y entrer/sortir ;
+pas de plafond de participants, contrairement au groupe ; un canal ou le
+porteur est encore seul n'est pas liste, faute d'interlocuteur).
 R-MSG4 (piece jointe projet ou fichier, apercu resolu a la lecture —
-`attachmentPreview`). R-MSG5 (modification 15 min, auteur seul). R-MSG6
+`attachmentPreview`). R-MSG5 (modification par l'auteur seul, sans limite de temps — un message
+supprime ne se modifie plus ; `editedAt` signale qu'il a ete modifie). R-MSG6
 (suppression laisse "Message supprime", jamais un vrai `DELETE`). R-MSG7
 (une conversation `direct` reste une "demande" tant que le destinataire n'a
 pas repondu — calcule a la lecture : tous les messages ont le meme auteur
-que le createur). Effet de bord : chaque message notifie les autres
+que le createur). R-MSG8 (medias : une image, une video ou un fichier se
+depose d'abord dans la conversation — `POST /conversations/:id/attachments`,
+multipart `file` — puis se joint au message suivant par
+`{kind: "upload", uploadId}` ; le texte devient alors facultatif. Type reel
+verifie a la reception, executables refuses comme R-F2 ; plafonds 10 Mo
+image, 50 Mo video, 20 Mo autre. Le depot n'est lisible que des
+participants : stockage prive, `attachmentPreview.url` signee et de courte
+duree. Un depot ne se joint qu'une fois, par son auteur ; jamais joint, il
+est purge apres 24 h ; supprimer le message supprime le fichier). R-MSG9
+(gestion d'un groupe, et d'un groupe seulement : tout participant le
+renomme, y ajoute des personnes — R-MSG2 tient toujours — et le quitte ;
+seul l'administrateur, `adminId`, en retire quelqu'un. L'administrateur est
+le createur ; s'il part, le plus ancien participant restant prend le role.
+Qui arrive voit l'historique sans qu'il compte comme non lu ; qui part ou
+est retire perd l'acces a la conversation. Un groupe ou il ne reste qu'une
+personne n'est plus liste, faute d'interlocuteur ; vide, il est supprime).
+Effet de
+bord : chaque message notifie les autres
 participants (`message_received`), sauf ceux qui ont deja lu (pas de
 notification a soi-meme).
 

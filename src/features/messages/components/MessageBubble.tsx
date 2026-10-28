@@ -11,8 +11,6 @@ export interface MessageBubbleProps {
   message: MessageWithAuthor;
   isOwn: boolean;
   showAuthor: boolean;
-  /** R-MSG5 : fenetre de 15 minutes ecoulee ou non, verifiee cote handler. */
-  editable: boolean;
   onEdit: (body: string) => void;
   onDelete: () => void;
 }
@@ -37,6 +35,40 @@ function AttachmentPreview({
       </Link>
     );
   }
+  // R-MSG8 : le type reel (verifie par le backend) decide de l'affichage.
+  if (attachment.kind === "upload") {
+    if (attachment.mimeType.startsWith("image/")) {
+      return (
+        <a href={attachment.url} target="_blank" rel="noreferrer">
+          <img
+            src={attachment.url}
+            alt={attachment.fileName}
+            className="mt-1.5 max-h-64 rounded-md border border-border"
+          />
+        </a>
+      );
+    }
+    if (attachment.mimeType.startsWith("video/")) {
+      return (
+        <video
+          src={attachment.url}
+          controls
+          preload="metadata"
+          className="mt-1.5 max-h-64 rounded-md border border-border"
+        />
+      );
+    }
+    return (
+      <a
+        href={attachment.url}
+        download={attachment.fileName}
+        className="mt-1.5 flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-body-sm text-foreground hover:bg-muted"
+      >
+        <Paperclip size={14} className="shrink-0 text-muted-foreground" />
+        <span className="truncate">{attachment.fileName}</span>
+      </a>
+    );
+  }
   return (
     <span className="mt-1.5 flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-body-sm text-foreground">
       <Paperclip size={14} className="shrink-0 text-muted-foreground" />
@@ -49,7 +81,6 @@ export function MessageBubble({
   message,
   isOwn,
   showAuthor,
-  editable,
   onEdit,
   onDelete,
 }: MessageBubbleProps) {
@@ -141,14 +172,17 @@ export function MessageBubble({
             )}
           >
             <div className="min-w-0">
-              <p className="whitespace-pre-wrap break-words text-body-md">
-                {message.body}
-              </p>
+              {message.body && (
+                <p className="whitespace-pre-wrap break-words text-body-md">
+                  {message.body}
+                </p>
+              )}
               {message.attachmentPreview && (
                 <AttachmentPreview attachment={message.attachmentPreview} />
               )}
             </div>
-            {isOwn && editable && (
+            {/* R-MSG5 : l'auteur modifie et supprime ses messages, sans limite de temps. */}
+            {isOwn && (
               <Menu.Root>
                 <Menu.Trigger
                   aria-label="Actions sur le message"

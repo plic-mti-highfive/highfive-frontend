@@ -24,13 +24,6 @@ import { MessageBubble } from "./MessageBubble";
 import { MessageDateSeparator } from "./MessageDateSeparator";
 import { MessageInput } from "./MessageInput";
 
-const EDIT_WINDOW_MS = 15 * 60 * 1000;
-
-/** R-MSG5 : fenetre de 15 minutes, verifiee cote handler — ici pour l'affichage seul. */
-function isWithinEditWindow(sentAt: string): boolean {
-  return Date.now() - new Date(sentAt).getTime() <= EDIT_WINDOW_MS;
-}
-
 export interface ConversationDetailProps {
   conversationId: string;
   currentUser: CurrentUser;
@@ -169,7 +162,6 @@ export function ConversationDetail({
             const showAuthor =
               !previous || previous.authorId !== message.authorId;
             const isOwn = message.authorId === currentUser.id;
-            const editable = isOwn && isWithinEditWindow(message.sentAt);
             return (
               <div key={message.id}>
                 {showDateSeparator && (
@@ -179,7 +171,6 @@ export function ConversationDetail({
                   message={message}
                   isOwn={isOwn}
                   showAuthor={showAuthor}
-                  editable={editable}
                   onEdit={(body) =>
                     editMessage.mutate({ messageId: message.id, body })
                   }

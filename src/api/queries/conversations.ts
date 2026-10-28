@@ -55,7 +55,7 @@ export function useSendMessage(conversationId: string) {
   });
 }
 
-/** R-MSG5 : fenetre de 15 minutes verifiee cote handler. */
+/** R-MSG5 : l'auteur seul, sans limite de temps. */
 export function useEditMessage(conversationId: string) {
   const queryClient = useQueryClient();
   return useMutation({

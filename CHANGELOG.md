@@ -26,6 +26,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - La banniere du projet s'affiche sur les cartes `card` et `hero` (fil,
   recherche, profil), recadree autour du point focal ; apercu de la carte dans
   l'editeur de personnalisation. Contrat additif : `ProjectSummary.banner`.
+- Contrat de la messagerie etendu, et applique par le backend 2.1.0 :
+  - **R-MSG8** — medias : `POST /conversations/:id/attachments`
+    (`MessageUpload`), piece jointe `{kind: "upload", uploadId}`, apercu
+    avec `mimeType` et `url` signee ; texte facultatif quand une piece
+    jointe est presente ; `lastMessage.attachmentKind`.
+  - **R-MSG9** — gestion des groupes : `PATCH /conversations/:id`,
+    `POST /conversations/:id/participants`,
+    `DELETE /conversations/:id/participants/:userId`,
+    `POST /conversations/:id/leave` ; champ `adminId`.
+  - `MessageBodyUpdateInput` devient un schema exporte.
+  - `src/api/conversations.ts` expose les fonctions correspondantes, et le
+    mock MSW sert ces routes.
+- La bulle de message affiche une image, un lecteur video ou un lien de
+  telechargement ; la liste annonce « Piece jointe » pour un message sans
+  texte.
 
 ### Changed
 
@@ -39,6 +54,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `src/mocks/data/data.test.ts`.
 - `DESIGN.md` : exception encadree a la « Deterministic Tint Rule » pour
   l'accent de projet choisi par son porteur.
+- R-MSG3 : un canal n'a plus de plafond de participants ; le plafond de 50
+  devient propre aux groupes (`GROUP_MAX_PARTICIPANTS`).
+- R-MSG5 : plus de fenetre de 15 minutes, l'auteur modifie son message a tout
+  moment (un message supprime ne se modifie plus). Le menu « Modifier /
+  Supprimer » de la bulle reste donc affiche sur ses propres messages — il
+  disparaissait apres 15 minutes, suppression comprise.
 
 ## [2.0.1] - 2026-09-16
 
