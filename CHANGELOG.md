@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - La banniere du projet s'affiche sur les cartes `card` et `hero` (fil,
   recherche, profil), recadree autour du point focal ; apercu de la carte dans
   l'editeur de personnalisation. Contrat additif : `ProjectSummary.banner`.
+- Personnalisation de la fiche appliquee par le backend core 2.2.0 : en mode
+  `http`, editeur, fiche, cartes (accent, banniere en miniature) et
+  moderation des medias fonctionnent contre le vrai serveur ; le message
+  « La personnalisation n'est pas encore disponible sur ce serveur » ne
+  s'affiche plus.
 - Contrat de la messagerie etendu, et applique par le backend 2.1.0 :
   - **R-MSG8** — medias : `POST /conversations/:id/attachments`
     (`MessageUpload`), piece jointe `{kind: "upload", uploadId}`, apercu

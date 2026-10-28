@@ -1,6 +1,6 @@
 # Personnalisation de la fiche projet — scope v1
 
-Statut : scope validé, plan d'implémentation à rédiger. Branche : `feat/project-customization`.
+Statut : livré côté front, appliqué par le backend core 2.2.0 (détail, choix et vérifications : `docs/PERSONNALISATION.md` du dépôt backend). En mode `http`, l'éditeur, la fiche, les cartes et la modération fonctionnent contre le vrai serveur.
 
 ## Objectif
 
@@ -159,6 +159,13 @@ co-porteurs, thème du Lab, versionnement du thème.
 - Quotas et types de fichiers images (équivalent R-F1/R-F2).
 - Suppression d'un média par un admin, journalisée comme les autres actions admin.
 - Le transfert de projet conserve la personnalisation.
+
+Traités par le backend core 2.2.0 : images en stockage privé lues par URL signée (stable
+6 h pour le cache), type réel vérifié (JPEG, PNG, WebP, AVIF ; 2 Mo ; 20 dépôts en attente
+par projet), miniature WebP de 640 px pour les cartes, images jamais enregistrées purgées
+après 24 h, image retirée d'une personnalisation supprimée à l'enregistrement, retrait par
+un admin journalisé (`remove_project_media`) et notifié au porteur (`admin_decision`),
+personnalisation conservée au transfert.
 
 ## Découpage
 
