@@ -51,7 +51,7 @@ export function SuggestTasksDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogPopup className="max-w-2xl">
-        <DialogTitle>Suggérer des tâches (IA)</DialogTitle>
+        <DialogTitle>Suggérer des étapes (IA)</DialogTitle>
         <DialogDescription>
           Propositions déduites du contenu du Mur et de la description du
           projet. Rien n'est créé avant ta validation.
@@ -70,7 +70,7 @@ export function SuggestTasksDialog({
         {phase === "error" && (
           <div className="mt-6 flex flex-col gap-4">
             <p className="text-body-md text-danger-fg" role="alert">
-              {errorMessage ?? "La suggestion de tâches a échoué."}
+              {errorMessage ?? "La suggestion d'étapes a échoué."}
             </p>
             <div className="flex justify-end gap-2">
               <Button variant="ghost" onClick={onClose}>
@@ -85,7 +85,7 @@ export function SuggestTasksDialog({
           <div className="mt-6 flex flex-col gap-4">
             <p className="text-body-md text-foreground">
               Le Mur ne contient pas encore assez de texte pour proposer des
-              tâches. Ajoute quelques post-its ou notes, puis réessaie.
+              étapes. Ajoute quelques post-its ou notes, puis réessaie.
             </p>
             <div className="flex justify-end gap-2">
               <Button variant="ghost" onClick={onClose}>
@@ -212,7 +212,7 @@ function ProposalsChecklist({
         >
           {accepting
             ? "Création…"
-            : `Créer ${retained.length} tâche${retained.length > 1 ? "s" : ""}`}
+            : `Créer ${retained.length} étape${retained.length > 1 ? "s" : ""}`}
         </Button>
       </div>
     </>

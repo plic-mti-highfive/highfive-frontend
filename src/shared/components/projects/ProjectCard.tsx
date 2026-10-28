@@ -295,7 +295,7 @@ export function ProjectCard({
           onError={() => setFailedCoverUrl(cover.url)}
           className={
             hero
-              ? "aspect-video w-full sm:order-last sm:aspect-auto sm:w-64"
+              ? "aspect-video w-full sm:order-last sm:aspect-auto sm:w-2/5 sm:shrink-0 lg:w-1/2"
               : "aspect-video w-full"
           }
         />
@@ -395,7 +395,7 @@ export function ProjectCard({
       {hero && !cover && (
         <div
           aria-hidden="true"
-          className="hidden w-64 shrink-0 sm:block"
+          className="hidden shrink-0 sm:block sm:w-2/5 lg:w-1/2"
           style={heroPatternStyle(project.id)}
         />
       )}

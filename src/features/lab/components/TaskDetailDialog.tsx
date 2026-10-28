@@ -32,7 +32,7 @@ export interface TaskDetailDialogProps {
 }
 
 /**
- * Panneau de détail d'une tâche (doc 04 §11) : titre, détails, assignés
+ * Panneau de détail d'une étape (doc 04 §11) : titre, détails, assignés
  * multiples parmi les VRAIS membres (`useMembers`), échéance optionnelle —
  * jamais de niveau d'urgence (écart volontaire vs l'ancien composant).
  * R-K6 : l'échéance ne porte aucune alerte visuelle même dépassée.
@@ -123,15 +123,15 @@ function TaskDetailForm({
           else setTitle(task.title);
         }}
         disabled={readOnly}
-        aria-label="Titre de la tâche"
+        aria-label="Titre de l'étape"
         className="border-none bg-transparent px-0 text-heading-md font-semibold shadow-none focus-visible:ring-0"
       />
       <DialogTitle className="sr-only">{task.title}</DialogTitle>
       <DialogDescription className="sr-only">
-        Détail de la tâche dans la colonne {column.label}
+        Détail de l'étape dans la colonne {column.label}
       </DialogDescription>
 
-      <div className="mt-4 flex flex-col gap-4">
+      <div className="mt-6 flex flex-col gap-6">
         <Field label="Colonne">
           <select
             value={column.id}
@@ -235,7 +235,7 @@ function TaskDetailForm({
               className="flex items-center gap-1.5 text-body-sm text-muted-foreground hover:text-danger-fg"
             >
               <Trash2 size={13} />
-              Supprimer la tâche
+              Supprimer l'étape
             </button>
           )}
         </div>

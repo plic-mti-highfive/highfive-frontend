@@ -73,18 +73,18 @@ function describeShape(editor: Editor, shape: TLShape): string {
 }
 
 /**
- * Tableau blanc (`/projets/:slug/lab/mur`, doc 04 §10, V2-10) : un seul espace
+ * Mur (`/projets/:slug/lab/mur`, doc 04 §10, V2-10) : un seul espace
  * tldraw, partagé en temps réel entre les membres via le service canvas
  * (Yjs/Hocuspocus, `useWallSync`) et persisté côté serveur. Le bandeau reflète
  * l'état réel de la connexion (jamais de faux « synchronisé »).
  *
- * Deux façons de créer des tâches depuis le Mur : convertir la sélection
- * (un élément = une tâche, sans IA) ou « Suggérer des tâches (IA) » (le core
+ * Deux façons de créer des étapes depuis le Mur : convertir la sélection
+ * (un élément = une étape, sans IA) ou « Suggérer des tâches (IA) » (le core
  * lit le Mur, l'IA propose, l'utilisateur valide).
  */
 export default function WallPage() {
   const { slug, project, readOnly: shellReadOnly } = useLabContext();
-  useDocumentTitle(`Tableau blanc · ${project.title}`);
+  useDocumentTitle(`Mur · ${project.title}`);
   const isMobile = useIsMobile();
   const colorScheme = useTldrawColorScheme();
   const convertSelection = useConvertWallSelectionToTasks(slug);
@@ -171,12 +171,11 @@ export default function WallPage() {
     <div className="flex h-full flex-col">
       {isMobile ? (
         <p className="shrink-0 border-b border-warning-border/30 bg-warning-bg px-4 py-2 text-body-sm text-warning-fg">
-          Le tableau blanc se modifie depuis un ordinateur : lecture seule sur
-          mobile.
+          Le Mur se modifie depuis un ordinateur : lecture seule sur mobile.
         </p>
       ) : shellReadOnly ? (
         <p className="shrink-0 border-b border-border bg-muted px-4 py-2 text-body-sm text-muted-foreground">
-          Lecture seule : tu ne peux pas modifier le tableau blanc.
+          Lecture seule : tu ne peux pas modifier le Mur.
         </p>
       ) : null}
 
@@ -202,7 +201,7 @@ export default function WallPage() {
         ) : sync.status === "error" ? (
           <ErrorState
             className="h-full"
-            message={sync.error ?? "Le tableau blanc est indisponible."}
+            message={sync.error ?? "Le Mur est indisponible."}
             onRetry={sync.retry}
           />
         ) : (
@@ -211,7 +210,7 @@ export default function WallPage() {
             role="status"
           >
             <Spinner size="sm" />
-            <span>Connexion au tableau blanc…</span>
+            <span>Connexion au Mur…</span>
           </div>
         )}
 
@@ -223,7 +222,7 @@ export default function WallPage() {
               variant="outline"
               onClick={openSuggestDialog}
             >
-              Suggérer des tâches (IA)
+              Suggérer des étapes (IA)
             </Button>
             <Button
               className="pointer-events-auto shadow-overlay"
@@ -231,7 +230,7 @@ export default function WallPage() {
               disabled={selectedIds.length === 0}
               onClick={openConvertDialog}
             >
-              Convertir la sélection en tâches
+              Convertir la sélection en étapes
               {selectedIds.length > 0 ? ` (${selectedIds.length})` : ""}
             </Button>
           </div>
@@ -258,7 +257,7 @@ export default function WallPage() {
               onSuccess: (created) => {
                 closeSuggestDialog();
                 setSuccessMessage(
-                  `${created.length} tâche${created.length > 1 ? "s" : ""} créée${created.length > 1 ? "s" : ""} dans Étapes.`,
+                  `${created.length} étape${created.length > 1 ? "s" : ""} créée${created.length > 1 ? "s" : ""} dans les Étapes.`,
                 );
               },
             },
@@ -279,7 +278,7 @@ export default function WallPage() {
                 setConvertOpen(false);
                 editor?.selectNone();
                 setSuccessMessage(
-                  `${tasks.length} tâche${tasks.length > 1 ? "s" : ""} créée${tasks.length > 1 ? "s" : ""} dans Étapes.`,
+                  `${tasks.length} étape${tasks.length > 1 ? "s" : ""} créée${tasks.length > 1 ? "s" : ""} dans les Étapes.`,
                 );
               },
             },
@@ -303,7 +302,7 @@ function SyncBanner({ sync }: { sync: WallSync }) {
         role="status"
         className="shrink-0 border-b border-info-border/30 bg-info-bg px-4 py-2 text-body-sm text-info-fg"
       >
-        Connexion au tableau blanc partagé…
+        Connexion au Mur partagé…
       </p>
     );
   }
@@ -329,8 +328,7 @@ function SyncBanner({ sync }: { sync: WallSync }) {
       role="status"
       className="shrink-0 border-b border-success-border/30 bg-success-bg px-4 py-2 text-body-sm text-success-fg"
     >
-      Tableau blanc partagé : les modifications sont synchronisées en temps
-      réel.
+      Mur partagé : les modifications sont synchronisées en temps réel.
     </p>
   );
 }

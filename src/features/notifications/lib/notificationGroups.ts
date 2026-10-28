@@ -45,7 +45,7 @@ const CATEGORY_LABEL: Record<NotificationCategory, string> = {
   mention: "Mention",
   comment: "Commentaire",
   highfive: "Highfive",
-  task: "Tâche",
+  task: "Étape",
   announcement: "Annonce",
   message: "Message",
 };

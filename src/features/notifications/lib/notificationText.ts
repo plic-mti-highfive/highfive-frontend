@@ -75,7 +75,7 @@ export function targetHref(target: NotificationTarget): string {
     case "comment":
       return `/projets/${target.projectSlug}`;
     case "task":
-      return `/projets/${target.projectSlug}/lab/taches`;
+      return `/projets/${target.projectSlug}/lab/etapes`;
     case "message":
       return `/messages/${target.conversationId}`;
   }
