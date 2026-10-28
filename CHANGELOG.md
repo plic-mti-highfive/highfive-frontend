@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - La banniere du projet s'affiche sur les cartes `card` et `hero` (fil,
   recherche, profil), recadree autour du point focal ; apercu de la carte dans
   l'editeur de personnalisation. Contrat additif : `ProjectSummary.banner`.
+- Personnalisation de la fiche appliquee par le backend core 2.2.0 : en mode
+  `http`, editeur, fiche, cartes (accent, banniere en miniature) et
+  moderation des medias fonctionnent contre le vrai serveur ; le message
+  « La personnalisation n'est pas encore disponible sur ce serveur » ne
+  s'affiche plus.
 - Contrat de la messagerie etendu, et applique par le backend 2.1.0 :
   - **R-MSG8** — medias : `POST /conversations/:id/attachments`
     (`MessageUpload`), piece jointe `{kind: "upload", uploadId}`, apercu
@@ -80,6 +85,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   moment (un message supprime ne se modifie plus). Le menu « Modifier /
   Supprimer » de la bulle reste donc affiche sur ses propres messages — il
   disparaissait apres 15 minutes, suppression comprise.
+
+### Fixed
+
+- La notification `admin_decision` disait « a pris une décision concernant ton
+  compte » alors que sa cible est un projet ou un commentaire (suppression
+  d'un projet, retrait d'un média, commentaire masqué) : elle dit désormais
+  « a pris une décision de modération sur » suivi de la cible.
 
 ## [2.0.1] - 2026-09-16
 

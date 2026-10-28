@@ -672,8 +672,7 @@ non implementee cote front — rien ci-dessous n'est dans `openapi.yaml`.
     usage programmatique futur, ou retirer.
 12. **Personnalisation de la fiche** (`Project.customization`,
     `ProjectSummary.accent`/`banner`) : champs et routes additifs (V2-4), voir §3
-    "Projets". Ecarts du mock a corriger cote backend : pas de nettoyage des
-    images orphelines, pas de notification au porteur (R-S3) quand un admin
-    retire un media, images
-    servies en `data:` URL (le backend sert de vraies URLs), pas de
-    controle du type MIME reel.
+    "Projets". Ecarts du mock, corriges par le backend core 2.2.0 : pas de
+    nettoyage des images orphelines, pas de notification au porteur (R-S3)
+    quand un admin retire un media, images servies en `data:` URL (le
+    backend sert des URL signees), pas de controle du type MIME reel.

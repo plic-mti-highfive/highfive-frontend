@@ -51,7 +51,12 @@ export function actionPhrase(type: NotificationType, plural: boolean): string {
     case "message_received":
       return plural ? "t'ont envoyé un message" : "t'a envoyé un message";
     case "admin_decision":
-      return "a pris une décision concernant ton compte";
+      // Toujours suivie du libelle de la cible (un projet ou un commentaire,
+      // jamais un compte) : « … a pris une décision de modération sur
+      // Fresque murale ».
+      return plural
+        ? "ont pris une décision de modération sur"
+        : "a pris une décision de modération sur";
   }
 }
 
