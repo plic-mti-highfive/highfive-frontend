@@ -101,10 +101,18 @@ export function HighfiveButton({
       onClick={handleClick}
       className={cn("gap-1.5", className)}
     >
-      <Hand
-        size={size === "sm" ? 14 : 16}
-        className={cn(given && "fill-current stroke-0")}
-      />
+      <Hand size={size === "sm" ? 14 : 16}>
+        {given && (
+          // Les doigts de `Hand` sont des arcs ouverts : `fill` seul laisse le
+          // centre vide. On ajoute des silhouettes fermees sous le contour.
+          <g fill="currentColor" stroke="none">
+            <path d="M6 6a2 2 0 0 1 4 0v10H6z" />
+            <path d="M10 4a2 2 0 0 1 4 0v12h-4z" />
+            <path d="M14 6a2 2 0 0 1 4 0v10h-4z" />
+            <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15L6 10H18z" />
+          </g>
+        )}
+      </Hand>
       {size === "md" && <span>{given ? "Highfive donné" : "Highfive"}</span>}
       <span className="tabular-nums">{countLabel}</span>
     </Button>

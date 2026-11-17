@@ -236,11 +236,16 @@ export function AppRouter() {
 
         {/* Coquille atelier — Le Lab (doc 06 §4) */}
         <Route path="/projets/:slug/lab" element={<LabLayout />}>
-          {/* Tableau blanc (V2-10, fusion des deux anciens espaces de travail sur
+          {/* Mur (V2-10, fusion des deux anciens espaces de travail sur
               tldraw) est l'entrée par défaut de l'atelier. */}
           <Route index element={<Navigate to="mur" replace />} />
           <Route path="mur" element={withSuspense(<LabWallPage />)} />
-          <Route path="taches" element={withSuspense(<LabTasksPage />)} />
+          <Route path="etapes" element={withSuspense(<LabTasksPage />)} />
+          {/* Ancienne adresse des Étapes (liens de notification déjà émis). */}
+          <Route
+            path="taches"
+            element={<Navigate to="../etapes" relative="path" replace />}
+          />
         </Route>
 
         {/* Redirections des anciennes routes (id -> slug/pseudo impossible

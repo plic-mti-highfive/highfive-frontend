@@ -46,13 +46,14 @@ export const queryKeys = {
   conversations: {
     list: () => ["conversations"] as const,
     detail: (id: string) => ["conversations", id] as const,
-    messages: (id: string, cursor?: string) =>
-      ["conversations", id, "messages", cursor ?? null] as const,
+    /** Toutes les pages du fil (`useInfiniteQuery`), plus recentes d'abord. */
+    messages: (id: string) => ["conversations", id, "messages"] as const,
   },
   notifications: {
     /** Prefixe utilise pour invalider toutes les cles notifications (liste + compteur de l'en-tete). */
     all: () => ["notifications"] as const,
     list: (cursor?: string) => ["notifications", cursor ?? null] as const,
+    infinite: () => ["notifications", "infinite"] as const,
     preferences: () => ["notifications", "preferences"] as const,
   },
   admin: {

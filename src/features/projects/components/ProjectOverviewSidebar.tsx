@@ -47,9 +47,6 @@ export function ProjectOverviewSidebar({
               </AvatarGroup>
               <p className="text-body-sm text-muted-foreground">
                 {members.length} {members.length === 1 ? "membre" : "membres"}
-                {members.length > MAX_AVATARS && (
-                  <> dont {MAX_AVATARS} affichés</>
-                )}
               </p>
             </>
           )}

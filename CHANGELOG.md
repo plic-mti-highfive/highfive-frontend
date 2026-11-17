@@ -26,6 +26,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - La banniere du projet s'affiche sur les cartes `card` et `hero` (fil,
   recherche, profil), recadree autour du point focal ; apercu de la carte dans
   l'editeur de personnalisation. Contrat additif : `ProjectSummary.banner`.
+- Personnalisation de la fiche appliquee par le backend core 2.2.0 : en mode
+  `http`, editeur, fiche, cartes (accent, banniere en miniature) et
+  moderation des medias fonctionnent contre le vrai serveur ; le message
+  « La personnalisation n'est pas encore disponible sur ce serveur » ne
+  s'affiche plus.
+- Contrat de la messagerie etendu, et applique par le backend 2.1.0 :
+  - **R-MSG8** — medias : `POST /conversations/:id/attachments`
+    (`MessageUpload`), piece jointe `{kind: "upload", uploadId}`, apercu
+    avec `mimeType` et `url` signee ; texte facultatif quand une piece
+    jointe est presente ; `lastMessage.attachmentKind`.
+  - **R-MSG9** — gestion des groupes : `PATCH /conversations/:id`,
+    `POST /conversations/:id/participants`,
+    `DELETE /conversations/:id/participants/:userId`,
+    `POST /conversations/:id/leave` ; champ `adminId`.
+  - `MessageBodyUpdateInput` devient un schema exporte.
+  - `src/api/conversations.ts` expose les fonctions correspondantes, et le
+    mock MSW sert ces routes.
+- La bulle de message affiche une image, un lecteur video ou un lien de
+  telechargement ; la liste annonce « Piece jointe » pour un message sans
+  texte.
+- Branchement de la messagerie et des notifications sur le backend :
+  - Polling (pas de temps reel, SPEC §5) : fil ouvert toutes les 5 s, liste et
+    detail des conversations toutes les 15 s, notifications (et cloche) toutes
+    les 30 s ; suspendu quand l'onglet est cache.
+  - Fil pagine (`useInfiniteQuery`) : « Messages precedents » charge les plus
+    anciens sans faire sauter le defilement ; un nouveau message fait defiler
+    seulement si l'on etait en bas, ou si c'est le sien.
+  - Un message recu pendant qu'une conversation est ouverte la marque lue ;
+    lire ou ecrire rafraichit les notifications (le serveur les eteint).
+  - Piece jointe dans la zone de saisie (bouton, ou coller une image) : depot
+    puis envoi (R-MSG8), plafonds verifies avant l'envoi, brouillon conserve
+    et erreur du serveur affichee si l'envoi echoue.
+  - Parametres d'un groupe (R-MSG9) : renommer, voir les membres et
+    l'administrateur, ajouter des personnes, retirer (administrateur), quitter.
+  - Page Notifications paginee (« Charger la suite »).
+  - Erreurs de creation de conversation et d'action sur un message affichees.
 
 ### Changed
 
@@ -39,6 +75,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `src/mocks/data/data.test.ts`.
 - `DESIGN.md` : exception encadree a la « Deterministic Tint Rule » pour
   l'accent de projet choisi par son porteur.
+- R-MSG3 : un canal n'a plus de plafond de participants ; le plafond de 50
+  devient propre aux groupes (`GROUP_MAX_PARTICIPANTS`).
+- Mock MSW : la premiere page de messages porte les plus recents, comme le
+  backend (le mock servait les plus anciens d'abord).
+- Un compte suspendu ne voit plus « Modifier » sur ses messages (il peut
+  toujours les supprimer).
+- R-MSG5 : plus de fenetre de 15 minutes, l'auteur modifie son message a tout
+  moment (un message supprime ne se modifie plus). Le menu « Modifier /
+  Supprimer » de la bulle reste donc affiche sur ses propres messages — il
+  disparaissait apres 15 minutes, suppression comprise.
+
+### Fixed
+
+- La notification `admin_decision` disait « a pris une décision concernant ton
+  compte » alors que sa cible est un projet ou un commentaire (suppression
+  d'un projet, retrait d'un média, commentaire masqué) : elle dit désormais
+  « a pris une décision de modération sur » suivi de la cible.
 
 ## [2.0.1] - 2026-09-16
 

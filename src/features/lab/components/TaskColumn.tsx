@@ -3,6 +3,7 @@ import { Plus, Trash2 } from "lucide-react";
 import type { Column, Task } from "@/domain";
 import type { TeamMember } from "@/api/memberships";
 import { Button, IconButton, Input } from "@shared/ui";
+import { cn } from "@shared/lib/cn";
 import { getAccent } from "@shared/lib/accent";
 import { TaskCard } from "./TaskCard";
 
@@ -20,13 +21,12 @@ export interface TaskColumnProps {
 }
 
 /**
- * Une colonne des Tâches (doc 04 §11) : le libellé visible reste celui du
- * doc 03 (colonne, tâche), jamais un emprunt aux outils de suivi logiciel.
- * Le glisser-déposer ne cible que la colonne (pas une
- * position précise) — le contrat `TaskMoveInput` (R-K5) ne modélise que la
- * colonne + un ordre, sans réindexer Étapes voisines côté handler ; une
- * dépose place donc la tâche en fin de colonne cible, et l'alternative
- * clavier (`TaskCard`, "Déplacer vers…") fait exactement la même chose.
+ * Une colonne des Étapes (doc 04 §11) : en-tête sobre (nom, compteur), cartes
+ * espacées, ajout en bas. Le glisser-déposer ne cible que la colonne (pas une position précise) — le contrat `TaskMoveInput`
+ * (R-K5) ne modélise que la colonne + un ordre, sans réindexer les étapes
+ * voisines côté handler ; une dépose place donc l'étape en fin de colonne
+ * cible, et l'alternative clavier (menu ⋮ de `TaskCard`) fait exactement la
+ * même chose.
  */
 export function TaskColumn({
   column,
@@ -52,8 +52,9 @@ export function TaskColumn({
   }
 
   return (
-    <div
+    <section
       data-accent={accent}
+      aria-label={column.label}
       onDragOver={(e) => {
         if (readOnly) return;
         e.preventDefault();
@@ -70,20 +71,17 @@ export function TaskColumn({
         const taskId = e.dataTransfer.getData("text/plain");
         if (taskId) onMoveTask(taskId, column.id);
       }}
-      className={`flex w-70 shrink-0 flex-col gap-2.5 rounded-xl bg-[var(--accent-light)]/40 p-3 transition-shadow ${
-        isOver ? "ring-2 ring-[var(--accent-base)]" : ""
-      }`}
+      className={cn(
+        "group/column flex flex-col gap-5 rounded-2xl bg-muted/50 p-5 transition-shadow md:w-80 md:shrink-0 lg:flex-1 lg:basis-72",
+        isOver && "ring-2 ring-[var(--accent-base)]",
+      )}
     >
-      <div className="flex items-center justify-between gap-2 px-1">
+      <header className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
-          <span
-            className="size-2.5 shrink-0 rounded-full bg-[var(--accent-base)]"
-            aria-hidden
-          />
-          <h2 className="truncate text-ui-md text-foreground">
+          <h2 className="truncate font-display text-heading-md font-semibold text-foreground">
             {column.label}
           </h2>
-          <span className="shrink-0 rounded-pill bg-[var(--accent-light)] px-1.5 py-0.5 text-label font-bold text-[var(--accent-dark)]">
+          <span className="shrink-0 text-body-sm text-muted-foreground">
             {tasks.length}
           </span>
         </div>
@@ -91,38 +89,46 @@ export function TaskColumn({
           <IconButton
             aria-label={`Supprimer la colonne ${column.label}`}
             size="xs"
+            className="opacity-0 transition-opacity focus-visible:opacity-100 group-focus-within/column:opacity-100 group-hover/column:opacity-100 max-md:opacity-100"
             onClick={onRequestDeleteColumn}
           >
-            <Trash2 size={13} />
+            <Trash2 size={14} />
           </IconButton>
         )}
-      </div>
+      </header>
 
-      <div className="flex flex-col gap-2">
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            column={column}
-            columns={columns}
-            members={members}
-            readOnly={readOnly}
-            onOpen={() => onOpenTask(task.id)}
-            onDragStart={() => {}}
-            onDragEnd={() => {}}
-            onMoveTo={(columnId) => onMoveTask(task.id, columnId)}
-          />
-        ))}
-      </div>
+      {tasks.length > 0 ? (
+        <ul className="flex flex-col gap-3">
+          {tasks.map((task) => (
+            <li key={task.id}>
+              <TaskCard
+                task={task}
+                column={column}
+                columns={columns}
+                members={members}
+                readOnly={readOnly}
+                onOpen={() => onOpenTask(task.id)}
+                onMoveTo={(columnId) => onMoveTask(task.id, columnId)}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="rounded-xl border border-dashed border-border px-4 py-8 text-center text-body-sm text-muted-foreground">
+          {readOnly
+            ? "Aucune étape ici."
+            : "Rien ici pour l'instant. Ajoute une étape ou glisses-en une."}
+        </p>
+      )}
 
       {!readOnly &&
         (adding ? (
-          <div className="flex flex-col gap-2 rounded-md border border-border bg-card p-2">
+          <div className="flex flex-col gap-3 rounded-xl bg-card p-3 shadow-rest">
             <Input
               autoFocus
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Titre de la tâche…"
+              placeholder="Titre de l'étape…"
               onKeyDown={(e) => {
                 if (e.key === "Enter") submit();
                 if (e.key === "Escape") {
@@ -151,12 +157,12 @@ export function TaskColumn({
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-body-sm text-muted-foreground transition-colors hover:bg-[var(--accent-light)] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex items-center gap-2 self-start rounded-md px-2 py-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <Plus size={13} />
-            Ajouter une tâche
+            <Plus size={14} />
+            Ajouter une étape
           </button>
         ))}
-    </div>
+    </section>
   );
 }

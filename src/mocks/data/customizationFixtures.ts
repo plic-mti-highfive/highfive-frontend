@@ -9,7 +9,8 @@ import type { DbCustomizationImage } from "../db";
 /**
  * Personnalisations de demo (docs/v2/customization-scope.md). Images =
  * degrades SVG neutres encodes en data URL : pas de fausses photos
- * (PRODUCT.md, "Don't invent what isn't real"). Les id sont des uuid
+ * (PRODUCT.md, "Don't invent what isn't real"). Seule une minorite de
+ * projets a une banniere (7 sur 25), et moins encore une galerie (5). Les id sont des uuid
  * litteraux (et non `nextId()`) pour ne pas decaler les id des autres
  * fixtures ; ils vivent dans la plage `...-8c0d-...`.
  */
@@ -64,6 +65,42 @@ const IMAGES = {
   mareeCapture2: {
     n: 7,
     url: gradient("rgb(5, 64, 96)", "rgb(194, 75, 255)", 1200, 800),
+  },
+  repairBanner: {
+    n: 8,
+    url: gradient("rgb(255, 176, 46)", "rgb(122, 61, 8)", 1600, 533),
+  },
+  repairEtabli: {
+    n: 9,
+    url: gradient("rgb(255, 224, 160)", "rgb(179, 92, 20)", 1200, 800),
+  },
+  repairPieces: {
+    n: 10,
+    url: gradient("rgb(120, 120, 130)", "rgb(240, 200, 120)", 1200, 800),
+  },
+  cineBanner: {
+    n: 11,
+    url: gradient("rgb(40, 24, 72)", "rgb(220, 70, 90)", 1600, 533),
+  },
+  vergerBanner: {
+    n: 12,
+    url: gradient("rgb(166, 214, 84)", "rgb(40, 110, 60)", 1600, 533),
+  },
+  vergerFleurs: {
+    n: 13,
+    url: gradient("rgb(255, 230, 240)", "rgb(130, 190, 90)", 1200, 800),
+  },
+  vergerRecolte: {
+    n: 14,
+    url: gradient("rgb(240, 120, 60)", "rgb(90, 140, 50)", 1200, 800),
+  },
+  vergerGreffe: {
+    n: 15,
+    url: gradient("rgb(200, 170, 120)", "rgb(60, 100, 50)", 1200, 800),
+  },
+  serigraphieBanner: {
+    n: 16,
+    url: gradient("rgb(30, 60, 200)", "rgb(255, 220, 40)", 1600, 533),
   },
 } satisfies Record<string, FixtureImage>;
 
@@ -131,6 +168,81 @@ export const CUSTOMIZATIONS: Record<string, ProjectCustomization> = {
         url: IMAGES.mareeCapture2.url,
         alt: "Capture d'écran fictive : grotte violette",
         caption: "La grotte",
+      },
+    ],
+  },
+  // Banniere seule : le reste de la fiche garde l'apparence par defaut.
+  "cine-club-de-quartier": {
+    banner: {
+      id: imageId(IMAGES.cineBanner.n),
+      url: IMAGES.cineBanner.url,
+      alt: "Dégradé violet et rouge, comme la lumière d'une salle de projection",
+      focal: { x: 50, y: 40 },
+    },
+    sections: [...DEFAULT_SECTIONS],
+    gallery: [],
+  },
+  // Banniere seule.
+  "atelier-serigraphie": {
+    banner: {
+      id: imageId(IMAGES.serigraphieBanner.n),
+      url: IMAGES.serigraphieBanner.url,
+      alt: "Dégradé bleu et jaune, aplats de sérigraphie",
+      focal: { x: 50, y: 50 },
+    },
+    sections: [...DEFAULT_SECTIONS],
+    gallery: [],
+  },
+  // Banniere + galerie de deux images, sans palette.
+  "repair-cafe-du-mois": {
+    banner: {
+      id: imageId(IMAGES.repairBanner.n),
+      url: IMAGES.repairBanner.url,
+      alt: "Dégradé orange et brun, comme le bois d'un établi",
+      focal: { x: 60, y: 50 },
+    },
+    sections: [...DEFAULT_SECTIONS],
+    gallery: [
+      {
+        id: imageId(IMAGES.repairEtabli.n),
+        url: IMAGES.repairEtabli.url,
+        alt: "Dégradé ocre, l'établi un samedi matin",
+        caption: "L'établi du premier samedi",
+      },
+      {
+        id: imageId(IMAGES.repairPieces.n),
+        url: IMAGES.repairPieces.url,
+        alt: "Dégradé gris et or, la caisse de pièces détachées",
+      },
+    ],
+  },
+  // Banniere + galerie de trois images, palette Forêt.
+  "verger-conservatoire": {
+    banner: {
+      id: imageId(IMAGES.vergerBanner.n),
+      url: IMAGES.vergerBanner.url,
+      alt: "Dégradé vert tendre, feuillage du verger au printemps",
+      focal: { x: 50, y: 30 },
+    },
+    theme: presetTheme("foret"),
+    sections: [...DEFAULT_SECTIONS],
+    gallery: [
+      {
+        id: imageId(IMAGES.vergerFleurs.n),
+        url: IMAGES.vergerFleurs.url,
+        alt: "Dégradé rose pâle et vert, floraison des pommiers",
+        caption: "Floraison d'avril",
+      },
+      {
+        id: imageId(IMAGES.vergerRecolte.n),
+        url: IMAGES.vergerRecolte.url,
+        alt: "Dégradé orange et vert, récolte d'automne",
+        caption: "Récolte d'octobre",
+      },
+      {
+        id: imageId(IMAGES.vergerGreffe.n),
+        url: IMAGES.vergerGreffe.url,
+        alt: "Dégradé brun et vert, atelier de greffe",
       },
     ],
   },

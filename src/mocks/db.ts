@@ -16,6 +16,7 @@ import type {
   JoinRequest,
   Membership,
   Message,
+  MessageUpload,
   Notification,
   NotificationPreference,
   Project,
@@ -107,6 +108,13 @@ function byShallowEquality<T>(row: T, criteria: Partial<T>): boolean {
   );
 }
 
+/** R-MSG8 : depot propre a une conversation, en attente ou rattache a un message. */
+export type DbMessageUpload = MessageUpload & {
+  conversationId: string;
+  uploadedBy: string;
+  url: string;
+};
+
 export interface MockDatabase {
   users: Table<DbUser>;
   tags: Table<Tag>;
@@ -124,6 +132,7 @@ export interface MockDatabase {
   customizationImages: Table<DbCustomizationImage>;
   conversations: Table<Conversation>;
   messages: Table<Message>;
+  messageUploads: Table<DbMessageUpload>;
   notifications: Table<Notification>;
   notificationPreferences: Table<NotificationPreference & { userId: string }>;
   reports: Table<Report>;
@@ -177,6 +186,7 @@ function buildDb(dataset: DemoDataset): MockDatabase {
     ),
     conversations: new Table(dataset.conversations, byShallowEquality),
     messages: new Table(dataset.messages, byShallowEquality),
+    messageUploads: new Table<DbMessageUpload>([], byShallowEquality),
     notifications: new Table(dataset.notifications, byShallowEquality),
     notificationPreferences: new Table<
       NotificationPreference & { userId: string }

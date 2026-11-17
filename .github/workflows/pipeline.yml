@@ -50,6 +50,9 @@ jobs:
       - name: Check design tokens
         run: pnpm check:tokens
 
+      - name: Build
+        run: pnpm build
+
       - name: Run tests and generate JUnit report
         run: pnpm exec vitest run --reporter=default --reporter=junit --outputFile=junit.xml --passWithNoTests
 

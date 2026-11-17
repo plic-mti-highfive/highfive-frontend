@@ -73,6 +73,7 @@ export function MessagesPage() {
                 conversationId={conversationId}
                 currentUser={user}
                 onBack={() => navigate("/messages")}
+                onLeft={() => navigate("/messages", { replace: true })}
               />
             ) : (
               <EmptyConversation />

@@ -4,7 +4,7 @@ import type { TeamMember } from "@/api/memberships";
 
 /**
  * Contexte transmis par `LabLayout` (coquille atelier) à ses deux onglets
- * (Tableau blanc, Étapes) via `<Outlet context={…} />`. Centralise ici ce que
+ * (Mur, Étapes) via `<Outlet context={…} />`. Centralise ici ce que
  * la coquille a déjà résolu — projet, mon rôle, lecture seule — pour que
  * chaque page n'ait pas à recalculer l'accès (R-W1, R-PR4).
  */

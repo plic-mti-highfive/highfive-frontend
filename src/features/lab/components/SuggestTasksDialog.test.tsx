@@ -41,7 +41,7 @@ describe("SuggestTasksDialog", () => {
     expect(screen.getByDisplayValue("Préparer la maquette")).toBeTruthy();
     expect(screen.getByText("Dessiner les écrans clés.")).toBeTruthy();
     expect(screen.getByText(/post-it maquette/)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Créer 3 tâches" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Créer 3 étapes" })).toBeTruthy();
   });
 
   it("envoie uniquement les propositions cochées, titres corrigés", async () => {
@@ -52,7 +52,7 @@ describe("SuggestTasksDialog", () => {
     const title = screen.getByLabelText("Titre de la proposition 1");
     await user.clear(title);
     await user.type(title, "  Maquettes v1  ");
-    await user.click(screen.getByRole("button", { name: "Créer 2 tâches" }));
+    await user.click(screen.getByRole("button", { name: "Créer 2 étapes" }));
 
     expect(props.onConfirm).toHaveBeenCalledTimes(1);
     expect(props.onConfirm).toHaveBeenCalledWith([
@@ -72,7 +72,7 @@ describe("SuggestTasksDialog", () => {
     await user.clear(screen.getByLabelText("Titre de la proposition 1"));
 
     const button = screen.getByRole("button", {
-      name: "Créer 0 tâche",
+      name: "Créer 0 étape",
     }) as HTMLButtonElement;
     expect(button.disabled).toBe(true);
   });

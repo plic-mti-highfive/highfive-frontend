@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { Button, ErrorState, Input, PageHeader, Skeleton } from "@shared/ui";
+import { Button, ErrorState, Input, Skeleton } from "@shared/ui";
 import { useDocumentTitle } from "@shared/lib/useDocumentTitle";
 import {
   useColumns,
@@ -21,12 +21,17 @@ import { DeleteColumnDialog } from "../components/DeleteColumnDialog";
 const MAX_COLUMNS = 6;
 
 /**
- * Étapes (`/projets/:slug/lab/taches`, doc 04 §11) : colonnes de 1 à 6
+ * Étapes (`/projets/:slug/lab/etapes`, doc 04 §11) : colonnes de 1 à 6
  * (R-K2), suppression avec choix de destination (R-K3), glisser-déposer
  * entre colonnes + alternative clavier "Déplacer vers…" (voir TaskCard).
- * Vocabulaire du doc 03 uniquement (tâche, colonne, Fait) — pas de
+ * Vocabulaire du doc 03 uniquement (étape, colonne, Fait) — pas de
  * vocabulaire emprunté aux outils de support/suivi logiciel, ni de niveau
  * d'urgence.
+ *
+ * Mise en page : la page défile (verticalement, dans la coquille du Lab) dans
+ * un conteneur de largeur de site ; les colonnes se répartissent la largeur,
+ * se déroulent en liste sur mobile et ne défilent à l'horizontale qu'au-delà
+ * de ce que l'écran peut contenir.
  */
 export default function TasksPage() {
   const { slug, project, myRole, readOnly, members } = useLabContext();
@@ -50,9 +55,9 @@ export default function TasksPage() {
 
   if (columnsQuery.isLoading || tasksQuery.isLoading) {
     return (
-      <div className="flex h-full gap-4 overflow-hidden p-6">
+      <div className="mx-auto flex max-w-content flex-col gap-6 px-6 py-8 md:flex-row">
         {[0, 1, 2].map((i) => (
-          <Skeleton key={i} className="h-full w-70 shrink-0" />
+          <Skeleton key={i} className="h-72 rounded-2xl md:flex-1" />
         ))}
       </div>
     );
@@ -62,7 +67,7 @@ export default function TasksPage() {
     return (
       <div className="flex h-full items-center justify-center">
         <ErrorState
-          message="Impossible de charger Étapes pour le moment."
+          message="Impossible de charger les Étapes pour le moment."
           onRetry={() => {
             columnsQuery.refetch();
             tasksQuery.refetch();
@@ -94,17 +99,67 @@ export default function TasksPage() {
     setAddingColumn(false);
   }
 
-  return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <div className="shrink-0 px-6 pt-6">
-        <PageHeader
-          title="Étapes"
-          description={`${tasks.length} tâche${tasks.length > 1 ? "s" : ""} sur ${columns.length} colonne${columns.length > 1 ? "s" : ""}`}
-        />
-      </div>
+  const canAddColumn = canManageColumns && columns.length < MAX_COLUMNS;
 
-      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden px-6 py-4">
-        <div className="flex h-full items-start gap-4">
+  function cancelNewColumn() {
+    setAddingColumn(false);
+    setNewColumnLabel("");
+  }
+
+  return (
+    <div className="h-full overflow-y-auto">
+      <div className="mx-auto flex max-w-content flex-col gap-8 px-6 py-8">
+        <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+          <div className="flex flex-col gap-1.5">
+            <h1 className="font-display text-heading-lg font-semibold text-foreground">
+              Étapes
+            </h1>
+            <p className="text-body-md text-muted-foreground">
+              {tasks.length === 0
+                ? "Pas encore d'étape."
+                : `${tasks.length} étape${tasks.length > 1 ? "s" : ""} sur ${columns.length} colonne${columns.length > 1 ? "s" : ""}`}
+            </p>
+          </div>
+
+          {canAddColumn &&
+            (addingColumn ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  autoFocus
+                  value={newColumnLabel}
+                  maxLength={24}
+                  onChange={(e) => setNewColumnLabel(e.target.value)}
+                  placeholder="Nom de la colonne…"
+                  aria-label="Nom de la nouvelle colonne"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") submitNewColumn();
+                    if (e.key === "Escape") cancelNewColumn();
+                  }}
+                />
+                <Button
+                  size="sm"
+                  onClick={submitNewColumn}
+                  disabled={!newColumnLabel.trim()}
+                >
+                  Ajouter
+                </Button>
+                <Button size="sm" variant="ghost" onClick={cancelNewColumn}>
+                  Annuler
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAddingColumn(true)}
+              >
+                <Plus size={14} />
+                Nouvelle colonne
+              </Button>
+            ))}
+        </header>
+
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:overflow-x-auto md:pb-4">
           {columns.map((column) => (
             <TaskColumn
               key={column.id}
@@ -125,56 +180,6 @@ export default function TasksPage() {
               onRequestDeleteColumn={() => setDeletingColumnId(column.id)}
             />
           ))}
-
-          {canManageColumns && columns.length < MAX_COLUMNS && (
-            <div className="w-70 shrink-0">
-              {addingColumn ? (
-                <div className="flex flex-col gap-2 rounded-xl border-2 border-dashed border-border p-3">
-                  <Input
-                    autoFocus
-                    value={newColumnLabel}
-                    onChange={(e) => setNewColumnLabel(e.target.value)}
-                    placeholder="Nom de la colonne…"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") submitNewColumn();
-                      if (e.key === "Escape") {
-                        setAddingColumn(false);
-                        setNewColumnLabel("");
-                      }
-                    }}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={submitNewColumn}
-                      disabled={!newColumnLabel.trim()}
-                    >
-                      Ajouter
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setAddingColumn(false);
-                        setNewColumnLabel("");
-                      }}
-                    >
-                      Annuler
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setAddingColumn(true)}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-4 text-body-sm text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <Plus size={14} />
-                  Nouvelle colonne
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </div>
 

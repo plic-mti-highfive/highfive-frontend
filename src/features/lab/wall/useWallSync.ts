@@ -48,7 +48,7 @@ interface Live {
 
 function messageOf(error: unknown): string {
   if (error instanceof ApiError) return error.message;
-  return "Impossible d'ouvrir le tableau blanc partagé. Réessaie dans un instant.";
+  return "Impossible d'ouvrir le Mur partagé. Réessaie dans un instant.";
 }
 
 /**
@@ -121,7 +121,7 @@ export function useWallSync(slug: string, enabled = true): WallSync {
         if (destroyed) return;
         update({
           error:
-            "Accès au tableau blanc refusé ou session expirée. Réessaie pour rouvrir une session.",
+            "Accès au Mur refusé ou session expirée. Réessaie pour rouvrir une session.",
           connection: "offline",
         });
       },
