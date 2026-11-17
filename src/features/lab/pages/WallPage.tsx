@@ -324,13 +324,5 @@ function SyncBanner({ sync }: { sync: WallSync }) {
       </div>
     );
   }
-  return (
-    <p
-      role="status"
-      className="shrink-0 border-b border-success-border/30 bg-success-bg px-4 py-2 text-body-sm text-success-fg"
-    >
-      Tableau blanc partagé : les modifications sont synchronisées en temps
-      réel.
-    </p>
-  );
+  return null;
 }
