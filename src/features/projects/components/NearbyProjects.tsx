@@ -23,9 +23,11 @@ export function NearbyProjects({ project }: { project: Project }) {
       title="Dans le même esprit"
       className="border-t border-border pt-10"
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
         {nearby.map((item) => (
-          <ProjectCard key={item.id} project={item} />
+          <div key={item.id} className="mb-4 break-inside-avoid">
+            <ProjectCard project={item} />
+          </div>
         ))}
       </div>
     </Section>

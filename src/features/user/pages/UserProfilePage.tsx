@@ -169,9 +169,11 @@ export default function UserProfilePage() {
                     }
                   />
                 ) : (
-                  <div className="grid gap-4 pt-4 grid-cols-2">
+                  <div className="columns-2 gap-4 pt-4">
                     {created.map((project) => (
-                      <ProjectCard key={project.id} project={project} />
+                      <div key={project.id} className="mb-4 break-inside-avoid">
+                        <ProjectCard project={project} />
+                      </div>
                     ))}
                   </div>
                 )}
@@ -196,9 +198,11 @@ export default function UserProfilePage() {
                     }
                   />
                 ) : (
-                  <div className="grid gap-4 pt-4 grid-cols-2">
+                  <div className="columns-2 gap-4 pt-4">
                     {joined.map((project) => (
-                      <ProjectCard key={project.id} project={project} />
+                      <div key={project.id} className="mb-4 break-inside-avoid">
+                        <ProjectCard project={project} />
+                      </div>
                     ))}
                   </div>
                 )}
