@@ -307,13 +307,11 @@ export function SearchPage() {
         <>
           {activeType === "projets" &&
             (projectItems.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
                 {projectItems.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    variant="card"
-                  />
+                  <div key={project.id} className="mb-4 break-inside-avoid">
+                    <ProjectCard project={project} variant="card" />
+                  </div>
                 ))}
               </div>
             ) : (
