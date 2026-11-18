@@ -53,9 +53,11 @@ export function DiscoverSectionBlock({
       }
     >
       {variant === "card" && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="columns-1 gap-4 sm:columns-2">
           {section.items.map((project) => (
-            <ProjectCard key={project.id} project={project} variant="card" />
+            <div key={project.id} className="mb-4 break-inside-avoid">
+              <ProjectCard project={project} variant="card" />
+            </div>
           ))}
         </div>
       )}
